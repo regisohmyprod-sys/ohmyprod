@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OH MY PROD – Gestion Tournées</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
+  :root{--black:#0a0a0a;--dark:#111111;--card:#1a1a1a;--border:#2a2a2a;--red:#e31e24;--red-dark:#b01518;--white:#ffffff;--grey:#888888;--grey-light:#cccccc;--green:#22c55e;--yellow:#f59e0b;--blue:#3b82f6}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:var(--black);color:var(--white);min-height:100vh;font-size:14px}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+  .logo-area{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;background:#000}
+  .logo-txt{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)}
+  .logo-txt span{color:var(--red)}
+  .nav-section{padding:12px 8px;flex:1;overflow-y:auto}
+  .nav-label{font-size:10px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--grey-light);font-size:13px;font-weight:500;transition:all .15s;text-decoration:none}
+  .nav-item:hover{background:var(--border);color:var(--white)}
+  .nav-item.active{background:var(--red);color:var(--white)}
+  .nav-item .icon{font-size:16px;width:20px;text-align:center}
+  .tournee-item{margin:2px 0;padding:6px 10px 6px 30px;border-radius:6px;cursor:pointer;color:var(--grey);font-size:12px;transition:all .15s}
+  .tournee-item:hover{color:var(--white);background:var(--border)}
+  .tournee-item.active{color:var(--red)}
+  .main{margin-left:220px;min-height:100vh}
+  .topbar{background:var(--dark);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+  .breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--grey)}
+  .breadcrumb span{color:var(--white);font-weight:600}
+  .topbar-actions{display:flex;gap:8px}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+  .btn-primary{background:var(--red);color:white}
+  .btn-primary:hover{background:var(--red-dark)}
+  .btn-ghost{background:var(--border);color:var(--grey-light)}
+  .btn-ghost:hover{background:#333;color:white}
+  .content{padding:24px}
+  .page{display:none}
+  .page.active{display:block}
+  .page-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:20px}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .stat-label{font-size:11px;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .stat-value{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--white);line-height:1}
+  .stat-sub{font-size:11px;color:var(--grey);margin-top:4px}
+  .tournees-grid{display:grid;gap:12px}
+  .tournee-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:16px}
+  .tournee-card:hover{border-color:var(--red);transform:translateX(2px)}
+  .tournee-poster{width:80px;height:55px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-family:'Bebas Neue',sans-serif;color:var(--red);letter-spacing:1px;text-align:center;flex-shrink:0;overflow:hidden;border:1px solid #333}
+  .tournee-info{flex:1}
+  .tournee-name{font-weight:700;font-size:16px;margin-bottom:2px}
+  .tournee-meta{font-size:12px;color:var(--grey)}
+  .dates-count{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red);line-height:1}
+  .dates-label{font-size:11px;color:var(--grey)}
+  .dates-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .month-group{margin-bottom:20px}
+  .month-label{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--grey);letter-spacing:2px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+  .date-row{display:flex;align-items:center;gap:16px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+  .date-row:hover{border-color:var(--red)}
+  .date-day{text-align:center;min-width:44px}
+  .date-num{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;color:var(--red)}
+  .date-dow{font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.5px}
+  .date-info{flex:1}
+  .date-city{font-weight:700;font-size:16px}
+  .date-venue{font-size:12px;color:var(--grey);margin-top:2px}
+  .checklist-bar{display:flex;align-items:center;gap:8px;min-width:120px}
+  .bar-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:2px;background:var(--yellow)}
+  .bar-fill.high{background:var(--green)}
+  .bar-text{font-size:11px;color:var(--grey);white-space:nowrap}
+  .badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .badge-green{background:rgba(34,197,94,.15);color:#22c55e}
+  .badge-orange{background:rgba(249,115,22,.15);color:#f97316}
+  .badge-red{background:rgba(239,68,68,.15);color:#ef4444}
+  .badge-purple{background:rgba(168,85,247,.15);color:#a855f7}
+  .badge-grey{background:var(--border);color:var(--grey)}
+  .date-detail-header{text-align:center;padding:24px 0;position:relative}
+  .date-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px}
+  .date-nav.left{left:0}
+  .date-nav.right{right:0}
+  .nav-arrow{width:32px;height:32px;border-radius:50%;background:var(--border);border:none;color:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
+  .nav-arrow:hover{background:var(--red)}
+  .city-title{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:4px;line-height:1}
+  .city-date{font-size:18px;color:var(--grey-light);margin-top:6px;font-weight:700}
+  .city-meta{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px}
+  .venue-name{font-size:13px;color:var(--grey-light);text-transform:uppercase;letter-spacing:.5px}
+  .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{padding:10px 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--grey);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px}
+  .tab:hover{color:var(--white)}
+  .tab.active{color:var(--red);border-bottom-color:var(--red)}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .planning-keys{background:var(--card);border:1px solid var(--red);border-radius:12px;overflow:hidden;margin-bottom:20px}
+  .planning-keys-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;padding:10px 16px;color:#fff}
+  .planning-keys-subtitle{padding:8px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--grey-light);background:var(--dark);border-bottom:1px solid var(--border)}
+  .planning-keys-grid5{display:grid;grid-template-columns:repeat(5,1fr)}
+  .planning-keys-grid4{display:grid;grid-template-columns:repeat(4,1fr)}
+  .planning-keys-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+  .planning-key-item{padding:14px 16px;border-right:1px solid var(--border);text-align:center}
+  .planning-key-item:last-child{border-right:none}
+  .planning-key-label{font-size:11px;color:var(--grey);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .planning-key-value{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);line-height:1}
+  .planning-key-sub{font-size:10px;color:var(--grey);margin-top:3px}
+  .planning-team-block{margin-bottom:24px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .planning-team-title-bar{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-bottom:2px solid var(--red);padding-right:12px}
+  .planning-team-actions{display:flex;gap:6px;flex-shrink:0}
+  .planning-team-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:12px 16px;color:var(--white)}
+  .planning-day-label{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;padding:10px 16px 4px;background:var(--dark);border-bottom:1px solid var(--border)}
+  .planning-team-block .planning-event{padding:10px 16px;border-bottom:1px solid var(--border)}
+  .planning-team-block .planning-event:last-child{border-bottom:none}
+  .planning-event{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+  .event-time{min-width:90px;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--grey);letter-spacing:1px}
+  .event-body{flex:1}
+  .event-name{font-weight:600;margin-bottom:4px}
+  .event-participants{display:flex;gap:4px;flex-wrap:wrap}
+  .avatar{width:24px;height:24px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:2px solid var(--dark)}
+  .team-table{width:100%;border-collapse:collapse}
+  .team-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+  .team-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
+  .team-table tr:last-child td{border-bottom:none}
+  .member-avatar{width:30px;height:30px;border-radius:50%;background:var(--red);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-right:8px}
+  .hotel-card{background:var(--dark);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+  .hotel-name{font-weight:700;font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .hotel-infos{background:var(--black);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+  .hotel-info-row{display:flex;align-items:baseline;gap:10px;font-size:13px}
+  .hotel-info-label{min-width:150px;color:var(--grey);font-size:12px;font-weight:600;flex-shrink:0}
+  .hotel-info-value{color:var(--grey-light)}
+  .hotel-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .hotel-row:last-child{border-bottom:none}
+  .room-type{font-size:11px;color:var(--grey);background:var(--border);padding:2px 8px;border-radius:10px}
+  .room-block{background:var(--black);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+  .room-block-header{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:var(--border)}
+  .room-block .hotel-row{padding:8px 12px;border-bottom:1px solid var(--border)}
+  .room-block .hotel-row:last-child{border-bottom:none}
+  .inv-table{width:100%;border-collapse:collapse}
+  .inv-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+  .inv-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
+  .inv-table tr:last-child td{border-bottom:none}
+  .inv-total{display:flex;justify-content:flex-end;padding:10px 12px;font-weight:700;border-top:2px solid var(--border);font-size:13px;gap:40px}
+  .doc-category{margin-bottom:16px}
+  .doc-category-title{font-size:12px;color:var(--grey);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .doc-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--dark);border:1px solid var(--border);border-radius:8px;margin-bottom:4px}
+  .doc-name{display:flex;align-items:center;gap:10px;font-size:13px}
+  .doc-icon{color:var(--red);font-size:18px}
+  .doc-actions{display:flex;gap:10px}
+  .doc-btn{background:none;border:none;color:var(--grey);cursor:pointer;font-size:16px}
+  .doc-btn:hover{color:var(--white)}
+  .alert-warning{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--yellow);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:13px}
+  .info-message{background:var(--dark);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;margin-top:8px}
+  .info-message-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .info-from{font-size:13px;display:flex;align-items:center;gap:6px}
+  .info-arrow{color:var(--grey)}
+  .info-to{color:var(--red);font-weight:600;font-size:12px}
+  .info-date-msg{font-size:11px;color:var(--grey)}
+  .info-message-body{font-size:13px;color:var(--grey-light);line-height:1.5}
+  .info-new-msg{border-top:1px solid var(--border);padding:14px 0 0}
+  .info-new-msg-row{display:flex;gap:10px;margin-bottom:10px}
+  .info-field{flex:1;display:flex;flex-direction:column;gap:4px}
+  .info-field label{font-size:11px;color:var(--grey);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .info-field input,.info-field select{background:var(--black);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;outline:none}
+  .info-field input:focus,.info-field select:focus{border-color:var(--red)}
+  .info-new-msg textarea{width:100%;background:var(--black);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;resize:vertical;min-height:80px;outline:none}
+  .info-new-msg textarea:focus{border-color:var(--red)}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--grey);cursor:pointer;font-size:13px;padding:6px 0;border:none;background:none;transition:color .15s}
+  .back-btn:hover{color:var(--white)}
+  .tournee-dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+  .tournee-stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+  .tournee-stat-label{font-size:11px;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+  .tournee-stat-value{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);line-height:1}
+  .tournee-stat-sub{font-size:11px;color:var(--grey)}
+  .dates-scroll{max-height:calc(100vh - 280px);overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+  .dates-scroll::-webkit-scrollbar{width:5px}
+  .dates-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+  @media(max-width:768px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="logo-area">
+    <div class="logo-txt">OH MY<br><span>PROD !</span></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Navigation</div>
+    <a class="nav-item active" onclick="showPage('dashboard')"><span class="icon">🏠</span> Tableau de bord</a>
+    <a class="nav-item" onclick="showPage('tournees')"><span class="icon">🎵</span> Tournées</a>
+    <div class="nav-label" style="margin-top:12px;">Tournées actives</div>
+    <div class="tournee-item active" onclick="showTournee('twoq')">🎸 TWOQ – L'hommage</div>
+    <div class="tournee-item" onclick="showTournee('twoq2')">👑 TWOQ – Éternelle Légende</div>
+    <div class="tournee-item" onclick="showTournee('greg')">🎤 Greg Petras</div>
+    <div class="nav-label" style="margin-top:12px;">Compte</div>
+    <a class="nav-item" onclick="showPage('equipe')"><span class="icon">👥</span> Membres</a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div class="breadcrumb" id="breadcrumb"><span>OH MY PROD</span></div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="showPage('tournees')">+ Tournée</button>
+      <button class="btn btn-primary">📨 Notifier l'équipe</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-title">TABLEAU DE BORD</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Tournées actives</div><div class="stat-value">3</div><div class="stat-sub">TWOQ + Greg Petras</div></div>
+        <div class="stat-card"><div class="stat-label">Prochaines dates</div><div class="stat-value" style="color:var(--red)">90</div><div class="stat-sub">jusqu'en 2028</div></div>
+        <div class="stat-card"><div class="stat-label">Membres équipe</div><div class="stat-value">25</div><div class="stat-sub">artistes + technique + prod</div></div>
+        <div class="stat-card"><div class="stat-label">Prochaine date</div><div class="stat-value" style="font-size:22px;margin-top:4px">4 AVR</div><div class="stat-sub">AVIGNON</div></div>
+      </div>
+      <div class="page-title" style="font-size:22px;margin-bottom:12px">PROCHAINES DATES</div>
+      <div style="display:grid;gap:6px">
+        <div class="date-row" onclick="showDateDetail('avignon')"><div class="date-day"><div class="date-num">4</div><div class="date-dow">Sam</div></div><div class="date-info"><div class="date-city">AVIGNON</div><div class="date-venue">TWOQ TOUR</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill high" style="width:50%"></div></div><div class="bar-text">9/18</div></div><div class="badge badge-green">Confirmée</div></div>
+        <div class="date-row"><div class="date-day"><div class="date-num">24</div><div class="date-dow">Ven</div></div><div class="date-info"><div class="date-city">NIORT</div><div class="date-venue">TWOQ TOUR</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:28%"></div></div><div class="bar-text">5/18</div></div><div class="badge badge-green">Confirmée</div></div>
+        <div class="date-row"><div class="date-day"><div class="date-num">25</div><div class="date-dow">Sam</div></div><div class="date-info"><div class="date-city">DÉOLS-CHÂTEAUROUX</div><div class="date-venue">TWOQ TOUR</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:11%"></div></div><div class="bar-text">2/18</div></div><div class="badge badge-green">Confirmée</div></div>
+        <div class="date-row"><div class="date-day"><div class="date-num">23</div><div class="date-dow">Sam</div></div><div class="date-info"><div class="date-city">DÔME DE MARSEILLE</div><div class="date-venue">GREG PETRAS</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><div class="bar-text">–</div></div><div class="badge badge-orange">Option</div></div>
+        <div class="date-row" onclick="showDateDetail('aix')"><div class="date-day"><div class="date-num">28</div><div class="date-dow">Jeu</div></div><div class="date-info"><div class="date-city">AIX-EN-PROVENCE</div><div class="date-venue">TWOQ TOUR</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div><div class="bar-text">4/18</div></div><div class="badge badge-green">Confirmée</div></div>
+      </div>
+    </div>
+
+    <!-- TOURNEES -->
+    <div id="page-tournees" class="page">
+      <div class="page-title">TOURNÉES</div>
+      <div class="tournees-grid">
+        <div class="tournee-card" onclick="showTournee('twoq')">
+          <div class="tournee-poster">THE WORLD<br>OF QUEEN</div>
+          <div class="tournee-info"><div class="tournee-name">THE WORLD OF QUEEN</div><div style="font-size:13px;color:var(--grey-light);margin-bottom:3px">L'hommage à la légende</div><div class="tournee-meta">fév. 2023 → mai 2026</div></div>
+          <div><div class="dates-count">86</div><div class="dates-label">dates</div></div>
+        </div>
+        <div class="tournee-card" onclick="showTournee('twoq2')">
+          <div class="tournee-poster">THE WORLD<br>OF QUEEN</div>
+          <div class="tournee-info"><div class="tournee-name">THE WORLD OF QUEEN</div><div style="font-size:13px;color:var(--grey-light);margin-bottom:3px">L'Éternelle Légende – New Show</div><div class="tournee-meta">sept. 2026 → déc. 2028</div></div>
+          <div><div class="dates-count">82</div><div class="dates-label">dates</div></div>
+        </div>
+        <div class="tournee-card" onclick="showTournee('greg')">
+          <div class="tournee-poster" style="font-size:11px">GREG<br>PETRAS</div>
+          <div class="tournee-info"><div class="tournee-name">GREG PETRAS</div><div style="font-size:13px;color:var(--grey-light);margin-bottom:3px">Dôme de Marseille</div><div class="tournee-meta">mai 2026</div></div>
+          <div><div class="dates-count">1</div><div class="dates-label">date</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOURNEE TWOQ -->
+    <div id="page-tournee-twoq" class="page">
+      <button class="back-btn" onclick="showPage('tournees')">← Tournées</button>
+      <div class="page-title" style="margin-top:8px">THE WORLD OF QUEEN</div>
+      <div style="color:var(--grey-light);margin-bottom:16px;font-size:15px;font-weight:600">L'hommage à la légende</div>
+      <div class="tournee-dashboard">
+        <div class="tournee-stat-card"><div class="tournee-stat-label">Dates effectuées</div><div class="tournee-stat-value">62</div></div>
+        <div class="tournee-stat-card"><div class="tournee-stat-label">Dates restantes</div><div class="tournee-stat-value" style="color:var(--red)">24</div></div>
+        <div class="tournee-stat-card"><div class="tournee-stat-label">Prochaine date</div><div class="tournee-stat-value">4 AVR</div><div class="tournee-stat-sub">Avignon</div></div>
+        <div class="tournee-stat-card"><div class="tournee-stat-label">Début tournée</div><div class="tournee-stat-value">FÉV 2023</div></div>
+        <div class="tournee-stat-card"><div class="tournee-stat-label">Fin tournée</div><div class="tournee-stat-value">MAI 2026</div></div>
+        <div class="tournee-stat-card"><div class="tournee-stat-label">Spectateurs à ce jour</div><div class="tournee-stat-value" style="color:var(--green)">148 200</div></div>
+        <div class="tournee-stat-card"><div class="tournee-stat-label">Spectateurs en prévision</div><div class="tournee-stat-value" style="color:var(--yellow)">198 000</div></div>
+      </div>
+      <div class="dates-header">
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" style="background:var(--red)">À venir</button>
+          <button class="btn btn-ghost">Tout</button>
+          <button class="btn btn-ghost">Passées</button>
+        </div>
+        <button class="btn btn-primary">+ Ajouter une date</button>
+      </div>
+      <div class="dates-scroll">
+        <div class="month-group">
+          <div class="month-label">AVRIL 2026</div>
+          <div class="date-row" onclick="showDateDetail('avignon')"><div class="date-day"><div class="date-num">4</div><div class="date-dow">Sam</div></div><div class="date-info"><div class="date-city">AVIGNON</div><div class="date-venue">Confluence Spectacles</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill high" style="width:50%"></div></div><div class="bar-text">9/18</div></div><div class="badge badge-green">Confirmée</div></div>
+          <div class="date-row"><div class="date-day"><div class="date-num">24</div><div class="date-dow">Ven</div></div><div class="date-info"><div class="date-city">NIORT</div><div class="date-venue">–</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:28%"></div></div><div class="bar-text">5/18</div></div><div class="badge badge-green">Confirmée</div></div>
+          <div class="date-row"><div class="date-day"><div class="date-num">25</div><div class="date-dow">Sam</div></div><div class="date-info"><div class="date-city">DÉOLS-CHÂTEAUROUX</div><div class="date-venue">–</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:11%"></div></div><div class="bar-text">2/18</div></div><div class="badge badge-green">Confirmée</div></div>
+        </div>
+        <div class="month-group">
+          <div class="month-label">MAI 2026</div>
+          <div class="date-row" onclick="showDateDetail('aix')"><div class="date-day"><div class="date-num">28</div><div class="date-dow">Jeu</div></div><div class="date-info"><div class="date-city">AIX-EN-PROVENCE</div><div class="date-venue">–</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div><div class="bar-text">4/18</div></div><div class="badge badge-green">Confirmée</div></div>
+        </div>
+        <div class="month-group">
+          <div class="month-label">NOVEMBRE 2026</div>
+          <div class="date-row"><div class="date-day"><div class="date-num">28</div><div class="date-dow">Sam</div></div><div class="date-info"><div class="date-city">DÔME DE PARIS</div><div class="date-venue">Palais des Sports</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:5%"></div></div><div class="bar-text">1/18</div></div><div class="badge badge-orange">Option</div></div>
+        </div>
+        <div class="month-group">
+          <div class="month-label">DÉCEMBRE 2026</div>
+          <div class="date-row"><div class="date-day"><div class="date-num">12</div><div class="date-dow">Sam</div></div><div class="date-info"><div class="date-city">BORDEAUX</div><div class="date-venue">Arkéa Arena</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><div class="bar-text">0/18</div></div><div class="badge badge-red">Annulée</div></div>
+          <div class="date-row"><div class="date-day"><div class="date-num">19</div><div class="date-dow">Sam</div></div><div class="date-info"><div class="date-city">LYON</div><div class="date-venue">Halle Tony Garnier</div></div><div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><div class="bar-text">0/18</div></div><div class="badge badge-purple">Reportée</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATE AVIGNON -->
+    <div id="page-date-avignon" class="page">
+      <button class="back-btn" onclick="showTournee('twoq')">← THE WORLD OF QUEEN</button>
+      <div class="date-detail-header">
+        <div class="date-nav left"><button class="nav-arrow">◀</button></div>
+        <div class="city-title">AVIGNON</div>
+        <div class="city-date">samedi 4 avril 2026 &nbsp;·&nbsp; <span style="color:var(--white);font-weight:600">21h00</span></div>
+        <div class="city-meta">
+          <span class="venue-name" style="color:#22c55e">● Confirmée</span>
+          <span class="venue-name">📍 Confluence Spectacles</span>
+        </div>
+        <div class="date-nav right"><button class="nav-arrow" onclick="showDateDetail('aix')">▶</button></div>
+      </div>
+
+      <!-- INFOS CLÉS -->
+      <div class="planning-keys" style="margin-bottom:16px">
+        <div class="planning-keys-title" style="background:var(--red);color:#fff">⏱️ INFOS CLÉS DU JOUR</div>
+        <div class="planning-keys-subtitle">🎭 REMPLISSAGE</div>
+        <div class="planning-keys-grid5">
+          <div class="planning-key-item"><div class="planning-key-label">Jauge choisie</div><div class="planning-key-value">1 500</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">Jauge max</div><div class="planning-key-value">2 500</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">Pointage ventes</div><div class="planning-key-value" style="color:var(--green)">1 400</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">Jauge occupée</div><div class="planning-key-value" style="color:var(--green)">1 470</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">% Remplissage</div><div class="planning-key-value" style="color:var(--yellow)">98%</div><div class="planning-key-sub">1470/1500</div></div>
+        </div>
+        <div style="border-top:1px solid var(--red)"></div>
+        <div class="planning-keys-subtitle">🕐 HORAIRES IMPORTANTES</div>
+        <div class="planning-keys-grid4">
+          <div class="planning-key-item"><div class="planning-key-label">🔧 Montage start</div><div class="planning-key-value">07h00</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🍽️ Déjeuner</div><div class="planning-key-value">13h00</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🎸 Balances</div><div class="planning-key-value">15h30</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🍷 Dîner</div><div class="planning-key-value">18h30</div></div>
+        </div>
+        <div class="planning-keys-grid4" style="border-top:1px solid var(--border)">
+          <div class="planning-key-item"><div class="planning-key-label">🚪 Open doors</div><div class="planning-key-value">19h00</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🎵 Start show</div><div class="planning-key-value">20h30</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🏁 End show</div><div class="planning-key-value">22h30</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🚛 End date</div><div class="planning-key-value">01h30 <span style="font-size:11px;font-family:'Inter',sans-serif;color:var(--grey)">J+1</span></div></div>
+        </div>
+        <div style="border-top:1px solid var(--red)"></div>
+        <div class="planning-keys-subtitle">📌 INFOS IMPORTANTES</div>
+        <div id="infos-avignon" style="padding:0 12px">
+          <div class="info-message"><div class="info-message-header"><div class="info-from">✍️ <strong>Mathieu</strong> <span class="info-arrow">→</span> <span class="info-to">Equipe technique</span></div><div class="info-date-msg">01/04 · 09h10</div></div><div class="info-message-body">Chargement du camion à 06h00. Point de RDV : parking nord de la salle. Prévoir les badges d'accès.</div></div>
+          <div class="info-message"><div class="info-message-header"><div class="info-from">✍️ <strong>Régis</strong> <span class="info-arrow">→</span> <span class="info-to">Toute l'équipe</span></div><div class="info-date-msg">31/03 · 14h22</div></div><div class="info-message-body">RDV au Mercure Avignon Gare TGV pour 18h. Check-in groupé. Dîner à 20h au restaurant de l'hôtel.</div></div>
+          <div class="info-new-msg">
+            <div class="info-new-msg-row">
+              <div class="info-field"><label>De</label><input type="text" value="Régis" /></div>
+              <div class="info-field"><label>Pour</label><select><option>Toute l'équipe</option><option>Equipe technique</option><option>Artistes</option><option>Production</option></select></div>
+            </div>
+            <textarea placeholder="Votre message..."></textarea>
+            <button class="btn btn-primary" style="margin-top:8px;margin-bottom:16px;width:100%;background:rgba(227,30,36,.15);border:1px solid var(--red);color:var(--red)" onclick="addInfoMessage()">📨 Publier</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <div class="tab active" onclick="showTab(this,'equipe-date')">👥 Équipe</div>
+        <div class="tab" onclick="showTab(this,'planning')">📅 Planning</div>
+        <div class="tab" onclick="showTab(this,'hebergement')">🏨 Hébergement</div>
+        <div class="tab" onclick="showTab(this,'contacts')">📞 Contacts</div>
+        <div class="tab" onclick="showTab(this,'invitations')">🎟 Invitations</div>
+        <div class="tab" onclick="showTab(this,'documents')">📄 Documents</div>
+      </div>
+
+      <!-- ÉQUIPE -->
+      <div id="tab-equipe-date" class="tab-content active">
+        <button class="btn btn-primary" style="margin-bottom:16px">Modifier l'équipe</button>
+        <table class="team-table">
+          <thead><tr><th>Membre</th><th>Fonction</th><th>Membre depuis</th><th>Groupe de départ</th></tr></thead>
+          <tbody>
+            <tr><td><span class="member-avatar">AH</span>Adrien Husson</td><td>Guitariste</td><td style="color:var(--grey);font-size:12px">fév. 2023</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">PARIS</td></tr>
+            <tr><td><span class="member-avatar">AC</span>Alexandre Caramia</td><td>Batteur / Lead 2</td><td style="color:var(--grey);font-size:12px">fév. 2023</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">PARIS</td></tr>
+            <tr><td><span class="member-avatar">AM</span>Alexandrine Marfaing Hugueny</td><td>Productrice</td><td style="color:var(--grey);font-size:12px">fév. 2023</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">JOSSE</td></tr>
+            <tr><td><span class="member-avatar">AE</span>Alexis Eymerie</td><td>Régie Vidéo · Tech</td><td style="color:var(--grey);font-size:12px">sept. 2024</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">TOULOUSE</td></tr>
+            <tr><td><span class="member-avatar">AB</span>Arthur Bergogne</td><td>Régie plateau · Tech</td><td style="color:var(--grey);font-size:12px">janv. 2025</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">TOULOUSE</td></tr>
+            <tr><td><span class="member-avatar" style="background:var(--blue)">BD</span>Base de Lannoy</td><td>Bassiste</td><td style="color:var(--grey);font-size:12px">fév. 2023</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">PARIS</td></tr>
+            <tr><td><span class="member-avatar" style="background:var(--blue)">CL</span>Claire Lairy</td><td>Chanteuse Lyrique</td><td style="color:var(--grey);font-size:12px">oct. 2023</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">MONTPELLIER</td></tr>
+            <tr><td><span class="member-avatar" style="background:var(--red)">FC</span>Fred Caramia</td><td>Chanteur Principal</td><td style="color:var(--grey);font-size:12px">fév. 2023</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">PARIS</td></tr>
+            <tr><td><span class="member-avatar">ML</span>Mathieu Le Nestour</td><td>Directeur technique</td><td style="color:var(--grey);font-size:12px">fév. 2023</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">PARIS</td></tr>
+            <tr><td><span class="member-avatar">SP</span>Sarah Prost</td><td>Chanteuse</td><td style="color:var(--grey);font-size:12px">mars 2024</td><td style="color:var(--grey-light);font-size:12px;font-weight:600">MONTPELLIER</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PLANNING -->
+      <div id="tab-planning" class="tab-content">
+        <button class="btn btn-primary" style="margin-bottom:20px">+ Ajouter un événement</button>
+        <div class="planning-team-block">
+          <div class="planning-team-title-bar">
+            <div class="planning-team-title">🎤 PLANNING TEAM ARTISTIQUE</div>
+            <div class="planning-team-actions">
+              <button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" onclick="printPlanning('artistique')">🖨️ PDF</button>
+              <button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" onclick="mailPlanning('artistique')">✉️ Mail</button>
+            </div>
+          </div>
+          <div class="planning-day-label">LA VEILLE</div>
+          <div class="planning-event"><div class="event-time">08:00</div><div class="event-body"><div class="event-name">🚂 Trajet Paris → Avignon (TGV)</div><div class="event-participants"><div class="avatar" style="background:var(--red)">FC</div><div class="avatar">AH</div><div class="avatar">AC</div><div class="avatar" style="background:var(--blue)">BD</div><div class="avatar" style="background:var(--blue)">CL</div><div class="avatar">SP</div></div></div></div>
+          <div class="planning-event"><div class="event-time">12:30</div><div class="event-body"><div class="event-name">🏨 Arrivée hôtel – Check-in</div></div></div>
+          <div class="planning-day-label">JOUR J</div>
+          <div class="planning-event"><div class="event-time">08:00</div><div class="event-body"><div class="event-name">☕ Petit-déjeuner hôtel</div></div></div>
+          <div class="planning-event"><div class="event-time">15:30 → 17:00</div><div class="event-body"><div class="event-name">🎸 Balance / Filage</div></div></div>
+          <div class="planning-event"><div class="event-time">18:30</div><div class="event-body"><div class="event-name">🍽️ Dîner équipe artistique</div></div></div>
+          <div class="planning-event"><div class="event-time">19:30</div><div class="event-body"><div class="event-name">🎭 Habillage / Maquillage</div></div></div>
+          <div class="planning-event"><div class="event-time">20:30</div><div class="event-body"><div class="event-name">🎵 DÉBUT DU SPECTACLE</div></div></div>
+        </div>
+        <div class="planning-team-block">
+          <div class="planning-team-title-bar">
+            <div class="planning-team-title">📋 PLANNING TEAM PRODUCTION</div>
+            <div class="planning-team-actions">
+              <button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" onclick="printPlanning('production')">🖨️ PDF</button>
+              <button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" onclick="mailPlanning('production')">✉️ Mail</button>
+            </div>
+          </div>
+          <div class="planning-day-label">LA VEILLE</div>
+          <div class="planning-event"><div class="event-time">09:00</div><div class="event-body"><div class="event-name">🚗 Départ JOSSE → Avignon</div><div class="event-participants"><div class="avatar">AM</div><div class="avatar">RP</div></div></div></div>
+          <div class="planning-day-label">JOUR J</div>
+          <div class="planning-event"><div class="event-time">09:00</div><div class="event-body"><div class="event-name">📋 Accueil équipe technique à la salle</div></div></div>
+          <div class="planning-event"><div class="event-time">10:00</div><div class="event-body"><div class="event-name">🎟 Vérification billetterie / invitations</div></div></div>
+          <div class="planning-event"><div class="event-time">19:00</div><div class="event-body"><div class="event-name">🚪 Accueil du public</div></div></div>
+          <div class="planning-event"><div class="event-time">20:30</div><div class="event-body"><div class="event-name">🎵 DÉBUT DU SPECTACLE</div></div></div>
+        </div>
+        <div class="planning-team-block">
+          <div class="planning-team-title-bar">
+            <div class="planning-team-title">🔧 PLANNING TEAM TECHNIQUE</div>
+            <div class="planning-team-actions">
+              <button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" onclick="printPlanning('technique')">🖨️ PDF</button>
+              <button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" onclick="mailPlanning('technique')">✉️ Mail</button>
+            </div>
+          </div>
+          <div class="planning-day-label">LA VEILLE</div>
+          <div class="planning-event"><div class="event-time">00:01 → 06:00</div><div class="event-body"><div class="event-name">🚌 Départ camion – Toulouse</div><div class="event-participants"><div class="avatar">AB</div><div class="avatar">AE</div></div></div></div>
+          <div class="planning-event"><div class="event-time">08:00</div><div class="event-body"><div class="event-name">🅿️ Arrivée salle – Déchargement</div></div></div>
+          <div class="planning-day-label">JOUR J</div>
+          <div class="planning-event"><div class="event-time">07:00 → 13:00</div><div class="event-body"><div class="event-name">🔧 Montage plateau / Son / Lumières / Vidéo</div></div></div>
+          <div class="planning-event"><div class="event-time">15:30 → 17:00</div><div class="event-body"><div class="event-name">🎸 Balance / Filage avec artistes</div></div></div>
+          <div class="planning-event"><div class="event-time">17:00 → 19:00</div><div class="event-body"><div class="event-name">⚙️ Réglages finaux</div></div></div>
+          <div class="planning-event"><div class="event-time">20:30</div><div class="event-body"><div class="event-name">🎵 DÉBUT DU SPECTACLE</div></div></div>
+        </div>
+      </div>
+
+      <!-- HÉBERGEMENT -->
+      <div id="tab-hebergement" class="tab-content">
+        <div class="alert-warning">⚠️ 15 membres de l'équipe sans hébergement</div>
+        <button class="btn btn-primary" style="margin-right:8px;margin-bottom:16px">+ Ajouter un hôtel</button>
+        <button class="btn btn-ghost" style="margin-bottom:16px">+ Ajouter un tourbus</button>
+        <div class="hotel-card">
+          <div class="hotel-name">🏨 Mercure Avignon Gare TGV <span style="font-size:12px;font-weight:500;color:var(--grey-light);background:var(--border);padding:3px 10px;border-radius:20px;margin-left:8px">Team Artistique</span></div>
+          <div class="hotel-infos">
+            <div class="hotel-info-row"><span class="hotel-info-label">📍 Adresse</span><span class="hotel-info-value">Rue Édouard Daladier, 84000 Avignon</span></div>
+            <div class="hotel-info-row"><span class="hotel-info-label">🚉 Gare → Hôtel</span><span class="hotel-info-value">350 m · 5 min à pied</span></div>
+            <div class="hotel-info-row"><span class="hotel-info-label">🎭 Hôtel → Salle</span><span class="hotel-info-value">2,1 km · 8 min en voiture</span></div>
+            <div class="hotel-info-row"><span class="hotel-info-label">📝 Autre</span><span class="hotel-info-value" style="color:var(--border);font-style:italic">—</span></div>
+          </div>
+          <div class="room-block"><div class="room-block-header"><span class="room-type">Single</span><span style="font-size:11px;color:var(--grey)">Chambre 1</span></div><div class="hotel-row"><div><span class="member-avatar" style="width:24px;height:24px;font-size:9px">AH</span>Adrien Husson</div><div style="color:var(--grey);font-size:12px">1 nuit</div></div></div>
+          <div class="room-block"><div class="room-block-header"><span class="room-type">Twin</span><span style="font-size:11px;color:var(--grey)">Chambre 2 — partagée</span></div><div class="hotel-row"><div><span class="member-avatar" style="width:24px;height:24px;font-size:9px">AC</span>Alexandre Caramia</div><div style="color:var(--grey);font-size:12px">1 nuit</div></div><div class="hotel-row"><div><span class="member-avatar" style="width:24px;height:24px;font-size:9px">SP</span>Sarah Prost</div><div style="color:var(--grey);font-size:12px">1 nuit</div></div></div>
+          <div class="room-block"><div class="room-block-header"><span class="room-type">Single</span><span style="font-size:11px;color:var(--grey)">Chambre 3</span></div><div class="hotel-row"><div><span class="member-avatar" style="width:24px;height:24px;font-size:9px;background:var(--red)">FC</span>Fred Caramia</div><div style="color:var(--grey);font-size:12px">1 nuit</div></div></div>
+          <div class="room-block"><div class="room-block-header"><span class="room-type">Single</span><span style="font-size:11px;color:var(--grey)">Chambre 4</span></div><div class="hotel-row"><div><span class="member-avatar" style="width:24px;height:24px;font-size:9px">ML</span>Mathieu Le Nestour</div><div style="color:var(--grey);font-size:12px">1 nuit</div></div></div>
+        </div>
+      </div>
+
+      <!-- CONTACTS -->
+      <div id="tab-contacts" class="tab-content">
+        <button class="btn btn-primary" style="margin-bottom:16px">+ Ajouter un contact</button>
+        <table class="team-table">
+          <thead><tr><th>Nom</th><th>Fonction</th><th>📞 Téléphone</th><th>✉️ Mail</th></tr></thead>
+          <tbody>
+            <tr><td>—</td><td>Directeur de salle</td><td style="color:var(--grey-light);font-size:12px">—</td><td style="color:var(--grey-light);font-size:12px">—</td></tr>
+            <tr><td>—</td><td>Régisseur salle</td><td style="color:var(--grey-light);font-size:12px">—</td><td style="color:var(--grey-light);font-size:12px">—</td></tr>
+            <tr><td>VOIR SALLE</td><td>Traiteur</td><td style="color:var(--grey-light);font-size:12px">—</td><td style="color:var(--grey-light);font-size:12px">—</td></tr>
+            <tr><td>—</td><td>Responsable billetterie</td><td style="color:var(--grey-light);font-size:12px">—</td><td style="color:var(--grey-light);font-size:12px">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- INVITATIONS -->
+      <div id="tab-invitations" class="tab-content">
+        <button class="btn btn-primary" style="margin-bottom:16px">+ Créer une liste</button>
+        <div style="font-weight:700;font-size:15px;margin-bottom:12px">LISTE INVITATIONS PRODUCTION</div>
+        <table class="inv-table">
+          <thead><tr><th>Date</th><th>Demandeur</th><th>Invité(e)</th><th>Nb</th><th>Validé</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--grey)">04/11</td><td>RÉGIS</td><td>ICI VAUCLUSE</td><td>6</td><td><span class="badge badge-green">6 ✓</span></td></tr>
+            <tr><td style="color:var(--grey)">05/01</td><td>JEU CONCOURS NOËL 2025</td><td>PIETRI NATHALIE</td><td>2</td><td><span class="badge badge-green">2 ✓</span></td></tr>
+            <tr><td style="color:var(--grey)">29/03</td><td>Mathieu Le Nestour</td><td>LEMONNIER</td><td>4</td><td><span class="badge badge-green">4 ✓</span></td></tr>
+            <tr><td style="color:var(--grey)">31/03</td><td>RÉGIS</td><td>NOSTALGIE</td><td>20</td><td><span class="badge badge-green">20 ✓</span></td></tr>
+          </tbody>
+        </table>
+        <div class="inv-total"><span>Total : 32</span><span>Validé : 32</span></div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div id="tab-documents" class="tab-content">
+        <button class="btn btn-primary" style="margin-bottom:16px">+ Ajouter des documents</button>
+        <div class="doc-category">
+          <div class="doc-category-title">🚂 Voyage</div>
+          <div class="doc-item"><div class="doc-name"><span class="doc-icon">📄</span>Train Aller/Retour Avignon ADRIEN</div><div class="doc-actions"><button class="doc-btn">✏️</button><button class="doc-btn">⬇️</button><button class="doc-btn" style="color:var(--red)">🗑</button></div></div>
+          <div class="doc-item"><div class="doc-name"><span class="doc-icon">📄</span>Train Aller/Retour Avignon FRED</div><div class="doc-actions"><button class="doc-btn">✏️</button><button class="doc-btn">⬇️</button><button class="doc-btn" style="color:var(--red)">🗑</button></div></div>
+          <div class="doc-item"><div class="doc-name"><span class="doc-icon">📄</span>Train Aller/Retour Avignon MATHIEU</div><div class="doc-actions"><button class="doc-btn">✏️</button><button class="doc-btn">⬇️</button><button class="doc-btn" style="color:var(--red)">🗑</button></div></div>
+        </div>
+        <div class="doc-category">
+          <div class="doc-category-title">🏨 Hébergement</div>
+          <div class="doc-item"><div class="doc-name"><span class="doc-icon">📄</span>Réservation Mercure Avignon</div><div class="doc-actions"><button class="doc-btn">✏️</button><button class="doc-btn">⬇️</button><button class="doc-btn" style="color:var(--red)">🗑</button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATE AIX -->
+    <div id="page-date-aix" class="page">
+      <button class="back-btn" onclick="showTournee('twoq')">← THE WORLD OF QUEEN</button>
+      <div class="date-detail-header">
+        <div class="date-nav left"><button class="nav-arrow" onclick="showDateDetail('avignon')">◀</button></div>
+        <div class="city-title">AIX-EN-PROVENCE</div>
+        <div class="city-date">jeudi 28 mai 2026 &nbsp;·&nbsp; <span style="color:var(--white);font-weight:600">20h30</span></div>
+        <div class="city-meta"><span class="venue-name" style="color:#22c55e">● Confirmée</span><span class="venue-name">📍 –</span></div>
+        <div class="date-nav right"><button class="nav-arrow">▶</button></div>
+      </div>
+      <div style="padding:40px;text-align:center;color:var(--grey)">Infos à compléter pour cette date</div>
+    </div>
+
+    <!-- EQUIPE GLOBALE -->
+    <div id="page-equipe" class="page">
+      <div class="page-title">MEMBRES</div>
+      <button class="btn btn-primary" style="margin-bottom:20px">+ Inviter un membre</button>
+      <table class="team-table">
+        <thead><tr><th>Membre</th><th>Rôle</th><th>Accès</th></tr></thead>
+        <tbody>
+          <tr><td><span class="member-avatar">RP</span>Régis Pascau</td><td>Producteur</td><td><span class="badge badge-green">Admin</span></td></tr>
+          <tr><td><span class="member-avatar">AM</span>Alexandrine Marfaing</td><td>Productrice</td><td><span class="badge badge-green">Admin</span></td></tr>
+          <tr><td><span class="member-avatar" style="background:var(--red)">FC</span>Fred Caramia</td><td>Chanteur Principal</td><td><span class="badge badge-grey">Membre</span></td></tr>
+          <tr><td><span class="member-avatar">ML</span>Mathieu Le Nestour</td><td>Dir. Technique</td><td><span class="badge badge-grey">Membre</span></td></tr>
+          <tr><td><span class="member-avatar">AH</span>Adrien Husson</td><td>Guitariste</td><td><span class="badge badge-grey">Membre</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function addInfoMessage() {
+    const container = document.getElementById('infos-avignon');
+    const from = container.querySelector('.info-field input').value.trim();
+    const to = container.querySelector('.info-field select').value;
+    const text = container.querySelector('textarea').value.trim();
+    if (!text) return;
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}) + ' · ' + now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}).replace(':','h');
+    const msg = document.createElement('div');
+    msg.className = 'info-message';
+    msg.innerHTML = `<div class="info-message-header"><div class="info-from">✍️ <strong>${from||'Anonyme'}</strong> <span class="info-arrow">→</span> <span class="info-to">${to}</span></div><div class="info-date-msg">${dateStr}</div></div><div class="info-message-body">${text}</div>`;
+    container.querySelector('.info-new-msg').insertAdjacentElement('beforebegin', msg);
+    container.querySelector('textarea').value = '';
+  }
+
+  function printPlanning(team) {
+    const names = {artistique:'🎤 TEAM ARTISTIQUE',production:'📋 TEAM PRODUCTION',technique:'🔧 TEAM TECHNIQUE'};
+    const emojis = {artistique:'🎤',production:'📋',technique:'🔧'};
+    const blocks = document.querySelectorAll('.planning-team-block');
+    let target = null;
+    blocks.forEach(b => { if(b.querySelector('.planning-team-title').textContent.includes(emojis[team])) target=b; });
+    if (!target) return;
+    let html = '';
+    target.querySelectorAll('.planning-day-label,.planning-event').forEach(el => {
+      if (el.classList.contains('planning-day-label')) html += `<div style="background:#f5f5f5;padding:8px 16px;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #eee">${el.textContent}</div>`;
+      else html += `<div style="display:flex;gap:16px;padding:10px 16px;border-bottom:1px solid #eee"><div style="min-width:110px;font-weight:700;color:#555;font-size:13px">${el.querySelector('.event-time')?.textContent||''}</div><div style="font-size:13px">${el.querySelector('.event-name')?.textContent||''}</div></div>`;
+    });
+    const win = window.open('','_blank');
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${names[team]} – AVIGNON</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif}@media print{body{-webkit-print-color-adjust:exact}}</style></head><body><div style="background:#111;color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:20px;font-weight:900;letter-spacing:2px">${names[team]}</div><div style="font-size:13px;color:#aaa;margin-top:4px">AVIGNON · samedi 4 avril 2026 · 20h30</div><div style="font-size:11px;color:#888;margin-top:2px">CONFLUENCE SPECTACLES</div></div><div style="text-align:right"><div style="font-size:24px;font-weight:900;color:#e31e24">OH MY PROD</div><div style="font-size:10px;color:#aaa">THE WORLD OF QUEEN</div></div></div><div style="border:2px solid #e31e24;margin:16px;border-radius:8px;overflow:hidden"><div style="background:#fff0f0;padding:8px 16px;font-size:11px;font-weight:700;color:#e31e24;text-transform:uppercase">⏱ INFOS CLÉS — Montage: 07h00 · Déjeuner: 13h00 · Balances: 15h30 · Dîner: 18h30 · Open doors: 19h00 · Start show: 20h30 · End show: 22h30 · End date: 01h30 J+1</div></div><div style="margin:16px;border:1px solid #ddd;border-radius:8px;overflow:hidden">${html}</div><div style="text-align:center;color:#aaa;font-size:10px;margin-top:24px;padding:12px">Document généré par OH MY PROD – Confidentiel</div><script>window.onload=function(){window.print()}<\/script></body></html>`);
+    win.document.close();
+  }
+
+  function mailPlanning(team) {
+    const names = {artistique:'Team Artistique',production:'Team Production',technique:'Team Technique'};
+    const subject = encodeURIComponent(`Planning ${names[team]} – AVIGNON – 4 avril 2026`);
+    const body = encodeURIComponent(`Bonjour,\n\nPlanning ${names[team]} – AVIGNON – samedi 4 avril 2026\n\nMontage: 07h00 | Déjeuner: 13h00 | Balances: 15h30 | Dîner: 18h30\nOpen doors: 19h00 | Start show: 20h30 | End show: 22h30 | End date: 01h30 J+1\n\nLieu: CONFLUENCE SPECTACLES – Avignon\n\nBonne route !\nOH MY PROD`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-'+id).classList.add('active');
+    updateBreadcrumb(id);
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  }
+
+  function showTournee(id) {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    const el = document.getElementById('page-tournee-'+id);
+    if (el) el.classList.add('active');
+    updateBreadcrumb('tournee-'+id);
+  }
+
+  function showDateDetail(id) {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    const el = document.getElementById('page-date-'+id);
+    if (el) {
+      el.classList.add('active');
+      el.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+      el.querySelectorAll('.tab-content').forEach((t,i)=>t.classList.toggle('active',i===0));
+    }
+    updateBreadcrumb('date-'+id);
+  }
+
+  function showTab(el, id) {
+    const parent = el.closest('.page');
+    parent.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    parent.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-'+id).classList.add('active');
+  }
+
+  function updateBreadcrumb(id) {
+    const bc = document.getElementById('breadcrumb');
+    const map = {
+      'dashboard':'<span>OH MY PROD</span>',
+      'tournees':'OH MY PROD <span class="sep">/</span> <span>Tournées</span>',
+      'tournee-twoq':'OH MY PROD <span class="sep">/</span> Tournées <span class="sep">/</span> <span>TWOQ</span>',
+      'tournee-twoq2':'OH MY PROD <span class="sep">/</span> Tournées <span class="sep">/</span> <span>TWOQ New Show</span>',
+      'tournee-greg':'OH MY PROD <span class="sep">/</span> Tournées <span class="sep">/</span> <span>Greg Petras</span>',
+      'date-avignon':'OH MY PROD <span class="sep">/</span> TWOQ <span class="sep">/</span> <span>Avignon</span>',
+      'date-aix':'OH MY PROD <span class="sep">/</span> TWOQ <span class="sep">/</span> <span>Aix-en-Provence</span>',
+      'equipe':'OH MY PROD <span class="sep">/</span> <span>Membres</span>',
+    };
+    bc.innerHTML = map[id]||map['dashboard'];
+  }
+</script>
+</body>
+</html>
