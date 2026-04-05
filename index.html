@@ -3169,7 +3169,7 @@
     const uuid = crypto.randomUUID();
     const initiales = `${prenom[0]||''}${nom[0]||''}`.toUpperCase();
 
-    const { error } = await _supabase.from('profiles').insert({
+    const { error } = await _supabase.from('membres').insert({
       id: uuid,
       prenom, nom,
       email: email || null,
@@ -3201,7 +3201,7 @@
   async function chargerMembres() {
     if (_allMembres.length > 0) return; // déjà chargés
     const { data, error } = await _supabase
-      .from('profiles')
+      .from('membres')
       .select('*')
       .order('nom', { ascending: true });
     if (!error && data) _allMembres = data;
@@ -3215,10 +3215,10 @@
     // Charger les membres déjà assignés à cette date
     const { data: equipe } = await _supabase
       .from('equipe_date')
-      .select('profile_id')
+      .select('membre_id')
       .eq('date_id', dateId);
 
-    const assignes = new Set((equipe || []).map(e => e.profile_id));
+    const assignes = new Set((equipe || []).map(e => e.membre_id));
 
     // Grouper par role
     const roles = {};
@@ -3271,9 +3271,9 @@
 
     // Insérer les nouvelles
     if (checked.length > 0) {
-      const inserts = checked.map(profileId => ({
+      const inserts = checked.map(membreId => ({
         date_id: _dateActiveId,
-        profile_id: profileId,
+        membre_id: membreId,
       }));
       const { error } = await _supabase.from('equipe_date').insert(inserts);
       if (error) { alert('Erreur : ' + error.message); return; }
