@@ -1657,7 +1657,13 @@
 
       <!-- ÉQUIPE -->
       <div id="tab-dyn-equipe" class="tab-content active">
-        <div class="empty-state"><div class="empty-state-icon">👥</div><div>Équipe à configurer</div></div>
+        <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-size:13px; color:var(--grey);">Sélectionne les membres présents sur cette date</div>
+          <button class="btn btn-primary" style="font-size:12px;" onclick="sauvegarderEquipeDate()">💾 Enregistrer</button>
+        </div>
+        <div id="dyn-equipe-list" style="display:flex; flex-direction:column; gap:6px;">
+          <div style="color:var(--grey); font-size:13px; padding:20px 0;">Chargement des membres...</div>
+        </div>
       </div>
 
       <!-- PLANNING -->
@@ -2312,20 +2318,71 @@
           div.onclick = async () => {
             document.getElementById('hotel-adresse').value = item.display_name;
             box.style.display = 'none';
-            // Calcul distance salle → hôtel (approximatif via coordonnées)
+
             const distEl = document.getElementById('hotel-dist-salle');
-            if (item.lat && item.lon) {
-              // Coordonnées Confluence Spectacles Avignon (exemple)
-              const salLat = 43.949, salLng = 4.806;
-              const hLat = parseFloat(item.lat), hLng = parseFloat(item.lon);
+            if (!item.lat || !item.lon) return;
+
+            const hLat = parseFloat(item.lat);
+            const hLng = parseFloat(item.lon);
+
+            // Récupérer les coordonnées de la salle active depuis Supabase ou l'adresse de la date
+            let salLat = null, salLng = null;
+            const dateActive = _datesActives?.find(d => d.id === _dateActiveId);
+            const adresseSalle = dateActive?.adresse_salle || (dateActive ? `${dateActive.nom_salle||''} ${dateActive.ville}` : null);
+
+            if (adresseSalle) {
+              try {
+                const resSalle = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(adresseSalle)}&format=json&limit=1&countrycodes=fr`, {
+                  headers: { 'Accept-Language': 'fr' }
+                });
+                const dataSalle = await resSalle.json();
+                if (dataSalle[0]) {
+                  salLat = parseFloat(dataSalle[0].lat);
+                  salLng = parseFloat(dataSalle[0].lon);
+                }
+              } catch(e) {}
+            }
+
+            if (salLat && salLng) {
               const R = 6371;
               const dLat = (hLat-salLat)*Math.PI/180;
               const dLng = (hLng-salLng)*Math.PI/180;
               const a = Math.sin(dLat/2)**2 + Math.cos(salLat*Math.PI/180)*Math.cos(hLat*Math.PI/180)*Math.sin(dLng/2)**2;
               const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
               const distStr = dist < 1 ? `${Math.round(dist*1000)} m` : `${dist.toFixed(1)} km`;
-              const temps = Math.round(dist / 0.05); // ~5km/h à pied
+              const temps = Math.round(dist / 0.05);
               distEl.value = `${distStr} · ~${temps} min à pied`;
+            } else {
+              distEl.value = 'Adresse salle non trouvée — saisir manuellement';
+              distEl.readOnly = false;
+            }
+
+            // Calcul distance gare → hôtel
+            const dateActive2 = _datesActives?.find(d => d.id === _dateActiveId);
+            const ville = dateActive2?.ville || '';
+            if (ville) {
+              try {
+                const resGare = await fetch(`https://nominatim.openstreetmap.org/search?q=gare+SNCF+${encodeURIComponent(ville)}&format=json&limit=1&countrycodes=fr`, {
+                  headers: { 'Accept-Language': 'fr' }
+                });
+                const dataGare = await resGare.json();
+                if (dataGare[0]) {
+                  const gLat = parseFloat(dataGare[0].lat);
+                  const gLng = parseFloat(dataGare[0].lon);
+                  const R = 6371;
+                  const dLat2 = (hLat-gLat)*Math.PI/180;
+                  const dLng2 = (hLng-gLng)*Math.PI/180;
+                  const a2 = Math.sin(dLat2/2)**2 + Math.cos(gLat*Math.PI/180)*Math.cos(hLat*Math.PI/180)*Math.sin(dLng2/2)**2;
+                  const dist2 = R * 2 * Math.atan2(Math.sqrt(a2), Math.sqrt(1-a2));
+                  const distStr2 = dist2 < 1 ? `${Math.round(dist2*1000)} m` : `${dist2.toFixed(1)} km`;
+                  const temps2 = Math.round(dist2 / 0.05);
+                  document.getElementById('hotel-dist-gare').value = `${distStr2} · ~${temps2} min à pied`;
+                  // Afficher le nom de la gare trouvée
+                  const nomGare = dataGare[0].display_name.split(',')[0];
+                  const gareNomEl = document.getElementById('hotel-gare-nom');
+                  if (gareNomEl) gareNomEl.textContent = `📍 Gare détectée : ${nomGare}`;
+                }
+              } catch(e) {}
             }
           };
           box.appendChild(div);
@@ -2346,7 +2403,9 @@
   function addHotel() {
     const nom = document.getElementById('hotel-nom').value.trim();
     const adresse = document.getElementById('hotel-adresse').value.trim();
-    const team = document.getElementById('hotel-team').value;
+    const teamChecked = ['artistique','production','technique','tous']
+      .filter(t => document.getElementById(`hotel-team-${t}`)?.checked);
+    const team = teamChecked.length > 0 ? teamChecked.join(', ') : 'tous';
     const distSalle = document.getElementById('hotel-dist-salle').value;
     const distGare = document.getElementById('hotel-dist-gare').value;
     const commentaire = document.getElementById('hotel-commentaire').value.trim();
@@ -3030,6 +3089,9 @@
     document.querySelectorAll('#page-date-dynamic .tab').forEach((t,i) => t.classList.toggle('active', i===0));
     document.querySelectorAll('#page-date-dynamic .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
     updateBreadcrumb('date-dynamic');
+
+    // Charger l'équipe de la date
+    chargerEquipeDate(_dateActiveId);
   }
 
   function showDateDetail(id) {
@@ -3042,6 +3104,109 @@
 
   let _dateActiveId = null;
   let _tourneeActiveId = null;
+
+  // Membres chargés globalement
+  let _allMembres = [];
+
+  async function chargerMembres() {
+    if (_allMembres.length > 0) return; // déjà chargés
+    const { data, error } = await _supabase
+      .from('profiles')
+      .select('*')
+      .order('nom', { ascending: true });
+    if (!error && data) _allMembres = data;
+  }
+
+  async function chargerEquipeDate(dateId) {
+    await chargerMembres();
+    const container = document.getElementById('dyn-equipe-list');
+    if (!container) return;
+
+    // Charger les membres déjà assignés à cette date
+    const { data: equipe } = await _supabase
+      .from('equipe_date')
+      .select('profile_id, role_date')
+      .eq('date_id', dateId);
+
+    const assignes = new Set((equipe || []).map(e => e.profile_id));
+
+    // Grouper par team
+    const teams = {
+      'Artistique': _allMembres.filter(m => m.team === 'artistique'),
+      'Production': _allMembres.filter(m => m.team === 'production'),
+      'Technique': _allMembres.filter(m => m.team === 'technique'),
+      'Autre': _allMembres.filter(m => !['artistique','production','technique'].includes(m.team)),
+    };
+
+    container.innerHTML = '';
+
+    const teamIcons = { Artistique: '🎤', Production: '📋', Technique: '🔧', Autre: '👤' };
+
+    Object.entries(teams).forEach(([teamName, membres]) => {
+      if (membres.length === 0) return;
+
+      const section = document.createElement('div');
+      section.style.cssText = 'margin-bottom:16px;';
+      section.innerHTML = `<div style="font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border);">${teamIcons[teamName]} ${teamName}</div>`;
+
+      membres.forEach(m => {
+        const label = document.createElement('label');
+        label.style.cssText = 'display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); cursor:pointer; font-size:13px;';
+        label.innerHTML = `
+          <input type="checkbox" data-membre-id="${m.id}" ${assignes.has(m.id) ? 'checked' : ''} style="accent-color:var(--red); width:16px; height:16px;" />
+          <div style="flex:1;">
+            <div style="font-weight:600;">${m.prenom || ''} ${m.nom || ''}</div>
+            <div style="font-size:11px; color:var(--grey);">${m.fonction || ''}</div>
+          </div>
+          <div style="font-size:11px; color:var(--grey);">${m.telephone || ''}</div>`;
+        section.appendChild(label);
+      });
+
+      container.appendChild(section);
+    });
+
+    if (_allMembres.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div>Aucun membre trouvé</div></div>';
+    }
+  }
+
+  async function sauvegarderEquipeDate() {
+    if (!_dateActiveId) return;
+
+    // Récupérer les cases cochées
+    const checked = [...document.querySelectorAll('#dyn-equipe-list input[type="checkbox"]:checked')]
+      .map(cb => cb.dataset.membreId);
+
+    // Supprimer les anciennes assignations
+    await _supabase.from('equipe_date').delete().eq('date_id', _dateActiveId);
+
+    // Insérer les nouvelles
+    if (checked.length > 0) {
+      const inserts = checked.map(profileId => ({
+        date_id: _dateActiveId,
+        profile_id: profileId,
+      }));
+      const { error } = await _supabase.from('equipe_date').insert(inserts);
+      if (error) { alert('Erreur : ' + error.message); return; }
+    }
+
+    // Feedback visuel
+    const btn = document.querySelector('#tab-dyn-equipe .btn-primary');
+    if (btn) {
+      btn.textContent = '✅ Enregistré !';
+      btn.style.background = 'var(--green)';
+      setTimeout(() => { btn.textContent = '💾 Enregistrer'; btn.style.background = ''; }, 2000);
+    }
+  }
+
+  function toggleTousHotel(cb) {
+    if (cb.checked) {
+      ['artistique','production','technique'].forEach(t => {
+        const el = document.getElementById(`hotel-team-${t}`);
+        if (el) el.checked = false;
+      });
+    }
+  }
 
   function calcJaugeOcc(prefix) {
     const pointage = parseInt(document.getElementById(`${prefix}-pointage`)?.value) || 0;
@@ -4064,13 +4229,25 @@
           <input type="text" id="hotel-nom" placeholder="ex: Ibis Avignon Centre" />
         </div>
         <div class="modal-field">
-          <label>Team</label>
-          <select id="hotel-team">
-            <option value="tous">👥 Tous</option>
-            <option value="artistique">🎤 Artistique</option>
-            <option value="production">📋 Production</option>
-            <option value="technique">🔧 Technique</option>
-          </select>
+          <label>Team(s) concernée(s)</label>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:400; cursor:pointer;">
+              <input type="checkbox" id="hotel-team-artistique" value="artistique" style="accent-color:var(--red); width:15px; height:15px;" />
+              🎤 Artistique
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:400; cursor:pointer;">
+              <input type="checkbox" id="hotel-team-production" value="production" style="accent-color:var(--red); width:15px; height:15px;" />
+              📋 Production
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:400; cursor:pointer;">
+              <input type="checkbox" id="hotel-team-technique" value="technique" style="accent-color:var(--red); width:15px; height:15px;" />
+              🔧 Technique
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:400; cursor:pointer;">
+              <input type="checkbox" id="hotel-team-tous" value="tous" style="accent-color:var(--red); width:15px; height:15px;" onchange="toggleTousHotel(this)" />
+              👥 Tous
+            </label>
+          </div>
         </div>
       </div>
 
@@ -4087,11 +4264,12 @@
       <div class="modal-row">
         <div class="modal-field">
           <label>📏 Distance salle → hôtel</label>
-          <input type="text" id="hotel-dist-salle" placeholder="Calculée auto ou saisir manuellement" readonly style="background:var(--black); border:1px solid var(--border); border-radius:8px; color:var(--grey-light); padding:9px 12px; font-size:13px; font-family:'Inter',sans-serif; outline:none; width:100%; box-sizing:border-box;" />
+          <input type="text" id="hotel-dist-salle" placeholder="Calculée auto depuis l'adresse salle ou saisir manuellement" style="background:var(--black); border:1px solid var(--border); border-radius:8px; color:var(--grey-light); padding:9px 12px; font-size:13px; font-family:'Inter',sans-serif; outline:none; width:100%; box-sizing:border-box;" />
         </div>
         <div class="modal-field">
           <label>📏 Distance gare → hôtel</label>
-          <input type="text" id="hotel-dist-gare" placeholder="ex: 500 m · 7 min" />
+          <input type="text" id="hotel-dist-gare" placeholder="Calculée auto depuis la gare de la ville ou saisir manuellement" style="background:var(--black); border:1px solid var(--border); border-radius:8px; color:var(--grey-light); padding:9px 12px; font-size:13px; font-family:'Inter',sans-serif; outline:none; width:100%; box-sizing:border-box;" />
+          <div id="hotel-gare-nom" style="font-size:11px; color:var(--grey); margin-top:4px;"></div>
         </div>
       </div>
 
