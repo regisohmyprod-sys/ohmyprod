@@ -3453,22 +3453,35 @@
 
   // Charger toutes les tournées depuis Supabase
   async function chargerTournees() {
-    const { data: tournees, error } = await _supabase
+    // Charger les tournées
+    const { data: tournees, error: errT } = await _supabase
       .from('tournees')
-      .select('*, dates_concert(*)')
+      .select('*')
       .order('date_debut', { ascending: true });
 
-    if (error) { console.error('Erreur tournées:', error); return; }
+    if (errT) { console.error('Erreur tournées:', errT); return; }
+
+    // Charger toutes les dates
+    const { data: toutesDatess, error: errD } = await _supabase
+      .from('dates_concert')
+      .select('*')
+      .order('date_concert', { ascending: true });
+
+    if (errD) { console.error('Erreur dates:', errD); }
+
+    // Associer les dates aux tournées
+    tournees.forEach(t => {
+      t.dates_concert = (toutesDatess || []).filter(d => d.tournee_id === t.id);
+    });
 
     renderTourneesGrid(tournees);
     renderDashboardTournees(tournees);
     renderDashboardStats(tournees);
 
-    // Charger les dates de la première tournée TWOQ par défaut
     const twoq = tournees.find(t => t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage'));
     if (twoq) renderDatesTournee('twoq', twoq);
 
-    const twoq2 = tournees.find(t => t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('Éternelle'));
+    const twoq2 = tournees.find(t => t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle'));
     if (twoq2) renderDatesTournee('twoq2', twoq2);
 
     const greg = tournees.find(t => t.nom_groupe === 'GREG PETRAS');
