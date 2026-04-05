@@ -2781,8 +2781,15 @@
       }).select().single();
 
       if (!error && data) {
-        // Recharger les dates de la tournée
+        // Recharger les données
         await chargerTournees();
+        // Retourner sur la tournée avec filtre "Tout"
+        showTournee(_tourneeActiveId || 'twoq');
+        // Forcer le filtre "Tout"
+        setTimeout(() => {
+          const toutBtn = document.querySelector('#page-tournee-dynamic .filter-btn:nth-child(2)');
+          if (toutBtn) toutBtn.click();
+        }, 100);
         closeModal('modal-add-date');
         ['new-ville','new-date','new-salle','new-adresse','new-jauge-choisie','new-jauge-max','new-dist-gare','new-dist-salle','new-commentaire'].forEach(id => {
           const el = document.getElementById(id); if (el) el.value = '';
@@ -3350,17 +3357,19 @@
     // Mettre à jour le mini dashboard
     renderMiniDashTournee(id, tournee);
 
-    // Appliquer le filtre "Tout" par défaut pour tout voir
-    const filterBtns = document.querySelectorAll(`#page-tournee-${id} .filter-btn`);
-    filterBtns.forEach(b => {
-      b.classList.remove('btn-primary', 'active-filter');
-      b.classList.add('btn-ghost');
-      b.style.background = '';
-      if (b.textContent.trim() === 'Tout') {
-        b.classList.remove('btn-ghost');
-        b.classList.add('btn-primary', 'active-filter');
+    // Appliquer le filtre "Tout" par défaut
+    setTimeout(() => {
+      const toutBtn = document.querySelector('#page-tournee-dynamic .filter-btn:nth-child(2)');
+      if (toutBtn) {
+        document.querySelectorAll('#page-tournee-dynamic .filter-btn').forEach(b => {
+          b.classList.remove('btn-primary', 'active-filter');
+          b.classList.add('btn-ghost');
+          b.style.background = '';
+        });
+        toutBtn.classList.remove('btn-ghost');
+        toutBtn.classList.add('btn-primary', 'active-filter');
       }
-    });
+    }, 50);
   }
 
   // Mini dashboard dans la page tournée
