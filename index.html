@@ -3165,13 +3165,19 @@
 
     if (!prenom || !nom) { alert('Prénom et nom obligatoires.'); return; }
 
+    // Générer un UUID
+    const uuid = crypto.randomUUID();
+    const initiales = `${prenom[0]||''}${nom[0]||''}`.toUpperCase();
+
     const { error } = await _supabase.from('profiles').insert({
+      id: uuid,
       prenom, nom,
       email: email || null,
       telephone: tel || null,
       fonction: fonction || null,
       groupe_depart: team || null,
       role: role || 'membre',
+      avatar_initiales: initiales,
     });
 
     if (error) { alert('Erreur : ' + error.message); return; }
