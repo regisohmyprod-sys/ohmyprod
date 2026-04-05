@@ -1589,6 +1589,9 @@
         </div>
         <div class="date-nav right"><button class="nav-arrow" id="dyn-next-btn">▶</button></div>
       </div>
+      <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+        <button class="btn" id="dyn-delete-btn" style="background:#7f1d1d; color:#fff; font-size:12px; border:1px solid #ef4444;" onclick="supprimerDate()">🗑️ Supprimer cette date</button>
+      </div>
 
       <!-- INFOS CLÉS -->
       <div class="planning-keys" style="margin-bottom:16px;">
@@ -2964,6 +2967,8 @@
 
   function showDateDynamic(date, idx, tournee, tourneeId) {
     _dateActiveIdx = idx;
+    _dateActiveId = date.id;
+    _tourneeActiveId = tourneeId;
     const dt = new Date(date.date_concert);
 
     document.getElementById('dyn-date-ville').textContent = date.ville.toUpperCase();
@@ -3022,7 +3027,28 @@
     }
   }
 
-  function addInfoMessageDyn() {
+  let _dateActiveId = null;
+  let _tourneeActiveId = null;
+
+  async function supprimerDate() {
+    if (!_dateActiveId) return;
+    const ville = document.getElementById('dyn-date-ville').textContent;
+    if (!confirm(`Supprimer la date de ${ville} ? Cette action est irréversible.`)) return;
+
+    const { error } = await _supabase
+      .from('dates_concert')
+      .delete()
+      .eq('id', _dateActiveId);
+
+    if (error) {
+      alert('Erreur lors de la suppression : ' + error.message);
+      return;
+    }
+
+    // Recharger les données et retourner à la tournée
+    await chargerTournees();
+    showTournee(_tourneeActiveId);
+  }
     const de = document.getElementById('dyn-msg-de').value.trim();
     const pour = document.getElementById('dyn-msg-pour').value;
     const msg = document.getElementById('dyn-msg-text').value.trim();
