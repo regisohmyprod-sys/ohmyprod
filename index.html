@@ -2997,11 +2997,11 @@
 
     document.getElementById('dyn-date-back-btn').onclick = () => showTournee(tourneeId);
 
-    const pct = date.jauge_max ? Math.round((date.pointage_ventes||0)/date.jauge_max*100) : 0;
+    const pct = date.jauge_max ? Math.round(((date.jauge_occupee||date.pointage_ventes)||0)/date.jauge_max*100) : 0;
     document.getElementById('dyn-jauge-choisie').textContent = date.jauge_choisie?.toLocaleString('fr-FR')||'–';
     document.getElementById('dyn-jauge-max').textContent = date.jauge_max?.toLocaleString('fr-FR')||'–';
     document.getElementById('dyn-pointage').textContent = date.pointage_ventes?.toLocaleString('fr-FR')||'–';
-    document.getElementById('dyn-jauge-occ').textContent = date.pointage_ventes?.toLocaleString('fr-FR')||'–';
+    document.getElementById('dyn-jauge-occ').textContent = date.jauge_occupee?.toLocaleString('fr-FR') || date.pointage_ventes?.toLocaleString('fr-FR')||'–';
     document.getElementById('dyn-pct').textContent = date.jauge_max ? `${pct}%` : '–';
 
     const fmt = h => h ? h.substring(0,5).replace(':','h') : '–';
@@ -3043,6 +3043,15 @@
   let _dateActiveId = null;
   let _tourneeActiveId = null;
 
+  function calcJaugeOcc(prefix) {
+    const pointage = parseInt(document.getElementById(`${prefix}-pointage`)?.value) || 0;
+    const invitations = parseInt(document.getElementById(`${prefix}-invitations`)?.value) || 0;
+    const servitudes = parseInt(document.getElementById(`${prefix}-servitudes`)?.value) || 0;
+    const total = pointage + invitations + servitudes;
+    const el = document.getElementById(`${prefix}-jauge-occ`);
+    if (el) el.value = total > 0 ? total : '';
+  }
+
   function ouvrirModifierDate() {
     if (!_dateActiveId) return;
     // Trouver la date active dans les données
@@ -3058,6 +3067,9 @@
     document.getElementById('edit-jauge-choisie').value = date.jauge_choisie || '';
     document.getElementById('edit-jauge-max').value = date.jauge_max || '';
     document.getElementById('edit-pointage').value = date.pointage_ventes || '';
+    document.getElementById('edit-invitations').value = date.nb_invitations || '';
+    document.getElementById('edit-servitudes').value = date.nb_servitudes || '';
+    document.getElementById('edit-jauge-occ').value = date.jauge_occupee || '';
     document.getElementById('edit-montage').value = date.heure_montage ? date.heure_montage.substring(0,5) : '';
     document.getElementById('edit-dejeuner').value = date.heure_dejeuner ? date.heure_dejeuner.substring(0,5) : '';
     document.getElementById('edit-balances').value = date.heure_balances ? date.heure_balances.substring(0,5) : '';
@@ -3085,6 +3097,9 @@
       jauge_choisie: parseInt(document.getElementById('edit-jauge-choisie').value) || null,
       jauge_max: parseInt(document.getElementById('edit-jauge-max').value) || null,
       pointage_ventes: parseInt(document.getElementById('edit-pointage').value) || null,
+      nb_invitations: parseInt(document.getElementById('edit-invitations').value) || null,
+      nb_servitudes: parseInt(document.getElementById('edit-servitudes').value) || null,
+      jauge_occupee: parseInt(document.getElementById('edit-jauge-occ').value) || null,
       heure_montage: document.getElementById('edit-montage').value || null,
       heure_dejeuner: document.getElementById('edit-dejeuner').value || null,
       heure_balances: document.getElementById('edit-balances').value || null,
@@ -4546,7 +4561,19 @@
         </div>
         <div class="modal-field">
           <label>Pointage ventes</label>
-          <input type="number" id="new-pointage" placeholder="ex: 1200" />
+          <input type="number" id="new-pointage" placeholder="ex: 1200" onchange="calcJaugeOcc('new')" oninput="calcJaugeOcc('new')" />
+        </div>
+        <div class="modal-field">
+          <label>Invitations</label>
+          <input type="number" id="new-invitations" placeholder="ex: 50" onchange="calcJaugeOcc('new')" oninput="calcJaugeOcc('new')" />
+        </div>
+        <div class="modal-field">
+          <label>Servitudes salle</label>
+          <input type="number" id="new-servitudes" placeholder="ex: 30" onchange="calcJaugeOcc('new')" oninput="calcJaugeOcc('new')" />
+        </div>
+        <div class="modal-field">
+          <label>Jauge occupée (auto)</label>
+          <input type="number" id="new-jauge-occ" placeholder="Calculée auto" style="color:var(--green); font-weight:600;" readonly />
         </div>
         <div class="modal-field">
           <label>Distance gare → hôtel</label>
@@ -4624,7 +4651,19 @@
         </div>
         <div class="modal-field">
           <label>Pointage ventes</label>
-          <input type="number" id="edit-pointage" placeholder="ex: 1200" />
+          <input type="number" id="edit-pointage" placeholder="ex: 1200" onchange="calcJaugeOcc('edit')" oninput="calcJaugeOcc('edit')" />
+        </div>
+        <div class="modal-field">
+          <label>Invitations</label>
+          <input type="number" id="edit-invitations" placeholder="ex: 50" onchange="calcJaugeOcc('edit')" oninput="calcJaugeOcc('edit')" />
+        </div>
+        <div class="modal-field">
+          <label>Servitudes salle</label>
+          <input type="number" id="edit-servitudes" placeholder="ex: 30" onchange="calcJaugeOcc('edit')" oninput="calcJaugeOcc('edit')" />
+        </div>
+        <div class="modal-field">
+          <label>Jauge occupée (auto)</label>
+          <input type="number" id="edit-jauge-occ" placeholder="Calculée auto" style="color:var(--green); font-weight:600;" readonly />
         </div>
       </div>
 
