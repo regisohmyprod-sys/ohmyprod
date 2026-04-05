@@ -2761,9 +2761,9 @@
       return;
     }
 
-    // Trouver la tournée active (la page visible)
-    const activePage = document.querySelector('[id^="page-tournee-"].active');
-    const tourneeId = activePage ? activePage.dataset.tourneeId : null;
+    // Trouver la tournée active via la variable globale
+    const tourneeId = _tourneeActive?.id || null;
+    console.log('🎯 tourneeId:', tourneeId, '_tourneeActive:', _tourneeActive?.nom_groupe);
 
     // Sauvegarder en Supabase
     if (tourneeId) {
