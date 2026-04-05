@@ -1532,650 +1532,180 @@
     </div>
 
     <!-- TOURNEE DATES (TWOQ) -->
-    <div id="page-tournee-twoq" class="page" data-tournee-id="11111111-1111-1111-1111-111111111111">
+    <!-- PAGE TOURNÉE DYNAMIQUE -->
+    <div id="page-tournee-dynamic" class="page">
       <button class="back-btn" onclick="showPage('tournees')">← Tournées</button>
-      <div class="page-title" style="margin-top:8px;">THE WORLD OF QUEEN</div>
-      <div style="color:var(--grey-light); margin-bottom:16px; font-size:15px; font-weight:600;">L'hommage à la légende</div>
+      <div class="page-title" id="dyn-tournee-nom" style="margin-top:8px;"></div>
+      <div id="dyn-tournee-spectacle" style="color:var(--grey-light); margin-bottom:16px; font-size:15px; font-weight:600;"></div>
 
-      <!-- MINI DASHBOARD TOURNÉE -->
+      <!-- MINI DASHBOARD -->
       <div class="tournee-dashboard" style="grid-template-columns:repeat(5,1fr); margin-bottom:20px;">
         <div class="tournee-stat-card">
           <div class="tournee-stat-label">Dates effectuées</div>
-          <div class="tournee-stat-value">62</div>
+          <div class="tournee-stat-value" id="dyn-dates-effectuees">0</div>
         </div>
         <div class="tournee-stat-card">
           <div class="tournee-stat-label">Dates restantes</div>
-          <div class="tournee-stat-value" style="color:var(--red)">24</div>
+          <div class="tournee-stat-value" id="dyn-dates-restantes" style="color:var(--red)">0</div>
         </div>
         <div class="tournee-stat-card">
           <div class="tournee-stat-label">Prochaine date</div>
-          <div class="tournee-stat-value" style="font-size:18px;">4 AVR</div>
-          <div class="tournee-stat-sub">Avignon</div>
+          <div class="tournee-stat-value" id="dyn-prochaine-date" style="font-size:18px;">–</div>
+          <div class="tournee-stat-sub" id="dyn-prochaine-ville"></div>
         </div>
         <div class="tournee-stat-card">
           <div class="tournee-stat-label">Début tournée</div>
-          <div class="tournee-stat-value" style="font-size:18px;">FÉV 2023</div>
+          <div class="tournee-stat-value" id="dyn-debut" style="font-size:18px;">–</div>
         </div>
         <div class="tournee-stat-card">
           <div class="tournee-stat-label">Fin tournée</div>
-          <div class="tournee-stat-value" style="font-size:18px;">MAI 2026</div>
+          <div class="tournee-stat-value" id="dyn-fin" style="font-size:18px;">–</div>
         </div>
       </div>
 
       <div class="dates-header">
         <div style="display:flex; gap:8px;">
-          <button class="btn btn-primary filter-btn active-filter" style="background:var(--red);" onclick="filterDates('avenir', this)">À venir</button>
-          <button class="btn btn-ghost filter-btn" onclick="filterDates('tout', this)">Tout</button>
+          <button class="btn btn-ghost filter-btn" onclick="filterDates('avenir', this)">À venir</button>
+          <button class="btn btn-primary filter-btn active-filter" onclick="filterDates('tout', this)">Tout</button>
           <button class="btn btn-ghost filter-btn" onclick="filterDates('passees', this)">Passées</button>
         </div>
         <button class="btn btn-primary" onclick="openModal('modal-add-date')">+ Ajouter une date</button>
       </div>
 
-      <div class="dates-scroll">
-        <div class="month-group">
-          <div class="month-label">AVRIL 2026</div>
-          <div class="date-row" data-statut="avenir" onclick="showDateDetail('avignon')">
-            <div class="date-day"><div class="date-num">4</div><div class="date-dow">Sam</div></div>
-            <div class="date-info"><div class="date-city">AVIGNON</div><div class="date-venue">Confluence Spectacles</div></div>
-            <div class="checklist-bar"><div class="bar-track"><div class="bar-fill high" style="width:50%"></div></div><div class="bar-text">9/18</div></div>
-            <div class="badge badge-green">Confirmée</div>
-          </div>
-          <div class="date-row" data-statut="avenir" onclick="showDateDetail('niort')">
-            <div class="date-day"><div class="date-num">24</div><div class="date-dow">Ven</div></div>
-            <div class="date-info"><div class="date-city">NIORT</div><div class="date-venue">–</div></div>
-            <div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:28%"></div></div><div class="bar-text">5/18</div></div>
-            <div class="badge badge-green">Confirmée</div>
-          </div>
-          <div class="date-row" data-statut="avenir">
-            <div class="date-day"><div class="date-num">25</div><div class="date-dow">Sam</div></div>
-            <div class="date-info"><div class="date-city">DÉOLS-CHÂTEAUROUX</div><div class="date-venue">–</div></div>
-            <div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:11%"></div></div><div class="bar-text">2/18</div></div>
-            <div class="badge badge-green">Confirmée</div>
-          </div>
-        </div>
-        <div class="month-group">
-          <div class="month-label">MAI 2026</div>
-          <div class="date-row" data-statut="avenir" onclick="showDateDetail('aix')">
-            <div class="date-day"><div class="date-num">28</div><div class="date-dow">Jeu</div></div>
-            <div class="date-info"><div class="date-city">AIX-EN-PROVENCE</div><div class="date-venue">–</div></div>
-            <div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div><div class="bar-text">4/18</div></div>
-            <div class="badge badge-green">Confirmée</div>
-          </div>
-        </div>
-        <div class="month-group">
-          <div class="month-label">NOVEMBRE 2026</div>
-          <div class="date-row" data-statut="avenir">
-            <div class="date-day"><div class="date-num">28</div><div class="date-dow">Sam</div></div>
-            <div class="date-info"><div class="date-city">DÔME DE PARIS</div><div class="date-venue">Palais des Sports</div></div>
-            <div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:5%"></div></div><div class="bar-text">1/18</div></div>
-            <div class="badge badge-orange">Option</div>
-          </div>
-        </div>
-        <div class="month-group">
-          <div class="month-label">DÉCEMBRE 2026</div>
-          <div class="date-row" data-statut="passee">
-            <div class="date-day"><div class="date-num">12</div><div class="date-dow">Sam</div></div>
-            <div class="date-info"><div class="date-city">BORDEAUX</div><div class="date-venue">Arkéa Arena</div></div>
-            <div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><div class="bar-text">0/18</div></div>
-            <div class="badge badge-red">Annulée</div>
-          </div>
-          <div class="date-row" data-statut="passee">
-            <div class="date-day"><div class="date-num">19</div><div class="date-dow">Sam</div></div>
-            <div class="date-info"><div class="date-city">LYON</div><div class="date-venue">Halle Tony Garnier</div></div>
-            <div class="checklist-bar"><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><div class="bar-text">0/18</div></div>
-            <div class="badge badge-purple">Reportée</div>
-          </div>
-        </div>
-      </div>
+      <div class="dates-scroll" id="dyn-dates-scroll"></div>
     </div>
 
-    <!-- DATE DETAIL : AVIGNON -->
-    <div id="page-date-avignon" class="page">
-      <button class="back-btn" onclick="showTournee('twoq')">← THE WORLD OF QUEEN</button>
+    <!-- PAGE DATE DYNAMIQUE -->
+    <div id="page-date-dynamic" class="page">
+      <button class="back-btn" id="dyn-date-back-btn" onclick="showPage('page-tournee-dynamic')">← Retour</button>
 
       <div class="date-detail-header">
-        <div class="date-nav left">
-          <button class="nav-arrow">◀</button>
-        </div>
-        <div class="city-title">AVIGNON</div>
-        <div class="city-date">samedi 4 avril 2026 &nbsp;·&nbsp; <span style="color:var(--white); font-weight:600;">21h00</span></div>
+        <div class="date-nav left"><button class="nav-arrow" id="dyn-prev-btn">◀</button></div>
+        <div class="city-title" id="dyn-date-ville"></div>
+        <div class="city-date" id="dyn-date-info"></div>
         <div class="city-meta">
-          <span class="venue-name" id="status-avignon" style="color:#22c55e;">● Confirmée</span>
-          <span class="venue-name">📍 Confluence Spectacles</span>
+          <span class="venue-name" id="dyn-date-statut"></span>
+          <span class="venue-name" id="dyn-date-salle"></span>
         </div>
-        <div class="date-nav right">
-          <button class="nav-arrow" onclick="showDateDetail('niort')">▶</button>
-        </div>
+        <div class="date-nav right"><button class="nav-arrow" id="dyn-next-btn">▶</button></div>
       </div>
 
-      <!-- BLOC UNIFIÉ : INFOS CLÉS + INFOS IMPORTANTES -->
+      <!-- INFOS CLÉS -->
       <div class="planning-keys" style="margin-bottom:16px;">
-
-        <!-- Titre : bande rouge / écriture blanche -->
         <div class="planning-keys-title" style="background:var(--red); color:#fff;">⏱️ INFOS CLÉS DU JOUR</div>
 
-        <!-- BLOC 1 : REMPLISSAGE -->
         <div class="planning-keys-subtitle">🎭 REMPLISSAGE</div>
         <div class="planning-keys-grid5">
-          <div class="planning-key-item">
-            <div class="planning-key-label">Jauge choisie salle</div>
-            <div class="planning-key-value">1 500</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">Jauge salle max</div>
-            <div class="planning-key-value">2 500</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">Pointage ventes</div>
-            <div class="planning-key-value" style="color:var(--green)">1 400</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">Jauge occupée</div>
-            <div class="planning-key-value" style="color:var(--green)">1 470</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">% Remplissage</div>
-            <div class="planning-key-value" style="color:var(--yellow)">98%</div>
-            <div class="planning-key-sub">1470 / 1500</div>
-          </div>
+          <div class="planning-key-item"><div class="planning-key-label">Jauge choisie</div><div class="planning-key-value" id="dyn-jauge-choisie">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">Jauge max</div><div class="planning-key-value" id="dyn-jauge-max">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">Pointage ventes</div><div class="planning-key-value" id="dyn-pointage" style="color:var(--green)">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">Jauge occupée</div><div class="planning-key-value" id="dyn-jauge-occ" style="color:var(--green)">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">% Remplissage</div><div class="planning-key-value" id="dyn-pct" style="color:var(--yellow)">–</div></div>
         </div>
 
-        <!-- Séparateur rouge fin -->
         <div style="border-top:1px solid var(--red);"></div>
 
-        <!-- BLOC 2 : HORAIRES -->
-        <div class="planning-keys-subtitle">🕐 HORAIRES IMPORTANTES</div>
+        <div class="planning-keys-subtitle">🕐 HORAIRES</div>
         <div class="planning-keys-grid4">
-          <div class="planning-key-item">
-            <div class="planning-key-label">🔧 Montage start</div>
-            <div class="planning-key-value">07h00</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">🍽️ Déjeuner</div>
-            <div class="planning-key-value">13h00</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">🎸 Balances</div>
-            <div class="planning-key-value">15h30</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">🍷 Dîner</div>
-            <div class="planning-key-value">18h30</div>
-          </div>
+          <div class="planning-key-item"><div class="planning-key-label">🔧 Montage</div><div class="planning-key-value" id="dyn-montage">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🍽️ Déjeuner</div><div class="planning-key-value" id="dyn-dejeuner">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🎸 Balances</div><div class="planning-key-value" id="dyn-balances">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🍷 Dîner</div><div class="planning-key-value" id="dyn-diner">–</div></div>
         </div>
         <div class="planning-keys-grid4" style="border-top:1px solid var(--border);">
-          <div class="planning-key-item">
-            <div class="planning-key-label">🚪 Open doors</div>
-            <div class="planning-key-value">19h00</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">🎵 Start show</div>
-            <div class="planning-key-value">20h30</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">🏁 End show</div>
-            <div class="planning-key-value">22h30</div>
-          </div>
-          <div class="planning-key-item">
-            <div class="planning-key-label">🚛 End date</div>
-            <div class="planning-key-value">01h30 <span style="font-size:11px; font-family:'Inter',sans-serif; color:var(--grey);">J+1</span></div>
-          </div>
+          <div class="planning-key-item"><div class="planning-key-label">🚪 Open doors</div><div class="planning-key-value" id="dyn-portes">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🎵 Start show</div><div class="planning-key-value" id="dyn-start">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🏁 End show</div><div class="planning-key-value" id="dyn-end">–</div></div>
+          <div class="planning-key-item"><div class="planning-key-label">🚛 End date</div><div class="planning-key-value" id="dyn-enddate">–</div></div>
         </div>
 
-        <!-- Séparateur rouge fin avant infos importantes -->
         <div style="border-top:1px solid var(--red);"></div>
 
-        <!-- Infos importantes -->
-        <div>
-          <div class="planning-keys-subtitle">📌 INFOS IMPORTANTES</div>
-
-          <div id="infos-avignon" style="padding:0 12px;">
-
-            <div class="info-message">
-              <div class="info-message-header">
-                <div class="info-from">✍️ <strong>Mathieu</strong> <span class="info-arrow">→</span> <span class="info-to">Equipe technique</span></div>
-                <div class="info-date-msg">01/04 · 09h10</div>
+        <div class="planning-keys-subtitle">📌 INFOS IMPORTANTES</div>
+        <div id="dyn-infos-container" style="padding:0 12px;">
+          <div class="info-new-msg">
+            <div class="info-new-msg-row">
+              <div class="info-field"><label>De</label><input type="text" id="dyn-msg-de" placeholder="Votre nom" value="Régis" /></div>
+              <div class="info-field"><label>Pour</label>
+                <select id="dyn-msg-pour">
+                  <option>Toute l'équipe</option>
+                  <option>Team Artistique</option>
+                  <option>Team Technique</option>
+                  <option>Team Production</option>
+                </select>
               </div>
-              <div class="info-message-body">Chargement du camion à 06h00. Point de RDV : parking nord de la salle. Prévoir les badges d'accès.</div>
             </div>
-
-            <div class="info-message">
-              <div class="info-message-header">
-                <div class="info-from">✍️ <strong>Régis</strong> <span class="info-arrow">→</span> <span class="info-to">Toute l'équipe</span></div>
-                <div class="info-date-msg">31/03 · 14h22</div>
-              </div>
-              <div class="info-message-body">RDV au Mercure Avignon Gare TGV pour 18h. Check-in groupé. Dîner à 20h au restaurant de l'hôtel.</div>
-            </div>
-
-            <!-- Formulaire nouveau message -->
-            <div class="info-new-msg">
-              <div class="info-new-msg-row">
-                <div class="info-field">
-                  <label>De</label>
-                  <input type="text" placeholder="Votre nom" value="Régis" />
-                </div>
-                <div class="info-field">
-                  <label>Pour</label>
-                  <select>
-                    <option>Toute l'équipe</option>
-                    <option>Equipe technique</option>
-                    <option>Artistes</option>
-                    <option>Production</option>
-                  </select>
-                </div>
-              </div>
-              <textarea placeholder="Votre message..."></textarea>
-              <button class="btn btn-primary" style="margin-top:8px; margin-bottom:16px; width:100%; background:rgba(227,30,36,0.15); border:1px solid var(--red); color:var(--red);" onclick="addInfoMessage()">📨 Publier</button>
-            </div>
-
+            <textarea id="dyn-msg-text" class="info-new-msg-textarea" placeholder="Votre message..."></textarea>
+            <button class="btn btn-primary" style="background:var(--red); margin-top:8px;" onclick="addInfoMessageDyn()">📌 Publier</button>
           </div>
         </div>
       </div>
 
-      <!-- TABS -->
+      <!-- ONGLETS -->
       <div class="tabs">
-        <div class="tab active" onclick="showTab(this,'equipe-date')">👥 Équipe</div>
-        <div class="tab" onclick="showTab(this,'planning')">📅 Planning</div>
-        <div class="tab" onclick="showTab(this,'hebergement')">🏨 Hébergement</div>
-        <div class="tab" onclick="showTab(this,'contacts')">📞 Contacts</div>
-        <div class="tab" onclick="showTab(this,'invitations')">🎟 Invitations</div>
-        <div class="tab" onclick="showTab(this,'documents')">📄 Documents</div>
-      </div>
-
-      <!-- PLANNING -->
-      <div id="tab-planning" class="tab-content">
-        <button class="btn btn-primary" style="margin-bottom:20px;" onclick="openModal('modal-add-event')">+ Ajouter un événement</button>
-
-        <!-- TEAM ARTISTIQUE -->
-        <div class="planning-team-block">
-          <div class="planning-team-title-bar">
-            <div class="planning-team-title">🎤 PLANNING TEAM ARTISTIQUE</div>
-            <div class="planning-team-actions">
-              <button class="btn btn-ghost" style="font-size:12px; padding:5px 10px;" onclick="printPlanning('artistique')">🖨️ PDF</button>
-              <button class="btn btn-ghost" style="font-size:12px; padding:5px 10px;" onclick="mailPlanning('artistique')">✉️ Mail</button>
-            </div>
-          </div>
-
-          <div class="planning-day-label">LA VEILLE</div>
-          <div class="planning-event">
-            <div class="event-time">08:00</div>
-            <div class="event-body">
-              <div class="event-name">🚂 Trajet Paris → Avignon (TGV)</div>
-              <div class="event-participants">
-                <div class="avatar" title="Fred Caramia" style="background:var(--red)">FC</div>
-                <div class="avatar" title="Adrien Husson">AH</div>
-                <div class="avatar" title="Alexandre Caramia">AC</div>
-                <div class="avatar" title="Base de Lannoy" style="background:var(--blue)">BD</div>
-                <div class="avatar" title="Claire Lairy" style="background:var(--blue)">CL</div>
-                <div class="avatar" title="Sarah Prost">SP</div>
-              </div>
-            </div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">12:30</div>
-            <div class="event-body">
-              <div class="event-name">🏨 Arrivée hôtel – Check-in</div>
-              <div class="event-participants">
-                <div class="avatar" style="background:var(--red)">FC</div>
-                <div class="avatar">AH</div>
-                <div class="avatar">AC</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="planning-day-label">JOUR J</div>
-          <div class="planning-event">
-            <div class="event-time">08:00</div>
-            <div class="event-body"><div class="event-name">☕ Petit-déjeuner hôtel</div></div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">14:00 → 17:00</div>
-            <div class="event-body">
-              <div class="event-name">🎸 Balance / Filage</div>
-              <div class="event-participants">
-                <div class="avatar" style="background:var(--red)">FC</div>
-                <div class="avatar">AH</div>
-                <div class="avatar">AC</div>
-                <div class="avatar" style="background:var(--blue)">BD</div>
-                <div class="avatar" style="background:var(--blue)">CL</div>
-                <div class="avatar">SP</div>
-              </div>
-            </div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">18:00</div>
-            <div class="event-body"><div class="event-name">🍽️ Repas équipe artistique</div></div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">19:30</div>
-            <div class="event-body"><div class="event-name">🎭 Habillage / Maquillage</div></div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">21:00</div>
-            <div class="event-body"><div class="event-name">🎵 DÉBUT DU SPECTACLE</div></div>
-          </div>
-        </div>
-
-        <!-- TEAM PRODUCTION -->
-        <div class="planning-team-block">
-          <div class="planning-team-title-bar">
-            <div class="planning-team-title">📋 PLANNING TEAM PRODUCTION</div>
-            <div class="planning-team-actions">
-              <button class="btn btn-ghost" style="font-size:12px; padding:5px 10px;" onclick="printPlanning('production')">🖨️ PDF</button>
-              <button class="btn btn-ghost" style="font-size:12px; padding:5px 10px;" onclick="mailPlanning('production')">✉️ Mail</button>
-            </div>
-          </div>
-
-          <div class="planning-day-label">LA VEILLE</div>
-          <div class="planning-event">
-            <div class="event-time">09:00</div>
-            <div class="event-body">
-              <div class="event-name">🚗 Départ JOSSE → Avignon</div>
-              <div class="event-participants">
-                <div class="avatar" title="Alexandrine">AM</div>
-                <div class="avatar" title="Régis">RP</div>
-              </div>
-            </div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">15:00</div>
-            <div class="event-body"><div class="event-name">📞 Point organisationnel avec la salle</div></div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">17:00</div>
-            <div class="event-body"><div class="event-name">🏨 Arrivée hôtel – Check-in</div></div>
-          </div>
-
-          <div class="planning-day-label">JOUR J</div>
-          <div class="planning-event">
-            <div class="event-time">09:00</div>
-            <div class="event-body"><div class="event-name">📋 Accueil équipe technique à la salle</div></div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">10:00</div>
-            <div class="event-body"><div class="event-name">🎟 Vérification billetterie / invitations</div></div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">19:30</div>
-            <div class="event-body"><div class="event-name">🚪 Accueil du public</div></div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">21:00</div>
-            <div class="event-body"><div class="event-name">🎵 DÉBUT DU SPECTACLE</div></div>
-          </div>
-        </div>
-
-        <!-- TEAM TECHNIQUE -->
-        <div class="planning-team-block">
-          <div class="planning-team-title-bar">
-            <div class="planning-team-title">🔧 PLANNING TEAM TECHNIQUE</div>
-            <div class="planning-team-actions">
-              <button class="btn btn-ghost" style="font-size:12px; padding:5px 10px;" onclick="printPlanning('technique')">🖨️ PDF</button>
-              <button class="btn btn-ghost" style="font-size:12px; padding:5px 10px;" onclick="mailPlanning('technique')">✉️ Mail</button>
-            </div>
-          </div>
-
-          <div class="planning-day-label">LA VEILLE</div>
-          <div class="planning-event">
-            <div class="event-time">00:01 → 06:00</div>
-            <div class="event-body">
-              <div class="event-name">🚌 Départ camion – Toulouse</div>
-              <div class="event-participants">
-                <div class="avatar" title="Arthur Bergogne">AB</div>
-                <div class="avatar" title="Alexis Eymerie">AE</div>
-              </div>
-            </div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">08:00</div>
-            <div class="event-body"><div class="event-name">🅿️ Arrivée salle – Déchargement</div></div>
-          </div>
-
-          <div class="planning-day-label">JOUR J</div>
-          <div class="planning-event">
-            <div class="event-time">08:00 → 13:00</div>
-            <div class="event-body">
-              <div class="event-name">🔧 Montage plateau / Son / Lumières / Vidéo</div>
-              <div class="event-participants">
-                <div class="avatar">AB</div>
-                <div class="avatar">AE</div>
-                <div class="avatar">ML</div>
-              </div>
-            </div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">14:00 → 17:00</div>
-            <div class="event-body"><div class="event-name">🎸 Balance / Filage avec artistes</div></div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">17:00 → 19:30</div>
-            <div class="event-body"><div class="event-name">⚙️ Réglages finaux</div></div>
-          </div>
-          <div class="planning-event">
-            <div class="event-time">21:00</div>
-            <div class="event-body"><div class="event-name">🎵 DÉBUT DU SPECTACLE</div></div>
-          </div>
-        </div>
-
+        <div class="tab active" onclick="showTab(this,'dyn-equipe')">👥 Équipe</div>
+        <div class="tab" onclick="showTab(this,'dyn-planning')">📅 Planning</div>
+        <div class="tab" onclick="showTab(this,'dyn-hebergement')">🏨 Hébergement</div>
+        <div class="tab" onclick="showTab(this,'dyn-contacts')">📞 Contacts</div>
+        <div class="tab" onclick="showTab(this,'dyn-invitations')">🎟 Invitations</div>
+        <div class="tab" onclick="showTab(this,'dyn-documents')">📄 Documents</div>
       </div>
 
       <!-- ÉQUIPE -->
-      <div id="tab-equipe-date" class="tab-content active">
-        <button class="btn btn-primary" style="margin-bottom:16px;">Modifier l'équipe</button>
-        <table class="team-table">
-          <thead>
-            <tr><th>Membre</th><th>Fonction</th><th>Membre depuis</th><th>Groupe de départ</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><span class="member-avatar">AH</span>Adrien Husson</td><td>Guitariste</td><td style="color:var(--grey); font-size:12px;">fév. 2023</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">PARIS</td></tr>
-            <tr><td><span class="member-avatar">AC</span>Alexandre Caramia</td><td>Batteur / Lead 2</td><td style="color:var(--grey); font-size:12px;">fév. 2023</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">PARIS</td></tr>
-            <tr><td><span class="member-avatar">AM</span>Alexandrine Marfaing Hugueny</td><td>Productrice</td><td style="color:var(--grey); font-size:12px;">fév. 2023</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">JOSSE</td></tr>
-            <tr><td><span class="member-avatar">AE</span>Alexis Eymerie</td><td>Régie Vidéo · Equipe tech</td><td style="color:var(--grey); font-size:12px;">sept. 2024</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">TOULOUSE</td></tr>
-            <tr><td><span class="member-avatar">AB</span>Arthur Bergogne</td><td>Régie plateau · Equipe tech</td><td style="color:var(--grey); font-size:12px;">janv. 2025</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">TOULOUSE</td></tr>
-            <tr><td><span class="member-avatar" style="background:var(--blue)">BD</span>Base de Lannoy</td><td>Bassiste</td><td style="color:var(--grey); font-size:12px;">fév. 2023</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">PARIS</td></tr>
-            <tr><td><span class="member-avatar" style="background:var(--blue)">CL</span>Claire Lairy</td><td>Chanteuse Lyrique</td><td style="color:var(--grey); font-size:12px;">oct. 2023</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">MONTPELLIER</td></tr>
-            <tr><td><span class="member-avatar" style="background:var(--red)">FC</span>Fred Caramia</td><td>Chanteur Principal</td><td style="color:var(--grey); font-size:12px;">fév. 2023</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">PARIS</td></tr>
-            <tr><td><span class="member-avatar">ML</span>Mathieu Le Nestour</td><td>Directeur technique</td><td style="color:var(--grey); font-size:12px;">fév. 2023</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">PARIS</td></tr>
-            <tr><td><span class="member-avatar">SP</span>Sarah Prost</td><td>Chanteuse</td><td style="color:var(--grey); font-size:12px;">mars 2024</td><td style="color:var(--grey-light); font-size:12px; font-weight:600;">MONTPELLIER</td></tr>
-          </tbody>
-        </table>
+      <div id="tab-dyn-equipe" class="tab-content active">
+        <div class="empty-state"><div class="empty-state-icon">👥</div><div>Équipe à configurer</div></div>
+      </div>
+
+      <!-- PLANNING -->
+      <div id="tab-dyn-planning" class="tab-content">
+        <button class="btn btn-primary" style="margin-bottom:20px;" onclick="openModal('modal-add-event')">+ Ajouter un événement</button>
+        <div id="dyn-planning-content">
+          <div class="empty-state"><div class="empty-state-icon">📅</div><div>Aucun événement planifié</div></div>
+        </div>
       </div>
 
       <!-- HÉBERGEMENT -->
-      <div id="tab-hebergement" class="tab-content">
-        <div class="alert alert-warning">⚠️ 15 membres de l'équipe sans hébergement</div>
+      <div id="tab-dyn-hebergement" class="tab-content">
         <button class="btn btn-primary" style="margin-right:8px; margin-bottom:16px;" onclick="openModal('modal-add-hotel')">+ Ajouter un hôtel</button>
-        <button class="btn btn-ghost" style="margin-right:8px; margin-bottom:16px;" onclick="openModal('modal-add-tourbus')">🚌 Ajouter un tour bus</button>
-        <button class="btn btn-ghost" style="margin-bottom:16px;">+ Ajouter un tourbus</button>
-
-        <div class="hotel-card">
-          <div class="hotel-name">🏨 Mercure Avignon Gare TGV <span style="font-size:12px; font-weight:500; color:var(--grey-light); background:var(--border); padding:3px 10px; border-radius:20px; margin-left:8px;">Team Artistique</span></div>
-
-          <!-- Infos pratiques hôtel -->
-          <div class="hotel-infos">
-            <div class="hotel-info-row">
-              <span class="hotel-info-label">📍 Adresse</span>
-              <span class="hotel-info-value">Rue Édouard Daladier, 84000 Avignon</span>
-            </div>
-            <div class="hotel-info-row">
-              <span class="hotel-info-label">🚉 Gare → Hôtel</span>
-              <span class="hotel-info-value">350 m · 5 min à pied</span>
-            </div>
-            <div class="hotel-info-row">
-              <span class="hotel-info-label">🎭 Hôtel → Salle</span>
-              <span class="hotel-info-value">2,1 km · 8 min en voiture</span>
-            </div>
-            <div class="hotel-info-row">
-              <span class="hotel-info-label">📝 Autre</span>
-              <span class="hotel-info-value hotel-info-empty">—</span>
-            </div>
-          </div>
-
-          <!-- Chambre 1 : Single -->
-          <div class="room-block">
-            <div class="room-block-header">
-              <span class="room-type">Single</span>
-              <span style="font-size:11px; color:var(--grey);">Chambre 1</span>
-            </div>
-            <div class="hotel-row">
-              <div><span class="member-avatar" style="width:24px;height:24px;font-size:9px">AH</span> Adrien Husson</div>
-              <div style="color:var(--grey); font-size:12px;">1 nuit</div>
-            </div>
-          </div>
-
-          <!-- Chambre 2 : Twin (2 personnes) -->
-          <div class="room-block">
-            <div class="room-block-header">
-              <span class="room-type">Twin</span>
-              <span style="font-size:11px; color:var(--grey);">Chambre 2 — partagée</span>
-            </div>
-            <div class="hotel-row">
-              <div><span class="member-avatar" style="width:24px;height:24px;font-size:9px">AC</span> Alexandre Caramia</div>
-              <div style="color:var(--grey); font-size:12px;">1 nuit</div>
-            </div>
-            <div class="hotel-row">
-              <div><span class="member-avatar" style="width:24px;height:24px;font-size:9px">SP</span> Sarah Prost</div>
-              <div style="color:var(--grey); font-size:12px;">1 nuit</div>
-            </div>
-          </div>
-
-          <!-- Chambre 3 : Single -->
-          <div class="room-block">
-            <div class="room-block-header">
-              <span class="room-type">Single</span>
-              <span style="font-size:11px; color:var(--grey);">Chambre 3</span>
-            </div>
-            <div class="hotel-row">
-              <div><span class="member-avatar" style="width:24px;height:24px;font-size:9px;background:var(--red)">FC</span> Fred Caramia</div>
-              <div style="color:var(--grey); font-size:12px;">1 nuit</div>
-            </div>
-          </div>
-
-          <!-- Chambre 4 : Single -->
-          <div class="room-block">
-            <div class="room-block-header">
-              <span class="room-type">Single</span>
-              <span style="font-size:11px; color:var(--grey);">Chambre 4</span>
-            </div>
-            <div class="hotel-row">
-              <div><span class="member-avatar" style="width:24px;height:24px;font-size:9px">ML</span> Mathieu Le Nestour</div>
-              <div style="color:var(--grey); font-size:12px;">1 nuit</div>
-            </div>
-          </div>
-
+        <button class="btn btn-ghost" style="margin-bottom:16px;" onclick="openModal('modal-add-tourbus')">🚌 Ajouter un tour bus</button>
+        <div id="dyn-hebergement-content">
+          <div class="empty-state"><div class="empty-state-icon">🏨</div><div>Aucun hébergement enregistré</div></div>
         </div>
       </div>
 
       <!-- CONTACTS -->
-      <div id="tab-contacts" class="tab-content">
-        <button class="btn btn-primary" style="margin-bottom:16px;">+ Ajouter un contact</button>
-        <table class="team-table">
-          <thead><tr><th>Nom</th><th>Fonction</th><th>📞 Téléphone</th><th>✉️ Mail</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>—</td>
-              <td>Directeur de salle</td>
-              <td style="color:var(--grey-light); font-size:12px;">—</td>
-              <td style="color:var(--grey-light); font-size:12px;">—</td>
-            </tr>
-            <tr>
-              <td>—</td>
-              <td>Régisseur salle</td>
-              <td style="color:var(--grey-light); font-size:12px;">—</td>
-              <td style="color:var(--grey-light); font-size:12px;">—</td>
-            </tr>
-            <tr>
-              <td>VOIR SALLE</td>
-              <td>Traiteur</td>
-              <td style="color:var(--grey-light); font-size:12px;">—</td>
-              <td style="color:var(--grey-light); font-size:12px;">—</td>
-            </tr>
-            <tr>
-              <td>—</td>
-              <td>Responsable billetterie</td>
-              <td style="color:var(--grey-light); font-size:12px;">—</td>
-              <td style="color:var(--grey-light); font-size:12px;">—</td>
-            </tr>
-          </tbody>
-        </table>
+      <div id="tab-dyn-contacts" class="tab-content">
+        <div class="empty-state"><div class="empty-state-icon">📞</div><div>Aucun contact</div></div>
       </div>
 
       <!-- INVITATIONS -->
-      <div id="tab-invitations" class="tab-content">
-        <button class="btn btn-primary" style="margin-bottom:16px;" onclick="openModal('modal-create-liste-invit')">+ Créer une liste</button>
-
-        <div id="invit-listes-container">
-          <div class="invit-liste-bloc">
-            <div class="invit-liste-header">
-              <div>
-                <div style="font-weight:700; font-size:15px;">LISTE INVITATIONS PRODUCTION</div>
-                <div style="font-size:11px; color:var(--grey); margin-top:2px;">Quota : illimité · 🟢 Ouvert aux demandes</div>
-              </div>
-              <div style="display:flex; gap:8px;">
-                <button class="btn btn-ghost" style="font-size:12px;" onclick="imprimerListeInvit(this)">🖨️ Imprimer PDF</button>
-                <button class="btn btn-primary" style="font-size:12px;" onclick="openModal('modal-add-invit')">+ Ajouter une invitation</button>
-              </div>
+      <div id="tab-dyn-invitations" class="tab-content">
+        <button class="btn btn-primary" style="margin-bottom:16px;" onclick="openModal('modal-add-invit')">+ Ajouter une invitation</button>
+        <div class="invit-liste-bloc">
+          <div class="invit-liste-header">
+            <div>
+              <div style="font-weight:700; font-size:15px;" id="dyn-invit-titre">LISTE INVITATIONS</div>
+              <div style="font-size:11px; color:var(--grey); margin-top:2px;">🟢 Ouvert aux demandes</div>
             </div>
-            <table class="inv-table">
-              <thead><tr><th>Date</th><th>Demandeur</th><th>Invité(e)</th><th>Nb</th><th>Validé</th></tr></thead>
-              <tbody>
-                <tr><td style="color:var(--grey)">04/11</td><td>RÉGIS</td><td>ICI VAUCLUSE</td><td>6</td><td><span class="badge badge-green">6 ✓</span></td></tr>
-                <tr><td style="color:var(--grey)">05/01</td><td>JEU CONCOURS NOËL 2025</td><td>PIETRI NATHALIE</td><td>2</td><td><span class="badge badge-green">2 ✓</span></td></tr>
-                <tr><td style="color:var(--grey)">29/03</td><td>Mathieu Le Nestour</td><td>LEMONNIER</td><td>4</td><td><span class="badge badge-green">4 ✓</span></td></tr>
-                <tr><td style="color:var(--grey)">31/03</td><td>RÉGIS</td><td>NOSTALGIE</td><td>20</td><td><span class="badge badge-green">20 ✓</span></td></tr>
-              </tbody>
-            </table>
-            <div class="inv-total"><span>Total : 32</span><span>Validé : 32</span></div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-ghost" style="font-size:12px;" onclick="imprimerListeInvit(this)">🖨️ Imprimer PDF</button>
+            </div>
           </div>
+          <table class="inv-table">
+            <thead><tr><th>Date</th><th>Demandeur</th><th>Invité(e)</th><th>Mail</th><th>Nb</th><th>N° Place</th><th>Statut</th><th>Options</th><th>Notes</th></tr></thead>
+            <tbody id="dyn-invit-tbody"></tbody>
+          </table>
+          <div class="inv-total" id="dyn-invit-total"><span>Total : 0</span><span>Validé : 0</span></div>
         </div>
       </div>
 
       <!-- DOCUMENTS -->
-      <div id="tab-documents" class="tab-content">
+      <div id="tab-dyn-documents" class="tab-content">
         <button class="btn btn-primary" style="margin-bottom:16px;" onclick="openModal('modal-add-doc')">+ Ajouter des documents</button>
-        <div class="doc-category">
-          <div class="doc-category-title">🚂 Voyage</div>
-          <div class="doc-item">
-            <div class="doc-name"><span class="doc-icon">📄</span> Train Aller/Retour Avignon ADRIEN</div>
-            <div class="doc-actions">
-              <button class="doc-btn">✏️</button>
-              <button class="doc-btn">⬇️</button>
-              <button class="doc-btn" style="color:var(--red)">🗑</button>
-            </div>
-          </div>
-          <div class="doc-item">
-            <div class="doc-name"><span class="doc-icon">📄</span> Train Aller/Retour Avignon FRED</div>
-            <div class="doc-actions">
-              <button class="doc-btn">✏️</button>
-              <button class="doc-btn">⬇️</button>
-              <button class="doc-btn" style="color:var(--red)">🗑</button>
-            </div>
-          </div>
-          <div class="doc-item">
-            <div class="doc-name"><span class="doc-icon">📄</span> Train Aller/Retour Avignon MATHIEU</div>
-            <div class="doc-actions">
-              <button class="doc-btn">✏️</button>
-              <button class="doc-btn">⬇️</button>
-              <button class="doc-btn" style="color:var(--red)">🗑</button>
-            </div>
-          </div>
-        </div>
-        <div class="doc-category">
-          <div class="doc-category-title">🏨 Hébergement</div>
-          <div class="doc-item">
-            <div class="doc-name"><span class="doc-icon">📄</span> Réservation Mercure Avignon</div>
-            <div class="doc-actions">
-              <button class="doc-btn">✏️</button>
-              <button class="doc-btn">⬇️</button>
-              <button class="doc-btn" style="color:var(--red)">🗑</button>
-            </div>
-          </div>
-        </div>
+        <div id="dyn-documents-content"></div>
       </div>
-
     </div>
 
-    <!-- EQUIPE GLOBALE -->
     <div id="page-equipe" class="page">
       <div class="page-title">MEMBRES</div>
       <button class="btn btn-primary" style="margin-bottom:20px;" onclick="openModal('modal-invite-membre')">+ Inviter un membre</button>
@@ -3335,21 +2865,181 @@
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   }
 
+  // Tournée et dates actives pour navigation
+  let _allTournees = [];
+  let _tourneeActive = null;
+  let _datesActives = [];
+  let _dateActiveIdx = 0;
+
   function showTournee(id) {
+    const tournee = _allTournees?.find(t => {
+      if (id === 'twoq') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage');
+      if (id === 'twoq2') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle');
+      if (id === 'greg') return t.nom_groupe === 'GREG PETRAS';
+      return false;
+    });
+    if (!tournee) return;
+    _tourneeActive = tournee;
+
+    // Remplir la page dynamique
+    document.getElementById('dyn-tournee-nom').textContent = tournee.nom_groupe;
+    document.getElementById('dyn-tournee-spectacle').textContent = tournee.nom_spectacle;
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dates = tournee.dates_concert || [];
+    const avenir = dates.filter(d => new Date(d.date_concert) >= today);
+    const passees = dates.filter(d => new Date(d.date_concert) < today);
+    const prochaine = [...avenir].sort((a,b) => new Date(a.date_concert)-new Date(b.date_concert))[0];
+
+    document.getElementById('dyn-dates-effectuees').textContent = passees.length;
+    document.getElementById('dyn-dates-restantes').textContent = avenir.length;
+    if (prochaine) {
+      const d = new Date(prochaine.date_concert);
+      document.getElementById('dyn-prochaine-date').textContent = `${d.getDate()} ${MOIS[d.getMonth()]}`;
+      document.getElementById('dyn-prochaine-ville').textContent = prochaine.ville;
+    }
+    if (tournee.date_debut) document.getElementById('dyn-debut').textContent =
+      new Date(tournee.date_debut).toLocaleDateString('fr-FR',{month:'short',year:'numeric'}).toUpperCase();
+    if (tournee.date_fin) document.getElementById('dyn-fin').textContent =
+      new Date(tournee.date_fin).toLocaleDateString('fr-FR',{month:'short',year:'numeric'}).toUpperCase();
+
+    renderDatesScroll(tournee, id);
+
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-tournee-' + id).classList.add('active');
+    document.getElementById('page-tournee-dynamic').classList.add('active');
     document.querySelectorAll('.tournee-item').forEach(t => t.classList.remove('active'));
-    updateBreadcrumb('tournee-' + id);
-    
+    updateBreadcrumb('tournee-dynamic');
+  }
+
+  function renderDatesScroll(tournee, tourneeId) {
+    const scroll = document.getElementById('dyn-dates-scroll');
+    if (!scroll) return;
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dates = (tournee.dates_concert || [])
+      .sort((a,b) => new Date(a.date_concert)-new Date(b.date_concert));
+    _datesActives = dates;
+
+    const groupes = {};
+    dates.forEach(d => {
+      const dt = new Date(d.date_concert);
+      const key = `${MOIS[dt.getMonth()]} ${dt.getFullYear()}`;
+      if (!groupes[key]) groupes[key] = [];
+      groupes[key].push(d);
+    });
+
+    scroll.innerHTML = '';
+    if (dates.length === 0) {
+      scroll.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><div>Aucune date pour cette tournée</div></div>';
+      return;
+    }
+
+    Object.entries(groupes).forEach(([mois, datesliste]) => {
+      const group = document.createElement('div');
+      group.className = 'month-group';
+      group.innerHTML = `<div class="month-label">${mois}</div>`;
+
+      datesliste.forEach(d => {
+        const dt = new Date(d.date_concert);
+        const avenir = dt >= today;
+        const pct = d.jauge_max ? Math.round((d.pointage_ventes||0)/d.jauge_max*100) : 0;
+        const fillClass = pct > 70 ? 'high' : pct > 40 ? 'medium' : '';
+        const globalIdx = dates.indexOf(d);
+
+        const row = document.createElement('div');
+        row.className = 'date-row';
+        row.dataset.statut = avenir ? 'avenir' : 'passee';
+        row.style.cursor = 'pointer';
+        row.onclick = () => showDateDynamic(d, globalIdx, tournee, tourneeId);
+        row.innerHTML = `
+          <div class="date-day"><div class="date-num">${dt.getDate()}</div><div class="date-dow">${JOURS[dt.getDay()]}</div></div>
+          <div class="date-info"><div class="date-city">${d.ville.toUpperCase()}</div><div class="date-venue">${d.nom_salle||'–'}</div></div>
+          <div class="checklist-bar"><div class="bar-track"><div class="bar-fill ${fillClass}" style="width:${pct}%"></div></div><div class="bar-text">${d.pointage_ventes||0}/${d.jauge_max||'–'}</div></div>
+          ${STATUT_BADGE[d.statut]||''}`;
+        group.appendChild(row);
+      });
+      scroll.appendChild(group);
+    });
+  }
+
+  function showDateDynamic(date, idx, tournee, tourneeId) {
+    _dateActiveIdx = idx;
+    const dt = new Date(date.date_concert);
+
+    document.getElementById('dyn-date-ville').textContent = date.ville.toUpperCase();
+    document.getElementById('dyn-date-info').innerHTML =
+      `${dt.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} &nbsp;·&nbsp; <span style="color:var(--white);font-weight:600;">${(date.heure_show||'20:30').substring(0,5).replace(':','h')}</span>`;
+
+    const statutColors = {confirmee:'#22c55e',option:'#f59e0b',annulee:'#ef4444',reportee:'#a855f7'};
+    const statutLabels = {confirmee:'● Confirmée',option:'● Option',annulee:'● Annulée',reportee:'● Reportée'};
+    const sc = document.getElementById('dyn-date-statut');
+    sc.textContent = statutLabels[date.statut]||'';
+    sc.style.color = statutColors[date.statut]||'#fff';
+    document.getElementById('dyn-date-salle').textContent = date.nom_salle ? `📍 ${date.nom_salle}` : '';
+
+    document.getElementById('dyn-date-back-btn').onclick = () => showTournee(tourneeId);
+
+    const pct = date.jauge_max ? Math.round((date.pointage_ventes||0)/date.jauge_max*100) : 0;
+    document.getElementById('dyn-jauge-choisie').textContent = date.jauge_choisie?.toLocaleString('fr-FR')||'–';
+    document.getElementById('dyn-jauge-max').textContent = date.jauge_max?.toLocaleString('fr-FR')||'–';
+    document.getElementById('dyn-pointage').textContent = date.pointage_ventes?.toLocaleString('fr-FR')||'–';
+    document.getElementById('dyn-jauge-occ').textContent = date.pointage_ventes?.toLocaleString('fr-FR')||'–';
+    document.getElementById('dyn-pct').textContent = date.jauge_max ? `${pct}%` : '–';
+
+    const fmt = h => h ? h.substring(0,5).replace(':','h') : '–';
+    document.getElementById('dyn-montage').textContent = fmt(date.heure_montage);
+    document.getElementById('dyn-dejeuner').textContent = date.heure_dejeuner||'–';
+    document.getElementById('dyn-balances').textContent = fmt(date.heure_balances);
+    document.getElementById('dyn-diner').textContent = date.heure_diner||'–';
+    document.getElementById('dyn-portes').textContent = fmt(date.heure_portes);
+    document.getElementById('dyn-start').textContent = fmt(date.heure_debut_show);
+    document.getElementById('dyn-end').textContent = fmt(date.heure_fin_show);
+    document.getElementById('dyn-enddate').textContent = date.heure_fin_demontage||'–';
+
+    document.getElementById('dyn-prev-btn').onclick = () => {
+      if (_dateActiveIdx > 0) showDateDynamic(_datesActives[_dateActiveIdx-1], _dateActiveIdx-1, tournee, tourneeId);
+    };
+    document.getElementById('dyn-next-btn').onclick = () => {
+      if (_dateActiveIdx < _datesActives.length-1) showDateDynamic(_datesActives[_dateActiveIdx+1], _dateActiveIdx+1, tournee, tourneeId);
+    };
+    document.getElementById('dyn-prev-btn').disabled = idx === 0;
+    document.getElementById('dyn-next-btn').disabled = idx === _datesActives.length-1;
+
+    document.getElementById('dyn-invit-titre').textContent = `LISTE INVITATIONS – ${date.ville.toUpperCase()}`;
+
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-date-dynamic').classList.add('active');
+    document.querySelectorAll('#page-date-dynamic .tab').forEach((t,i) => t.classList.toggle('active', i===0));
+    document.querySelectorAll('#page-date-dynamic .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
+    updateBreadcrumb('date-dynamic');
   }
 
   function showDateDetail(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-date-' + id).classList.add('active');
-    updateBreadcrumb('date-' + id);
-    // Reset to first tab
-    document.querySelectorAll('#page-date-' + id + ' .tab').forEach((t,i) => t.classList.toggle('active', i===0));
-    document.querySelectorAll('#page-date-' + id + ' .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
+    // Redirige vers showDateDynamic si possible
+    const date = _datesActives.find(d => d.ville.toLowerCase().replace(/[^a-z]/g,'') === id);
+    if (date && _tourneeActive) {
+      showDateDynamic(date, _datesActives.indexOf(date), _tourneeActive, 'twoq');
+    }
+  }
+
+  function addInfoMessageDyn() {
+    const de = document.getElementById('dyn-msg-de').value.trim();
+    const pour = document.getElementById('dyn-msg-pour').value;
+    const msg = document.getElementById('dyn-msg-text').value.trim();
+    if (!msg) return;
+    const now = new Date();
+    const dateStr = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')} · ${String(now.getHours()).padStart(2,'0')}h${String(now.getMinutes()).padStart(2,'0')}`;
+    const container = document.getElementById('dyn-infos-container');
+    const newMsg = document.createElement('div');
+    newMsg.className = 'info-message';
+    newMsg.innerHTML = `
+      <div class="info-message-header">
+        <div class="info-from">✍️ <strong>${de}</strong> <span class="info-arrow">→</span> <span class="info-to">${pour}</span></div>
+        <div class="info-date-msg">${dateStr}</div>
+      </div>
+      <div class="info-message-body">${msg}</div>`;
+    container.querySelector('.info-new-msg').insertAdjacentElement('beforebegin', newMsg);
+    document.getElementById('dyn-msg-text').value = '';
   }
 
   function showTab(el, id) {
@@ -3476,18 +3166,14 @@
       t.dates_concert = (toutesDatess || []).filter(d => d.tournee_id === t.id);
     });
 
+    // Stocker globalement
+    _allTournees = tournees;
+
     renderTourneesGrid(tournees);
     renderDashboardTournees(tournees);
     renderDashboardStats(tournees);
 
-    const twoq = tournees.find(t => t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage'));
-    if (twoq) renderDatesTournee('twoq', twoq);
-
-    const twoq2 = tournees.find(t => t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle'));
-    if (twoq2) renderDatesTournee('twoq2', twoq2);
-
-    const greg = tournees.find(t => t.nom_groupe === 'GREG PETRAS');
-    if (greg) renderDatesTournee('greg', greg);
+    // Les dates sont chargées dynamiquement via showTournee()
   }
 
   // Afficher la grille des tournées (page Tournées)
@@ -3586,6 +3272,7 @@
   // Afficher les dates d'une tournée
   function renderDatesTournee(id, tournee) {
     const scroll = document.querySelector(`#page-tournee-${id} .dates-scroll`);
+    console.log(`🗓️ renderDatesTournee(${id})`, 'scroll:', !!scroll, 'dates:', tournee.dates_concert?.length);
     if (!scroll) return;
 
     const today = new Date();
