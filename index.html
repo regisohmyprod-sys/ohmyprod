@@ -2841,9 +2841,12 @@
     btn.classList.add('btn-primary', 'active-filter');
     if (filtre === 'avenir') btn.style.background = 'var(--red)';
 
+    // Cibler le bon scroll (dynamique)
+    const scroll = document.getElementById('dyn-dates-scroll');
+    if (!scroll) return;
+
     // Filtrer les date-rows
-    const rows = document.querySelectorAll('.dates-scroll .date-row');
-    rows.forEach(row => {
+    scroll.querySelectorAll('.date-row').forEach(row => {
       const statut = row.dataset.statut || 'avenir';
       if (filtre === 'tout') {
         row.style.display = '';
@@ -2855,7 +2858,7 @@
     });
 
     // Cacher les month-group vides
-    document.querySelectorAll('.dates-scroll .month-group').forEach(group => {
+    scroll.querySelectorAll('.month-group').forEach(group => {
       const visibles = [...group.querySelectorAll('.date-row')].filter(r => r.style.display !== 'none');
       group.style.display = visibles.length === 0 ? 'none' : '';
     });
