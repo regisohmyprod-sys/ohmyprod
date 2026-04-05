@@ -3446,7 +3446,9 @@
   };
 
   function isAvenir(dateStr) {
-    return new Date(dateStr) >= new Date(new Date().toDateString());
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return new Date(dateStr) >= today;
   }
 
   // Charger toutes les tournées depuis Supabase
@@ -3571,6 +3573,9 @@
     const scroll = document.querySelector(`#page-tournee-${id} .dates-scroll`);
     if (!scroll) return;
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const dates = (tournee.dates_concert || [])
       .sort((a,b) => new Date(a.date_concert) - new Date(b.date_concert));
 
@@ -3592,8 +3597,8 @@
 
       datesliste.forEach(d => {
         const dt = new Date(d.date_concert);
-        const avenir = isAvenir(d.date_concert);
-        const pct = d.jauge_choisie && d.jauge_max ? Math.round((d.pointage_ventes||0) / d.jauge_max * 100) : 0;
+        const avenir = dt >= today;
+        const pct = d.jauge_max ? Math.round((d.pointage_ventes||0) / d.jauge_max * 100) : 0;
         const fillClass = pct > 70 ? 'high' : pct > 40 ? 'medium' : '';
 
         const row = document.createElement('div');
@@ -3610,8 +3615,20 @@
       scroll.appendChild(group);
     });
 
-    // Mettre à jour le mini dashboard de la tournée
+    // Mettre à jour le mini dashboard
     renderMiniDashTournee(id, tournee);
+
+    // Appliquer le filtre "Tout" par défaut pour tout voir
+    const filterBtns = document.querySelectorAll(`#page-tournee-${id} .filter-btn`);
+    filterBtns.forEach(b => {
+      b.classList.remove('btn-primary', 'active-filter');
+      b.classList.add('btn-ghost');
+      b.style.background = '';
+      if (b.textContent.trim() === 'Tout') {
+        b.classList.remove('btn-ghost');
+        b.classList.add('btn-primary', 'active-filter');
+      }
+    });
   }
 
   // Mini dashboard dans la page tournée
