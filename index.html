@@ -3516,7 +3516,13 @@
   // =============================================
   const SUPABASE_URL = 'https://nhxqcavianozskxgfcbt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_59Pg7368sxCT6y3j9nNw0g_i8ILGRZ3';
-  const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    }
+  });
 
   async function checkSession() {
     // Auto-remplir l'email si mémorisé
