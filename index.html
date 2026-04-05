@@ -1718,17 +1718,13 @@
 
     <div id="page-equipe" class="page">
       <div class="page-title">MEMBRES</div>
-      <button class="btn btn-primary" style="margin-bottom:20px;" onclick="openModal('modal-invite-membre')">+ Inviter un membre</button>
-      <table class="team-table">
-        <thead><tr><th>Membre</th><th>Rôle</th><th>Accès</th></tr></thead>
-        <tbody>
-          <tr><td><span class="member-avatar">RP</span>Régis Pascau</td><td>Producteur</td><td><span class="badge badge-green">Admin</span></td></tr>
-          <tr><td><span class="member-avatar">AM</span>Alexandrine Marfaing</td><td>Productrice</td><td><span class="badge badge-green">Admin</span></td></tr>
-          <tr><td><span class="member-avatar" style="background:var(--red)">FC</span>Fred Caramia</td><td>Chanteur Principal</td><td><span class="badge badge-grey">Membre</span></td></tr>
-          <tr><td><span class="member-avatar">ML</span>Mathieu Le Nestour</td><td>Dir. Technique</td><td><span class="badge badge-grey">Membre</span></td></tr>
-          <tr><td><span class="member-avatar">AH</span>Adrien Husson</td><td>Guitariste</td><td><span class="badge badge-grey">Membre</span></td></tr>
-        </tbody>
-      </table>
+      <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="openModal('modal-invite-membre')">📧 Inviter par email</button>
+        <button class="btn btn-ghost" onclick="openModal('modal-add-membre-manuel')">+ Ajouter manuellement</button>
+      </div>
+      <div id="membres-list-container">
+        <div style="color:var(--grey); font-size:13px;">Chargement des membres...</div>
+      </div>
     </div>
 
   </div>
@@ -3105,6 +3101,99 @@
   let _dateActiveId = null;
   let _tourneeActiveId = null;
 
+  async function chargerPageMembres() {
+    await chargerMembres();
+    const container = document.getElementById('membres-list-container');
+    if (!container) return;
+
+    if (_allMembres.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div>Aucun membre</div></div>';
+      return;
+    }
+
+    const teams = {
+      'artistique': { label: '🎤 Artistique', membres: [] },
+      'production': { label: '📋 Production', membres: [] },
+      'technique': { label: '🔧 Technique', membres: [] },
+      'autre': { label: '👤 Autre', membres: [] },
+    };
+
+    _allMembres.forEach(m => {
+      const t = m.team || 'autre';
+      if (teams[t]) teams[t].membres.push(m);
+      else teams['autre'].membres.push(m);
+    });
+
+    container.innerHTML = '';
+    Object.values(teams).forEach(({ label, membres }) => {
+      if (membres.length === 0) return;
+      const section = document.createElement('div');
+      section.style.marginBottom = '24px';
+      section.innerHTML = `<div style="font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border);">${label}</div>`;
+
+      const table = document.createElement('table');
+      table.className = 'team-table';
+      table.innerHTML = '<thead><tr><th>Membre</th><th>Fonction</th><th>Téléphone</th><th>Rôle</th></tr></thead>';
+      const tbody = document.createElement('tbody');
+
+      membres.forEach(m => {
+        const initiales = `${(m.prenom||'')[0]||''}${(m.nom||'')[0]||''}`.toUpperCase();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="member-avatar">${initiales}</span>${m.prenom||''} ${m.nom||''}</td>
+          <td>${m.fonction||'–'}</td>
+          <td>${m.telephone||'–'}</td>
+          <td><span class="badge ${m.role_app==='admin'?'badge-green':'badge-grey'}">${m.role_app==='admin'?'Admin':'Membre'}</span></td>`;
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      section.appendChild(table);
+      container.appendChild(section);
+    });
+  }
+
+  async function ajouterMembreManuel() {
+    const prenom = document.getElementById('manuel-prenom').value.trim();
+    const nom = document.getElementById('manuel-nom').value.trim();
+    const email = document.getElementById('manuel-email').value.trim();
+    const tel = document.getElementById('manuel-tel').value.trim();
+    const fonction = document.getElementById('manuel-fonction').value.trim();
+    const team = document.getElementById('manuel-team').value;
+    const role = document.getElementById('manuel-role').value;
+
+    if (!prenom || !nom) { alert('Prénom et nom obligatoires.'); return; }
+
+    const { error } = await _supabase.from('profiles').insert({
+      prenom, nom,
+      email: email || null,
+      telephone: tel || null,
+      fonction: fonction || null,
+      team,
+      role_app: role,
+    });
+
+    if (error) { alert('Erreur : ' + error.message); return; }
+
+    // Reset
+    ['manuel-prenom','manuel-nom','manuel-email','manuel-tel','manuel-fonction'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    closeModal('modal-add-membre-manuel');
+
+    // Recharger
+    _allMembres = [];
+    await chargerMembres();
+    chargerPageMembres();
+  }
+
+  // Charger les membres quand on va sur la page équipe
+  const _origShowPage = showPage;
+  function showPage(id) {
+    _origShowPage(id);
+    if (id === 'equipe') chargerPageMembres();
+  }
+
   // Membres chargés globalement
   let _allMembres = [];
 
@@ -3125,38 +3214,41 @@
     // Charger les membres déjà assignés à cette date
     const { data: equipe } = await _supabase
       .from('equipe_date')
-      .select('profile_id, role_date')
+      .select('profile_id')
       .eq('date_id', dateId);
 
     const assignes = new Set((equipe || []).map(e => e.profile_id));
 
-    // Grouper par team
-    const teams = {
-      'Artistique': _allMembres.filter(m => m.team === 'artistique'),
-      'Production': _allMembres.filter(m => m.team === 'production'),
-      'Technique': _allMembres.filter(m => m.team === 'technique'),
-      'Autre': _allMembres.filter(m => !['artistique','production','technique'].includes(m.team)),
-    };
+    // Grouper par role
+    const roles = {};
+    _allMembres.forEach(m => {
+      const role = m.role || 'Autre';
+      if (!roles[role]) roles[role] = [];
+      roles[role].push(m);
+    });
 
     container.innerHTML = '';
 
-    const teamIcons = { Artistique: '🎤', Production: '📋', Technique: '🔧', Autre: '👤' };
+    if (_allMembres.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div>Aucun membre trouvé</div></div>';
+      return;
+    }
 
-    Object.entries(teams).forEach(([teamName, membres]) => {
-      if (membres.length === 0) return;
-
+    Object.entries(roles).forEach(([roleName, membres]) => {
       const section = document.createElement('div');
       section.style.cssText = 'margin-bottom:16px;';
-      section.innerHTML = `<div style="font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border);">${teamIcons[teamName]} ${teamName}</div>`;
+      section.innerHTML = `<div style="font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border);">👤 ${roleName}</div>`;
 
       membres.forEach(m => {
         const label = document.createElement('label');
         label.style.cssText = 'display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); cursor:pointer; font-size:13px;';
+        const initiales = m.avatar_initiales || `${(m.prenom||'')[0]||''}${(m.nom||'')[0]||''}`.toUpperCase();
         label.innerHTML = `
           <input type="checkbox" data-membre-id="${m.id}" ${assignes.has(m.id) ? 'checked' : ''} style="accent-color:var(--red); width:16px; height:16px;" />
+          <div style="width:32px; height:32px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0;">${initiales}</div>
           <div style="flex:1;">
             <div style="font-weight:600;">${m.prenom || ''} ${m.nom || ''}</div>
-            <div style="font-size:11px; color:var(--grey);">${m.fonction || ''}</div>
+            <div style="font-size:11px; color:var(--grey);">${m.fonction || ''} ${m.groupe_depart ? '· 📍 ' + m.groupe_depart : ''}</div>
           </div>
           <div style="font-size:11px; color:var(--grey);">${m.telephone || ''}</div>`;
         section.appendChild(label);
@@ -3164,10 +3256,6 @@
 
       container.appendChild(section);
     });
-
-    if (_allMembres.length === 0) {
-      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div>Aucun membre trouvé</div></div>';
-    }
   }
 
   async function sauvegarderEquipeDate() {
@@ -4774,6 +4862,64 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-add-date')">Annuler</button>
       <button class="btn btn-primary" onclick="addDate()">✅ Enregistrer la date</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE AJOUTER UN MEMBRE MANUELLEMENT -->
+<div id="modal-add-membre-manuel" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">👤 AJOUTER UN MEMBRE</div>
+      <button class="modal-close" onclick="closeModal('modal-add-membre-manuel')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Prénom *</label>
+          <input type="text" id="manuel-prenom" placeholder="ex: Frédéric" />
+        </div>
+        <div class="modal-field">
+          <label>Nom *</label>
+          <input type="text" id="manuel-nom" placeholder="ex: Caramia" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Email</label>
+          <input type="email" id="manuel-email" placeholder="ex: fred@email.com" />
+        </div>
+        <div class="modal-field">
+          <label>Téléphone</label>
+          <input type="tel" id="manuel-tel" placeholder="ex: 06 12 34 56 78" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Fonction</label>
+          <input type="text" id="manuel-fonction" placeholder="ex: Chanteur principal" />
+        </div>
+        <div class="modal-field">
+          <label>Team</label>
+          <select id="manuel-team">
+            <option value="artistique">🎤 Artistique</option>
+            <option value="production">📋 Production</option>
+            <option value="technique">🔧 Technique</option>
+            <option value="autre">👤 Autre</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label>Rôle app</label>
+          <select id="manuel-role">
+            <option value="membre">Membre</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-membre-manuel')">Annuler</button>
+      <button class="btn btn-primary" onclick="ajouterMembreManuel()">✅ Ajouter</button>
     </div>
   </div>
 </div>
