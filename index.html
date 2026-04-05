@@ -3453,21 +3453,23 @@
 
   // Charger toutes les tournées depuis Supabase
   async function chargerTournees() {
-    // Charger les tournées
+    console.log('🔄 Chargement tournées...');
+    
     const { data: tournees, error: errT } = await _supabase
       .from('tournees')
       .select('*')
       .order('date_debut', { ascending: true });
 
-    if (errT) { console.error('Erreur tournées:', errT); return; }
+    if (errT) { console.error('❌ Erreur tournées:', errT); return; }
+    console.log('✅ Tournées:', tournees?.length, tournees);
 
-    // Charger toutes les dates
     const { data: toutesDatess, error: errD } = await _supabase
       .from('dates_concert')
       .select('*')
       .order('date_concert', { ascending: true });
 
-    if (errD) { console.error('Erreur dates:', errD); }
+    if (errD) { console.error('❌ Erreur dates:', errD); }
+    console.log('✅ Dates:', toutesDatess?.length, toutesDatess);
 
     // Associer les dates aux tournées
     tournees.forEach(t => {
