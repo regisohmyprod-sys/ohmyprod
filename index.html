@@ -1589,7 +1589,8 @@
         </div>
         <div class="date-nav right"><button class="nav-arrow" id="dyn-next-btn">▶</button></div>
       </div>
-      <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px;">
+        <button class="btn" style="background:var(--card); color:var(--white); font-size:12px; border:1px solid var(--border);" onclick="ouvrirModifierDate()">✏️ Modifier la fiche</button>
         <button class="btn" id="dyn-delete-btn" style="background:#7f1d1d; color:#fff; font-size:12px; border:1px solid #ef4444;" onclick="supprimerDate()">🗑️ Supprimer cette date</button>
       </div>
 
@@ -2752,6 +2753,7 @@
     const statut = document.getElementById('new-statut').value;
     const jaugeChoisie = parseInt(document.getElementById('new-jauge-choisie').value) || null;
     const jaugeMax = parseInt(document.getElementById('new-jauge-max').value) || null;
+    const pointage = parseInt(document.getElementById('new-pointage').value) || null;
     const distGare = document.getElementById('new-dist-gare').value.trim();
     const distSalle = document.getElementById('new-dist-salle').value.trim();
     const commentaire = document.getElementById('new-commentaire').value.trim();
@@ -2775,6 +2777,7 @@
         heure_show: heure || null,
         statut, jauge_choisie: jaugeChoisie,
         jauge_max: jaugeMax,
+        pointage_ventes: pointage,
         distance_gare_hotel: distGare || null,
         distance_hotel_salle: distSalle || null,
         note_autre: commentaire || null,
@@ -3039,6 +3042,82 @@
 
   let _dateActiveId = null;
   let _tourneeActiveId = null;
+
+  function ouvrirModifierDate() {
+    if (!_dateActiveId) return;
+    // Trouver la date active dans les données
+    const date = _datesActives.find(d => d.id === _dateActiveId);
+    if (!date) return;
+
+    // Pré-remplir le formulaire
+    document.getElementById('edit-ville').value = date.ville || '';
+    document.getElementById('edit-date').value = date.date_concert || '';
+    document.getElementById('edit-heure').value = date.heure_show ? date.heure_show.substring(0,5) : '';
+    document.getElementById('edit-salle').value = date.nom_salle || '';
+    document.getElementById('edit-statut').value = date.statut || 'confirmee';
+    document.getElementById('edit-jauge-choisie').value = date.jauge_choisie || '';
+    document.getElementById('edit-jauge-max').value = date.jauge_max || '';
+    document.getElementById('edit-pointage').value = date.pointage_ventes || '';
+    document.getElementById('edit-montage').value = date.heure_montage ? date.heure_montage.substring(0,5) : '';
+    document.getElementById('edit-dejeuner').value = date.heure_dejeuner ? date.heure_dejeuner.substring(0,5) : '';
+    document.getElementById('edit-balances').value = date.heure_balances ? date.heure_balances.substring(0,5) : '';
+    document.getElementById('edit-diner').value = date.heure_diner ? date.heure_diner.substring(0,5) : '';
+    document.getElementById('edit-portes').value = date.heure_portes ? date.heure_portes.substring(0,5) : '';
+    document.getElementById('edit-start').value = date.heure_debut_show ? date.heure_debut_show.substring(0,5) : '';
+    document.getElementById('edit-end').value = date.heure_fin_show ? date.heure_fin_show.substring(0,5) : '';
+    document.getElementById('edit-enddate').value = date.heure_fin_demontage ? date.heure_fin_demontage.substring(0,5) : '';
+    document.getElementById('edit-dist-gare').value = date.distance_gare_hotel || '';
+    document.getElementById('edit-dist-salle').value = date.distance_hotel_salle || '';
+    document.getElementById('edit-commentaire').value = date.note_autre || '';
+
+    openModal('modal-edit-date');
+  }
+
+  async function sauvegarderModifDate() {
+    if (!_dateActiveId) return;
+
+    const updates = {
+      ville: document.getElementById('edit-ville').value.trim(),
+      date_concert: document.getElementById('edit-date').value,
+      heure_show: document.getElementById('edit-heure').value || null,
+      nom_salle: document.getElementById('edit-salle').value.trim() || null,
+      statut: document.getElementById('edit-statut').value,
+      jauge_choisie: parseInt(document.getElementById('edit-jauge-choisie').value) || null,
+      jauge_max: parseInt(document.getElementById('edit-jauge-max').value) || null,
+      pointage_ventes: parseInt(document.getElementById('edit-pointage').value) || null,
+      heure_montage: document.getElementById('edit-montage').value || null,
+      heure_dejeuner: document.getElementById('edit-dejeuner').value || null,
+      heure_balances: document.getElementById('edit-balances').value || null,
+      heure_diner: document.getElementById('edit-diner').value || null,
+      heure_portes: document.getElementById('edit-portes').value || null,
+      heure_debut_show: document.getElementById('edit-start').value || null,
+      heure_fin_show: document.getElementById('edit-end').value || null,
+      heure_fin_demontage: document.getElementById('edit-enddate').value || null,
+      distance_gare_hotel: document.getElementById('edit-dist-gare').value.trim() || null,
+      distance_hotel_salle: document.getElementById('edit-dist-salle').value.trim() || null,
+      note_autre: document.getElementById('edit-commentaire').value.trim() || null,
+    };
+
+    const { error } = await _supabase
+      .from('dates_concert')
+      .update(updates)
+      .eq('id', _dateActiveId);
+
+    if (error) {
+      alert('Erreur lors de la sauvegarde : ' + error.message);
+      return;
+    }
+
+    closeModal('modal-edit-date');
+    // Recharger et réafficher
+    await chargerTournees();
+    showTournee(_tourneeActiveId);
+    // Réouvrir la date modifiée
+    setTimeout(() => {
+      const dateUpdated = _datesActives.find(d => d.id === _dateActiveId);
+      if (dateUpdated) showDateDynamic(dateUpdated, _datesActives.indexOf(dateUpdated), _tourneeActive, _tourneeActiveId);
+    }, 300);
+  }
 
   async function supprimerDate() {
     if (!_dateActiveId) return;
@@ -4466,6 +4545,10 @@
           <input type="number" id="new-jauge-max" placeholder="ex: 3500" />
         </div>
         <div class="modal-field">
+          <label>Pointage ventes</label>
+          <input type="number" id="new-pointage" placeholder="ex: 1200" />
+        </div>
+        <div class="modal-field">
           <label>Distance gare → hôtel</label>
           <input type="text" id="new-dist-gare" placeholder="ex: 500 m · 7 min" />
         </div>
@@ -4486,6 +4569,125 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-add-date')">Annuler</button>
       <button class="btn btn-primary" onclick="addDate()">✅ Enregistrer la date</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE MODIFIER UNE DATE -->
+<div id="modal-edit-date" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">✏️ MODIFIER LA FICHE DATE</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-date')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Ville</label>
+          <input type="text" id="edit-ville" placeholder="ex: Lyon" />
+        </div>
+        <div class="modal-field">
+          <label>Date du concert</label>
+          <input type="date" id="edit-date" />
+        </div>
+        <div class="modal-field">
+          <label>Heure du show</label>
+          <input type="time" id="edit-heure" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field" style="flex:2;">
+          <label>Nom de la salle</label>
+          <input type="text" id="edit-salle" placeholder="ex: Zénith de Lyon" />
+        </div>
+        <div class="modal-field" style="flex:1;">
+          <label>Statut</label>
+          <select id="edit-statut">
+            <option value="confirmee">✅ Confirmée</option>
+            <option value="option">🟠 Option</option>
+            <option value="annulee">🔴 Annulée</option>
+            <option value="reportee">🟣 Reportée</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Jauge choisie</label>
+          <input type="number" id="edit-jauge-choisie" placeholder="ex: 2500" />
+        </div>
+        <div class="modal-field">
+          <label>Jauge maximum</label>
+          <input type="number" id="edit-jauge-max" placeholder="ex: 3500" />
+        </div>
+        <div class="modal-field">
+          <label>Pointage ventes</label>
+          <input type="number" id="edit-pointage" placeholder="ex: 1200" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>🔧 Heure montage</label>
+          <input type="time" id="edit-montage" />
+        </div>
+        <div class="modal-field">
+          <label>🍽️ Déjeuner</label>
+          <input type="time" id="edit-dejeuner" />
+        </div>
+        <div class="modal-field">
+          <label>🎸 Balances</label>
+          <input type="time" id="edit-balances" />
+        </div>
+        <div class="modal-field">
+          <label>🍷 Dîner</label>
+          <input type="time" id="edit-diner" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>🚪 Open doors</label>
+          <input type="time" id="edit-portes" />
+        </div>
+        <div class="modal-field">
+          <label>🎵 Start show</label>
+          <input type="time" id="edit-start" />
+        </div>
+        <div class="modal-field">
+          <label>🏁 End show</label>
+          <input type="time" id="edit-end" />
+        </div>
+        <div class="modal-field">
+          <label>🚛 End date</label>
+          <input type="time" id="edit-enddate" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Distance gare → hôtel</label>
+          <input type="text" id="edit-dist-gare" placeholder="ex: 500 m · 7 min" />
+        </div>
+        <div class="modal-field">
+          <label>Distance hôtel → salle</label>
+          <input type="text" id="edit-dist-salle" placeholder="ex: 2 km · 10 min" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>💬 Commentaires</label>
+          <textarea id="edit-commentaire" placeholder="Notes libres..." style="background:var(--black); border:1px solid var(--border); border-radius:8px; color:var(--white); padding:10px 12px; font-size:13px; font-family:'Inter',sans-serif; resize:vertical; min-height:80px; outline:none; width:100%; box-sizing:border-box;"></textarea>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-date')">Annuler</button>
+      <button class="btn btn-primary" onclick="sauvegarderModifDate()">💾 Enregistrer les modifications</button>
     </div>
   </div>
 </div>
