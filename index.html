@@ -3273,12 +3273,20 @@
 
     const assignes = new Set((equipe || []).map(e => e.membre_id));
 
-    // Grouper par role
-    const roles = {};
+    // Grouper par team dans l'ordre voulu
+    const ordreTeams = ['production', 'artistique', 'technique'];
+    const teamLabels = {
+      'production': '📋 PRODUCTION',
+      'artistique': '🎤 ARTISTIQUE',
+      'technique': '🔧 TECHNIQUE',
+      'autre': '👤 AUTRE',
+    };
+
+    const teams = { production: [], artistique: [], technique: [], autre: [] };
     _allMembres.forEach(m => {
-      const role = m.role || 'Autre';
-      if (!roles[role]) roles[role] = [];
-      roles[role].push(m);
+      const t = (m.team || 'autre').toLowerCase();
+      if (teams[t] !== undefined) teams[t].push(m);
+      else teams['autre'].push(m);
     });
 
     container.innerHTML = '';
@@ -3288,10 +3296,13 @@
       return;
     }
 
-    Object.entries(roles).forEach(([roleName, membres]) => {
+    [...ordreTeams, 'autre'].forEach(teamKey => {
+      const membres = teams[teamKey];
+      if (membres.length === 0) return;
+
       const section = document.createElement('div');
       section.style.cssText = 'margin-bottom:16px;';
-      section.innerHTML = `<div style="font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border);">👤 ${roleName}</div>`;
+      section.innerHTML = `<div style="font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border);">${teamLabels[teamKey]}</div>`;
 
       membres.forEach(m => {
         const label = document.createElement('label');
