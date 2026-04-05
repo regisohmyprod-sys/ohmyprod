@@ -2934,6 +2934,7 @@
     document.getElementById('page-' + id).classList.add('active');
     updateBreadcrumb(id);
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (id === 'equipe') chargerPageMembres();
   }
 
   // Tournée et dates actives pour navigation
@@ -3188,12 +3189,6 @@
   }
 
   // Charger les membres quand on va sur la page équipe
-  const _origShowPage = showPage;
-  function showPage(id) {
-    _origShowPage(id);
-    if (id === 'equipe') chargerPageMembres();
-  }
-
   // Membres chargés globalement
   let _allMembres = [];
 
