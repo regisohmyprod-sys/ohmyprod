@@ -3144,7 +3144,7 @@
           <td><span class="member-avatar">${initiales}</span>${m.prenom||''} ${m.nom||''}</td>
           <td>${m.fonction||'–'}</td>
           <td>${m.telephone||'–'}</td>
-          <td><span class="badge ${m.role_app==='admin'?'badge-green':'badge-grey'}">${m.role_app==='admin'?'Admin':'Membre'}</span></td>`;
+          <td><span class="badge ${m.role==='admin'?'badge-green':'badge-grey'}">${m.role==='admin'?'Admin':'Membre'}</span></td>`;
         tbody.appendChild(tr);
       });
 
@@ -3170,8 +3170,8 @@
       email: email || null,
       telephone: tel || null,
       fonction: fonction || null,
-      team,
-      role_app: role,
+      groupe_depart: team || null,
+      role: role || 'membre',
     });
 
     if (error) { alert('Erreur : ' + error.message); return; }
