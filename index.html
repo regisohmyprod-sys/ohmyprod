@@ -3138,13 +3138,17 @@
       const tbody = document.createElement('tbody');
 
       membres.forEach(m => {
-        const initiales = `${(m.prenom||'')[0]||''}${(m.nom||'')[0]||''}`.toUpperCase();
+        const initiales = m.avatar_initiales || `${(m.prenom||'')[0]||''}${(m.nom||'')[0]||''}`.toUpperCase();
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><span class="member-avatar">${initiales}</span>${m.prenom||''} ${m.nom||''}</td>
           <td>${m.fonction||'–'}</td>
           <td>${m.telephone||'–'}</td>
-          <td><span class="badge ${m.role==='admin'?'badge-green':'badge-grey'}">${m.role==='admin'?'Admin':'Membre'}</span></td>`;
+          <td><span class="badge ${m.role==='admin'?'badge-green':'badge-grey'}">${m.role==='admin'?'Admin':'Membre'}</span></td>
+          <td style="text-align:right; white-space:nowrap;">
+            <button class="btn btn-ghost" style="font-size:11px; padding:4px 8px; margin-right:4px;" onclick="ouvrirModifierMembre('${m.id}')">✏️</button>
+            <button class="btn" style="font-size:11px; padding:4px 8px; background:#7f1d1d; border:1px solid #ef4444; color:#fff;" onclick="supprimerMembre('${m.id}', '${m.prenom} ${m.nom}')">🗑️</button>
+          </td>`;
         tbody.appendChild(tr);
       });
 
@@ -3152,6 +3156,55 @@
       section.appendChild(table);
       container.appendChild(section);
     });
+  }
+
+  function ouvrirModifierMembre(id) {
+    const m = _allMembres.find(m => m.id === id);
+    if (!m) return;
+    document.getElementById('edit-membre-id').value = m.id;
+    document.getElementById('edit-membre-prenom').value = m.prenom || '';
+    document.getElementById('edit-membre-nom').value = m.nom || '';
+    document.getElementById('edit-membre-email').value = m.email || '';
+    document.getElementById('edit-membre-tel').value = m.telephone || '';
+    document.getElementById('edit-membre-fonction').value = m.fonction || '';
+    document.getElementById('edit-membre-team').value = m.team || 'artistique';
+    document.getElementById('edit-membre-role').value = m.role || 'membre';
+    document.getElementById('edit-membre-groupe').value = m.groupe_depart || '';
+    openModal('modal-edit-membre');
+  }
+
+  async function sauvegarderModifMembre() {
+    const id = document.getElementById('edit-membre-id').value;
+    const prenom = document.getElementById('edit-membre-prenom').value.trim();
+    const nom = document.getElementById('edit-membre-nom').value.trim();
+    if (!prenom || !nom) { alert('Prénom et nom obligatoires.'); return; }
+
+    const initiales = `${prenom[0]||''}${nom[0]||''}`.toUpperCase();
+    const { error } = await _supabase.from('membres').update({
+      prenom, nom,
+      email: document.getElementById('edit-membre-email').value.trim() || null,
+      telephone: document.getElementById('edit-membre-tel').value.trim() || null,
+      fonction: document.getElementById('edit-membre-fonction').value.trim() || null,
+      team: document.getElementById('edit-membre-team').value || null,
+      role: document.getElementById('edit-membre-role').value || 'membre',
+      groupe_depart: document.getElementById('edit-membre-groupe').value.trim() || null,
+      avatar_initiales: initiales,
+    }).eq('id', id);
+
+    if (error) { alert('Erreur : ' + error.message); return; }
+    closeModal('modal-edit-membre');
+    _allMembres = [];
+    await chargerMembres();
+    chargerPageMembres();
+  }
+
+  async function supprimerMembre(id, nom) {
+    if (!confirm(`Supprimer ${nom} ? Cette action est irréversible.`)) return;
+    const { error } = await _supabase.from('membres').delete().eq('id', id);
+    if (error) { alert('Erreur : ' + error.message); return; }
+    _allMembres = [];
+    await chargerMembres();
+    chargerPageMembres();
   }
 
   async function ajouterMembreManuel() {
@@ -5052,6 +5105,71 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-edit-date')">Annuler</button>
       <button class="btn btn-primary" onclick="sauvegarderModifDate()">💾 Enregistrer les modifications</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE MODIFIER UN MEMBRE -->
+<div id="modal-edit-membre" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box" style="max-width:540px;">
+    <div class="modal-header">
+      <div class="modal-title">✏️ MODIFIER UN MEMBRE</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-membre')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-membre-id" />
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Prénom *</label>
+          <input type="text" id="edit-membre-prenom" placeholder="Prénom" />
+        </div>
+        <div class="modal-field">
+          <label>Nom *</label>
+          <input type="text" id="edit-membre-nom" placeholder="Nom" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Email</label>
+          <input type="email" id="edit-membre-email" placeholder="email@exemple.com" />
+        </div>
+        <div class="modal-field">
+          <label>Téléphone</label>
+          <input type="text" id="edit-membre-tel" placeholder="06 12 34 56 78" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Fonction</label>
+          <input type="text" id="edit-membre-fonction" placeholder="ex: Chanteur principal" />
+        </div>
+        <div class="modal-field">
+          <label>Groupe / Départ</label>
+          <input type="text" id="edit-membre-groupe" placeholder="ex: Paris" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Team</label>
+          <select id="edit-membre-team">
+            <option value="artistique">🎤 Artistique</option>
+            <option value="production">📋 Production</option>
+            <option value="technique">🔧 Technique</option>
+            <option value="autre">👤 Autre</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label>Rôle App</label>
+          <select id="edit-membre-role">
+            <option value="membre">Membre</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-membre')">Annuler</button>
+      <button class="btn btn-primary" onclick="sauvegarderModifMembre()">💾 Enregistrer</button>
     </div>
   </div>
 </div>
