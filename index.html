@@ -3251,7 +3251,9 @@
     const container = document.getElementById('cs-liste-dates');
     if (!container) return;
     container.innerHTML = '<div style="color:#888;font-size:13px;padding:20px;">Chargement...</div>';
-    const today = new Date().toISOString().split('T')[0];
+    // Date locale (évite décalage UTC le soir)
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     let query = _supabase.from('dates_concert').select('id, date_concert, ville, nom_salle, tournee_id, statut').order('date_concert', { ascending: true });
     if (_csFilter === 'avenir') {
       query = query.gte('date_concert', today);
@@ -3501,8 +3503,8 @@
 
     const today = new Date(); today.setHours(0,0,0,0);
     const dates = tournee.dates_concert || [];
-    const avenir = dates.filter(d => new Date(d.date_concert) >= today);
-    const passees = dates.filter(d => new Date(d.date_concert) < today);
+    const avenir = dates.filter(d => parseDate(d.date_concert) >= today);
+    const passees = dates.filter(d => parseDate(d.date_concert) < today);
     const prochaine = [...avenir].sort((a,b) => new Date(a.date_concert)-new Date(b.date_concert))[0];
 
     document.getElementById('dyn-dates-effectuees').textContent = passees.length;
@@ -4148,10 +4150,18 @@
     reportee:  '<span class="badge badge-purple">Reportée</span>',
   };
 
+  // Parse une date YYYY-MM-DD en heure locale (évite le bug UTC)
+  function parseDate(str) {
+    if (!str) return null;
+    return new Date(str.substring(0,10) + 'T00:00:00');
+  }
+
   function isAvenir(dateStr) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return new Date(dateStr) >= today;
+    // Forcer parsing en heure locale (évite le décalage UTC)
+    const d = parseDate(dateStr);
+    return d ? d >= today : false;
   }
 
   // Charger toutes les tournées depuis Supabase
@@ -4221,8 +4231,8 @@
     tournees.forEach(t => {
       const dates = t.dates_concert || [];
       const today = new Date();
-      const avenir = dates.filter(d => new Date(d.date_concert) >= today);
-      const passees = dates.filter(d => new Date(d.date_concert) < today);
+      const avenir = dates.filter(d => parseDate(d.date_concert) >= today);
+      const passees = dates.filter(d => parseDate(d.date_concert) < today);
       const prochaine = avenir.sort((a,b) => new Date(a.date_concert) - new Date(b.date_concert))[0];
 
       const prochaineStr = prochaine
@@ -4259,7 +4269,7 @@
     tournees.forEach(t => {
       const dates = t.dates_concert || [];
       dates.forEach(d => {
-        if (new Date(d.date_concert) >= today) {
+        if (parseDate(d.date_concert) >= today) {
           totalAvenir++;
           if (!prochaine || new Date(d.date_concert) < new Date(prochaine.date_concert)) {
             prochaine = d;
@@ -4354,9 +4364,9 @@
     if (!page) return;
     const today = new Date();
     const dates = tournee.dates_concert || [];
-    const avenir = dates.filter(d => new Date(d.date_concert) >= today)
+    const avenir = dates.filter(d => parseDate(d.date_concert) >= today)
       .sort((a,b) => new Date(a.date_concert) - new Date(b.date_concert));
-    const passees = dates.filter(d => new Date(d.date_concert) < today);
+    const passees = dates.filter(d => parseDate(d.date_concert) < today);
     const prochaine = avenir[0];
 
     const vals = page.querySelectorAll('.tournee-stat-value');
