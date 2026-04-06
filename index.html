@@ -1733,7 +1733,8 @@
       </div>
 
       <!-- Bouton sauvegarder -->
-      <button onclick="fpSauvegarder()" style="width:100%;background:#e31e24;color:#fff;border:none;border-radius:8px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:40px;" id="fp-save-btn">💾 Enregistrer la fiche</button>
+      <button onclick="fpSauvegarder()" style="width:100%;background:#e31e24;color:#fff;border:none;border-radius:8px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;" id="fp-save-btn">💾 Enregistrer la fiche</button>
+      <button onclick="fpSupprimer()" style="width:100%;background:transparent;color:#555;border:1px solid #333;border-radius:8px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:40px;">🗑️ Supprimer la fiche de production</button>
     </div>
 
     <!-- TOURNEES -->
@@ -3485,6 +3486,21 @@
         btn.style.background = '#e31e24';
         btn.disabled = false;
       }, 2000);
+    }
+  }
+
+  async function fpSupprimer() {
+    if (!_fpDateId) return;
+    const ville = document.getElementById('fp-ville').value || 'cette date';
+    if (!confirm(`Supprimer la fiche de production pour ${ville} ?\n\nLa date reste dans la tournée, seule la fiche de prod est supprimée.`)) return;
+
+    const { error } = await _supabase.from('fiches_production').delete().eq('date_concert_id', _fpDateId);
+    if (error) {
+      alert('❌ Erreur : ' + error.message);
+    } else {
+      // Retour à Créa/Suivi
+      showPage('gestion-omp');
+      csChargerDates();
     }
   }
 
