@@ -3492,13 +3492,18 @@
   async function fpSupprimer() {
     if (!_fpDateId) return;
     const ville = document.getElementById('fp-ville').value || 'cette date';
-    if (!confirm(`Supprimer la fiche de production pour ${ville} ?\n\nLa date reste dans la tournée, seule la fiche de prod est supprimée.`)) return;
+    if (!confirm(`Supprimer définitivement la date de ${ville} ?\n\nCela supprimera la fiche de prod ET la date de la tournée.`)) return;
 
-    const { error } = await _supabase.from('fiches_production').delete().eq('date_concert_id', _fpDateId);
+    // Supprimer la fiche de prod
+    await _supabase.from('fiches_production').delete().eq('date_concert_id', _fpDateId);
+    // Supprimer la date elle-même
+    const { error } = await _supabase.from('dates_concert').delete().eq('id', _fpDateId);
+
     if (error) {
       alert('❌ Erreur : ' + error.message);
     } else {
-      // Retour à Créa/Suivi
+      // Recharger les tournées et retour à Créa/Suivi
+      await chargerTournees();
       showPage('gestion-omp');
       csChargerDates();
     }
