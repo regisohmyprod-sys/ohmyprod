@@ -3348,26 +3348,29 @@
     if (!nomSalle || nomSalle.length < 3) return;
     clearTimeout(_fpAdresseTimer);
     _fpAdresseTimer = setTimeout(async () => {
-      try {
-        const ville = document.getElementById('fp-ville').value || '';
-        const q = encodeURIComponent(nomSalle + ' ' + ville + ' France');
-        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=fr`, {
-          headers: { 'Accept': 'application/json', 'Accept-Language': 'fr' }
-        });
-        const data = await r.json();
-        if (data && data[0]) {
-          document.getElementById('fp-adresse-salle').value = data[0].display_name;
-        }
-      } catch(e) {}
       // Mémoriser la salle
       const salles = JSON.parse(localStorage.getItem('omp_salles') || '[]');
       if (!salles.includes(nomSalle)) {
         salles.push(nomSalle);
         localStorage.setItem('omp_salles', JSON.stringify(salles));
         const dl = document.getElementById('fp-salle-list');
-        dl.innerHTML = salles.map(s => `<option value="${s}">`).join('');
+        if (dl) dl.innerHTML = salles.map(s => `<option value="${s}">`).join('');
       }
-    }, 1000);
+      // Recherche adresse
+      try {
+        const ville = document.getElementById('fp-ville').value || '';
+        const q = encodeURIComponent(nomSalle + ' ' + ville + ' France');
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=fr`, {
+          headers: { 'Accept': 'application/json', 'Accept-Language': 'fr', 'User-Agent': 'OhMyProd/1.0 (regis.ohmyprod@gmail.com)' }
+        });
+        const data = await r.json();
+        if (data && data[0]) {
+          document.getElementById('fp-adresse-salle').value = data[0].display_name;
+        }
+      } catch(e) {
+        console.log('Adresse auto erreur:', e);
+      }
+    }, 800);
   }
 
   async function fpSauvegarder() {
