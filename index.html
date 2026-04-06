@@ -3147,11 +3147,11 @@
     if (!container) return;
     container.innerHTML = '<div style="color:#888;font-size:13px;padding:20px;">Chargement...</div>';
 
-    let query = _supabase.from('dates_concert').select('id, date, ville, salle, tournee_id, statut').order('date', { ascending: true });
+    let query = _supabase.from('dates_concert').select('id, date_concert, ville, nom_salle, tournee_id, statut').order('date_concert', { ascending: true });
     if (_csFilter !== 'all') query = query.eq('tournee_id', _csFilter);
 
     const { data: dates, error } = await query;
-    if (error || !dates) { container.innerHTML = '<div style="color:#e31e24;">Erreur chargement</div>'; return; }
+    if (error || !dates) { container.innerHTML = '<div style="color:#e31e24;">Erreur chargement : ' + (error?.message||'') + '</div>'; return; }
 
     // Charger les fiches existantes
     const { data: fiches } = await _supabase.from('fiches_production').select('date_concert_id');
@@ -3163,9 +3163,8 @@
 
     container.innerHTML = dates.map(d => {
       const hasFiche = fichesIds.has(d.id);
-      const dateObj = d.date ? new Date(d.date) : null;
+      const dateObj = d.date_concert ? new Date(d.date_concert) : null;
       const dateStr = dateObj ? dateObj.toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' }) : '—';
-      const isPast = dateObj && dateObj < new Date();
       return `
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
           <div style="flex:1;">
