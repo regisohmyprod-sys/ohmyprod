@@ -1551,14 +1551,127 @@
 
     <!-- GESTION OMP -->
     <div id="page-gestion-omp" class="page">
-      <div class="page-title">🔒 GESTION OMP — CREA / SUIVI DATES</div>
+      <div class="page-title">📋 CRÉA / SUIVI DATES</div>
+
+      <!-- Filtres tournée -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="filter-btn active" id="cs-filter-all" onclick="csSetFilter('all')">Toutes</button>
+        <button class="filter-btn" id="cs-filter-twoq" onclick="csSetFilter('twoq')">TWOQ L'Hommage</button>
+        <button class="filter-btn" id="cs-filter-twoq2" onclick="csSetFilter('twoq2')">TWOQ Éternelle</button>
+        <button class="filter-btn" id="cs-filter-greg" onclick="csSetFilter('greg')">Greg Petras</button>
+      </div>
+
+      <!-- Liste dates -->
+      <div id="cs-liste-dates" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <!-- PAGE FICHE PRODUCTION -->
+    <div id="page-fiche-prod" class="page">
+      <button class="back-btn" onclick="showPage('gestion-omp');csChargerDates()">← Créa / Suivi dates</button>
+      <div class="page-title" id="fp-titre" style="margin-top:8px;"></div>
+      <div id="fp-sous-titre" style="color:var(--grey-light);font-size:13px;margin-bottom:20px;"></div>
+
+      <!-- BLOC 1 : Infos générales -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
-        <div style="color:#c9a84c;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">⚠️ Accès administrateur uniquement</div>
-        <div style="color:#888;font-size:13px;">Ce module contient les informations financières et de production des tournées. Visible uniquement par Régis et Alexandrine.</div>
+        <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:16px;">📋 INFOS GÉNÉRALES</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Producteur</label>
+            <input id="fp-producteur" type="text" value="OH MY PROD" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Promoteur local</label>
+            <input id="fp-promoteur" type="text" placeholder="PAS DE PL" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Type de prod</label>
+            <select id="fp-type-prod" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="Prod OMP">Prod OMP</option>
+              <option value="Coproduction">Coproduction</option>
+              <option value="Accueil">Accueil</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Gestion billetterie</label>
+            <select id="fp-billetterie" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="LDC">LDC</option>
+              <option value="Ticketmaster">Ticketmaster</option>
+              <option value="Fnac">Fnac</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">MG montant (€)</label>
+            <input id="fp-mg" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal OMP %</label>
+            <input id="fp-deal-omp" type="number" placeholder="100" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal Promo locale %</label>
+            <input id="fp-deal-promo" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+        </div>
       </div>
-      <div id="gestion-omp-content" style="color:#888;font-size:14px;padding:20px 0;">
-        Sélectionnez une tournée depuis le tableau de bord pour accéder à son bordereau financier.
+
+      <!-- BLOC 2 : Infos salle & ventes -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
+        <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:16px;">🏟️ SALLE & VENTES</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Salle</label>
+            <input id="fp-salle" type="text" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Heure</label>
+            <input id="fp-heure" type="text" placeholder="20H30" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Jauge de départ</label>
+            <input id="fp-jauge-depart" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">État des ventes</label>
+            <input id="fp-etat-ventes" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Invitations</label>
+            <input id="fp-invitations" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Total jauge à ce jour</label>
+            <input id="fp-total-jauge" type="number" placeholder="0" readonly style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:6px;color:#c9a84c;padding:8px 10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Date MEV</label>
+            <input id="fp-date-mev" type="date" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Jauge finale choisie</label>
+            <input id="fp-jauge-finale" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">DL OMP %</label>
+            <input id="fp-dl-omp" type="number" placeholder="100" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">DL Prod locale %</label>
+            <input id="fp-dl-prod-locale" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding-top:20px;">
+            <input id="fp-cout-plateau-mg" type="checkbox" style="width:16px;height:16px;accent-color:#e31e24;">
+            <label for="fp-cout-plateau-mg" style="font-size:13px;color:#fff;">Coût plateau sur MG ?</label>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Boost bonus (€)</label>
+            <input id="fp-boost" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+        </div>
       </div>
+
+      <!-- Bouton sauvegarder -->
+      <button onclick="fpSauvegarder()" style="width:100%;background:#e31e24;color:#fff;border:none;border-radius:8px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:40px;" id="fp-save-btn">💾 Enregistrer la fiche</button>
     </div>
 
     <!-- TOURNEES -->
@@ -3007,32 +3120,165 @@
     if (id === 'equipe') chargerPageMembres();
   }
 
-  function showGestionOMP(tourneeId) {
-    // Vérifier si admin
-    const isAdmin = _currentUserRole === 'admin';
-    if (!isAdmin) {
-      alert('🔒 Accès réservé aux administrateurs OMP.');
-      return;
-    }
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-gestion-omp').classList.add('active');
-    updateBreadcrumb('gestion-omp');
+  // =============================================
+  // MODULE CRÉA / SUIVI DATES
+  // =============================================
+  let _csFilter = 'all';
+  let _fpDateId = null; // date_concert_id en cours d'édition
 
-    if (tourneeId) {
-      const noms = { twoq: 'TWOQ – L\'hommage', twoq2: 'TWOQ – Éternelle Légende', greg: 'Greg Petras' };
-      document.getElementById('gestion-omp-content').innerHTML = `
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;">
-          <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:16px;">
-            📋 ${noms[tourneeId] || tourneeId}
+  function showGestionOMP(tourneeId) {
+    const isAdmin = _currentUserRole === 'admin';
+    if (!isAdmin) { alert('🔒 Accès réservé aux administrateurs OMP.'); return; }
+    if (tourneeId) _csFilter = tourneeId;
+    showPage('gestion-omp');
+    csChargerDates();
+  }
+
+  function csSetFilter(f) {
+    _csFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('cs-filter-' + f);
+    if (btn) btn.classList.add('active');
+    csChargerDates();
+  }
+
+  async function csChargerDates() {
+    const container = document.getElementById('cs-liste-dates');
+    if (!container) return;
+    container.innerHTML = '<div style="color:#888;font-size:13px;padding:20px;">Chargement...</div>';
+
+    let query = _supabase.from('dates_concert').select('id, date, ville, salle, tournee_id, statut').order('date', { ascending: true });
+    if (_csFilter !== 'all') query = query.eq('tournee_id', _csFilter);
+
+    const { data: dates, error } = await query;
+    if (error || !dates) { container.innerHTML = '<div style="color:#e31e24;">Erreur chargement</div>'; return; }
+
+    // Charger les fiches existantes
+    const { data: fiches } = await _supabase.from('fiches_production').select('date_concert_id');
+    const fichesIds = new Set((fiches || []).map(f => f.date_concert_id));
+
+    if (!dates.length) { container.innerHTML = '<div style="color:#888;font-size:13px;padding:20px;">Aucune date trouvée.</div>'; return; }
+
+    const TOURNEE_NOMS = { twoq: 'TWOQ L\'Hommage', twoq2: 'TWOQ Éternelle', greg: 'Greg Petras' };
+
+    container.innerHTML = dates.map(d => {
+      const hasFiche = fichesIds.has(d.id);
+      const dateObj = d.date ? new Date(d.date) : null;
+      const dateStr = dateObj ? dateObj.toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' }) : '—';
+      const isPast = dateObj && dateObj < new Date();
+      return `
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:14px;color:#fff;">${d.ville || '—'}</div>
+            <div style="font-size:12px;color:#888;margin-top:2px;">${dateStr} · ${TOURNEE_NOMS[d.tournee_id] || d.tournee_id}</div>
           </div>
-          <div style="color:#888;font-size:13px;line-height:1.8;">
-            ✅ Infos date (ville, salle, date, heure...)<br>
-            ✅ Jauge & ventes<br>
-            ✅ Deals (DL, PL, Type prod)<br>
-            ✅ Coût plateau & Boost<br>
-            🔜 Bordereau financier complet (en cours d'intégration)
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${hasFiche
+              ? '<span style="font-size:11px;color:#4caf50;font-weight:700;background:rgba(76,175,80,0.1);border:1px solid #4caf50;border-radius:4px;padding:2px 8px;">✅ FICHE</span>'
+              : '<span style="font-size:11px;color:#888;background:#111;border:1px solid #333;border-radius:4px;padding:2px 8px;">— vide</span>'
+            }
+            <button onclick="fpOuvrir('${d.id}','${(d.ville||'').replace(/'/g,"\\'")}','${dateStr}')" style="background:#e31e24;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+              ${hasFiche ? '✏️ Modifier' : '+ Créer'}
+            </button>
           </div>
         </div>`;
+    }).join('');
+  }
+
+  async function fpOuvrir(dateConcertId, ville, dateStr) {
+    _fpDateId = dateConcertId;
+    document.getElementById('fp-titre').textContent = ville.toUpperCase();
+    document.getElementById('fp-sous-titre').textContent = dateStr;
+
+    // Réinitialiser les champs
+    ['fp-producteur','fp-promoteur','fp-salle','fp-heure','fp-mg','fp-deal-omp','fp-deal-promo','fp-etat-ventes','fp-invitations','fp-total-jauge','fp-jauge-depart','fp-jauge-finale','fp-dl-omp','fp-dl-prod-locale','fp-boost','fp-date-mev'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('fp-producteur').value = 'OH MY PROD';
+    document.getElementById('fp-cout-plateau-mg').checked = false;
+
+    // Charger fiche existante
+    const { data: fiche } = await _supabase.from('fiches_production').select('*').eq('date_concert_id', dateConcertId).single();
+    if (fiche) {
+      document.getElementById('fp-producteur').value = fiche.producteur || 'OH MY PROD';
+      document.getElementById('fp-promoteur').value = fiche.promoteur_local || '';
+      document.getElementById('fp-type-prod').value = fiche.type_prod || 'Prod OMP';
+      document.getElementById('fp-billetterie').value = fiche.gestion_billetterie || 'LDC';
+      document.getElementById('fp-mg').value = fiche.mg_montant || '';
+      document.getElementById('fp-deal-omp').value = fiche.deal_omp_pct || '';
+      document.getElementById('fp-deal-promo').value = fiche.deal_promo_locale_pct || '';
+      document.getElementById('fp-salle').value = fiche.salle || '';
+      document.getElementById('fp-heure').value = fiche.heure || '';
+      document.getElementById('fp-jauge-depart').value = fiche.jauge_depart || '';
+      document.getElementById('fp-etat-ventes').value = fiche.etat_ventes || '';
+      document.getElementById('fp-invitations').value = fiche.invitations || '';
+      document.getElementById('fp-total-jauge').value = fiche.total_jauge || '';
+      document.getElementById('fp-date-mev').value = fiche.date_mev || '';
+      document.getElementById('fp-jauge-finale').value = fiche.jauge_finale || '';
+      document.getElementById('fp-dl-omp').value = fiche.dl_omp_pct || '';
+      document.getElementById('fp-dl-prod-locale').value = fiche.dl_prod_locale_pct || '';
+      document.getElementById('fp-cout-plateau-mg').checked = fiche.cout_plateau_sur_mg || false;
+      document.getElementById('fp-boost').value = fiche.boost_bonus || '';
+    }
+
+    // Calcul auto total jauge
+    ['fp-etat-ventes','fp-invitations'].forEach(id => {
+      document.getElementById(id).addEventListener('input', fpCalcTotal);
+    });
+
+    showPage('fiche-prod');
+  }
+
+  function fpCalcTotal() {
+    const ventes = parseInt(document.getElementById('fp-etat-ventes').value) || 0;
+    const invits = parseInt(document.getElementById('fp-invitations').value) || 0;
+    document.getElementById('fp-total-jauge').value = ventes + invits;
+  }
+
+  async function fpSauvegarder() {
+    const btn = document.getElementById('fp-save-btn');
+    btn.textContent = '⏳ Enregistrement...';
+    btn.disabled = true;
+
+    const payload = {
+      date_concert_id: _fpDateId,
+      producteur: document.getElementById('fp-producteur').value,
+      promoteur_local: document.getElementById('fp-promoteur').value,
+      type_prod: document.getElementById('fp-type-prod').value,
+      gestion_billetterie: document.getElementById('fp-billetterie').value,
+      mg_montant: parseFloat(document.getElementById('fp-mg').value) || 0,
+      deal_omp_pct: parseFloat(document.getElementById('fp-deal-omp').value) || 0,
+      deal_promo_locale_pct: parseFloat(document.getElementById('fp-deal-promo').value) || 0,
+      salle: document.getElementById('fp-salle').value,
+      heure: document.getElementById('fp-heure').value,
+      jauge_depart: parseInt(document.getElementById('fp-jauge-depart').value) || 0,
+      etat_ventes: parseInt(document.getElementById('fp-etat-ventes').value) || 0,
+      invitations: parseInt(document.getElementById('fp-invitations').value) || 0,
+      total_jauge: parseInt(document.getElementById('fp-total-jauge').value) || 0,
+      date_mev: document.getElementById('fp-date-mev').value || null,
+      jauge_finale: parseInt(document.getElementById('fp-jauge-finale').value) || 0,
+      dl_omp_pct: parseFloat(document.getElementById('fp-dl-omp').value) || 0,
+      dl_prod_locale_pct: parseFloat(document.getElementById('fp-dl-prod-locale').value) || 0,
+      cout_plateau_sur_mg: document.getElementById('fp-cout-plateau-mg').checked,
+      boost_bonus: parseFloat(document.getElementById('fp-boost').value) || 0,
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await _supabase.from('fiches_production').upsert(payload, { onConflict: 'date_concert_id' });
+
+    if (error) {
+      alert('❌ Erreur : ' + error.message);
+      btn.textContent = '💾 Enregistrer la fiche';
+      btn.disabled = false;
+    } else {
+      btn.textContent = '✅ Enregistré !';
+      btn.style.background = '#4caf50';
+      setTimeout(() => {
+        btn.textContent = '💾 Enregistrer la fiche';
+        btn.style.background = '#e31e24';
+        btn.disabled = false;
+      }, 2000);
     }
   }
 
