@@ -3129,7 +3129,8 @@
   function showGestionOMP(tourneeId) {
     const isAdmin = _currentUserRole === 'admin';
     if (!isAdmin) { alert('🔒 Accès réservé aux administrateurs OMP.'); return; }
-    if (tourneeId) _csFilter = tourneeId;
+    if (tourneeId) _csFilter = tourneeId; // ex: 'twoq', sera résolu via CS_TOURNEE_IDS
+    else _csFilter = 'all';
     showPage('gestion-omp');
     csChargerDates();
   }
