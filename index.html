@@ -278,7 +278,7 @@
     flex: 1;
     padding: 8px 0;
     border-radius: 7px;
-    border: 1px solid #c9a84c;
+    border: 1px solid #e31e24;
     background: rgba(201,168,76,0.1);
     color: #c9a84c;
     font-size: 12px;
@@ -1451,7 +1451,7 @@
       <span>OH MY PROD</span>
     </div>
     <div class="topbar-actions">
-      <button class="btn btn-ghost" onclick="chargerTournees()" title="Actualiser les données">🔄</button>
+      <button class="btn btn-ghost" onclick="window.location.href = window.location.href.split('?')[0] + '?v=' + Date.now()" title="Actualiser la page (vider le cache)">🔄</button>
       <button class="btn btn-ghost" onclick="openModal('modal-add-tournee')">+ Tournée</button>
       <button class="btn btn-primary" onclick="openModal('modal-notifier')">📨 Notifier l'équipe</button>
       <button class="btn btn-ghost" onclick="doLogout()" title="Déconnexion">🚪</button>
