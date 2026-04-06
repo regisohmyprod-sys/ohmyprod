@@ -1559,11 +1559,12 @@
         <button id="cs-filter-twoq2" onclick="csSetFilter('twoq2')" style="background:#fff;color:#111;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;transition:all 0.15s;">TWOQ Éternelle</button>
         <button id="cs-filter-greg" onclick="csSetFilter('greg')" style="background:#fff;color:#111;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;transition:all 0.15s;">Greg Petras</button>
       </div>
-      <!-- Filtres période — ligne 2 : petits boutons -->
-      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <!-- Filtres période — ligne 2 : petits boutons + bouton créer -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
         <button class="filter-btn active" id="cs-filter-avenir" onclick="csSetFilter('avenir')">À venir</button>
         <button class="filter-btn" id="cs-filter-all" onclick="csSetFilter('all')">Toutes</button>
         <button class="filter-btn" id="cs-filter-passees" onclick="csSetFilter('passees')">Passées</button>
+        <button id="cs-btn-creer-date" onclick="csCreerDate()" style="display:none;margin-left:auto;background:#e31e24;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;">+ CRÉER UNE DATE</button>
       </div>
 
       <!-- Liste dates -->
@@ -3177,7 +3178,24 @@
       const btn = document.getElementById('cs-filter-' + f);
       if (btn) btn.classList.add('active');
     }
+    // Afficher le bouton CRÉER UNE DATE uniquement si une tournée est sélectionnée
+    const btnCreer = document.getElementById('cs-btn-creer-date');
+    if (btnCreer) btnCreer.style.display = ['twoq','twoq2','greg'].includes(f) ? 'block' : 'none';
     csChargerDates();
+  }
+
+  function csCreerDate() {
+    // Positionner _tourneeActive selon le filtre tournée actif
+    if (['twoq','twoq2','greg'].includes(_csFilter)) {
+      const tournee = _allTournees?.find(t => {
+        if (_csFilter === 'twoq') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage');
+        if (_csFilter === 'twoq2') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle');
+        if (_csFilter === 'greg') return t.nom_groupe === 'GREG PETRAS';
+        return false;
+      });
+      if (tournee) _tourneeActive = tournee;
+    }
+    openModal('modal-add-date');
   }
 
   async function csChargerDates() {
@@ -3225,7 +3243,7 @@
               : '<span style="font-size:11px;color:#888;background:#111;border:1px solid #333;border-radius:4px;padding:2px 8px;">— vide</span>'
             }
             <button onclick="fpOuvrir('${d.id}','${(d.ville||'').replace(/'/g,"\\'")}','${dateStr}')" style="background:#e31e24;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
-              ${hasFiche ? '✏️ Modifier' : '📋 Créer / Suivre'}
+              ${hasFiche ? '✏️ Modifier' : '📋 Suivre'}
             </button>
           </div>
         </div>`;
