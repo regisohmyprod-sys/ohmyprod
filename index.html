@@ -1573,8 +1573,34 @@
     <!-- PAGE FICHE PRODUCTION -->
     <div id="page-fiche-prod" class="page">
       <button class="back-btn" onclick="showPage('gestion-omp');csChargerDates()">← Créa / Suivi dates</button>
-      <div class="page-title" id="fp-titre" style="margin-top:8px;"></div>
-      <div id="fp-sous-titre" style="color:var(--grey-light);font-size:13px;margin-bottom:20px;"></div>
+
+      <!-- EN-TÊTE FICHE : Ville / Date / Horaire / État -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-top:8px;margin-bottom:16px;">
+        <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:16px;">📍 IDENTIFICATION DE LA DATE</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Ville</label>
+            <input id="fp-ville" type="text" placeholder="ex : NIORT" style="width:100%;background:#0a0a0a;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:8px 10px;font-size:15px;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Date du concert</label>
+            <input id="fp-date-concert" type="date" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Horaire</label>
+            <input id="fp-horaire" type="text" placeholder="20H30" oninput="document.getElementById('fp-heure').value=this.value" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">État de la date</label>
+            <select id="fp-statut" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="confirmee">✅ Confirmée</option>
+              <option value="option">🟡 Option</option>
+              <option value="reportee">🔵 Reportée</option>
+              <option value="annulee">❌ Annulée</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
       <!-- BLOC 1 : Infos générales -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
@@ -1586,23 +1612,32 @@
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Promoteur local</label>
-            <input id="fp-promoteur" type="text" placeholder="PAS DE PL" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <select id="fp-promoteur" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="PAS DE PL">PAS DE PL</option>
+              <option value="LDC">LDC</option>
+              <option value="NDA">NDA</option>
+              <option value="BLCITRON">BLCITRON</option>
+              <option value="PEELPROD">PEELPROD</option>
+              <option value="AUTRE">AUTRE</option>
+            </select>
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Type de prod</label>
             <select id="fp-type-prod" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-              <option value="Prod OMP">Prod OMP</option>
-              <option value="Coproduction">Coproduction</option>
-              <option value="Accueil">Accueil</option>
+              <option value="PROD OMP">PROD OMP</option>
+              <option value="CO-PROD">CO-PROD</option>
+              <option value="PLOCALE">PLOCALE</option>
+              <option value="VENTE">VENTE</option>
             </select>
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Gestion billetterie</label>
-            <select id="fp-billetterie" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-              <option value="LDC">LDC</option>
-              <option value="Ticketmaster">Ticketmaster</option>
-              <option value="Fnac">Fnac</option>
-              <option value="Autre">Autre</option>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal OMP %</label>
+            <select id="fp-deal-omp" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="50/50">50/50</option>
+              <option value="60/40">60/40</option>
+              <option value="80/20">80/20</option>
+              <option value="100% OMP" selected>100% OMP</option>
+              <option value="VENTE">VENTE</option>
             </select>
           </div>
           <div>
@@ -1610,12 +1645,28 @@
             <input id="fp-mg" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal OMP %</label>
-            <input id="fp-deal-omp" type="number" placeholder="100" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-          </div>
-          <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal Promo locale %</label>
             <input id="fp-deal-promo" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Gestion billetterie</label>
+            <select id="fp-billetterie" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="OMP">OMP</option>
+              <option value="LDC">LDC</option>
+              <option value="NDA">NDA</option>
+              <option value="BLCITRON">BLCITRON</option>
+              <option value="PEELPROD">PEELPROD</option>
+              <option value="AUTRES">AUTRES</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal billetterie</label>
+            <select id="fp-deal-billetterie" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="100%">100%</option>
+              <option value="50/50">50/50</option>
+              <option value="80/20">80/20</option>
+              <option value="AUTRES">AUTRES</option>
+            </select>
           </div>
         </div>
       </div>
@@ -1626,11 +1677,16 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Salle</label>
-            <input id="fp-salle" type="text" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <input id="fp-salle" type="text" list="fp-salle-list" autocomplete="off" oninput="fpAutoAdresse(this.value)" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <datalist id="fp-salle-list"></datalist>
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Heure</label>
-            <input id="fp-heure" type="text" placeholder="20H30" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Heure <span style="color:#555;">(depuis horaire)</span></label>
+            <input id="fp-heure" type="text" readonly style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:6px;color:#c9a84c;padding:8px 10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div style="grid-column:1/-1;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Adresse salle <span style="color:#555;font-size:10px;">(auto)</span></label>
+            <input id="fp-adresse-salle" type="text" placeholder="Trouvée automatiquement via le nom de la salle" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Jauge de départ</label>
@@ -1638,11 +1694,11 @@
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">État des ventes</label>
-            <input id="fp-etat-ventes" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <input id="fp-etat-ventes" type="number" placeholder="0" oninput="fpCalcTotal()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Invitations</label>
-            <input id="fp-invitations" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <input id="fp-invitations" type="number" placeholder="0" oninput="fpCalcTotal()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Total jauge à ce jour</label>
@@ -3220,29 +3276,50 @@
 
   async function fpOuvrir(dateConcertId, ville, dateStr) {
     _fpDateId = dateConcertId;
-    document.getElementById('fp-titre').textContent = ville.toUpperCase();
-    document.getElementById('fp-sous-titre').textContent = dateStr;
 
-    // Réinitialiser les champs
-    ['fp-producteur','fp-promoteur','fp-salle','fp-heure','fp-mg','fp-deal-omp','fp-deal-promo','fp-etat-ventes','fp-invitations','fp-total-jauge','fp-jauge-depart','fp-jauge-finale','fp-dl-omp','fp-dl-prod-locale','fp-boost','fp-date-mev'].forEach(id => {
+    // Réinitialiser tous les champs
+    ['fp-ville','fp-salle','fp-heure','fp-horaire','fp-mg','fp-deal-promo','fp-etat-ventes','fp-invitations','fp-total-jauge','fp-jauge-depart','fp-jauge-finale','fp-dl-omp','fp-dl-prod-locale','fp-boost','fp-date-mev','fp-adresse-salle'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
     document.getElementById('fp-producteur').value = 'OH MY PROD';
     document.getElementById('fp-cout-plateau-mg').checked = false;
+    document.getElementById('fp-ville').value = ville;
+
+    // Charger salle mémorisées en datalist
+    const sallesSaved = JSON.parse(localStorage.getItem('omp_salles') || '[]');
+    const dl = document.getElementById('fp-salle-list');
+    dl.innerHTML = sallesSaved.map(s => `<option value="${s}">`).join('');
+
+    // Charger la date depuis dates_concert pour pré-remplir date + heure
+    const { data: dc } = await _supabase.from('dates_concert').select('date_concert, heure_show, nom_salle, statut').eq('id', dateConcertId).single();
+    if (dc) {
+      if (dc.date_concert) document.getElementById('fp-date-concert').value = dc.date_concert;
+      if (dc.heure_show) {
+        document.getElementById('fp-horaire').value = dc.heure_show;
+        document.getElementById('fp-heure').value = dc.heure_show;
+      }
+      if (dc.nom_salle) document.getElementById('fp-salle').value = dc.nom_salle;
+      if (dc.statut) document.getElementById('fp-statut').value = dc.statut;
+    }
 
     // Charger fiche existante
     const { data: fiche } = await _supabase.from('fiches_production').select('*').eq('date_concert_id', dateConcertId).single();
     if (fiche) {
       document.getElementById('fp-producteur').value = fiche.producteur || 'OH MY PROD';
-      document.getElementById('fp-promoteur').value = fiche.promoteur_local || '';
-      document.getElementById('fp-type-prod').value = fiche.type_prod || 'Prod OMP';
-      document.getElementById('fp-billetterie').value = fiche.gestion_billetterie || 'LDC';
+      document.getElementById('fp-promoteur').value = fiche.promoteur_local || 'PAS DE PL';
+      document.getElementById('fp-type-prod').value = fiche.type_prod || 'PROD OMP';
+      document.getElementById('fp-billetterie').value = fiche.gestion_billetterie || 'OMP';
+      document.getElementById('fp-deal-billetterie').value = fiche.deal_billetterie || '100%';
       document.getElementById('fp-mg').value = fiche.mg_montant || '';
-      document.getElementById('fp-deal-omp').value = fiche.deal_omp_pct || '';
+      document.getElementById('fp-deal-omp').value = fiche.deal_omp_pct || '100% OMP';
       document.getElementById('fp-deal-promo').value = fiche.deal_promo_locale_pct || '';
-      document.getElementById('fp-salle').value = fiche.salle || '';
-      document.getElementById('fp-heure').value = fiche.heure || '';
+      if (fiche.salle) document.getElementById('fp-salle').value = fiche.salle;
+      if (fiche.adresse_salle) document.getElementById('fp-adresse-salle').value = fiche.adresse_salle;
+      if (fiche.heure) {
+        document.getElementById('fp-horaire').value = fiche.heure;
+        document.getElementById('fp-heure').value = fiche.heure;
+      }
       document.getElementById('fp-jauge-depart').value = fiche.jauge_depart || '';
       document.getElementById('fp-etat-ventes').value = fiche.etat_ventes || '';
       document.getElementById('fp-invitations').value = fiche.invitations || '';
@@ -3253,12 +3330,9 @@
       document.getElementById('fp-dl-prod-locale').value = fiche.dl_prod_locale_pct || '';
       document.getElementById('fp-cout-plateau-mg').checked = fiche.cout_plateau_sur_mg || false;
       document.getElementById('fp-boost').value = fiche.boost_bonus || '';
+      if (fiche.ville) document.getElementById('fp-ville').value = fiche.ville;
+      if (fiche.statut_date) document.getElementById('fp-statut').value = fiche.statut_date;
     }
-
-    // Calcul auto total jauge
-    ['fp-etat-ventes','fp-invitations'].forEach(id => {
-      document.getElementById(id).addEventListener('input', fpCalcTotal);
-    });
 
     showPage('fiche-prod');
   }
@@ -3269,22 +3343,53 @@
     document.getElementById('fp-total-jauge').value = ventes + invits;
   }
 
+  let _fpAdresseTimer = null;
+  async function fpAutoAdresse(nomSalle) {
+    if (!nomSalle || nomSalle.length < 3) return;
+    clearTimeout(_fpAdresseTimer);
+    _fpAdresseTimer = setTimeout(async () => {
+      try {
+        const ville = document.getElementById('fp-ville').value || '';
+        const q = encodeURIComponent(nomSalle + ' ' + ville + ' France');
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1`);
+        const data = await r.json();
+        if (data && data[0]) {
+          document.getElementById('fp-adresse-salle').value = data[0].display_name;
+        }
+      } catch(e) {}
+      // Mémoriser la salle
+      const salles = JSON.parse(localStorage.getItem('omp_salles') || '[]');
+      if (!salles.includes(nomSalle)) {
+        salles.push(nomSalle);
+        localStorage.setItem('omp_salles', JSON.stringify(salles));
+        const dl = document.getElementById('fp-salle-list');
+        dl.innerHTML = salles.map(s => `<option value="${s}">`).join('');
+      }
+    }, 800);
+  }
+
   async function fpSauvegarder() {
     const btn = document.getElementById('fp-save-btn');
     btn.textContent = '⏳ Enregistrement...';
     btn.disabled = true;
 
+    const heure = document.getElementById('fp-horaire').value || document.getElementById('fp-heure').value;
+
     const payload = {
       date_concert_id: _fpDateId,
+      ville: document.getElementById('fp-ville').value,
+      statut_date: document.getElementById('fp-statut').value,
       producteur: document.getElementById('fp-producteur').value,
       promoteur_local: document.getElementById('fp-promoteur').value,
       type_prod: document.getElementById('fp-type-prod').value,
       gestion_billetterie: document.getElementById('fp-billetterie').value,
+      deal_billetterie: document.getElementById('fp-deal-billetterie').value,
       mg_montant: parseFloat(document.getElementById('fp-mg').value) || 0,
-      deal_omp_pct: parseFloat(document.getElementById('fp-deal-omp').value) || 0,
+      deal_omp_pct: document.getElementById('fp-deal-omp').value,
       deal_promo_locale_pct: parseFloat(document.getElementById('fp-deal-promo').value) || 0,
       salle: document.getElementById('fp-salle').value,
-      heure: document.getElementById('fp-heure').value,
+      adresse_salle: document.getElementById('fp-adresse-salle').value,
+      heure: heure,
       jauge_depart: parseInt(document.getElementById('fp-jauge-depart').value) || 0,
       etat_ventes: parseInt(document.getElementById('fp-etat-ventes').value) || 0,
       invitations: parseInt(document.getElementById('fp-invitations').value) || 0,
