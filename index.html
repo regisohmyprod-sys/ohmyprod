@@ -3213,10 +3213,38 @@
     if (error || !data) { alert('Erreur création : ' + (error?.message || '')); return; }
 
     closeModal('modal-cs-creer-date');
+    _fpDateId = data.id;
 
-    // Recharger la liste puis ouvrir la fiche prod
-    await csChargerDates();
-    fpOuvrir(data.id, ville, new Date(date).toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' }));
+    // Reset tous les champs
+    ['fp-ville','fp-salle','fp-heure','fp-horaire','fp-mg','fp-deal-promo','fp-etat-ventes','fp-invitations','fp-total-jauge','fp-jauge-depart','fp-jauge-finale','fp-dl-omp','fp-dl-prod-locale','fp-boost','fp-date-mev','fp-adresse-salle'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('fp-cout-plateau-mg').checked = false;
+
+    // Pré-remplir avec les données saisies
+    document.getElementById('fp-ville').value = ville;
+    document.getElementById('fp-date-concert').value = date;
+    document.getElementById('fp-horaire').value = heure;
+    document.getElementById('fp-heure').value = heure;
+    document.getElementById('fp-statut').value = 'confirmee';
+
+    // Valeurs par défaut fiche
+    document.getElementById('fp-producteur').value = 'OH MY PROD';
+    document.getElementById('fp-promoteur').value = 'PAS DE PL';
+    document.getElementById('fp-type-prod').value = 'PROD OMP';
+    document.getElementById('fp-billetterie').value = 'OMP';
+    document.getElementById('fp-deal-billetterie').value = '100%';
+    document.getElementById('fp-deal-omp').value = '100% OMP';
+    document.getElementById('fp-mg').value = '0';
+    document.getElementById('fp-deal-promo').value = '0';
+
+    const sallesSaved = JSON.parse(localStorage.getItem('omp_salles') || '[]');
+    const dl = document.getElementById('fp-salle-list');
+    if (dl) dl.innerHTML = sallesSaved.map(s => `<option value="${s}">`).join('');
+
+    // Recharger la liste en arrière-plan
+    csChargerDates();
+    showPage('fiche-prod');
   }
 
   async function csChargerDates() {
