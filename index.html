@@ -1553,15 +1553,17 @@
     <div id="page-gestion-omp" class="page">
       <div class="page-title">📋 CRÉA / SUIVI DATES</div>
 
-      <!-- Filtres tournée -->
+      <!-- Filtres tournée — ligne 1 : tournées en gros boutons blancs -->
+      <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+        <button id="cs-filter-twoq" onclick="csSetFilter('twoq')" style="background:#fff;color:#111;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;transition:all 0.15s;">TWOQ L'Hommage</button>
+        <button id="cs-filter-twoq2" onclick="csSetFilter('twoq2')" style="background:#fff;color:#111;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;transition:all 0.15s;">TWOQ Éternelle</button>
+        <button id="cs-filter-greg" onclick="csSetFilter('greg')" style="background:#fff;color:#111;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;transition:all 0.15s;">Greg Petras</button>
+      </div>
+      <!-- Filtres période — ligne 2 : petits boutons -->
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
         <button class="filter-btn active" id="cs-filter-avenir" onclick="csSetFilter('avenir')">À venir</button>
         <button class="filter-btn" id="cs-filter-all" onclick="csSetFilter('all')">Toutes</button>
         <button class="filter-btn" id="cs-filter-passees" onclick="csSetFilter('passees')">Passées</button>
-        <div style="width:1px;background:#2a2a2a;margin:0 4px;"></div>
-        <button class="filter-btn" id="cs-filter-twoq" onclick="csSetFilter('twoq')">TWOQ L'Hommage</button>
-        <button class="filter-btn" id="cs-filter-twoq2" onclick="csSetFilter('twoq2')">TWOQ Éternelle</button>
-        <button class="filter-btn" id="cs-filter-greg" onclick="csSetFilter('greg')">Greg Petras</button>
       </div>
 
       <!-- Liste dates -->
@@ -3146,9 +3148,21 @@
 
   function csSetFilter(f) {
     _csFilter = f;
+    // Reset petits filtres période
     document.querySelectorAll('#page-gestion-omp .filter-btn').forEach(b => b.classList.remove('active'));
-    const btn = document.getElementById('cs-filter-' + f);
-    if (btn) btn.classList.add('active');
+    // Reset gros boutons tournées
+    ['cs-filter-twoq','cs-filter-twoq2','cs-filter-greg'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) { b.style.background = '#fff'; b.style.color = '#111'; }
+    });
+    // Activer le bon bouton
+    if (['twoq','twoq2','greg'].includes(f)) {
+      const b = document.getElementById('cs-filter-' + f);
+      if (b) { b.style.background = '#e31e24'; b.style.color = '#fff'; }
+    } else {
+      const btn = document.getElementById('cs-filter-' + f);
+      if (btn) btn.classList.add('active');
+    }
     csChargerDates();
   }
 
