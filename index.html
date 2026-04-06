@@ -3134,6 +3134,12 @@
     csChargerDates();
   }
 
+  const CS_TOURNEE_IDS = {
+    twoq:  '11111111-1111-1111-1111-111111111111',
+    twoq2: '22222222-2222-2222-2222-222222222222',
+    greg:  '33333333-3333-3333-3333-333333333333'
+  };
+
   function csSetFilter(f) {
     _csFilter = f;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -3148,7 +3154,10 @@
     container.innerHTML = '<div style="color:#888;font-size:13px;padding:20px;">Chargement...</div>';
 
     let query = _supabase.from('dates_concert').select('id, date_concert, ville, nom_salle, tournee_id, statut').order('date_concert', { ascending: true });
-    if (_csFilter !== 'all') query = query.eq('tournee_id', _csFilter);
+    if (_csFilter !== 'all') {
+      const tid = CS_TOURNEE_IDS[_csFilter];
+      if (tid) query = query.eq('tournee_id', tid);
+    }
 
     const { data: dates, error } = await query;
     if (error || !dates) { container.innerHTML = '<div style="color:#e31e24;">Erreur chargement : ' + (error?.message||'') + '</div>'; return; }
@@ -3159,7 +3168,11 @@
 
     if (!dates.length) { container.innerHTML = '<div style="color:#888;font-size:13px;padding:20px;">Aucune date trouvée.</div>'; return; }
 
-    const TOURNEE_NOMS = { twoq: 'TWOQ L\'Hommage', twoq2: 'TWOQ Éternelle', greg: 'Greg Petras' };
+    const TOURNEE_NOMS = {
+      '11111111-1111-1111-1111-111111111111': 'TWOQ L\'Hommage',
+      '22222222-2222-2222-2222-222222222222': 'TWOQ Éternelle',
+      '33333333-3333-3333-3333-333333333333': 'Greg Petras'
+    };
 
     container.innerHTML = dates.map(d => {
       const hasFiche = fichesIds.has(d.id);
