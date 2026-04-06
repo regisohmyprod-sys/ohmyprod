@@ -3185,17 +3185,38 @@
   }
 
   function csCreerDate() {
-    // Positionner _tourneeActive selon le filtre tournée actif
-    if (['twoq','twoq2','greg'].includes(_csFilter)) {
-      const tournee = _allTournees?.find(t => {
-        if (_csFilter === 'twoq') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage');
-        if (_csFilter === 'twoq2') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle');
-        if (_csFilter === 'greg') return t.nom_groupe === 'GREG PETRAS';
-        return false;
-      });
-      if (tournee) _tourneeActive = tournee;
-    }
-    openModal('modal-add-date');
+    // Ouvrir la mini-modale de création rapide
+    document.getElementById('cs-new-ville').value = '';
+    document.getElementById('cs-new-date').value = '';
+    document.getElementById('cs-new-heure').value = '20:30';
+    openModal('modal-cs-creer-date');
+  }
+
+  async function csCreerDateValider() {
+    const ville = document.getElementById('cs-new-ville').value.trim();
+    const date = document.getElementById('cs-new-date').value;
+    const heure = document.getElementById('cs-new-heure').value || '20:30';
+    if (!ville || !date) { alert('Ville et date obligatoires.'); return; }
+
+    const tourneeId = CS_TOURNEE_IDS[_csFilter];
+    if (!tourneeId) { alert('Aucune tournée sélectionnée.'); return; }
+
+    // Créer la date dans dates_concert
+    const { data, error } = await _supabase.from('dates_concert').insert({
+      ville,
+      date_concert: date,
+      heure_show: heure,
+      tournee_id: tourneeId,
+      statut: 'confirmee',
+    }).select().single();
+
+    if (error || !data) { alert('Erreur création : ' + (error?.message || '')); return; }
+
+    closeModal('modal-cs-creer-date');
+
+    // Recharger la liste puis ouvrir la fiche prod
+    await csChargerDates();
+    fpOuvrir(data.id, ville, new Date(date).toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' }));
   }
 
   async function csChargerDates() {
@@ -5322,6 +5343,38 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-notifier')">Annuler</button>
       <button class="btn btn-primary" onclick="envoyerNotif()">📨 Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE CRÉER UNE DATE (depuis Créa/Suivi) -->
+<div id="modal-cs-creer-date" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">📋 CRÉER UNE DATE</div>
+      <button class="modal-close" onclick="closeModal('modal-cs-creer-date')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Ville *</label>
+          <input type="text" id="cs-new-ville" placeholder="ex: Lyon" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Date du concert *</label>
+          <input type="date" id="cs-new-date" />
+        </div>
+        <div class="modal-field">
+          <label>Heure du show</label>
+          <input type="time" id="cs-new-heure" value="20:30" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-cs-creer-date')">Annuler</button>
+      <button class="btn btn-primary" onclick="csCreerDateValider()">✅ Créer et ouvrir la fiche</button>
     </div>
   </div>
 </div>
