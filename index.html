@@ -3143,15 +3143,30 @@
   // =============================================
   // MODULE CRÉA / SUIVI DATES
   // =============================================
-  let _csFilter = 'avenir';
+  let _csFilter = 'avenir';      // période : 'avenir' | 'all' | 'passees'
+  let _csTournee = null;         // tournée : 'twoq' | 'twoq2' | 'greg' | null
   let _fpDateId = null; // date_concert_id en cours d'édition
 
   function showGestionOMP(tourneeId) {
     const isAdmin = _currentUserRole === 'admin';
     if (!isAdmin) { alert('🔒 Accès réservé aux administrateurs OMP.'); return; }
-    if (tourneeId) _csFilter = tourneeId; // ex: 'twoq', sera résolu via CS_TOURNEE_IDS
-    else _csFilter = 'all';
+    _csFilter = 'avenir'; // défaut : à venir
+    _csTournee = tourneeId || null; // tournée pré-sélectionnée si appelé depuis dashboard
     showPage('gestion-omp');
+    // Mettre à jour visuels
+    document.querySelectorAll('#page-gestion-omp .filter-btn').forEach(b => b.classList.remove('active'));
+    const btnAvenir = document.getElementById('cs-filter-avenir');
+    if (btnAvenir) btnAvenir.classList.add('active');
+    ['cs-filter-twoq','cs-filter-twoq2','cs-filter-greg'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) { b.style.background = '#fff'; b.style.color = '#111'; }
+    });
+    if (_csTournee) {
+      const b = document.getElementById('cs-filter-' + _csTournee);
+      if (b) { b.style.background = '#e31e24'; b.style.color = '#fff'; }
+    }
+    const btnCreer = document.getElementById('cs-btn-creer-date');
+    if (btnCreer) btnCreer.style.display = _csTournee ? 'block' : 'none';
     csChargerDates();
   }
 
@@ -3162,25 +3177,33 @@
   };
 
   function csSetFilter(f) {
-    _csFilter = f;
-    // Reset petits filtres période
+    // Distinguer filtre tournée vs filtre période
+    if (['twoq','twoq2','greg'].includes(f)) {
+      _csTournee = (_csTournee === f) ? null : f; // toggle
+    } else {
+      _csFilter = f;
+    }
+
+    // Reset visuels
     document.querySelectorAll('#page-gestion-omp .filter-btn').forEach(b => b.classList.remove('active'));
-    // Reset gros boutons tournées
     ['cs-filter-twoq','cs-filter-twoq2','cs-filter-greg'].forEach(id => {
       const b = document.getElementById(id);
       if (b) { b.style.background = '#fff'; b.style.color = '#111'; }
     });
-    // Activer le bon bouton
-    if (['twoq','twoq2','greg'].includes(f)) {
-      const b = document.getElementById('cs-filter-' + f);
+
+    // Activer bouton tournée sélectionnée
+    if (_csTournee) {
+      const b = document.getElementById('cs-filter-' + _csTournee);
       if (b) { b.style.background = '#e31e24'; b.style.color = '#fff'; }
-    } else {
-      const btn = document.getElementById('cs-filter-' + f);
-      if (btn) btn.classList.add('active');
     }
-    // Afficher le bouton CRÉER UNE DATE uniquement si une tournée est sélectionnée
+    // Activer bouton période sélectionnée
+    const btnPeriode = document.getElementById('cs-filter-' + _csFilter);
+    if (btnPeriode) btnPeriode.classList.add('active');
+
+    // Afficher bouton CRÉER UNE DATE seulement si une tournée est sélectionnée
     const btnCreer = document.getElementById('cs-btn-creer-date');
-    if (btnCreer) btnCreer.style.display = ['twoq','twoq2','greg'].includes(f) ? 'block' : 'none';
+    if (btnCreer) btnCreer.style.display = _csTournee ? 'block' : 'none';
+
     csChargerDates();
   }
 
@@ -3198,7 +3221,7 @@
     const heure = document.getElementById('cs-new-heure').value || '20:30';
     if (!ville || !date) { alert('Ville et date obligatoires.'); return; }
 
-    const tourneeId = CS_TOURNEE_IDS[_csFilter];
+    const tourneeId = CS_TOURNEE_IDS[_csTournee];
     if (!tourneeId) { alert('Aucune tournée sélectionnée.'); return; }
 
     // Créer la date dans dates_concert
@@ -3251,16 +3274,22 @@
     const container = document.getElementById('cs-liste-dates');
     if (!container) return;
     container.innerHTML = '<div style="color:#888;font-size:13px;padding:20px;">Chargement...</div>';
-    // Date locale (évite décalage UTC le soir)
+
+    // Date locale (évite décalage UTC)
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
     let query = _supabase.from('dates_concert').select('id, date_concert, ville, nom_salle, tournee_id, statut').order('date_concert', { ascending: true });
+
+    // Filtre période
     if (_csFilter === 'avenir') {
       query = query.gte('date_concert', today);
     } else if (_csFilter === 'passees') {
       query = query.lt('date_concert', today);
-    } else if (CS_TOURNEE_IDS[_csFilter]) {
-      query = query.eq('tournee_id', CS_TOURNEE_IDS[_csFilter]);
+    }
+    // Filtre tournée (cumulable avec période)
+    if (_csTournee && CS_TOURNEE_IDS[_csTournee]) {
+      query = query.eq('tournee_id', CS_TOURNEE_IDS[_csTournee]);
     }
 
     const { data: dates, error } = await query;
