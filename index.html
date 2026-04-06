@@ -3320,8 +3320,6 @@
         </div>`;
     }).join('');
   }
-    }).join('');
-  }
 
   async function fpOuvrir(dateConcertId, ville, dateStr) {
     _fpDateId = dateConcertId;
@@ -3456,6 +3454,15 @@
       boost_bonus: parseFloat(document.getElementById('fp-boost').value) || 0,
       updated_at: new Date().toISOString()
     };
+
+    // Mettre à jour dates_concert (date + heure + ville + salle + statut)
+    await _supabase.from('dates_concert').update({
+      date_concert: document.getElementById('fp-date-concert').value || null,
+      heure_show: heure || null,
+      ville: document.getElementById('fp-ville').value || null,
+      nom_salle: document.getElementById('fp-salle').value || null,
+      statut: document.getElementById('fp-statut').value || null,
+    }).eq('id', _fpDateId);
 
     // Vérifier si fiche existe déjà
     const { data: existing } = await _supabase.from('fiches_production').select('id').eq('date_concert_id', _fpDateId).single();
