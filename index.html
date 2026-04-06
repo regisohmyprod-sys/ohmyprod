@@ -209,6 +209,108 @@
   .tournee-item:hover { color: var(--white); background: var(--border); }
   .tournee-item.active { color: var(--red); }
 
+  /* NAV ITEM ADMIN (Gestion OMP) */
+  .nav-item-admin {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+  }
+  .nav-item-admin.admin-unlocked {
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: all;
+  }
+  .nav-item-admin.admin-unlocked:hover { background: var(--border); color: var(--white); }
+
+  /* DASHBOARD 3 COLONNES */
+  .db-tournees-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .db-col-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .db-col-header {
+    background: var(--dark);
+    padding: 12px 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: var(--white);
+    border-bottom: 2px solid var(--red);
+    line-height: 1.3;
+  }
+
+  .db-col-stats {
+    padding: 8px 0;
+    flex: 1;
+  }
+
+  .db-col-stat {
+    padding: 7px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .db-col-stat:last-child { border-bottom: none; }
+  .db-col-stat .db-tournee-label { margin-bottom: 0; }
+  .db-col-stat .db-tournee-value { font-size: 16px; text-align: right; }
+
+  .db-col-btns {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+
+  .db-btn-prod {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 7px;
+    border: 1px solid #c9a84c;
+    background: rgba(201,168,76,0.1);
+    color: #c9a84c;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+  }
+  .db-btn-prod:hover { background: rgba(201,168,76,0.25); }
+  .db-btn-prod.locked {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .db-btn-vhr {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 7px;
+    border: 1px solid #5c9be0;
+    background: rgba(92,155,224,0.1);
+    color: #5c9be0;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+  }
+  .db-btn-vhr:hover { background: rgba(92,155,224,0.25); }
+
   /* MAIN */
   .main {
     margin-left: 220px;
@@ -1318,11 +1420,18 @@
     <a class="nav-item active" onclick="showPage('dashboard')">
       <span class="icon">🏠</span> Tableau de bord
     </a>
-    <a class="nav-item" onclick="showPage('tournees')">
+
+    <!-- GESTION OMP — visible mais cliquable admins seulement -->
+    <div class="nav-item nav-item-admin" id="nav-gestion-omp" onclick="showGestionOMP()">
+      <span class="icon">🔒</span> Gestion OMP
+    </div>
+    <div class="tournee-item" id="nav-crea-suivi" onclick="showGestionOMP()">📋 Créa / Suivi dates</div>
+
+    <a class="nav-item" onclick="showPage('tournees')" style="margin-top:8px;">
       <span class="icon">🎵</span> Tournées
     </a>
 
-    <div class="nav-label" style="margin-top:12px;">Tournées actives</div>
+    <div class="nav-label" style="margin-top:4px;">Tournées actives</div>
     <div class="tournee-item active" onclick="showTournee('twoq')">🎸 TWOQ – L'hommage</div>
     <div class="tournee-item" onclick="showTournee('twoq2')">🎸 TWOQ – Éternelle Légende</div>
     <div class="tournee-item" onclick="showTournee('greg')">🎤 Greg Petras</div>
@@ -1378,117 +1487,77 @@
 
       <div class="page-title" style="font-size:22px; margin-bottom:12px;">TOURNÉES</div>
 
-      <!-- TWOQ L'HOMMAGE -->
-      <div class="db-tournee-card" onclick="showTournee('twoq')">
-        <div class="db-tournee-header">
-          🎸 THE WORLD OF QUEEN — L'hommage à la légende
-        </div>
-        <div class="db-tournee-grid">
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Dates effectuées</div>
-            <div class="db-tournee-value">62</div>
+      <!-- 3 COLONNES TOURNÉES -->
+      <div class="db-tournees-cols">
+
+        <!-- TWOQ L'HOMMAGE -->
+        <div class="db-col-card">
+          <div class="db-col-header">🎸 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7">L'hommage à la légende</span></div>
+          <div class="db-col-stats">
+            <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value">62</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" style="color:var(--red)">24</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" style="font-size:16px;">4 AVR – Avignon</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" style="font-size:16px;">FÉV 2023</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" style="font-size:16px;">MAI 2026</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" style="color:var(--green)">148 200</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" style="color:var(--yellow)">198 000</div></div>
           </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Dates restantes</div>
-            <div class="db-tournee-value" style="color:var(--red)">24</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Prochaine date</div>
-            <div class="db-tournee-value" style="font-size:18px;">4 AVR – Avignon</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Début tournée</div>
-            <div class="db-tournee-value" style="font-size:18px;">FÉV 2023</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Fin tournée</div>
-            <div class="db-tournee-value" style="font-size:18px;">MAI 2026</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Spectateurs à ce jour</div>
-            <div class="db-tournee-value" style="color:var(--green)">148 200</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Spectateurs en prévision</div>
-            <div class="db-tournee-value" style="color:var(--yellow)">198 000</div>
+          <div class="db-col-btns">
+            <button class="db-btn-prod admin-only" onclick="showGestionOMP('twoq')">🔒 PROD</button>
+            <button class="db-btn-vhr" onclick="showTournee('twoq')">🚌 VHR</button>
           </div>
         </div>
+
+        <!-- TWOQ ETERNELLE LEGENDE -->
+        <div class="db-col-card">
+          <div class="db-col-header">👑 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7">L'Éternelle Légende</span></div>
+          <div class="db-col-stats">
+            <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value">0</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" style="color:var(--red)">82</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" style="font-size:16px;">SEPT 2026</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" style="font-size:16px;">SEPT 2026</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" style="font-size:16px;">DÉC 2028</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" style="color:var(--green)">0</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" style="color:var(--yellow)">250 000</div></div>
+          </div>
+          <div class="db-col-btns">
+            <button class="db-btn-prod admin-only" onclick="showGestionOMP('twoq2')">🔒 PROD</button>
+            <button class="db-btn-vhr" onclick="showTournee('twoq2')">🚌 VHR</button>
+          </div>
+        </div>
+
+        <!-- GREG PETRAS -->
+        <div class="db-col-card">
+          <div class="db-col-header">🎤 GREG PETRAS<br><span style="font-size:13px;font-weight:400;opacity:.7">Dôme de Marseille</span></div>
+          <div class="db-col-stats">
+            <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value">0</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" style="color:var(--red)">1</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" style="font-size:16px;">23 MAI</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" style="font-size:16px;">MAI 2026</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" style="font-size:16px;">MAI 2026</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" style="color:var(--green)">0</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" style="color:var(--yellow)">5 000</div></div>
+          </div>
+          <div class="db-col-btns">
+            <button class="db-btn-prod admin-only" onclick="showGestionOMP('greg')">🔒 PROD</button>
+            <button class="db-btn-vhr" onclick="showTournee('greg')">🚌 VHR</button>
+          </div>
+        </div>
+
       </div>
 
-      <!-- TWOQ ETERNELLE LEGENDE -->
-      <div class="db-tournee-card" onclick="showTournee('twoq2')">
-        <div class="db-tournee-header">
-          👑 THE WORLD OF QUEEN — L'Éternelle Légende
-        </div>
-        <div class="db-tournee-grid">
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Dates effectuées</div>
-            <div class="db-tournee-value">0</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Dates restantes</div>
-            <div class="db-tournee-value" style="color:var(--red)">82</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Prochaine date</div>
-            <div class="db-tournee-value" style="font-size:18px;">SEPT 2026</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Début tournée</div>
-            <div class="db-tournee-value" style="font-size:18px;">SEPT 2026</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Fin tournée</div>
-            <div class="db-tournee-value" style="font-size:18px;">DÉC 2028</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Spectateurs à ce jour</div>
-            <div class="db-tournee-value" style="color:var(--green)">0</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Spectateurs en prévision</div>
-            <div class="db-tournee-value" style="color:var(--yellow)">250 000</div>
-          </div>
-        </div>
-      </div>
+    </div>
 
-      <!-- GREG PETRAS -->
-      <div class="db-tournee-card" onclick="showTournee('greg')">
-        <div class="db-tournee-header">
-          🎤 GREG PETRAS — Dôme de Marseille
-        </div>
-        <div class="db-tournee-grid">
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Dates effectuées</div>
-            <div class="db-tournee-value">0</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Dates restantes</div>
-            <div class="db-tournee-value" style="color:var(--red)">1</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Prochaine date</div>
-            <div class="db-tournee-value" style="font-size:18px;">23 MAI</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Début tournée</div>
-            <div class="db-tournee-value" style="font-size:18px;">MAI 2026</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Fin tournée</div>
-            <div class="db-tournee-value" style="font-size:18px;">MAI 2026</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Spectateurs à ce jour</div>
-            <div class="db-tournee-value" style="color:var(--green)">0</div>
-          </div>
-          <div class="db-tournee-stat">
-            <div class="db-tournee-label">Spectateurs en prévision</div>
-            <div class="db-tournee-value" style="color:var(--yellow)">5 000</div>
-          </div>
-        </div>
+    <!-- GESTION OMP -->
+    <div id="page-gestion-omp" class="page">
+      <div class="page-title">🔒 GESTION OMP — CREA / SUIVI DATES</div>
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
+        <div style="color:#c9a84c;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">⚠️ Accès administrateur uniquement</div>
+        <div style="color:#888;font-size:13px;">Ce module contient les informations financières et de production des tournées. Visible uniquement par Régis et Alexandrine.</div>
       </div>
-
+      <div id="gestion-omp-content" style="color:#888;font-size:14px;padding:20px 0;">
+        Sélectionnez une tournée depuis le tableau de bord pour accéder à son bordereau financier.
+      </div>
     </div>
 
     <!-- TOURNEES -->
@@ -2937,6 +3006,57 @@
     if (id === 'equipe') chargerPageMembres();
   }
 
+  function showGestionOMP(tourneeId) {
+    // Vérifier si admin
+    const isAdmin = _currentUserRole === 'admin';
+    if (!isAdmin) {
+      alert('🔒 Accès réservé aux administrateurs OMP.');
+      return;
+    }
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-gestion-omp').classList.add('active');
+    updateBreadcrumb('gestion-omp');
+
+    if (tourneeId) {
+      const noms = { twoq: 'TWOQ – L\'hommage', twoq2: 'TWOQ – Éternelle Légende', greg: 'Greg Petras' };
+      document.getElementById('gestion-omp-content').innerHTML = `
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;">
+          <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:16px;">
+            📋 ${noms[tourneeId] || tourneeId}
+          </div>
+          <div style="color:#888;font-size:13px;line-height:1.8;">
+            ✅ Infos date (ville, salle, date, heure...)<br>
+            ✅ Jauge & ventes<br>
+            ✅ Deals (DL, PL, Type prod)<br>
+            ✅ Coût plateau & Boost<br>
+            🔜 Bordereau financier complet (en cours d'intégration)
+          </div>
+        </div>`;
+    }
+  }
+
+  // Appliquer les restrictions admin après chargement
+  function applyAdminUI() {
+    const isAdmin = _currentUserRole === 'admin';
+    // Nav Gestion OMP
+    const navGestion = document.getElementById('nav-gestion-omp');
+    const navCrea = document.getElementById('nav-crea-suivi');
+    if (navGestion) {
+      if (isAdmin) { navGestion.classList.add('admin-unlocked'); navGestion.style.pointerEvents = 'all'; }
+      else { navGestion.classList.remove('admin-unlocked'); }
+    }
+    if (navCrea) {
+      navCrea.style.opacity = isAdmin ? '1' : '0.35';
+      navCrea.style.pointerEvents = isAdmin ? 'all' : 'none';
+      navCrea.style.cursor = isAdmin ? 'pointer' : 'default';
+    }
+    // Boutons PROD dans le dashboard
+    document.querySelectorAll('.db-btn-prod').forEach(btn => {
+      if (!isAdmin) btn.classList.add('locked');
+      else btn.classList.remove('locked');
+    });
+  }
+
   // Tournée et dates actives pour navigation
   let _allTournees = [];
   let _tourneeActive = null;
@@ -3571,10 +3691,26 @@
     showApp(data.user);
   }
 
+  let _currentUserRole = 'membre'; // défaut
+
   async function showApp(user) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
+
+    // Récupérer le rôle depuis Supabase profiles
+    try {
+      const { data: profile } = await _supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      _currentUserRole = profile?.role || 'membre';
+    } catch(e) {
+      _currentUserRole = 'membre';
+    }
+
     await chargerTournees();
+    applyAdminUI();
   }
 
   // =============================================
