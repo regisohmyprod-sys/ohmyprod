@@ -701,31 +701,6 @@
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
-  /* AUTOCOMPLETE ADRESSE */
-  .adresse-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0; right: 0;
-    background: #1e1e1e;
-    border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    z-index: 9999;
-    max-height: 220px;
-    overflow-y: auto;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  }
-  .adresse-suggestion-item {
-    padding: 10px 14px;
-    font-size: 13px;
-    color: var(--grey-light);
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    transition: background 0.1s;
-  }
-  .adresse-suggestion-item:hover { background: rgba(227,30,36,0.12); color: var(--white); }
-  .adresse-suggestion-item:last-child { border-bottom: none; }
-
   /* PLANNING INFOS CLÉS */
   .planning-keys {
     background: var(--card);
@@ -3009,48 +2984,6 @@
         document.getElementById('new-tournee-preview').style.display = 'block';
       };
       reader.readAsDataURL(e.target.files[0]);
-    }
-  });
-
-  let adresseTimer = null;
-
-  async function searchAdresse(query) {
-    const box = document.getElementById('adresse-suggestions');
-    if (query.length < 3) { box.style.display = 'none'; return; }
-
-    clearTimeout(adresseTimer);
-    adresseTimer = setTimeout(async () => {
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&countrycodes=fr&addressdetails=1`, {
-          headers: { 'Accept-Language': 'fr' }
-        });
-        const data = await res.json();
-
-        box.innerHTML = '';
-        if (data.length === 0) { box.style.display = 'none'; return; }
-
-        data.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'adresse-suggestion-item';
-          div.textContent = item.display_name;
-          div.onclick = () => {
-            document.getElementById('new-adresse').value = item.display_name;
-            box.style.display = 'none';
-          };
-          box.appendChild(div);
-        });
-        box.style.display = 'block';
-      } catch(e) {
-        box.style.display = 'none';
-      }
-    }, 400);
-  }
-
-  // Fermer suggestions si on clique ailleurs
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('#new-adresse') && !e.target.closest('#adresse-suggestions')) {
-      const box = document.getElementById('adresse-suggestions');
-      if (box) box.style.display = 'none';
     }
   });
 
