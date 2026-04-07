@@ -3805,54 +3805,86 @@
   // FINANCIER — sauvegarde
   // =============================================
   function finCalcTotaux() {
-    const ids_omp_salle = ['fin-omp-loc-mg','fin-omp-loc-pct','fin-omp-loc-ht','fin-omp-loc-billet',
-      'fin-omp-prest-energie','fin-omp-prest-chauf','fin-omp-prest-config','fin-omp-prest-fenwick','fin-omp-prest-accroches','fin-omp-prest-elec',
-      'fin-omp-pers-nettoyage','fin-omp-pers-nett-supp','fin-omp-pers-elec','fin-omp-pers-hriger','fin-omp-pers-regisseur','fin-omp-pers-forfait',
-      'fin-omp-pers-caissier','fin-omp-pers-rigg','fin-omp-pers-hotesses','fin-omp-pers-controle','fin-omp-pers-parking','fin-omp-pers-secu',
-      'fin-omp-pers-vigi','fin-omp-pers-consigne','fin-omp-pers-gardien',
-      'fin-omp-secu-ssiap1','fin-omp-secu-ssiap2','fin-omp-secu-protciv','fin-omp-secu-vigi2','fin-omp-secu-medical','fin-omp-secu-autres'];
-    const ids_pl_salle = ['fin-pl-loc-mg','fin-pl-loc-pct','fin-pl-loc-ht','fin-pl-loc-billet',
-      'fin-pl-prest-energie','fin-pl-prest-chauf','fin-pl-prest-config','fin-pl-prest-fenwick','fin-pl-prest-accroches','fin-pl-prest-elec',
-      'fin-pl-pers-nettoyage','fin-pl-pers-nett-supp','fin-pl-pers-elec','fin-pl-pers-hriger','fin-pl-pers-regisseur','fin-pl-pers-forfait',
-      'fin-pl-pers-caissier','fin-pl-pers-rigg','fin-pl-pers-hotesses','fin-pl-pers-controle','fin-pl-pers-parking','fin-pl-pers-secu',
-      'fin-pl-pers-vigi','fin-pl-pers-consigne','fin-pl-pers-gardien',
-      'fin-pl-secu-ssiap1','fin-pl-secu-ssiap2','fin-pl-secu-protciv','fin-pl-secu-vigi2','fin-pl-secu-medical','fin-pl-secu-autres'];
-    const ids_omp_autres = ['fin-omp-sal-tournee','fin-omp-sal-road','fin-omp-sal-promo',
-      'fin-omp-tech-road','fin-omp-tech-figer','fin-omp-tech-coulisses','fin-omp-tech-autres','fin-omp-tech-conso','fin-omp-tech-controleur',
-      'fin-omp-promo-meta','fin-omp-promo-autres1','fin-omp-promo-autres2',
-      'fin-omp-voy-prod','fin-omp-voy-artiste','fin-omp-voy-tech','fin-omp-voy-vhr',
-      'fin-omp-vhr-pkart','fin-omp-vhr-pktech','fin-omp-vhr-taxiart','fin-omp-vhr-taxitech','fin-omp-vhr-total2',
-      'fin-omp-hotel-prod','fin-omp-hotel-tech','fin-omp-hotel-art','fin-omp-hotel-estim',
-      'fin-omp-trai-total','fin-omp-trai-resto','fin-omp-trai-loge'];
-    const ids_pl_autres = ['fin-pl-sal-regisseur','fin-pl-sal-road','fin-pl-sal-caissier',
-      'fin-pl-tech-road','fin-pl-tech-figer','fin-pl-tech-coulisses','fin-pl-tech-autres','fin-pl-tech-conso','fin-pl-tech-controleur',
-      'fin-pl-promo-meta','fin-pl-promo-autres1','fin-pl-promo-autres2',
-      'fin-pl-voy-prod','fin-pl-voy-artiste','fin-pl-voy-tech','fin-pl-voy-autres',
-      'fin-pl-vhr-pkart','fin-pl-vhr-pktech','fin-pl-vhr-taxiart','fin-pl-vhr-taxitech','fin-pl-vhr-total2',
-      'fin-pl-hotel-prod','fin-pl-hotel-tech','fin-pl-hotel-art','fin-pl-hotel-estim',
-      'fin-pl-trai-total','fin-pl-trai-resto','fin-pl-trai-loge'];
-
     const sum = ids => ids.reduce((t, id) => { const el = document.getElementById(id); return t + (parseFloat(el?.value) || 0); }, 0);
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}); };
 
-    const totalOmpSalle = sum(ids_omp_salle);
-    const totalPlSalle = sum(ids_pl_salle);
-    const totalOmpAutres = sum(ids_omp_autres);
-    const totalPlAutres = sum(ids_pl_autres);
+    // Totaux par SECTION OMP
+    const ompLoc   = sum(['fin-omp-loc-mg','fin-omp-loc-pct','fin-omp-loc-ht','fin-omp-loc-billet']);
+    const ompPrest = sum(['fin-omp-prest-energie','fin-omp-prest-chauf','fin-omp-prest-config','fin-omp-prest-fenwick','fin-omp-prest-accroches','fin-omp-prest-elec']);
+    const ompPers  = sum(['fin-omp-pers-nettoyage','fin-omp-pers-nett-supp','fin-omp-pers-elec','fin-omp-pers-hriger','fin-omp-pers-regisseur','fin-omp-pers-forfait','fin-omp-pers-caissier','fin-omp-pers-rigg','fin-omp-pers-hotesses','fin-omp-pers-controle','fin-omp-pers-parking','fin-omp-pers-secu','fin-omp-pers-vigi','fin-omp-pers-consigne','fin-omp-pers-gardien']);
+    const ompSecu  = sum(['fin-omp-secu-ssiap1','fin-omp-secu-ssiap2','fin-omp-secu-protciv','fin-omp-secu-vigi2','fin-omp-secu-medical','fin-omp-secu-autres']);
+    set('fin-omp-loc-total', ompLoc);
+    set('fin-omp-prest-total', ompPrest);
+    set('fin-omp-pers-total', ompPers);
+    set('fin-omp-secu-total', ompSecu);
+    const ompSallePPers = ompPrest + ompPers + ompSecu;
+    set('fin-omp-ppersonne', ompSallePPers);
+    const ompMgSalle = Math.max(ompLoc, ompSallePPers);
+    set('fin-omp-mgsalle', ompMgSalle);
+    const totalOmpSalle = ompMgSalle + ompSallePPers;
+    set('fin-omp-total-salle', totalOmpSalle);
 
-    const totalSalle = totalOmpSalle + totalPlSalle;
-    const totalAutres = totalOmpAutres + totalPlAutres;
-    const totalDepenses = totalSalle + totalAutres;
+    // Totaux par SECTION PROMOTEUR LOCAL
+    const plLoc   = sum(['fin-pl-loc-mg','fin-pl-loc-pct','fin-pl-loc-ht','fin-pl-loc-billet']);
+    const plPrest = sum(['fin-pl-prest-energie','fin-pl-prest-chauf','fin-pl-prest-config','fin-pl-prest-fenwick','fin-pl-prest-accroches','fin-pl-prest-elec']);
+    const plPers  = sum(['fin-pl-pers-nettoyage','fin-pl-pers-nett-supp','fin-pl-pers-elec','fin-pl-pers-hriger','fin-pl-pers-regisseur','fin-pl-pers-forfait','fin-pl-pers-caissier','fin-pl-pers-rigg','fin-pl-pers-hotesses','fin-pl-pers-controle','fin-pl-pers-parking','fin-pl-pers-secu','fin-pl-pers-vigi','fin-pl-pers-consigne','fin-pl-pers-gardien']);
+    const plSecu  = sum(['fin-pl-secu-ssiap1','fin-pl-secu-ssiap2','fin-pl-secu-protciv','fin-pl-secu-vigi2','fin-pl-secu-medical','fin-pl-secu-autres']);
+    set('fin-pl-loc-total', plLoc);
+    set('fin-pl-prest-total', plPrest);
+    set('fin-pl-pers-total', plPers);
+    set('fin-pl-secu-total', plSecu);
+    const plSallePPers = plPrest + plPers + plSecu;
+    set('fin-pl-ppersonne', plSallePPers);
+    const plMgSalle = Math.max(plLoc, plSallePPers);
+    set('fin-pl-mgsalle', plMgSalle);
+    const totalPlSalle = plMgSalle + plSallePPers;
+    set('fin-pl-total-salle', totalPlSalle);
 
+    // Totaux par SECTION OMP - AUTRES POSTES
+    const ompSal   = sum(['fin-omp-sal-tournee','fin-omp-sal-road','fin-omp-sal-promo']);
+    const ompTech  = sum(['fin-omp-tech-road','fin-omp-tech-figer','fin-omp-tech-coulisses','fin-omp-tech-autres','fin-omp-tech-conso','fin-omp-tech-controleur']);
+    const ompPromo = sum(['fin-omp-promo-meta','fin-omp-promo-autres1','fin-omp-promo-autres2']);
+    const ompVoy   = sum(['fin-omp-voy-prod','fin-omp-voy-artiste','fin-omp-voy-tech','fin-omp-voy-vhr']);
+    const ompVhr   = sum(['fin-omp-vhr-pkart','fin-omp-vhr-pktech','fin-omp-vhr-taxiart','fin-omp-vhr-taxitech','fin-omp-vhr-total2']);
+    const ompHotel = sum(['fin-omp-hotel-prod','fin-omp-hotel-tech','fin-omp-hotel-art','fin-omp-hotel-estim']);
+    const ompTrai  = sum(['fin-omp-trai-total','fin-omp-trai-resto','fin-omp-trai-loge']);
+    set('fin-omp-sal-total', ompSal);
+    set('fin-omp-tech-total', ompTech);
+    set('fin-omp-promo-total', ompPromo);
+    set('fin-omp-voy-total', ompVoy);
+    set('fin-omp-vhr-total', ompVhr);
+    set('fin-omp-hotel-total', ompHotel);
+    set('fin-omp-trai-stotal', ompTrai);
+    const totalOmpAutres = ompSal + ompTech + ompPromo + ompVoy + ompVhr + ompHotel + ompTrai;
+    set('fin-omp-total-autres', totalOmpAutres);
+
+    // Totaux par SECTION PL - AUTRES POSTES
+    const plSal   = sum(['fin-pl-sal-regisseur','fin-pl-sal-road','fin-pl-sal-caissier']);
+    const plTech  = sum(['fin-pl-tech-road','fin-pl-tech-figer','fin-pl-tech-coulisses','fin-pl-tech-autres','fin-pl-tech-conso','fin-pl-tech-controleur']);
+    const plPromo = sum(['fin-pl-promo-meta','fin-pl-promo-autres1','fin-pl-promo-autres2']);
+    const plVoy   = sum(['fin-pl-voy-prod','fin-pl-voy-artiste','fin-pl-voy-tech','fin-pl-voy-autres']);
+    const plVhr   = sum(['fin-pl-vhr-pkart','fin-pl-vhr-pktech','fin-pl-vhr-taxiart','fin-pl-vhr-taxitech','fin-pl-vhr-total2']);
+    const plHotel = sum(['fin-pl-hotel-prod','fin-pl-hotel-tech','fin-pl-hotel-art','fin-pl-hotel-estim']);
+    const plTrai  = sum(['fin-pl-trai-total','fin-pl-trai-resto','fin-pl-trai-loge']);
+    set('fin-pl-sal-total', plSal);
+    set('fin-pl-tech-total', plTech);
+    set('fin-pl-promo-total', plPromo);
+    set('fin-pl-voy-total', plVoy);
+    set('fin-pl-vhr-total', plVhr);
+    set('fin-pl-hotel-total', plHotel);
+    set('fin-pl-trai-stotal', plTrai);
+    const totalPlAutres = plSal + plTech + plPromo + plVoy + plVhr + plHotel + plTrai;
+    set('fin-pl-total-autres', totalPlAutres);
+
+    // TOTAUX GLOBAUX
     const fmt = v => v.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2});
-
-    const el1 = document.getElementById('fin-total-salle'); if (el1) el1.textContent = fmt(totalSalle);
-    const el2 = document.getElementById('fin-omp-total-salle'); if (el2) el2.textContent = fmt(totalOmpSalle);
-    const el3 = document.getElementById('fin-pl-total-salle'); if (el3) el3.textContent = fmt(totalPlSalle);
-    const el4 = document.getElementById('fin-total-autres'); if (el4) el4.textContent = fmt(totalAutres);
-    const el5 = document.getElementById('fin-omp-total-autres'); if (el5) el5.textContent = fmt(totalOmpAutres);
-    const el6 = document.getElementById('fin-pl-total-autres'); if (el6) el6.textContent = fmt(totalPlAutres);
-    const el7 = document.getElementById('fin-total-depenses'); if (el7) el7.textContent = fmt(totalDepenses) + ' €';
+    const el1 = document.getElementById('fin-total-salle'); if (el1) el1.textContent = fmt(totalOmpSalle + totalPlSalle);
+    const el2 = document.getElementById('fin-total-autres'); if (el2) el2.textContent = fmt(totalOmpAutres + totalPlAutres);
+    const el3 = document.getElementById('fin-total-depenses'); if (el3) el3.textContent = fmt(totalOmpSalle + totalPlSalle + totalOmpAutres + totalPlAutres) + ' €';
+    return; // ancien code supprimé
   }
+
+
 
   async function finSauvegarder() {
     if (!_fpDateId) { alert('Erreur : aucune date sélectionnée.'); return; }
