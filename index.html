@@ -3597,7 +3597,7 @@
 
         const bg = rowIdx % 2 === 0 ? '#242424' : '#1e1e1e';
         const descVal = d.desc || rowCode;
-        html += `<tr style="background:${bg};">
+        html += `<tr id="bill-row-${catIdx}-${rowIdx}" style="background:${bg};">
           <td style="padding:6px 10px;color:#aaa;font-size:11px;font-weight:600;">${rowCode}</td>
           <td style="padding:4px 6px;">
             <input type="text" value="${descVal}"
@@ -3608,36 +3608,36 @@
           </td>
           <td style="padding:4px 6px;text-align:right;">
             <input type="number" min="0" value="${d.billets||''}" placeholder="0"
-              onchange="billUpdate('${op}',${catIdx},${rowIdx},'billets',this.value)"
+              oninput="billUpdate('${op}',${catIdx},${rowIdx},'billets',this.value)"
               style="width:75px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#fff;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
           </td>
           <td style="padding:4px 6px;text-align:right;">
             <input type="number" min="0" step="0.01" value="${d.tarif||''}" placeholder="0,00"
-              onchange="billUpdate('${op}',${catIdx},${rowIdx},'tarif',this.value)"
+              oninput="billUpdate('${op}',${catIdx},${rowIdx},'tarif',this.value)"
               style="width:80px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#c9a84c;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
           </td>
-          <td style="padding:6px 10px;text-align:right;color:#fff;font-weight:600;">${billFmt(recette)}</td>
+          <td class="bill-recette" style="padding:6px 10px;text-align:right;color:#fff;font-weight:600;">${billFmt(recette)}</td>
           <td style="padding:4px 6px;text-align:right;">
             <input type="number" min="0" step="0.01" value="${d.dlDistrib}"
-              onchange="billUpdate('${op}',${catIdx},${rowIdx},'dlDistrib',this.value)"
+              oninput="billUpdate('${op}',${catIdx},${rowIdx},'dlDistrib',this.value)"
               tabindex="-1"
               style="width:70px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#888;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
           </td>
-          <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(totDLDistrib)}</td>
+          <td class="bill-dl-distrib-tot" style="padding:6px 10px;text-align:right;color:#888;">${billFmt(totDLDistrib)}</td>
           <td style="padding:4px 6px;text-align:right;">
             <input type="number" min="0" step="0.01" value="${d.dlProd}"
-              onchange="billUpdate('${op}',${catIdx},${rowIdx},'dlProd',this.value)"
+              oninput="billUpdate('${op}',${catIdx},${rowIdx},'dlProd',this.value)"
               tabindex="-1"
               style="width:70px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#888;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
           </td>
-          <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(totDLProd)}</td>
-          <td style="padding:6px 10px;text-align:right;color:#fff;font-weight:700;background:#1a1a1a;">${billFmt(pVente)}</td>
+          <td class="bill-dl-prod-tot" style="padding:6px 10px;text-align:right;color:#888;">${billFmt(totDLProd)}</td>
+          <td class="bill-pvente" style="padding:6px 10px;text-align:right;color:#fff;font-weight:700;background:#1a1a1a;">${billFmt(pVente)}</td>
         </tr>`;
       });
 
       // Ligne sous-total catégorie
       const verseCat = catRecette - catDLDistrib - catDLProd;
-      html += `<tr style="background:#2a2a2a;border-top:1px solid #333;">
+      html += `<tr id="bill-sub-${catIdx}" style="background:#2a2a2a;border-top:1px solid #333;">
         <td colspan="2" style="padding:6px 10px;text-align:right;color:#aaa;font-size:11px;font-style:italic;">Sous-total ${cat.label}</td>
         <td style="padding:6px 10px;text-align:right;color:#3b82f6;font-weight:700;">${catBillets}</td>
         <td></td>
@@ -3655,7 +3655,7 @@
     });
 
     // Ligne TOTAL GÉNÉRAL de l'onglet
-    html += `<tr style="background:#111;border-top:2px solid #3b82f6;">
+    html += `<tr id="bill-total-row" style="background:#111;border-top:2px solid #3b82f6;">
       <td colspan="2" style="padding:10px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#fff;">TOTAL</td>
       <td style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#3b82f6;font-weight:700;">${opBillets}</td>
       <td></td>
@@ -3667,12 +3667,74 @@
 
     tbody.innerHTML = html;
 
-    // Récap onglet actif (dans le bloc)
+    // Calculer les totaux après le rendu
+    billUpdateTotals();
+  }
+
+  function billUpdate(op, catIdx, rowIdx, field, val) {
+    _billData[op][catIdx][rowIdx][field] = field === 'desc' ? val : (parseFloat(val) || 0);
+    // Ne re-render que les totaux, pas le tableau entier (évite la perte de focus)
+    billUpdateTotals();
+  }
+
+  function billUpdateTotals() {
+    const op = _billTabActif;
+    let opBillets = 0, opRecette = 0, opVersement = 0;
+
+    BILL_CATS.forEach((cat, catIdx) => {
+      let catBillets = 0, catRecette = 0, catDLDistrib = 0, catDLProd = 0;
+      cat.rows.forEach((_, rowIdx) => {
+        const d = _billData[op][catIdx][rowIdx];
+        catBillets += d.billets;
+        catRecette += d.billets * d.tarif;
+        catDLDistrib += d.billets * d.dlDistrib;
+        catDLProd += d.billets * d.dlProd;
+      });
+      opBillets += catBillets;
+      opRecette += catRecette;
+      opVersement += catRecette - catDLDistrib - catDLProd;
+
+      // Mettre à jour les cellules de recette et versement dans le DOM
+      const subRow = document.getElementById(`bill-sub-${catIdx}`);
+      if (subRow) {
+        subRow.children[2].textContent = catBillets;
+        subRow.children[4].textContent = billFmt(catRecette);
+        subRow.children[6].textContent = billFmt(catDLDistrib);
+        subRow.children[8].textContent = billFmt(catDLProd);
+        subRow.children[9].textContent = billFmt(catRecette - catDLDistrib - catDLProd);
+      }
+
+      // Mettre à jour les recettes ligne par ligne
+      cat.rows.forEach((_, rowIdx) => {
+        const d = _billData[op][catIdx][rowIdx];
+        const recette = d.billets * d.tarif;
+        const totDLDistrib = d.billets * d.dlDistrib;
+        const totDLProd = d.billets * d.dlProd;
+        const pVente = d.tarif + d.dlDistrib + d.dlProd;
+        const el = document.getElementById(`bill-row-${catIdx}-${rowIdx}`);
+        if (el) {
+          el.querySelector('.bill-recette').textContent = billFmt(recette);
+          el.querySelector('.bill-dl-distrib-tot').textContent = billFmt(totDLDistrib);
+          el.querySelector('.bill-dl-prod-tot').textContent = billFmt(totDLProd);
+          el.querySelector('.bill-pvente').textContent = billFmt(pVente);
+        }
+      });
+    });
+
+    // Ligne TOTAL
+    const totalRow = document.getElementById('bill-total-row');
+    if (totalRow) {
+      totalRow.children[2].textContent = opBillets;
+      totalRow.children[4].textContent = billFmt(opRecette);
+      totalRow.children[9].textContent = billFmt(opVersement);
+    }
+
+    // Récap onglet
     document.getElementById('bill-op-billets').textContent = opBillets;
     document.getElementById('bill-op-recette').textContent = billFmt(opRecette);
     document.getElementById('bill-op-versement').textContent = billFmt(opVersement);
 
-    // Récap global tous réseaux
+    // Récap global
     let gBillets = 0, gRecette = 0, gVersement = 0;
     BILL_OPS.forEach(o => {
       BILL_CATS.forEach((cat, catIdx) => {
@@ -3690,11 +3752,6 @@
     document.getElementById('bill-total-billets').textContent = gBillets;
     document.getElementById('bill-total-recette').textContent = billFmt(gRecette);
     document.getElementById('bill-total-versement').textContent = billFmt(gVersement);
-  }
-
-  function billUpdate(op, catIdx, rowIdx, field, val) {
-    _billData[op][catIdx][rowIdx][field] = parseFloat(val) || 0;
-    billRenderTable();
   }
 
   function billFmt(n) {
