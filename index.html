@@ -3496,8 +3496,8 @@
 
     BILL_CATS.forEach((cat, catIdx) => {
       // Ligne titre catégorie
-      html += `<tr style="background:#1a1a1a;">
-        <td colspan="10" style="padding:8px 10px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:${cat.color};border-top:2px solid ${cat.color}33;">${cat.label}</td>
+      html += `<tr>
+        <td colspan="10" style="padding:10px 10px 6px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:${cat.color};border-top:2px solid ${cat.color}55;background:#222;">${cat.label}</td>
       </tr>`;
 
       let catBillets = 0, catRecette = 0, catDLDistrib = 0, catDLProd = 0;
@@ -3514,7 +3514,7 @@
         catDLDistrib += totDLDistrib;
         catDLProd += totDLProd;
 
-        const bg = rowIdx % 2 === 0 ? '#111' : '#0d0d0d';
+        const bg = rowIdx % 2 === 0 ? '#242424' : '#1e1e1e';
         html += `<tr style="background:${bg};">
           <td style="padding:6px 10px;color:#aaa;font-size:11px;font-weight:600;">${rowCode}</td>
           <td style="padding:6px 10px;color:#666;font-size:11px;">${rowCode === 'TN' ? cat.label : rowCode}</td>
@@ -3547,8 +3547,8 @@
 
       // Ligne sous-total catégorie
       const verseCat = catRecette - catDLDistrib - catDLProd;
-      html += `<tr style="background:#161616;border-top:1px solid #2a2a2a;">
-        <td colspan="4" style="padding:6px 10px;text-align:right;color:#888;font-size:11px;font-style:italic;">Sous-total ${cat.label}</td>
+      html += `<tr style="background:#2a2a2a;border-top:1px solid #333;">
+        <td colspan="4" style="padding:6px 10px;text-align:right;color:#aaa;font-size:11px;font-style:italic;">Sous-total ${cat.label}</td>
         <td style="padding:6px 10px;text-align:right;color:#c9a84c;font-weight:700;">${billFmt(catRecette)}</td>
         <td></td>
         <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(catDLDistrib)}</td>
@@ -6086,7 +6086,9 @@
     <!-- PAGE FICHE BILLETTERIE -->
     <div id="page-fiche-billetterie" class="page">
       <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;margin-top:8px;flex-wrap:wrap;gap:12px;">
+
+      <!-- HEADER -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;margin-top:8px;flex-wrap:wrap;gap:12px;">
         <div style="display:flex;align-items:center;gap:16px;">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;">🎟️ FICHE BILLETTERIE</div>
           <div id="bill-ville-date" style="font-size:13px;color:#888;"></div>
@@ -6094,53 +6096,49 @@
         <button onclick="billSauvegarder()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">💾 Enregistrer</button>
       </div>
 
+      <!-- RECAP -->
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:140px;">
+          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Billets vendus</div>
+          <div id="bill-total-billets" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#3b82f6;">0</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:160px;">
+          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Recette HDL</div>
+          <div id="bill-total-recette" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#c9a84c;">0,00 €</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #22c55e;border-radius:8px;padding:12px 20px;text-align:center;min-width:180px;">
+          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Versement Vendeur</div>
+          <div id="bill-total-versement" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#22c55e;">0,00 €</div>
+        </div>
+      </div>
+
       <!-- ONGLETS OPERATEURS -->
-      <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
-        <button class="bill-tab active" onclick="billSetTab('promo', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #3b82f6;border-bottom:none;background:#3b82f6;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Promoteur Local</button>
+      <div style="display:flex;gap:6px;margin-bottom:0;flex-wrap:wrap;">
+        <button class="bill-tab" onclick="billSetTab('promo', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #3b82f6;border-bottom:none;background:#3b82f6;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Promoteur Local</button>
         <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Ticketmaster</button>
         <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Fnac</button>
         <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Salle</button>
         <button class="bill-tab" onclick="billSetTab('weez', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Weezevent</button>
       </div>
 
-      <!-- CONTENEUR TABLEAUX -->
-      <div style="background:#0f0f0f;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
-
-        <!-- RECAP DROITE -->
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;gap:12px;">
-          <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:140px;">
-            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Billets vendus</div>
-            <div id="bill-total-billets" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#3b82f6;">0</div>
-          </div>
-          <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:160px;">
-            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Recette HDL</div>
-            <div id="bill-total-recette" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#c9a84c;">0,00 €</div>
-          </div>
-          <div style="background:#1a1a1a;border:1px solid #22c55e;border-radius:8px;padding:12px 20px;text-align:center;min-width:180px;">
-            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Versement Vendeur</div>
-            <div id="bill-total-versement" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#22c55e;">0,00 €</div>
-          </div>
-        </div>
-
-        <!-- TABLEAU -->
-        <table id="bill-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:800px;">
+      <!-- TABLEAU -->
+      <div style="background:#1a1a1a;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
+        <table id="bill-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:860px;">
           <thead>
-            <tr style="background:#1a1a1a;">
-              <th style="padding:8px 10px;text-align:left;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:80px;">Code</th>
-              <th style="padding:8px 10px;text-align:left;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;">Description</th>
-              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:90px;">N° Billets</th>
-              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:100px;">Tarif HDL</th>
-              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:110px;">Recette HDL</th>
-              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:100px;">DL Distrib</th>
-              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:120px;">Total DL Distrib</th>
-              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:100px;">DL Prod</th>
-              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:110px;">Total DL Prod</th>
-              <th style="padding:8px 10px;text-align:right;color:#fff;font-weight:700;border-bottom:1px solid #2a2a2a;width:120px;">P. Vente Public</th>
+            <tr style="background:#111;">
+              <th style="padding:8px 10px;text-align:left;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:60px;">Code</th>
+              <th style="padding:8px 10px;text-align:left;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;">Description</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:90px;">N° Billets</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:100px;">Tarif HDL</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:110px;">Recette HDL</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:95px;">DL Distrib</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:120px;">Total DL Distrib</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:90px;">DL Prod</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:110px;">Total DL Prod</th>
+              <th style="padding:8px 10px;text-align:right;color:#fff;font-weight:700;border-bottom:2px solid #2a2a2a;width:120px;background:#111;">P. Vente Public</th>
             </tr>
           </thead>
-          <tbody id="bill-tbody">
-            <!-- Généré par JS -->
-          </tbody>
+          <tbody id="bill-tbody"></tbody>
         </table>
       </div>
     </div>
