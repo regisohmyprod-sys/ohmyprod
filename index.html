@@ -4011,26 +4011,7 @@
   }
 
   // Appliquer les restrictions admin après chargement
-  function applyAdminUI() {
-    const isAdmin = _currentUserRole === 'admin';
-    // Nav Gestion OMP
-    const navGestion = document.getElementById('nav-gestion-omp');
-    const navCrea = document.getElementById('nav-crea-suivi');
-    if (navGestion) {
-      if (isAdmin) { navGestion.classList.add('admin-unlocked'); navGestion.style.pointerEvents = 'all'; }
-      else { navGestion.classList.remove('admin-unlocked'); }
-    }
-    if (navCrea) {
-      navCrea.style.opacity = isAdmin ? '1' : '0.35';
-      navCrea.style.pointerEvents = isAdmin ? 'all' : 'none';
-      navCrea.style.cursor = isAdmin ? 'pointer' : 'default';
-    }
-    // Boutons PROD dans le dashboard
-    document.querySelectorAll('.db-btn-prod').forEach(btn => {
-      if (!isAdmin) btn.classList.add('locked');
-      else btn.classList.remove('locked');
-    });
-  }
+  // applyAdminUI déplacé dans le second script
 
   // Tournée et dates actives pour navigation
   let _allTournees = [];
@@ -4704,6 +4685,25 @@
   }
 
   let _currentUserRole = 'membre'; // défaut
+
+  function applyAdminUI() {
+    const isAdmin = _currentUserRole === 'admin';
+    const navGestion = document.getElementById('nav-gestion-omp');
+    const navCrea = document.getElementById('nav-crea-suivi');
+    if (navGestion) {
+      if (isAdmin) { navGestion.classList.add('admin-unlocked'); navGestion.style.pointerEvents = 'all'; }
+      else { navGestion.classList.remove('admin-unlocked'); }
+    }
+    if (navCrea) {
+      navCrea.style.opacity = isAdmin ? '1' : '0.35';
+      navCrea.style.pointerEvents = isAdmin ? 'all' : 'none';
+      navCrea.style.cursor = isAdmin ? 'pointer' : 'default';
+    }
+    document.querySelectorAll('.db-btn-prod').forEach(btn => {
+      if (!isAdmin) btn.classList.add('locked');
+      else btn.classList.remove('locked');
+    });
+  }
 
   async function showApp(user) {
     document.getElementById('login-screen').style.display = 'none';
