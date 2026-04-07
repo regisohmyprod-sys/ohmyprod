@@ -1757,7 +1757,10 @@
 
     <!-- PAGE FICHE BILLETTERIE -->
     <div id="page-fiche-billetterie" class="page">
-      <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <button class="back-btn" onclick="billRetourFiche()" style="margin-bottom:0;">← Retour à la fiche</button>
+        <span id="bill-autosave-ind" style="font-size:11px;color:#22c55e;opacity:0;transition:opacity 0.5s;">✓ Auto-sauvegardé</span>
+      </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;margin-top:8px;flex-wrap:wrap;gap:12px;">
         <div style="display:flex;align-items:center;gap:16px;">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;">🎟️ FICHE BILLETTERIE</div>
@@ -3537,6 +3540,7 @@
       );
     });
     billCharger().then(() => billRenderTable());
+    billDemarrerAutoSave();
     showPage('fiche-billetterie');
   }
 
@@ -3639,14 +3643,14 @@
       const verseCat = catRecette - catDLDistrib - catDLProd;
       html += `<tr id="bill-sub-${catIdx}" style="background:#2a2a2a;border-top:1px solid #333;">
         <td colspan="2" style="padding:6px 10px;text-align:right;color:#aaa;font-size:11px;font-style:italic;">Sous-total ${cat.label}</td>
-        <td style="padding:6px 10px;text-align:right;color:#3b82f6;font-weight:700;">${catBillets}</td>
+        <td id="bill-sub-${catIdx}-billets" style="padding:6px 10px;text-align:right;color:#3b82f6;font-weight:700;">${catBillets}</td>
         <td></td>
-        <td style="padding:6px 10px;text-align:right;color:#c9a84c;font-weight:700;">${billFmt(catRecette)}</td>
+        <td id="bill-sub-${catIdx}-recette" style="padding:6px 10px;text-align:right;color:#c9a84c;font-weight:700;">${billFmt(catRecette)}</td>
         <td></td>
-        <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(catDLDistrib)}</td>
+        <td id="bill-sub-${catIdx}-dld" style="padding:6px 10px;text-align:right;color:#888;">${billFmt(catDLDistrib)}</td>
         <td></td>
-        <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(catDLProd)}</td>
-        <td style="padding:6px 10px;text-align:right;color:#22c55e;font-weight:700;">${billFmt(verseCat)}</td>
+        <td id="bill-sub-${catIdx}-dlp" style="padding:6px 10px;text-align:right;color:#888;">${billFmt(catDLProd)}</td>
+        <td id="bill-sub-${catIdx}-verse" style="padding:6px 10px;text-align:right;color:#22c55e;font-weight:700;">${billFmt(verseCat)}</td>
       </tr><tr><td colspan="10" style="height:8px;"></td></tr>`;
 
       opBillets += catBillets;
@@ -3657,12 +3661,12 @@
     // Ligne TOTAL GÉNÉRAL de l'onglet
     html += `<tr id="bill-total-row" style="background:#111;border-top:2px solid #3b82f6;">
       <td colspan="2" style="padding:10px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#fff;">TOTAL</td>
-      <td style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#3b82f6;font-weight:700;">${opBillets}</td>
+      <td id="bill-total-row-billets" style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#3b82f6;font-weight:700;">${opBillets}</td>
       <td></td>
-      <td style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#c9a84c;font-weight:700;">${billFmt(opRecette)}</td>
+      <td id="bill-total-row-recette" style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#c9a84c;font-weight:700;">${billFmt(opRecette)}</td>
       <td colspan="2"></td>
       <td colspan="2"></td>
-      <td style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#22c55e;font-weight:700;">${billFmt(opVersement)}</td>
+      <td id="bill-total-row-verse" style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#22c55e;font-weight:700;">${billFmt(opVersement)}</td>
     </tr>`;
 
     tbody.innerHTML = html;
@@ -3673,7 +3677,8 @@
 
   function billUpdate(op, catIdx, rowIdx, field, val) {
     _billData[op][catIdx][rowIdx][field] = field === 'desc' ? val : (parseFloat(val) || 0);
-    // Ne re-render que les totaux, pas le tableau entier (évite la perte de focus)
+    _billModifie = true;
+    billUpdateIndicateur(true);
     billUpdateTotals();
   }
 
@@ -3685,56 +3690,50 @@
       let catBillets = 0, catRecette = 0, catDLDistrib = 0, catDLProd = 0;
       cat.rows.forEach((_, rowIdx) => {
         const d = _billData[op][catIdx][rowIdx];
+        const rec = d.billets * d.tarif;
+        const dlD = d.billets * d.dlDistrib;
+        const dlP = d.billets * d.dlProd;
         catBillets += d.billets;
-        catRecette += d.billets * d.tarif;
-        catDLDistrib += d.billets * d.dlDistrib;
-        catDLProd += d.billets * d.dlProd;
-      });
-      opBillets += catBillets;
-      opRecette += catRecette;
-      opVersement += catRecette - catDLDistrib - catDLProd;
+        catRecette += rec;
+        catDLDistrib += dlD;
+        catDLProd += dlP;
 
-      // Mettre à jour les cellules de recette et versement dans le DOM
-      const subRow = document.getElementById(`bill-sub-${catIdx}`);
-      if (subRow) {
-        subRow.children[2].textContent = catBillets;
-        subRow.children[4].textContent = billFmt(catRecette);
-        subRow.children[6].textContent = billFmt(catDLDistrib);
-        subRow.children[8].textContent = billFmt(catDLProd);
-        subRow.children[9].textContent = billFmt(catRecette - catDLDistrib - catDLProd);
-      }
-
-      // Mettre à jour les recettes ligne par ligne
-      cat.rows.forEach((_, rowIdx) => {
-        const d = _billData[op][catIdx][rowIdx];
-        const recette = d.billets * d.tarif;
-        const totDLDistrib = d.billets * d.dlDistrib;
-        const totDLProd = d.billets * d.dlProd;
-        const pVente = d.tarif + d.dlDistrib + d.dlProd;
+        // Mettre à jour les cellules calculées de la ligne
         const el = document.getElementById(`bill-row-${catIdx}-${rowIdx}`);
         if (el) {
-          el.querySelector('.bill-recette').textContent = billFmt(recette);
-          el.querySelector('.bill-dl-distrib-tot').textContent = billFmt(totDLDistrib);
-          el.querySelector('.bill-dl-prod-tot').textContent = billFmt(totDLProd);
-          el.querySelector('.bill-pvente').textContent = billFmt(pVente);
+          el.querySelector('.bill-recette').textContent = billFmt(rec);
+          el.querySelector('.bill-dl-distrib-tot').textContent = billFmt(dlD);
+          el.querySelector('.bill-dl-prod-tot').textContent = billFmt(dlP);
+          el.querySelector('.bill-pvente').textContent = billFmt(d.tarif + d.dlDistrib + d.dlProd);
         }
       });
+
+      // Sous-total catégorie via IDs directs
+      const verse = catRecette - catDLDistrib - catDLProd;
+      const s = (id) => document.getElementById(`bill-sub-${catIdx}-${id}`);
+      if (s('billets')) s('billets').textContent = catBillets;
+      if (s('recette')) s('recette').textContent = billFmt(catRecette);
+      if (s('dld'))     s('dld').textContent     = billFmt(catDLDistrib);
+      if (s('dlp'))     s('dlp').textContent     = billFmt(catDLProd);
+      if (s('verse'))   s('verse').textContent   = billFmt(verse);
+
+      opBillets  += catBillets;
+      opRecette  += catRecette;
+      opVersement += verse;
     });
 
-    // Ligne TOTAL
-    const totalRow = document.getElementById('bill-total-row');
-    if (totalRow) {
-      totalRow.children[2].textContent = opBillets;
-      totalRow.children[4].textContent = billFmt(opRecette);
-      totalRow.children[9].textContent = billFmt(opVersement);
-    }
+    // Ligne TOTAL via IDs directs
+    const t = (id) => document.getElementById(`bill-total-row-${id}`);
+    if (t('billets')) t('billets').textContent = opBillets;
+    if (t('recette')) t('recette').textContent = billFmt(opRecette);
+    if (t('verse'))   t('verse').textContent   = billFmt(opVersement);
 
-    // Récap onglet
-    document.getElementById('bill-op-billets').textContent = opBillets;
-    document.getElementById('bill-op-recette').textContent = billFmt(opRecette);
+    // Récap onglet (3 carrés dans le bloc)
+    document.getElementById('bill-op-billets').textContent  = opBillets;
+    document.getElementById('bill-op-recette').textContent  = billFmt(opRecette);
     document.getElementById('bill-op-versement').textContent = billFmt(opVersement);
 
-    // Récap global
+    // Récap global tous réseaux (3 grands carrés en haut)
     let gBillets = 0, gRecette = 0, gVersement = 0;
     BILL_OPS.forEach(o => {
       BILL_CATS.forEach((cat, catIdx) => {
@@ -3743,14 +3742,14 @@
           const rec = d.billets * d.tarif;
           const dlD = d.billets * d.dlDistrib;
           const dlP = d.billets * d.dlProd;
-          gBillets += d.billets;
-          gRecette += rec;
+          gBillets   += d.billets;
+          gRecette   += rec;
           gVersement += rec - dlD - dlP;
         });
       });
     });
-    document.getElementById('bill-total-billets').textContent = gBillets;
-    document.getElementById('bill-total-recette').textContent = billFmt(gRecette);
+    document.getElementById('bill-total-billets').textContent  = gBillets;
+    document.getElementById('bill-total-recette').textContent  = billFmt(gRecette);
     document.getElementById('bill-total-versement').textContent = billFmt(gVersement);
   }
 
@@ -3758,7 +3757,10 @@
     return (n || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
   }
 
-  async function billSauvegarder() {
+  let _billModifie = false;      // flag : données modifiées depuis dernière sauvegarde
+  let _billAutoSaveTimer = null; // timer sauvegarde auto
+
+  async function billSauvegarder(silent = false) {
     if (!_fpDateId) return;
     const payload = JSON.stringify(_billData);
     const { data: existing } = await _supabase.from('fiches_production').select('id').eq('date_concert_id', _fpDateId).single();
@@ -3767,8 +3769,26 @@
     } else {
       await _supabase.from('fiches_production').insert({ date_concert_id: _fpDateId, billetterie_data: payload });
     }
+    _billModifie = false;
+    billUpdateIndicateur(false);
+    if (!silent) {
+      const btn = document.querySelector('#page-fiche-billetterie button[onclick="billSauvegarder()"]');
+      if (btn) { btn.textContent = '✅ Enregistré !'; btn.style.background = '#22c55e'; setTimeout(() => { btn.textContent = '💾 Enregistrer'; btn.style.background = '#3b82f6'; }, 2000); }
+    }
+  }
+
+  function billUpdateIndicateur(modifie) {
     const btn = document.querySelector('#page-fiche-billetterie button[onclick="billSauvegarder()"]');
-    if (btn) { btn.textContent = '✅ Enregistré !'; btn.style.background = '#22c55e'; setTimeout(() => { btn.textContent = '💾 Enregistrer'; btn.style.background = '#3b82f6'; }, 2000); }
+    if (!btn) return;
+    if (modifie) {
+      btn.textContent = '💾 Enregistrer *';
+      btn.style.background = '#c9a84c';
+      btn.style.color = '#111';
+    } else {
+      btn.textContent = '💾 Enregistrer';
+      btn.style.background = '#3b82f6';
+      btn.style.color = '#fff';
+    }
   }
 
   async function billCharger() {
@@ -3777,6 +3797,33 @@
     if (data?.billetterie_data) {
       try { _billData = JSON.parse(data.billetterie_data); } catch(e) {}
     }
+    _billModifie = false;
+    billUpdateIndicateur(false);
+  }
+
+  function billDemarrerAutoSave() {
+    if (_billAutoSaveTimer) clearInterval(_billAutoSaveTimer);
+    _billAutoSaveTimer = setInterval(() => {
+      if (_billModifie) {
+        billSauvegarder(true); // silencieux
+        // Petit feedback discret
+        const ind = document.getElementById('bill-autosave-ind');
+        if (ind) { ind.textContent = '✓ Auto-sauvegardé'; ind.style.opacity = '1'; setTimeout(() => { ind.style.opacity = '0'; }, 2000); }
+      }
+    }, 30000); // toutes les 30 secondes
+  }
+
+  function billArreterAutoSave() {
+    if (_billAutoSaveTimer) { clearInterval(_billAutoSaveTimer); _billAutoSaveTimer = null; }
+  }
+
+  async function billRetourFiche() {
+    if (_billModifie) {
+      const rep = confirm('Des modifications non sauvegardées !\n\nSauvegarder avant de quitter ?');
+      if (rep) await billSauvegarder(true);
+    }
+    billArreterAutoSave();
+    showPage('fiche-prod');
   }
 
 
