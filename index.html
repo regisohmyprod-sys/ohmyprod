@@ -1769,7 +1769,10 @@
 
       <!-- SECTION 1 : LOCATION SALLE -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
-        <div style="background:#c9a84c;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#000;text-align:center;">LOCATION SALLE</div>
+        <div style="background:#c9a84c;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#000;display:flex;align-items:center;justify-content:space-between;">
+          <span>LOCATION SALLE</span>
+          <span style="font-size:13px;">TOTAL OMP + PROMOTEUR LOCAL : <span id="fin-total-salle" style="font-size:18px;font-weight:900;">0</span> €</span>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
 
           <!-- OMP -->
@@ -1903,7 +1906,10 @@
 
       <!-- SECTION 2 : AUTRES POSTES DE DÉPENSES -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
-        <div style="background:#c9a84c;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#000;text-align:center;">AUTRES POSTES DE DÉPENSES</div>
+        <div style="background:#c9a84c;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#000;display:flex;align-items:center;justify-content:space-between;">
+          <span>AUTRES POSTES DE DÉPENSES</span>
+          <span style="font-size:13px;">TOTAL OMP + PROMOTEUR LOCAL : <span id="fin-total-autres" style="font-size:18px;font-weight:900;">0</span> €</span>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
 
           <!-- OMP -->
@@ -2010,6 +2016,12 @@
             </table>
           </div>
         </div>
+      </div>
+
+      <!-- TOTAL DÉPENSES GLOBAL -->
+      <div style="background:#1a1a2e;border:2px solid #c9a84c;border-radius:12px;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#c9a84c;">💰 TOTAL DÉPENSES</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff;" id="fin-total-depenses">0 €</div>
       </div>
 
     </div>
@@ -3792,6 +3804,56 @@
   // =============================================
   // FINANCIER — sauvegarde
   // =============================================
+  function finCalcTotaux() {
+    const ids_omp_salle = ['fin-omp-loc-mg','fin-omp-loc-pct','fin-omp-loc-ht','fin-omp-loc-billet',
+      'fin-omp-prest-energie','fin-omp-prest-chauf','fin-omp-prest-config','fin-omp-prest-fenwick','fin-omp-prest-accroches','fin-omp-prest-elec',
+      'fin-omp-pers-nettoyage','fin-omp-pers-nett-supp','fin-omp-pers-elec','fin-omp-pers-hriger','fin-omp-pers-regisseur','fin-omp-pers-forfait',
+      'fin-omp-pers-caissier','fin-omp-pers-rigg','fin-omp-pers-hotesses','fin-omp-pers-controle','fin-omp-pers-parking','fin-omp-pers-secu',
+      'fin-omp-pers-vigi','fin-omp-pers-consigne','fin-omp-pers-gardien',
+      'fin-omp-secu-ssiap1','fin-omp-secu-ssiap2','fin-omp-secu-protciv','fin-omp-secu-vigi2','fin-omp-secu-medical','fin-omp-secu-autres'];
+    const ids_pl_salle = ['fin-pl-loc-mg','fin-pl-loc-pct','fin-pl-loc-ht','fin-pl-loc-billet',
+      'fin-pl-prest-energie','fin-pl-prest-chauf','fin-pl-prest-config','fin-pl-prest-fenwick','fin-pl-prest-accroches','fin-pl-prest-elec',
+      'fin-pl-pers-nettoyage','fin-pl-pers-nett-supp','fin-pl-pers-elec','fin-pl-pers-hriger','fin-pl-pers-regisseur','fin-pl-pers-forfait',
+      'fin-pl-pers-caissier','fin-pl-pers-rigg','fin-pl-pers-hotesses','fin-pl-pers-controle','fin-pl-pers-parking','fin-pl-pers-secu',
+      'fin-pl-pers-vigi','fin-pl-pers-consigne','fin-pl-pers-gardien',
+      'fin-pl-secu-ssiap1','fin-pl-secu-ssiap2','fin-pl-secu-protciv','fin-pl-secu-vigi2','fin-pl-secu-medical','fin-pl-secu-autres'];
+    const ids_omp_autres = ['fin-omp-sal-tournee','fin-omp-sal-road','fin-omp-sal-promo',
+      'fin-omp-tech-road','fin-omp-tech-figer','fin-omp-tech-coulisses','fin-omp-tech-autres','fin-omp-tech-conso','fin-omp-tech-controleur',
+      'fin-omp-promo-meta','fin-omp-promo-autres1','fin-omp-promo-autres2',
+      'fin-omp-voy-prod','fin-omp-voy-artiste','fin-omp-voy-tech','fin-omp-voy-vhr',
+      'fin-omp-vhr-pkart','fin-omp-vhr-pktech','fin-omp-vhr-taxiart','fin-omp-vhr-taxitech','fin-omp-vhr-total2',
+      'fin-omp-hotel-prod','fin-omp-hotel-tech','fin-omp-hotel-art','fin-omp-hotel-estim',
+      'fin-omp-trai-total','fin-omp-trai-resto','fin-omp-trai-loge'];
+    const ids_pl_autres = ['fin-pl-sal-regisseur','fin-pl-sal-road','fin-pl-sal-caissier',
+      'fin-pl-tech-road','fin-pl-tech-figer','fin-pl-tech-coulisses','fin-pl-tech-autres','fin-pl-tech-conso','fin-pl-tech-controleur',
+      'fin-pl-promo-meta','fin-pl-promo-autres1','fin-pl-promo-autres2',
+      'fin-pl-voy-prod','fin-pl-voy-artiste','fin-pl-voy-tech','fin-pl-voy-autres',
+      'fin-pl-vhr-pkart','fin-pl-vhr-pktech','fin-pl-vhr-taxiart','fin-pl-vhr-taxitech','fin-pl-vhr-total2',
+      'fin-pl-hotel-prod','fin-pl-hotel-tech','fin-pl-hotel-art','fin-pl-hotel-estim',
+      'fin-pl-trai-total','fin-pl-trai-resto','fin-pl-trai-loge'];
+
+    const sum = ids => ids.reduce((t, id) => { const el = document.getElementById(id); return t + (parseFloat(el?.value) || 0); }, 0);
+
+    const totalOmpSalle = sum(ids_omp_salle);
+    const totalPlSalle = sum(ids_pl_salle);
+    const totalOmpAutres = sum(ids_omp_autres);
+    const totalPlAutres = sum(ids_pl_autres);
+
+    const totalSalle = totalOmpSalle + totalPlSalle;
+    const totalAutres = totalOmpAutres + totalPlAutres;
+    const totalDepenses = totalSalle + totalAutres;
+
+    const fmt = v => v.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+    const el1 = document.getElementById('fin-total-salle'); if (el1) el1.textContent = fmt(totalSalle);
+    const el2 = document.getElementById('fin-omp-total-salle'); if (el2) el2.textContent = fmt(totalOmpSalle);
+    const el3 = document.getElementById('fin-pl-total-salle'); if (el3) el3.textContent = fmt(totalPlSalle);
+    const el4 = document.getElementById('fin-total-autres'); if (el4) el4.textContent = fmt(totalAutres);
+    const el5 = document.getElementById('fin-omp-total-autres'); if (el5) el5.textContent = fmt(totalOmpAutres);
+    const el6 = document.getElementById('fin-pl-total-autres'); if (el6) el6.textContent = fmt(totalPlAutres);
+    const el7 = document.getElementById('fin-total-depenses'); if (el7) el7.textContent = fmt(totalDepenses) + ' €';
+  }
+
   async function finSauvegarder() {
     if (!_fpDateId) { alert('Erreur : aucune date sélectionnée.'); return; }
     const inputs = document.querySelectorAll('#page-fiche-financier .fin-input');
@@ -3821,6 +3883,11 @@
         });
       }
     } catch(e) {}
+    // Attacher les écouteurs pour recalcul en temps réel
+    document.querySelectorAll('#page-fiche-financier .fin-input').forEach(inp => {
+      inp.addEventListener('input', finCalcTotaux);
+    });
+    finCalcTotaux();
   }
 
   // =============================================
