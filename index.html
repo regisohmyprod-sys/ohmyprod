@@ -1787,6 +1787,23 @@
         <button class="bill-tab" onclick="billSetTab('weez', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Weezevent</button>
       </div>
       <div style="background:#1a1a1a;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
+
+        <!-- RÉCAP ONGLET ACTIF -->
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <div style="background:#0f1a2a;border:1px solid #3b82f6;border-radius:8px;padding:10px 16px;text-align:center;min-width:130px;">
+            <div style="font-size:10px;color:#3b82f6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Billets (ce réseau)</div>
+            <div id="bill-op-billets" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;">0</div>
+          </div>
+          <div style="background:#1a160a;border:1px solid #c9a84c;border-radius:8px;padding:10px 16px;text-align:center;min-width:150px;">
+            <div style="font-size:10px;color:#c9a84c;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Recette (ce réseau)</div>
+            <div id="bill-op-recette" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;">0,00 €</div>
+          </div>
+          <div style="background:#0a1a0f;border:1px solid #22c55e;border-radius:8px;padding:10px 16px;text-align:center;min-width:170px;">
+            <div style="font-size:10px;color:#22c55e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Versement (ce réseau)</div>
+            <div id="bill-op-versement" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;">0,00 €</div>
+          </div>
+        </div>
+
         <table id="bill-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:860px;">
           <thead>
             <tr style="background:#111;">
@@ -3515,8 +3532,8 @@
     });
     // Réinitialiser les données et charger depuis Supabase
     BILL_OPS.forEach(op => {
-      _billData[op] = BILL_CATS.map(() =>
-        ['TN','ADH','Promo'].map(() => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5 }))
+      _billData[op] = BILL_CATS.map((cat) =>
+        cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
       );
     });
     billCharger().then(() => billRenderTable());
@@ -3527,18 +3544,18 @@
   // BILLETTERIE
   // =============================================
   const BILL_CATS = [
-    { code: 'TN', label: 'Carré Or',  color: '#c9a84c', rows: ['TN','ADH','Promo'] },
-    { code: 'TN', label: 'Catégorie 1', color: '#e31e24', rows: ['TN','ADH','Promo'] },
-    { code: 'TN', label: 'Catégorie 2', color: '#3b82f6', rows: ['TN','ADH','Promo'] },
-    { code: 'TN', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['TN','ADH','Promo'] },
+    { code: 'TN', label: 'Carré Or',    color: '#c9a84c', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
+    { code: 'TN', label: 'Catégorie 1', color: '#e31e24', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
+    { code: 'TN', label: 'Catégorie 2', color: '#3b82f6', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
+    { code: 'TN', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
   ];
   const BILL_OPS = ['promo','tm','fnac','salle','weez'];
   let _billTabActif = 'promo';
   // Stockage : _billData[op][catIdx][rowIdx] = { billets, tarif, dlDistrib, dlProd }
   let _billData = {};
   BILL_OPS.forEach(op => {
-    _billData[op] = BILL_CATS.map(() =>
-      ['TN','ADH','Promo'].map(() => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5 }))
+    _billData[op] = BILL_CATS.map((cat) =>
+      cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
     );
   });
 
@@ -3556,7 +3573,7 @@
     if (!tbody) return;
     const op = _billTabActif;
     let html = '';
-    let totalBillets = 0, totalRecette = 0, totalVersement = 0;
+    let opBillets = 0, opRecette = 0, opVersement = 0; // onglet actif
 
     BILL_CATS.forEach((cat, catIdx) => {
       // Ligne titre catégorie
@@ -3579,9 +3596,15 @@
         catDLProd += totDLProd;
 
         const bg = rowIdx % 2 === 0 ? '#242424' : '#1e1e1e';
+        const descVal = d.desc || rowCode;
         html += `<tr style="background:${bg};">
           <td style="padding:6px 10px;color:#aaa;font-size:11px;font-weight:600;">${rowCode}</td>
-          <td style="padding:6px 10px;color:#666;font-size:11px;">${rowCode === 'TN' ? cat.label : rowCode}</td>
+          <td style="padding:4px 6px;">
+            <input type="text" value="${descVal}"
+              onchange="billUpdate('${op}',${catIdx},${rowIdx},'desc',this.value)"
+              style="width:100%;background:transparent;border:none;border-bottom:1px solid #333;color:#bbb;padding:3px 4px;font-size:11px;font-family:'Inter',sans-serif;outline:none;"
+              onfocus="this.style.borderBottomColor='#3b82f6'" onblur="this.style.borderBottomColor='#333'">
+          </td>
           <td style="padding:4px 6px;text-align:right;">
             <input type="number" min="0" value="${d.billets||''}" placeholder="0"
               onchange="billUpdate('${op}',${catIdx},${rowIdx},'billets',this.value)"
@@ -3621,17 +3644,36 @@
         <td style="padding:6px 10px;text-align:right;color:#22c55e;font-weight:700;">${billFmt(verseCat)}</td>
       </tr><tr><td colspan="10" style="height:8px;"></td></tr>`;
 
-      totalBillets += catBillets;
-      totalRecette += catRecette;
-      totalVersement += catRecette - catDLDistrib - catDLProd;
+      opBillets += catBillets;
+      opRecette += catRecette;
+      opVersement += catRecette - catDLDistrib - catDLProd;
     });
 
     tbody.innerHTML = html;
 
-    // Récap
-    document.getElementById('bill-total-billets').textContent = totalBillets;
-    document.getElementById('bill-total-recette').textContent = billFmt(totalRecette);
-    document.getElementById('bill-total-versement').textContent = billFmt(totalVersement);
+    // Récap onglet actif (dans le bloc)
+    document.getElementById('bill-op-billets').textContent = opBillets;
+    document.getElementById('bill-op-recette').textContent = billFmt(opRecette);
+    document.getElementById('bill-op-versement').textContent = billFmt(opVersement);
+
+    // Récap global tous réseaux
+    let gBillets = 0, gRecette = 0, gVersement = 0;
+    BILL_OPS.forEach(o => {
+      BILL_CATS.forEach((cat, catIdx) => {
+        cat.rows.forEach((_, rowIdx) => {
+          const d = _billData[o][catIdx][rowIdx];
+          const rec = d.billets * d.tarif;
+          const dlD = d.billets * d.dlDistrib;
+          const dlP = d.billets * d.dlProd;
+          gBillets += d.billets;
+          gRecette += rec;
+          gVersement += rec - dlD - dlP;
+        });
+      });
+    });
+    document.getElementById('bill-total-billets').textContent = gBillets;
+    document.getElementById('bill-total-recette').textContent = billFmt(gRecette);
+    document.getElementById('bill-total-versement').textContent = billFmt(gVersement);
   }
 
   function billUpdate(op, catIdx, rowIdx, field, val) {
