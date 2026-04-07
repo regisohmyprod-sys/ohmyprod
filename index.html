@@ -1580,7 +1580,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
           <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">📍 IDENTIFICATION DE LA DATE</div>
           <div style="display:flex;gap:8px;">
-            <button onclick="fpOuvrirFinancier()" style="background:#1e3a2f;color:#4caf50;border:1px solid #4caf50;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💰 FINANCIER</button>
+            <button onclick="fpOuvrirFinancier()" style="background:rgba(201,168,76,0.1);color:#c9a84c;border:1px solid #c9a84c;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💰 FINANCIER</button>
             <button onclick="fpOuvrirBilletterie()" style="background:#1a2a3a;color:#3b82f6;border:1px solid #3b82f6;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🎟️ BILLETTERIE</button>
           </div>
         </div>
@@ -3442,8 +3442,164 @@
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
     const el = document.getElementById('bill-ville-date');
     if (el) el.textContent = label;
+    _billTabActif = 'promo';
+    // Reset visuels onglets
+    document.querySelectorAll('.bill-tab').forEach((t,i) => {
+      t.style.background = i === 0 ? '#3b82f6' : '#1a1a1a';
+      t.style.color = i === 0 ? '#fff' : '#888';
+      t.style.borderColor = i === 0 ? '#3b82f6' : '#2a2a2a';
+    });
+    // Réinitialiser les données et charger depuis Supabase
+    BILL_OPS.forEach(op => {
+      _billData[op] = BILL_CATS.map(() =>
+        ['TN','ADH','Promo'].map(() => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5 }))
+      );
+    });
+    billCharger().then(() => billRenderTable());
     showPage('fiche-billetterie');
   }
+
+  // =============================================
+  // BILLETTERIE
+  // =============================================
+  const BILL_CATS = [
+    { code: 'TN', label: 'Carré Or',  color: '#c9a84c', rows: ['TN','ADH','Promo'] },
+    { code: 'TN', label: 'Catégorie 1', color: '#e31e24', rows: ['TN','ADH','Promo'] },
+    { code: 'TN', label: 'Catégorie 2', color: '#3b82f6', rows: ['TN','ADH','Promo'] },
+    { code: 'TN', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['TN','ADH','Promo'] },
+  ];
+  const BILL_OPS = ['promo','tm','fnac','salle','weez'];
+  let _billTabActif = 'promo';
+  // Stockage : _billData[op][catIdx][rowIdx] = { billets, tarif, dlDistrib, dlProd }
+  let _billData = {};
+  BILL_OPS.forEach(op => {
+    _billData[op] = BILL_CATS.map(() =>
+      ['TN','ADH','Promo'].map(() => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5 }))
+    );
+  });
+
+  function billSetTab(op, btn) {
+    _billTabActif = op;
+    document.querySelectorAll('.bill-tab').forEach(t => {
+      t.style.background = '#1a1a1a'; t.style.color = '#888'; t.style.borderColor = '#2a2a2a';
+    });
+    btn.style.background = '#3b82f6'; btn.style.color = '#fff'; btn.style.borderColor = '#3b82f6';
+    billRenderTable();
+  }
+
+  function billRenderTable() {
+    const tbody = document.getElementById('bill-tbody');
+    if (!tbody) return;
+    const op = _billTabActif;
+    let html = '';
+    let totalBillets = 0, totalRecette = 0, totalVersement = 0;
+
+    BILL_CATS.forEach((cat, catIdx) => {
+      // Ligne titre catégorie
+      html += `<tr style="background:#1a1a1a;">
+        <td colspan="10" style="padding:8px 10px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:${cat.color};border-top:2px solid ${cat.color}33;">${cat.label}</td>
+      </tr>`;
+
+      let catBillets = 0, catRecette = 0, catDLDistrib = 0, catDLProd = 0;
+
+      cat.rows.forEach((rowCode, rowIdx) => {
+        const d = _billData[op][catIdx][rowIdx];
+        const recette = d.billets * d.tarif;
+        const totDLDistrib = d.billets * d.dlDistrib;
+        const totDLProd = d.billets * d.dlProd;
+        const pVente = d.tarif + d.dlDistrib + d.dlProd;
+
+        catBillets += d.billets;
+        catRecette += recette;
+        catDLDistrib += totDLDistrib;
+        catDLProd += totDLProd;
+
+        const bg = rowIdx % 2 === 0 ? '#111' : '#0d0d0d';
+        html += `<tr style="background:${bg};">
+          <td style="padding:6px 10px;color:#aaa;font-size:11px;font-weight:600;">${rowCode}</td>
+          <td style="padding:6px 10px;color:#666;font-size:11px;">${rowCode === 'TN' ? cat.label : rowCode}</td>
+          <td style="padding:4px 6px;text-align:right;">
+            <input type="number" min="0" value="${d.billets||''}" placeholder="0"
+              onchange="billUpdate('${op}',${catIdx},${rowIdx},'billets',this.value)"
+              style="width:75px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#fff;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
+          </td>
+          <td style="padding:4px 6px;text-align:right;">
+            <input type="number" min="0" step="0.01" value="${d.tarif||''}" placeholder="0,00"
+              onchange="billUpdate('${op}',${catIdx},${rowIdx},'tarif',this.value)"
+              style="width:80px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#c9a84c;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
+          </td>
+          <td style="padding:6px 10px;text-align:right;color:#fff;font-weight:600;">${billFmt(recette)}</td>
+          <td style="padding:4px 6px;text-align:right;">
+            <input type="number" min="0" step="0.01" value="${d.dlDistrib}"
+              onchange="billUpdate('${op}',${catIdx},${rowIdx},'dlDistrib',this.value)"
+              style="width:70px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#888;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
+          </td>
+          <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(totDLDistrib)}</td>
+          <td style="padding:4px 6px;text-align:right;">
+            <input type="number" min="0" step="0.01" value="${d.dlProd}"
+              onchange="billUpdate('${op}',${catIdx},${rowIdx},'dlProd',this.value)"
+              style="width:70px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#888;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
+          </td>
+          <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(totDLProd)}</td>
+          <td style="padding:6px 10px;text-align:right;color:#fff;font-weight:700;background:#1a1a1a;">${billFmt(pVente)}</td>
+        </tr>`;
+      });
+
+      // Ligne sous-total catégorie
+      const verseCat = catRecette - catDLDistrib - catDLProd;
+      html += `<tr style="background:#161616;border-top:1px solid #2a2a2a;">
+        <td colspan="4" style="padding:6px 10px;text-align:right;color:#888;font-size:11px;font-style:italic;">Sous-total ${cat.label}</td>
+        <td style="padding:6px 10px;text-align:right;color:#c9a84c;font-weight:700;">${billFmt(catRecette)}</td>
+        <td></td>
+        <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(catDLDistrib)}</td>
+        <td></td>
+        <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(catDLProd)}</td>
+        <td style="padding:6px 10px;text-align:right;color:#22c55e;font-weight:700;">${billFmt(verseCat)}</td>
+      </tr><tr><td colspan="10" style="height:8px;"></td></tr>`;
+
+      totalBillets += catBillets;
+      totalRecette += catRecette;
+      totalVersement += catRecette - catDLDistrib - catDLProd;
+    });
+
+    tbody.innerHTML = html;
+
+    // Récap
+    document.getElementById('bill-total-billets').textContent = totalBillets;
+    document.getElementById('bill-total-recette').textContent = billFmt(totalRecette);
+    document.getElementById('bill-total-versement').textContent = billFmt(totalVersement);
+  }
+
+  function billUpdate(op, catIdx, rowIdx, field, val) {
+    _billData[op][catIdx][rowIdx][field] = parseFloat(val) || 0;
+    billRenderTable();
+  }
+
+  function billFmt(n) {
+    return (n || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+
+  async function billSauvegarder() {
+    if (!_fpDateId) return;
+    const payload = JSON.stringify(_billData);
+    const { data: existing } = await _supabase.from('fiches_production').select('id').eq('date_concert_id', _fpDateId).single();
+    if (existing) {
+      await _supabase.from('fiches_production').update({ billetterie_data: payload }).eq('date_concert_id', _fpDateId);
+    } else {
+      await _supabase.from('fiches_production').insert({ date_concert_id: _fpDateId, billetterie_data: payload });
+    }
+    const btn = document.querySelector('#page-fiche-billetterie button[onclick="billSauvegarder()"]');
+    if (btn) { btn.textContent = '✅ Enregistré !'; btn.style.background = '#22c55e'; setTimeout(() => { btn.textContent = '💾 Enregistrer'; btn.style.background = '#3b82f6'; }, 2000); }
+  }
+
+  async function billCharger() {
+    if (!_fpDateId) return;
+    const { data } = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
+    if (data?.billetterie_data) {
+      try { _billData = JSON.parse(data.billetterie_data); } catch(e) {}
+    }
+  }
+
 
   async function fpSauvegarder() {
     const btn = document.getElementById('fp-save-btn');
@@ -5930,12 +6086,62 @@
     <!-- PAGE FICHE BILLETTERIE -->
     <div id="page-fiche-billetterie" class="page">
       <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;margin-top:8px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;">🎟️ FICHE BILLETTERIE</div>
-        <div id="bill-ville-date" style="font-size:13px;color:#888;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;margin-top:8px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;">🎟️ FICHE BILLETTERIE</div>
+          <div id="bill-ville-date" style="font-size:13px;color:#888;"></div>
+        </div>
+        <button onclick="billSauvegarder()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">💾 Enregistrer</button>
       </div>
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:40px;text-align:center;color:#555;font-size:14px;">
-        🚧 Module billetterie en cours de construction…
+
+      <!-- ONGLETS OPERATEURS -->
+      <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="bill-tab active" onclick="billSetTab('promo', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #3b82f6;border-bottom:none;background:#3b82f6;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Promoteur Local</button>
+        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Ticketmaster</button>
+        <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Fnac</button>
+        <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Salle</button>
+        <button class="bill-tab" onclick="billSetTab('weez', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Weezevent</button>
+      </div>
+
+      <!-- CONTENEUR TABLEAUX -->
+      <div style="background:#0f0f0f;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
+
+        <!-- RECAP DROITE -->
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;gap:12px;">
+          <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:140px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Billets vendus</div>
+            <div id="bill-total-billets" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#3b82f6;">0</div>
+          </div>
+          <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:160px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Recette HDL</div>
+            <div id="bill-total-recette" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#c9a84c;">0,00 €</div>
+          </div>
+          <div style="background:#1a1a1a;border:1px solid #22c55e;border-radius:8px;padding:12px 20px;text-align:center;min-width:180px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Versement Vendeur</div>
+            <div id="bill-total-versement" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#22c55e;">0,00 €</div>
+          </div>
+        </div>
+
+        <!-- TABLEAU -->
+        <table id="bill-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:800px;">
+          <thead>
+            <tr style="background:#1a1a1a;">
+              <th style="padding:8px 10px;text-align:left;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:80px;">Code</th>
+              <th style="padding:8px 10px;text-align:left;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;">Description</th>
+              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:90px;">N° Billets</th>
+              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:100px;">Tarif HDL</th>
+              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:110px;">Recette HDL</th>
+              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:100px;">DL Distrib</th>
+              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:120px;">Total DL Distrib</th>
+              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:100px;">DL Prod</th>
+              <th style="padding:8px 10px;text-align:right;color:#888;font-weight:600;border-bottom:1px solid #2a2a2a;width:110px;">Total DL Prod</th>
+              <th style="padding:8px 10px;text-align:right;color:#fff;font-weight:700;border-bottom:1px solid #2a2a2a;width:120px;">P. Vente Public</th>
+            </tr>
+          </thead>
+          <tbody id="bill-tbody">
+            <!-- Généré par JS -->
+          </tbody>
+        </table>
       </div>
     </div>
 
