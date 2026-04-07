@@ -2408,7 +2408,7 @@
       demandeur: demandeur || null,
       nom_invite: `${prenom} ${nom}`.trim(),
       nombre: parseInt(places) || 1,
-      valide: statut === 'valide',
+      valide: statut === 'valide' ? 1 : 0,
       date_demande: date || null,
     };
     _supabase.from('invitations').insert([invitData]).then(({ error }) => {
