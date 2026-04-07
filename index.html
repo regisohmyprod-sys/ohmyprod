@@ -3888,10 +3888,31 @@
       const { data } = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
       if (data?.billetterie_data) {
         const parsed = JSON.parse(data.billetterie_data);
-        // Fusionner avec les données vierges (évite les clés manquantes)
         BILL_OPS.forEach(op => { if (parsed[op]) _billData[op] = parsed[op]; });
       }
     } catch(e) {}
+
+    // Charger les invitations depuis la table invitations
+    try {
+      if (!_billData['invit']) _billData['invit'] = {};
+      BILL_INVIT_TYPES.forEach(t => { _billData['invit'][t.key] = 0; });
+      const { data: invits } = await _supabase
+        .from('invitations')
+        .select('nom_liste, nombre')
+        .eq('date_concert_id', _fpDateId)
+        .eq('valide', 1);
+      if (invits && invits.length > 0) {
+        invits.forEach(inv => {
+          const key = inv.nom_liste;
+          if (_billData['invit'][key] !== undefined) {
+            _billData['invit'][key] += parseInt(inv.nombre) || 1;
+          } else {
+            _billData['invit']['autres'] = (_billData['invit']['autres'] || 0) + (parseInt(inv.nombre) || 1);
+          }
+        });
+      }
+    } catch(e) { console.error('Erreur chargement invitations bill:', e); }
+
     _billModifie = false;
     billUpdateIndicateur(false);
   }
