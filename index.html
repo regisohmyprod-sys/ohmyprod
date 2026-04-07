@@ -4578,6 +4578,19 @@
     document.getElementById('tab-' + id).classList.add('active');
     if (id === 'invitations' && _fpDateId) loadInvitations(_fpDateId);
   }
+  async function validerInvitation(id, dateId) {
+    const { error } = await _supabase.from('invitations').update({ valide: 1 }).eq('id', id);
+    if (error) { alert('Erreur : ' + error.message); return; }
+    loadInvitations(dateId);
+  }
+
+  async function supprimerInvitation(id, dateId) {
+    if (!confirm('Supprimer cette invitation ?')) return;
+    const { error } = await _supabase.from('invitations').delete().eq('id', id);
+    if (error) { alert('Erreur : ' + error.message); return; }
+    loadInvitations(dateId);
+  }
+
   async function loadInvitations(dateId) {
     const { data, error } = await _supabase
       .from('invitations')
@@ -4588,13 +4601,17 @@
     const tbody = document.getElementById('dyn-invit-tbody');
     const totalEl = document.getElementById('dyn-invit-total');
     if (tbody) tbody.innerHTML = '';
-    if (totalEl) totalEl.innerHTML = '<span>Total : 0</span><span>Valid\u00e9 : 0</span>';
+    if (totalEl) totalEl.innerHTML = '<span>Total : 0</span><span>Validé : 0</span>';
     let total = 0, valide = 0;
     (data || []).forEach(inv => {
       const statutBadge = inv.valide
-        ? '<span class="badge badge-green">Valid\u00e9</span>'
+        ? '<span class="badge badge-green">Validé</span>'
         : '<span class="badge badge-orange">En attente</span>';
       const dateStr = inv.date_demande ? new Date(inv.date_demande).toLocaleDateString('fr-FR') : '-';
+      const btnValider = !inv.valide
+        ? '<button onclick="validerInvitation(' + inv.id + ',\'' + dateId + '\')" style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;">Valider</button>'
+        : '<span style="color:#22c55e;font-size:11px;">&#10003;</span>';
+      const btnSupprimer = '<button onclick="supprimerInvitation(' + inv.id + ',\'' + dateId + '\')" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px;">&#x1F5D1;</button>';
       const row = '<tr style="border-bottom:1px solid var(--border); font-size:13px;">'
         + '<td style="padding:10px 12px; color:var(--grey);">' + dateStr + '</td>'
         + '<td style="padding:10px 12px; color:var(--grey);">' + (inv.demandeur || '-') + '</td>'
@@ -4603,14 +4620,14 @@
         + '<td style="padding:10px 12px; color:var(--grey); text-align:center;">' + (inv.nombre || 1) + '</td>'
         + '<td style="padding:10px 12px; color:var(--grey);">-</td>'
         + '<td style="padding:10px 12px;">' + statutBadge + '</td>'
-        + '<td style="padding:10px 12px; color:var(--grey);">-</td>'
+        + '<td style="padding:10px 12px;">' + btnValider + btnSupprimer + '</td>'
         + '<td style="padding:10px 12px; color:var(--grey);">-</td>'
         + '</tr>';
       if (tbody) tbody.insertAdjacentHTML('beforeend', row);
       total += parseInt(inv.nombre) || 1;
       if (inv.valide) valide += parseInt(inv.nombre) || 1;
     });
-    if (totalEl) totalEl.innerHTML = '<span>Total : ' + total + '</span><span>Valid\u00e9 : ' + valide + '</span>';
+    if (totalEl) totalEl.innerHTML = '<span>Total : ' + total + '</span><span>Validé : ' + valide + '</span>';
   }
     function updateBreadcrumb(id) {
     const bc = document.getElementById('breadcrumb');
