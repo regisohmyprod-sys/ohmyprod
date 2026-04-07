@@ -2037,6 +2037,13 @@
         </div>
       </div>
 
+      <!-- BOUTONS FICHES -->
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <button onclick="showPage('cloture-salle')" style="background:rgba(59,130,246,0.1);color:#3b82f6;border:1px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🏟️ CLÔTURE SALLE</button>
+        <button onclick="showPage('decla-droits')" style="background:rgba(168,85,247,0.1);color:#a855f7;border:1px solid #a855f7;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📋 DÉCLA DROITS</button>
+        <button onclick="showPage('bilan-amh')" style="background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid #22c55e;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📊 BILAN AMH</button>
+      </div>
+
       <!-- INFOS DATE À FOURNIR -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">INFOS DATES À FOURNIR</div>
@@ -2218,6 +2225,228 @@
         <div style="color:#555;font-size:13px;">Graphique disponible après connexion aux données de vente</div>
       </div>
 
+    </div>
+
+    <!-- PAGE CLÔTURE SALLE -->
+    <div id="page-cloture-salle" class="page">
+      <button class="back-btn" onclick="showPage('pilote-date')">← Retour au Pilote Date</button>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;margin-top:8px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;">🏟️ CLÔTURE SALLE</div>
+        <div id="cs-ville-date" style="font-size:13px;color:#888;"></div>
+      </div>
+
+      <!-- INFOS SHOW -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#3b82f6;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#fff;text-align:center;">THE WORLD OF QUEEN</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;width:40%;">SPECTACLE</td><td style="padding:7px 16px;color:#fff;font-weight:700;">THE WORLD OF QUEEN</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">DATE</td><td id="cs-date" style="padding:7px 16px;color:#3b82f6;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">PRODUCTEUR</td><td style="padding:7px 16px;color:#fff;font-weight:600;">OH MY PROD</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">PROMOTEUR LOCAL</td><td id="cs-promo" style="padding:7px 16px;color:#e31e24;font-weight:700;">PAS DE PL</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">GESTION BILLETTERIE</td><td style="padding:7px 16px;color:#fff;font-weight:600;">OMP</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">VILLE</td><td id="cs-ville" style="padding:7px 16px;color:#3b82f6;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Salle</td><td id="cs-salle" style="padding:7px 16px;color:#fff;font-weight:700;text-transform:uppercase;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">HEURE</td><td id="cs-heure" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
+        </table>
+      </div>
+
+      <!-- JAUGE + INFOS DATE -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#1e3a5f;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#7eb8d4;text-align:center;">JAUGE + INFOS DATE</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Etat des ventes à ce jour</td><td id="cs-ventes" style="padding:7px 16px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:900;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Total invitations</td><td id="cs-invitations" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Jauge totale à ce jour</td><td id="cs-jauge-total" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% de remplissage sur jauge choisie</td><td id="cs-remplissage" style="padding:7px 16px;color:#22c55e;font-weight:700;text-align:right;"></td></tr>
+          <tr><td style="padding:7px 16px;color:#888;">Prix moyen billet</td><td id="cs-prix-moyen" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+        </table>
+      </div>
+
+      <!-- SALLE - RECETTES & FACTURES -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#3b82f6;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;display:flex;justify-content:space-between;">
+          <span>SALLE</span><span>RECETTES &amp; FACTURES</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Recette HT billetterie</td><td id="cs-rec-ht" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% Salle contrat</td><td id="cs-pct-salle"><input type="number" class="fin-input" placeholder="0" style="width:80px;margin:4px 12px;float:right;"> %</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Facture salle prestations</td><td id="cs-fact-presta" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Location calculée MG &amp; %</td><td id="cs-loc-mg" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Acompte versé</td><td style="padding:7px 16px;"><input type="number" class="fin-input" id="cs-acompte" placeholder="0" style="width:120px;float:right;"></td></tr>
+          <tr style="background:#1a1a2e;border-top:2px solid #3b82f6;">
+            <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#fff;">FACTURE SALLE TOTAL</td>
+            <td id="cs-fact-total" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#3b82f6;font-weight:700;"></td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- CONTACT & IBAN -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;background:#111;font-weight:700;">CONTACT COMPTABILITÉ &amp; DIRECTION</td><td style="padding:7px 16px;color:#fff;">OH MY PROD<br>Alexandrine Marfaing Hugueny<br>06 17 15 70 89 — alex.marfaing@gmail.com</td></tr>
+          <tr><td style="padding:7px 16px;color:#888;background:#111;font-weight:700;">IBAN OH MY PROD</td><td style="padding:7px 16px;color:#fff;">Crédit Agricole Anglet<br>FR76 1690 6030 0887 0261 0551 850<br>AGRIFRPP869</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE DÉCLA DROITS -->
+    <div id="page-decla-droits" class="page">
+      <button class="back-btn" onclick="showPage('pilote-date')">← Retour au Pilote Date</button>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;margin-top:8px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#a855f7;">📋 DÉCLARATION DROITS</div>
+        <div id="dd-ville-date" style="font-size:13px;color:#888;"></div>
+      </div>
+
+      <!-- INFOS SHOW -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#a855f7;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;text-align:center;">THE WORLD OF QUEEN</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 16px;color:#888;width:35%;">Spectacle</td><td id="dd-date" style="padding:6px 16px;color:#a855f7;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 16px;color:#888;">Ville / Salle / Heure</td><td id="dd-lieu" style="padding:6px 16px;color:#fff;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 16px;color:#888;">Producteur</td><td style="padding:6px 16px;color:#fff;font-weight:600;">OH MY PROD</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 16px;color:#888;">Promoteur local</td><td id="dd-promo" style="padding:6px 16px;color:#e31e24;font-weight:700;">PAS DE PL</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 16px;color:#888;">Gestion billetterie</td><td style="padding:6px 16px;color:#fff;font-weight:600;">OMP</td></tr>
+          <tr><td style="padding:6px 16px;color:#888;">Payeur des droits</td><td style="padding:6px 16px;color:#fff;font-weight:600;">OH MY PROD</td></tr>
+        </table>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">MONTANT DÉCLA CNM + SACEM (HT)</div><div id="dd-decla-ht" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#a855f7;"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">MONTANT DÉCLA CNM + SACEM (HCNM)</div><div id="dd-decla-hcnm" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#a855f7;"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">PAYANTS</div><div id="dd-payants" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">INVIT + SERVITUDES</div><div id="dd-invit" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
+      </div>
+
+      <!-- SUIVI DES DROITS -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#a855f7;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">SUIVI DES DROITS</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr style="background:#111;"><th style="padding:7px 12px;text-align:left;color:#888;">DROITS</th><th style="padding:7px 12px;text-align:center;color:#888;">DÉCLARATION OK</th><th style="padding:7px 12px;text-align:center;color:#888;">RÈGLEMENT OK</th></tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">CNV</td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#a855f7;width:16px;height:16px;" id="dd-cnv-decla"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-cnv-regl"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACD</td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#a855f7;width:16px;height:16px;" id="dd-sacd-decla"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacd-regl"></td></tr>
+            <tr><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACEM</td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#a855f7;width:16px;height:16px;" id="dd-sacem-decla"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacem-regl"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SUIVI DES RÈGLEMENTS -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#a855f7;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">SUIVI DES RÈGLEMENTS</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr style="background:#111;"><th style="padding:7px 12px;text-align:left;color:#888;">RÉSEAU</th><th style="padding:7px 12px;text-align:right;color:#888;">MONTANT TTC</th><th style="padding:7px 12px;text-align:center;color:#888;">RÈGLEMENT OK</th></tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;">TICKETMASTER</td><td id="dd-tm-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-tm-ok"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;">FNAC</td><td id="dd-fnac-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-fnac-ok"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;">SALLE / FIMALAC</td><td style="padding:7px 12px;text-align:right;color:#888;">0,00 €</td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;">PROMOTEUR LOCAL</td><td style="padding:7px 12px;text-align:right;color:#888;">0,00 €</td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;">WEEZEVENT</td><td id="dd-weez-mt" style="padding:7px 12px;text-align:right;color:#fff;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;"></td></tr>
+            <tr style="background:#1a1a2e;border-top:2px solid #a855f7;"><td style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL</td><td id="dd-total-regl" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#a855f7;font-weight:700;"></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SUIVI DES RÈGLEMENTS OMP -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#a855f7;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">SUIVI DES RÈGLEMENTS OMP</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr style="background:#111;"><th style="padding:7px 12px;text-align:left;color:#888;">FOURNISSEUR</th><th style="padding:7px 12px;text-align:right;color:#888;">MONTANT TTC</th><th style="padding:7px 12px;text-align:center;color:#888;">RÈGLEMENT OK</th><th style="padding:7px 12px;text-align:left;color:#888;">PRESTATAIRE</th></tr></thead>
+          <tbody id="dd-omp-tbody">
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">FACTURE SALLE TOTAL</td><td id="dd-f-salle" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">TECHNIQUE OMP</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-tech-omp" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;">COULISSES</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">PERSONNEL EXT (hotesses, cont...)</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-pers-ext" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">RIGGERS</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-riggers" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">PROMOTEUR LOCAL</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-promo-local" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">CONTRÔLES</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-controles" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">ROADS SALAIRES</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-roads" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">SALAIRES OMP</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-salaires-omp" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">CONSOMMABLES FORFAIT</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-conso" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" checked></td><td style="padding:6px 12px;color:#888;">VINCENT</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">PROMO</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-promo-mt" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" checked></td><td style="padding:6px 12px;color:#888;">META</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">VOYAGES</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-voyages" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" checked></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">TRAITEURS</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-traiteurs" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">HOTEL TOTAL</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-hotel" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" checked></td><td style="padding:6px 12px;color:#888;"></td></tr>
+            <tr style="background:#1a1a2e;border-top:2px solid #a855f7;"><td style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL</td><td id="dd-total-omp" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#a855f7;font-weight:700;"></td><td colspan="2"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE BILAN AMH -->
+    <div id="page-bilan-amh" class="page">
+      <button class="back-btn" onclick="showPage('pilote-date')">← Retour au Pilote Date</button>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;margin-top:8px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#22c55e;">📊 BILAN AMH</div>
+        <div id="bilan-ville-date" style="font-size:13px;color:#888;"></div>
+      </div>
+
+      <!-- EN-TÊTE -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#888;text-align:center;">
+        THE WORLD OF QUEEN &nbsp;·&nbsp; <span id="bilan-ville" style="color:#22c55e;font-weight:700;"></span> &nbsp;·&nbsp; <span id="bilan-date-label" style="color:#fff;"></span>
+      </div>
+
+      <!-- RECETTE TTC -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">RECETTE TTC</div><div id="bilan-rec-ttc" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#c9a84c;"></div><div style="font-size:10px;color:#555;margin-top:4px;" id="bilan-nb-billets"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">TVA 2,10%</div><div id="bilan-tva" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">RECETTE HT</div><div id="bilan-rec-ht" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">TAXE PARAFISCALE 3,50%</div><div id="bilan-parafiscale" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #22c55e;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">RECETTE HT / HCNM</div><div id="bilan-rec-hcnm" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#22c55e;font-weight:700;"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">INVITATIONS</div><div id="bilan-invit" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
+      </div>
+
+      <!-- DROITS -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#22c55e;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">TAXES &amp; DROITS</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <tbody>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;width:40%;">SACEM 8,36%</td><td id="bilan-sacem" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td><td style="padding:6px 12px;color:#555;font-size:11px;">sur recette HT</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;">SACEM AGESSA 1,10%</td><td id="bilan-sacem-agessa" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td><td style="padding:6px 12px;color:#555;font-size:11px;">sur droits</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#22c55e;font-weight:700;">TOTAL SACEM</td><td id="bilan-total-sacem" style="padding:6px 12px;color:#22c55e;text-align:right;font-weight:700;"></td><td></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;">SACD 6%</td><td id="bilan-sacd" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td><td style="padding:6px 12px;color:#555;font-size:11px;">sur recette HT</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;">SACD CCSA 1,20%</td><td id="bilan-ccsa" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td><td style="padding:6px 12px;color:#555;font-size:11px;">sur recette HT</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;">SACD AGESSA 1,10%</td><td id="bilan-sacd-agessa" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td><td style="padding:6px 12px;color:#555;font-size:11px;">sur droits</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#22c55e;font-weight:700;">TOTAL SACD</td><td id="bilan-total-sacd" style="padding:6px 12px;color:#22c55e;text-align:right;font-weight:700;"></td><td></td></tr>
+            <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL DROITS</td><td id="bilan-total-droits" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;"></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FRAIS -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#22c55e;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">FRAIS</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead><tr style="background:#111;"><th style="padding:6px 12px;text-align:left;color:#888;">Poste</th><th style="padding:6px 12px;text-align:right;color:#888;">Montant</th><th style="padding:6px 12px;text-align:right;color:#888;">% CA HT</th><th style="padding:6px 12px;text-align:right;color:#888;">% Frais</th></tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">COÛT PLATEAU</td><td id="bilan-cout-plateau" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-cout-plateau-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-cout-plateau-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Salaires</td><td id="bilan-salaires" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Technique (COULISSE+CONSO)</td><td id="bilan-technique" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">TECH EXTERNE</td><td id="bilan-tech-ext" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-tech-ext-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-tech-ext-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">VHR</td><td id="bilan-vhr" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-vhr-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-vhr-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Voyages + Frais supp</td><td id="bilan-voyages" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Hôtel</td><td id="bilan-hotel" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Traiteur</td><td id="bilan-traiteur" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">COMMUNICATION</td><td id="bilan-comm" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-comm-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-comm-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">SALLE</td><td id="bilan-salle" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-salle-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-salle-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
+            <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;color:#fff;">TOTAL FRAIS</td><td id="bilan-total-frais" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#22c55e;"></td><td id="bilan-total-frais-pct" colspan="2" style="padding:8px 12px;text-align:right;color:#e31e24;font-weight:700;"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- RÉSULTAT -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#22c55e;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">RÉSULTAT</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Ré-intégration Droit au Tirage</td><td id="bilan-droit-tirage" style="padding:7px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">DLT TTC OMP</td><td id="bilan-dlt-omp" style="padding:7px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">DLT TTC Promo locale</td><td style="padding:7px 16px;text-align:right;color:#888;">0 €</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">CO PROD OMP 0%</td><td style="padding:7px 16px;text-align:right;color:#888;">0 €</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">CO PROD promo locale 0%</td><td style="padding:7px 16px;text-align:right;color:#888;">0 €</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Frais de structure / date</td><td id="bilan-frais-struct" style="padding:7px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Crédit de TVA sur date</td><td id="bilan-credit-tva" style="padding:7px 16px;text-align:right;color:#e31e24;font-weight:600;"></td></tr>
+          <tr style="border-bottom:2px solid #22c55e;background:#1a1a2e;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#fff;">RÉSULTAT NET DATE OMP</td><td id="bilan-resultat" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:24px;font-weight:700;"></td></tr>
+          <tr style="background:#111;"><td style="padding:7px 16px;color:#888;">MARGE SUR DATE OMP</td><td id="bilan-marge" style="padding:7px 16px;text-align:right;font-weight:700;"></td></tr>
+        </table>
+      </div>
     </div>
 
     <!-- PAGE FICHE BILLETTERIE -->
