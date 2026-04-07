@@ -4609,9 +4609,9 @@
         : '<span class="badge badge-orange">En attente</span>';
       const dateStr = inv.date_demande ? new Date(inv.date_demande).toLocaleDateString('fr-FR') : '-';
       const btnValider = !inv.valide
-        ? '<button onclick="validerInvitation(' + inv.id + ',\'' + dateId + '\')" style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;">Valider</button>'
+        ? '<button data-invid="' + inv.id + '" data-dateid="' + dateId + '" onclick="validerInvitation(this.dataset.invid, this.dataset.dateid)" style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;">Valider</button>'
         : '<span style="color:#22c55e;font-size:11px;">&#10003;</span>';
-      const btnSupprimer = '<button onclick="supprimerInvitation(' + inv.id + ',\'' + dateId + '\')" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px;">&#x1F5D1;</button>';
+      const btnSupprimer = '<button data-invid="' + inv.id + '" data-dateid="' + dateId + '" onclick="supprimerInvitation(this.dataset.invid, this.dataset.dateid)" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px;">&#x1F5D1;</button>';
       const row = '<tr style="border-bottom:1px solid var(--border); font-size:13px;">'
         + '<td style="padding:10px 12px; color:var(--grey);">' + dateStr + '</td>'
         + '<td style="padding:10px 12px; color:var(--grey);">' + (inv.demandeur || '-') + '</td>'
