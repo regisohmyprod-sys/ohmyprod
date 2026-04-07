@@ -1593,8 +1593,9 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
           <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;">📍 IDENTIFICATION DE LA DATE</div>
           <div style="display:flex;gap:8px;">
-            <button onclick="fpOuvrirFinancier()" style="background:rgba(201,168,76,0.1);color:#c9a84c;border:1px solid #c9a84c;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💰 FINANCIER</button>
             <button onclick="fpOuvrirBilletterie()" style="background:#1a2a3a;color:#3b82f6;border:1px solid #3b82f6;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🎟️ BILLETTERIE</button>
+            <button onclick="fpOuvrirFinancier()" style="background:rgba(201,168,76,0.1);color:#c9a84c;border:1px solid #c9a84c;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📊 DÉPENSES</button>
+            <button onclick="fpOuvrirPilote()" style="background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid #22c55e;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🎯 PILOTE DATE</button>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -1761,7 +1762,7 @@
       <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;margin-top:8px;flex-wrap:wrap;gap:12px;">
         <div style="display:flex;align-items:center;gap:16px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#c9a84c;">💰 FICHE FINANCIÈRE</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#c9a84c;">📊 FICHE DÉPENSES</div>
           <div id="fin-ville-date" style="font-size:13px;color:#888;"></div>
         </div>
         <button onclick="finSauvegarder()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
@@ -2022,6 +2023,199 @@
       <div style="background:#1a1a2e;border:2px solid #c9a84c;border-radius:12px;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#c9a84c;">💰 TOTAL DÉPENSES</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff;" id="fin-total-depenses">0 €</div>
+      </div>
+
+    </div>
+
+    <!-- PAGE PILOTE DATE -->
+    <div id="page-pilote-date" class="page">
+      <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;margin-top:8px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#22c55e;">🎯 PILOTE DATE</div>
+          <div id="pilote-ville-date" style="font-size:13px;color:#888;"></div>
+        </div>
+      </div>
+
+      <!-- INFOS DATE À FOURNIR -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">INFOS DATES À FOURNIR</div>
+        <div style="background:#1e3a5f;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;text-align:center;">THE WORLD OF QUEEN</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tbody>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;width:40%;">Date</td><td id="pilote-date" style="padding:7px 16px;color:#7eb8d4;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Producteur</td><td style="padding:7px 16px;color:#fff;font-weight:600;">OH MY PROD</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Promoteur local</td><td id="pilote-promo-local" style="padding:7px 16px;color:#e31e24;font-weight:700;">PAS DE PL</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Type de prod</td><td style="padding:7px 16px;color:#fff;font-weight:600;">Prod OMP</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">MG montant</td><td id="pilote-mg" style="padding:7px 16px;color:#fff;font-weight:600;">0 €</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Deal OMP</td><td id="pilote-deal-omp" style="padding:7px 16px;color:#22c55e;font-weight:700;">100%</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Deal Promo locale</td><td id="pilote-deal-pl" style="padding:7px 16px;color:#fff;font-weight:600;">0%</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Gestion Billetterie</td><td id="pilote-bill-gest" style="padding:7px 16px;color:#fff;font-weight:600;">OMP</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td colspan="2" style="padding:6px 16px;background:#c9a84c;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:#000;text-align:center;font-size:16px;" id="pilote-ville-titre">NIORT</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Salle</td><td id="pilote-salle" style="padding:7px 16px;color:#fff;font-weight:600;text-transform:uppercase;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Heure</td><td id="pilote-heure" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Jauge de départ</td><td id="pilote-jauge" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">État des ventes à ce jour</td><td id="pilote-ventes" style="padding:7px 16px;color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:900;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Invitations</td><td id="pilote-invitations" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
+            <tr><td style="padding:7px 16px;color:#888;">Total jauge à ce jour</td><td id="pilote-total-jauge" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+
+        <!-- PROJECTIONS FINANCIÈRES -->
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
+          <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">PROJECTIONS FINANCIÈRES</div>
+          <div style="background:#1e3a5f;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;text-align:center;">MEV / CHIFFRES VENTES</div>
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <tbody>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;font-weight:600;">Date jour</td><td id="pilote-date-jour" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:600;">Prix moyen</td><td id="pilote-prix-moyen" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;font-weight:600;">Etat date à ce jour</td><td id="pilote-etat-ventes2" style="padding:7px 16px;color:#e31e24;font-weight:700;text-align:right;background:rgba(239,68,68,0.1);"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:600;">Etat date projection</td><td id="pilote-projection" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;font-weight:600;">Point équilibre projeté</td><td id="pilote-equilibre" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:600;">Etat financier à ce jour</td><td id="pilote-fin-actuel" style="padding:7px 16px;font-weight:700;text-align:right;"></td></tr>
+              <tr><td style="padding:7px 16px;color:#888;font-weight:600;">Projection Etat financier</td><td id="pilote-fin-projection" style="padding:7px 16px;font-weight:700;text-align:right;"></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PROJECTIONS VENTES -->
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
+          <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">PROJECTIONS VENTES</div>
+          <div style="background:#1e3a5f;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;text-align:center;">MEV / CHIFFRES VENTES</div>
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <tbody>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">N° Jours depuis ouverture</td><td id="pilote-nb-jours" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Moyenne depuis open</td><td id="pilote-moy-open" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Moyenne vente 3 mois</td><td id="pilote-moy-3m" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Moyenne 30 derniers jours</td><td id="pilote-moy-30j" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Moyenne 7 derniers jours</td><td id="pilote-moy-7j" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:700;">TENDANCE</td><td id="pilote-tendance" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">N° Jours restants</td><td id="pilote-jours-restants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% de remplissage</td><td id="pilote-remplissage" style="padding:7px 16px;color:#22c55e;font-weight:700;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Projection payants</td><td id="pilote-proj-payants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="background:rgba(239,68,68,0.15);"><td style="padding:7px 16px;color:#fff;font-weight:700;">Projection total</td><td id="pilote-proj-total" style="padding:7px 16px;color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:900;text-align:right;"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RECETTES & TOTAL DÉPENSES -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">RECETTES & RÉSULTAT</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+          <div style="border-right:1px solid #2a2a2a;">
+            <div style="background:#1e3a5f;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;color:#7eb8d4;text-align:center;">RECETTES</div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;">Recette Brute TTC</td><td id="pilote-rec-ttc" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;">Recette HT</td><td id="pilote-rec-ht" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+              <tr><td style="padding:6px 12px;color:#888;font-weight:700;">Recette HT Hors CNM</td><td id="pilote-rec-hcnm" style="padding:6px 12px;color:#fff;text-align:right;font-weight:700;"></td></tr>
+            </table>
+          </div>
+          <div>
+            <div style="background:#2a1a1a;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;color:#e31e24;text-align:center;">TOTAL DÉPENSES & RÉSULTAT</div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;font-weight:700;">Total Dépenses</td><td id="pilote-total-dep" style="padding:6px 12px;color:#fff;text-align:right;font-weight:700;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;">Divers coût plateau</td><td id="pilote-cout-plateau" style="padding:6px 12px;color:#22c55e;text-align:right;font-weight:600;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;">Intégration Droit au Tirage</td><td id="pilote-droit-tirage" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+              <tr style="background:rgba(239,68,68,0.15);"><td style="padding:6px 12px;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;">RÉSULTAT DATE</td><td id="pilote-resultat" style="padding:6px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:900;"></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DROITS ET TAXES -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">DROITS ET TAXES</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead><tr style="background:#111;">
+            <th style="padding:6px 12px;text-align:left;color:#888;font-weight:600;">Taxe</th>
+            <th style="padding:6px 12px;text-align:right;color:#888;font-weight:600;">Taux</th>
+            <th style="padding:6px 12px;text-align:center;color:#888;font-weight:600;">Base</th>
+            <th style="padding:6px 12px;text-align:right;color:#c9a84c;font-weight:700;">Montant</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;">TVA</td><td style="padding:6px 12px;text-align:right;color:#888;">2,10%</td><td style="padding:6px 12px;text-align:center;color:#888;"></td><td id="pilote-tva" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;">SACEM</td><td style="padding:6px 12px;text-align:right;color:#888;">8,36%</td><td style="padding:6px 12px;text-align:center;color:#888;">recette ht</td><td id="pilote-sacem" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;">AGESSA</td><td style="padding:6px 12px;text-align:right;color:#888;">1,10%</td><td style="padding:6px 12px;text-align:center;color:#888;">SACEM</td><td id="pilote-agessa" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:700;">PARAFISCALE</td><td style="padding:6px 12px;text-align:right;color:#888;">3,50%</td><td style="padding:6px 12px;text-align:center;color:#888;">recette ht</td><td id="pilote-parafiscale" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;">SACD</td><td style="padding:6px 12px;text-align:right;color:#888;">6,00%</td><td style="padding:6px 12px;text-align:center;color:#888;">recette ht</td><td id="pilote-sacd" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;">CCSA</td><td style="padding:6px 12px;text-align:right;color:#888;">1,20%</td><td style="padding:6px 12px;text-align:center;color:#888;">recette ht</td><td id="pilote-ccsa" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;">AGESSA</td><td style="padding:6px 12px;text-align:right;color:#888;">1,10%</td><td style="padding:6px 12px;text-align:center;color:#888;">sur droits</td><td id="pilote-agessa2" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;">ASS. R.C.</td><td style="padding:6px 12px;text-align:right;color:#888;">0,00%</td><td style="padding:6px 12px;text-align:center;color:#888;">recette ht</td><td style="padding:6px 12px;text-align:right;color:#888;">- €</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;">ORGANIC</td><td style="padding:6px 12px;text-align:right;color:#888;">0,00%</td><td style="padding:6px 12px;text-align:center;color:#888;">recette ht</td><td style="padding:6px 12px;text-align:right;color:#888;">- €</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;">PROMO LOCALE</td><td style="padding:6px 12px;text-align:right;color:#888;">0,00%</td><td></td><td style="padding:6px 12px;text-align:right;color:#888;">- €</td></tr>
+            <tr style="background:#1a1a2e;border-top:2px solid #c9a84c;">
+              <td colspan="3" style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL DROITS</td>
+              <td id="pilote-total-droits" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c9a84c;font-weight:700;"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:2px solid #2a2a2a;">
+          <div style="padding:8px 12px;border-right:1px solid #2a2a2a;"><div style="font-size:11px;color:#888;margin-bottom:3px;">TOTAL SACEM</div><div id="pilote-total-sacem" style="font-weight:700;color:#fff;"></div></div>
+          <div style="padding:8px 12px;border-right:1px solid #2a2a2a;"><div style="font-size:11px;color:#888;margin-bottom:3px;">TOTAL SACD</div><div id="pilote-total-sacd" style="font-weight:700;color:#fff;"></div></div>
+          <div style="padding:8px 12px;"><div style="font-size:11px;color:#888;margin-bottom:3px;">TOTAL DROITS (hors CNM)</div><div id="pilote-total-droits2" style="font-weight:700;color:#c9a84c;"></div></div>
+        </div>
+        <div style="padding:8px 16px;background:#111;display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-weight:700;color:#888;">RECETTE NET DE TAXES ET DROITS</div>
+          <div id="pilote-rec-net" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;font-weight:700;"></div>
+        </div>
+      </div>
+
+      <!-- DROITS DE LOC & RÉSEAUX DE VENTE -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+
+        <!-- DROITS DE LOC -->
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
+          <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">DROITS DE LOC</div>
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#888;">DL OMP</td><td id="pilote-dl-omp-pct" style="padding:7px 12px;color:#22c55e;font-weight:700;text-align:center;">100%</td><td id="pilote-dl-omp-mt" style="padding:7px 12px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#888;">DL Promo locale</td><td id="pilote-dl-pl-pct" style="padding:7px 12px;color:#888;text-align:center;">0%</td><td id="pilote-dl-pl-mt" style="padding:7px 12px;color:#888;text-align:right;">0,00 €</td></tr>
+            <tr style="background:#1a1a2e;border-top:2px solid #c9a84c;">
+              <td colspan="2" style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;">DL TOTAL ttc</td>
+              <td id="pilote-dl-total-ttc" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c9a84c;font-weight:700;"></td>
+            </tr>
+          </table>
+          <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #2a2a2a;">
+            <div style="padding:8px 12px;border-right:1px solid #2a2a2a;"><div style="font-size:11px;color:#888;margin-bottom:3px;">DL TOTAL ttc</div><div id="pilote-dl-total-ttc2" style="font-weight:700;color:#fff;"></div></div>
+            <div style="padding:8px 12px;"><div style="font-size:11px;color:#888;margin-bottom:3px;">DL TOTAL HT</div><div id="pilote-dl-total-ht" style="font-weight:700;color:#fff;"></div></div>
+          </div>
+        </div>
+
+        <!-- RÉSEAUX DE VENTE -->
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
+          <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">RÉSEAUX DE VENTE</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="background:#111;">
+              <th style="padding:6px 10px;text-align:left;color:#888;font-weight:600;"></th>
+              <th style="padding:6px 10px;text-align:right;color:#888;font-weight:600;">N° billets</th>
+              <th style="padding:6px 10px;text-align:right;color:#888;font-weight:600;">Recettes</th>
+              <th style="padding:6px 10px;text-align:right;color:#888;font-weight:600;">Recettes +DL</th>
+            </tr></thead>
+            <tbody id="pilote-reseaux-tbody">
+              <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:6px 10px;color:#ccc;">TICKETMASTER</td><td id="pilote-tm-nb" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-tm-rec" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-tm-recdl" style="padding:6px 10px;text-align:right;color:#fff;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 10px;color:#ccc;">FNAC SPECTACLES</td><td id="pilote-fnac-nb" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-fnac-rec" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-fnac-recdl" style="padding:6px 10px;text-align:right;color:#fff;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:6px 10px;color:#ccc;">SALLE / FIMALAC</td><td id="pilote-salle-nb" style="padding:6px 10px;text-align:right;color:#888;">0</td><td id="pilote-salle-rec" style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td><td id="pilote-salle-recdl" style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 10px;color:#ccc;">PROMOTEUR LOCAL</td><td style="padding:6px 10px;text-align:right;color:#888;">0</td><td style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td><td style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:6px 10px;color:#ccc;">GUICHET OMP</td><td style="padding:6px 10px;text-align:right;color:#888;">0</td><td style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td><td style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td></tr>
+              <tr style="background:#1a1a2e;border-top:2px solid #c9a84c;">
+                <td style="padding:6px 10px;"></td>
+                <td id="pilote-total-nb" style="padding:6px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#c9a84c;font-weight:700;"></td>
+                <td id="pilote-total-rec" style="padding:6px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#c9a84c;font-weight:700;"></td>
+                <td id="pilote-total-recdl" style="padding:6px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#c9a84c;font-weight:700;"></td>
+              </tr>
+              <tr style="border-top:1px solid #2a2a2a;"><td style="padding:6px 10px;color:#888;font-size:11px;">DL OMP</td><td colspan="3" id="pilote-dl-omp-recap" style="padding:6px 10px;text-align:right;color:#888;font-size:11px;"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- GRAPHIQUE SUIVI DES VENTES (placeholder) -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:20px;margin-bottom:16px;text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#888;margin-bottom:8px;">📈 SUIVI DES VENTES</div>
+        <div style="color:#555;font-size:13px;">Graphique disponible après connexion aux données de vente</div>
       </div>
 
     </div>
@@ -3789,6 +3983,46 @@
         console.log('Adresse auto erreur:', e);
       }
     }, 800);
+  }
+
+  function fpOuvrirPilote() {
+    const ville = document.getElementById('fp-ville').value || '';
+    const date = document.getElementById('fp-date-concert').value || '';
+    const salle = document.getElementById('fp-salle').value || '';
+    const heure = document.getElementById('fp-heure').value || '20H30';
+    const jauge = document.getElementById('fp-jauge-depart').value || '';
+    const ventes = document.getElementById('fp-etat-ventes').value || '';
+    const invits = document.getElementById('fp-invitations').value || '';
+    const totalJauge = document.getElementById('fp-total-jauge').value || '';
+    const dealOmp = document.getElementById('fp-deal-promo').value || '100%';
+    const mg = document.getElementById('fp-mg').value || '0';
+
+    const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
+    const el = document.getElementById('pilote-ville-date');
+    if (el) el.textContent = label;
+
+    // Remplir les champs
+    const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+    set('pilote-ville-titre', ville.toUpperCase());
+    set('pilote-salle', salle.toUpperCase());
+    set('pilote-heure', (heure || '20:30').substring(0,5).replace(':','H'));
+    set('pilote-jauge', jauge);
+    set('pilote-ventes', ventes);
+    set('pilote-invitations', invits);
+    set('pilote-total-jauge', totalJauge);
+    set('pilote-mg', mg + ' €');
+    set('pilote-deal-omp', dealOmp);
+    set('pilote-etat-ventes2', ventes);
+    set('pilote-date-jour', new Date().toLocaleDateString('fr-FR'));
+    set('pilote-jours-restants', date ? Math.max(0, Math.ceil((new Date(date) - new Date()) / 86400000)) : '');
+    set('pilote-remplissage', jauge > 0 ? (Math.round(parseInt(ventes||0) / parseInt(jauge) * 10000) / 100).toFixed(2) + '%' : '');
+
+    if (date) {
+      const dt = new Date(date + 'T00:00:00');
+      set('pilote-date', dt.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'}));
+    }
+
+    showPage('page-pilote-date');
   }
 
   function fpOuvrirFinancier() {
