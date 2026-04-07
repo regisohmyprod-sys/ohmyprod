@@ -1378,6 +1378,19 @@
   .check-item:last-child { border-bottom: none; }
   .check-item input[type="checkbox"] { accent-color: var(--red); width: 15px; height: 15px; }
   .check-item.done { color: var(--grey); text-decoration: line-through; }
+  .fin-input {
+    background: #0a0a0a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #c9a84c;
+    padding: 4px 8px;
+    font-size: 13px;
+    text-align: right;
+    font-family: 'Bebas Neue', sans-serif;
+    width: 90px;
+    outline: none;
+  }
+  .fin-input:focus { border-color: #c9a84c; }
 </style>
 </head>
 <body>
@@ -1746,13 +1759,259 @@
     <!-- PAGE FICHE FINANCIER -->
     <div id="page-fiche-financier" class="page">
       <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;margin-top:8px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#c9a84c;">💰 FICHE FINANCIÈRE</div>
-        <div id="fin-ville-date" style="font-size:13px;color:#888;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;margin-top:8px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#c9a84c;">💰 FICHE FINANCIÈRE</div>
+          <div id="fin-ville-date" style="font-size:13px;color:#888;"></div>
+        </div>
+        <button onclick="finSauvegarder()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
       </div>
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:40px;text-align:center;color:#555;font-size:14px;">
-        🚧 Module financier en cours de construction…
+
+      <!-- SECTION 1 : LOCATION SALLE -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+        <div style="background:#c9a84c;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#000;text-align:center;">LOCATION SALLE</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+
+          <!-- OMP -->
+          <div style="border-right:1px solid #2a2a2a;">
+            <div style="background:#1e3a5f;padding:8px 12px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#7eb8d4;text-align:center;">OMP</div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead><tr style="background:#111;">
+                <th style="padding:6px 10px;text-align:left;color:#888;font-weight:600;">Type de location</th>
+                <th style="padding:6px 10px;text-align:right;color:#888;font-weight:600;">Montant</th>
+                <th style="padding:6px 10px;text-align:right;color:#c9a84c;font-weight:700;">Total</th>
+              </tr></thead>
+              <tbody>
+                <!-- Location MG -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Location</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Location MG</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-mg" placeholder="0" style="width:90px;"></td><td id="fin-omp-loc-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">% sur recette</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-pct" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Sur recette HT</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-ht" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">1 par billet</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-billet" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Prestations Salle -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Salle Prestations</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Energie</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-prest-energie" placeholder="0" style="width:90px;"></td><td id="fin-omp-prest-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Chauffage &amp; Gaz</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-prest-chauf" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Mise en configuration</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-prest-config" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Loc Fenwick</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-prest-fenwick" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Vérif accroches</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-prest-accroches" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Contrôle électrique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-prest-elec" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Personnel Salle -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Personnel Salle</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Nettoyage salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-nettoyage" placeholder="0" style="width:90px;"></td><td id="fin-omp-pers-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Nettoyage supp</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-nett-supp" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Electricien</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-elec" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">House riger</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-hriger" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Régisseur salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-regisseur" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Forfait personnel salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-forfait" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Caissier</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-caissier" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Rigg salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-rigg" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Hotesses salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-hotesses" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Contrôle salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-controle" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Gestion parking</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-parking" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Sécurité forfait</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-secu" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Plan vigi pirate</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-vigi" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Consigne billetterie</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-consigne" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Gardiennage</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-pers-gardien" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Personnel Sécurité -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Personnel Sécurité</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">SSIAP 1</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-secu-ssiap1" placeholder="0" style="width:90px;"></td><td id="fin-omp-secu-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">SSIAP 2</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-secu-ssiap2" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Protection civile</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-secu-protciv" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Plan vigi pirate</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-secu-vigi2" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Service médical</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-secu-medical" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Autres postes</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-secu-autres" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Totaux -->
+                <tr style="background:#111;border-top:2px solid #c9a84c;">
+                  <td style="padding:7px 10px;color:#888;font-size:11px;font-style:italic;">Prestations / personne salle</td>
+                  <td></td><td id="fin-omp-ppersonne" style="padding:7px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td>
+                </tr>
+                <tr style="background:#111;">
+                  <td style="padding:7px 10px;color:#888;font-size:11px;">Mg Salle OU % salle</td>
+                  <td></td><td id="fin-omp-mgsalle" style="padding:7px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td>
+                </tr>
+                <tr style="background:#1a1a2e;border-top:2px solid #c9a84c;">
+                  <td style="padding:8px 10px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL FACTURE SALLE</td>
+                  <td></td><td id="fin-omp-total-salle" style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c9a84c;font-weight:700;">0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PROMOTEUR LOCAL -->
+          <div>
+            <div style="background:#4a1a6e;padding:8px 12px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c084fc;text-align:center;">PROMOTEUR LOCAL</div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead><tr style="background:#111;">
+                <th style="padding:6px 10px;text-align:left;color:#888;font-weight:600;">Type de location</th>
+                <th style="padding:6px 10px;text-align:right;color:#888;font-weight:600;">Montant</th>
+                <th style="padding:6px 10px;text-align:right;color:#c084fc;font-weight:700;">Total</th>
+              </tr></thead>
+              <tbody>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Location</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Location MG</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-mg" placeholder="0" style="width:90px;"></td><td id="fin-pl-loc-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">% sur recette</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-pct" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Sur recette HT</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-ht" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">1 par billet</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-billet" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Salle Prestations</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Energie</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-prest-energie" placeholder="0" style="width:90px;"></td><td id="fin-pl-prest-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Chauffage &amp; Gaz</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-prest-chauf" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Mise en configuration</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-prest-config" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Loc Fenwick</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-prest-fenwick" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Vérif accroches</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-prest-accroches" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Contrôle électrique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-prest-elec" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Personnel Salle</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Nettoyage salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-nettoyage" placeholder="0" style="width:90px;"></td><td id="fin-pl-pers-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Nettoyage supp</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-nett-supp" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Electricien</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-elec" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">House riger</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-hriger" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Régisseur salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-regisseur" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Forfait personnel salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-forfait" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Caissier</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-caissier" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Rigg salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-rigg" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Hotesses salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-hotesses" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Contrôle salle</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-controle" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Gestion parking</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-parking" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Sécurité forfait</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-secu" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Plan vigi pirate</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-vigi" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Consigne billetterie</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-consigne" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Gardiennage</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-pers-gardien" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Personnel Sécurité</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">SSIAP 1</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-secu-ssiap1" placeholder="0" style="width:90px;"></td><td id="fin-pl-secu-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">SSIAP 2</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-secu-ssiap2" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Protection civile</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-secu-protciv" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Plan vigi pirate</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-secu-vigi2" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Service médical</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-secu-medical" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Autres postes</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-secu-autres" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#111;border-top:2px solid #c084fc;">
+                  <td style="padding:7px 10px;color:#888;font-size:11px;font-style:italic;">Prestations / personne salle</td>
+                  <td></td><td id="fin-pl-ppersonne" style="padding:7px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td>
+                </tr>
+                <tr style="background:#111;">
+                  <td style="padding:7px 10px;color:#888;font-size:11px;">Mg Salle OU % salle</td>
+                  <td></td><td id="fin-pl-mgsalle" style="padding:7px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td>
+                </tr>
+                <tr style="background:#1a1a2e;border-top:2px solid #c084fc;">
+                  <td style="padding:8px 10px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL FACTURE SALLE</td>
+                  <td></td><td id="fin-pl-total-salle" style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c084fc;font-weight:700;">0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+
+      <!-- SECTION 2 : AUTRES POSTES DE DÉPENSES -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+        <div style="background:#c9a84c;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#000;text-align:center;">AUTRES POSTES DE DÉPENSES</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+
+          <!-- OMP -->
+          <div style="border-right:1px solid #2a2a2a;">
+            <div style="background:#1e3a5f;padding:8px 12px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#7eb8d4;text-align:center;">OMP</div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <tbody>
+                <!-- Salaires -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Salaires</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Salaires tournée</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-sal-tournee" placeholder="0" style="width:90px;"></td><td id="fin-omp-sal-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Salaires road + carite</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-sal-road" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Personnel promo locale</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-sal-promo" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Prestataires techniques -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Prestataires techniques extérieurs</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Road extérieur sur facture</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-road" placeholder="0" style="width:90px;"></td><td id="fin-omp-tech-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Figer</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-figer" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">COULISSES évents</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-coulisses" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Autres Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-autres" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Consommables</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-conso" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Contrôleur</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-controleur" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Promo -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Promo</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Meta</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-promo-meta" placeholder="0" style="width:90px;"></td><td id="fin-omp-promo-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Autres pub</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-promo-autres1" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Autres pub</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-promo-autres2" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Voyages Tour -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Voyages Tour</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Production</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-voy-prod" placeholder="0" style="width:90px;"></td><td id="fin-omp-voy-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Artistique total</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-voy-artiste" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Techniciens total</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-voy-tech" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Frais supp VHR</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-voy-vhr" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Frais supp VHR -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Frais supp VHR</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Frais parking Artistique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-vhr-pkart" placeholder="0" style="width:90px;"></td><td id="fin-omp-vhr-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Frais parking Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-vhr-pktech" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Taxi/Uber Artistique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-vhr-taxiart" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Taxi/Uber Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-vhr-taxitech" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Total frais supp</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-vhr-total2" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Hôtels tour -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Hôtels tour</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Production</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-hotel-prod" placeholder="0" style="width:90px;"></td><td id="fin-omp-hotel-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-hotel-tech" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Artistique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-hotel-art" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;font-style:italic;">Estimation hôtel</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-hotel-estim" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- Traiteurs -->
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Traiteurs / Restauration</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Total traiteur</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-trai-total" placeholder="0" style="width:90px;"></td><td id="fin-omp-trai-stotal" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Total restaurant ext.</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-trai-resto" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Catering loge</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-trai-loge" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <!-- TOTAL -->
+                <tr style="background:#1a1a2e;border-top:2px solid #c9a84c;">
+                  <td style="padding:8px 10px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL AUTRES POSTES</td>
+                  <td></td><td id="fin-omp-total-autres" style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c9a84c;font-weight:700;">0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PROMOTEUR LOCAL -->
+          <div>
+            <div style="background:#4a1a6e;padding:8px 12px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c084fc;text-align:center;">PROMOTEUR LOCAL</div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <tbody>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Salaires</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Régisseur local</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-sal-regisseur" placeholder="0" style="width:90px;"></td><td id="fin-pl-sal-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Salaires road + carite</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-sal-road" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Caissier</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-sal-caissier" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Prestataires techniques extérieurs</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Road extérieur sur facture</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-road" placeholder="0" style="width:90px;"></td><td id="fin-pl-tech-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Figer</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-figer" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">COULISSES évents</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-coulisses" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Autres Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-autres" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Consommables</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-conso" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Contrôleur</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-controleur" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Promo</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Meta</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-promo-meta" placeholder="0" style="width:90px;"></td><td id="fin-pl-promo-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Autres pub</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-promo-autres1" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Autres pub</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-promo-autres2" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Voyages Tour</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Production</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-voy-prod" placeholder="0" style="width:90px;"></td><td id="fin-pl-voy-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Artistique total</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-voy-artiste" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Techniciens total</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-voy-tech" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Autres</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-voy-autres" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Frais supp VHR</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Frais parking Artistique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-vhr-pkart" placeholder="0" style="width:90px;"></td><td id="fin-pl-vhr-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Frais parking Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-vhr-pktech" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Taxi/Uber Artistique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-vhr-taxiart" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Taxi/Uber Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-vhr-taxitech" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Total frais supp</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-vhr-total2" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Hôtels tour</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Production</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-hotel-prod" placeholder="0" style="width:90px;"></td><td id="fin-pl-hotel-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-hotel-tech" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Artistique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-hotel-art" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;font-style:italic;">Estimation hôtel</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-hotel-estim" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Traiteurs / Restauration</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Total traiteur</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-trai-total" placeholder="0" style="width:90px;"></td><td id="fin-pl-trai-stotal" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Total restaurant ext.</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-trai-resto" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Catering loge</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-trai-loge" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr style="background:#1a1a2e;border-top:2px solid #c084fc;">
+                  <td style="padding:8px 10px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL AUTRES POSTES</td>
+                  <td></td><td id="fin-pl-total-autres" style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c084fc;font-weight:700;">0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- PAGE FICHE BILLETTERIE -->
@@ -3527,6 +3786,41 @@
     const el = document.getElementById('fin-ville-date');
     if (el) el.textContent = label;
     showPage('fiche-financier');
+    finCharger();
+  }
+
+  // =============================================
+  // FINANCIER — sauvegarde
+  // =============================================
+  async function finSauvegarder() {
+    if (!_fpDateId) { alert('Erreur : aucune date sélectionnée.'); return; }
+    const inputs = document.querySelectorAll('#page-fiche-financier .fin-input');
+    const data = {};
+    inputs.forEach(inp => { data[inp.id] = parseFloat(inp.value) || 0; });
+    const payload = JSON.stringify(data);
+    const { data: existing } = await _supabase.from('fiches_production').select('id').eq('date_concert_id', _fpDateId).single();
+    let error;
+    if (existing) {
+      ({ error } = await _supabase.from('fiches_production').update({ financier_data: payload }).eq('date_concert_id', _fpDateId));
+    } else {
+      ({ error } = await _supabase.from('fiches_production').insert({ date_concert_id: _fpDateId, financier_data: payload }));
+    }
+    if (error) { alert('Erreur sauvegarde : ' + error.message); return; }
+    alert('✅ Fiche financière enregistrée !');
+  }
+
+  async function finCharger() {
+    if (!_fpDateId) return;
+    try {
+      const { data } = await _supabase.from('fiches_production').select('financier_data').eq('date_concert_id', _fpDateId).single();
+      if (data?.financier_data) {
+        const parsed = JSON.parse(data.financier_data);
+        Object.entries(parsed).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          if (el && val) el.value = val;
+        });
+      }
+    } catch(e) {}
   }
 
   // =============================================
