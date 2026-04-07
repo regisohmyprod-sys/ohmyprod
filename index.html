@@ -3529,6 +3529,26 @@
     showPage('fiche-financier');
   }
 
+  // =============================================
+  // BILLETTERIE — constantes
+  // =============================================
+  const BILL_CATS = [
+    { code: 'TN', label: 'Carré Or',    color: '#c9a84c', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
+    { code: 'TN', label: 'Catégorie 1', color: '#e31e24', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
+    { code: 'TN', label: 'Catégorie 2', color: '#3b82f6', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
+    { code: 'TN', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
+  ];
+  const BILL_OPS = ['promo','tm','fnac','salle','weez','invit'];
+  const BILL_INVIT_CATS = ['OR','Cat 1','Cat 2','Cat 3','Cat PMR'];
+  let _billTabActif = 'promo';
+  let _billData = {};
+  ['promo','tm','fnac','salle','weez'].forEach(op => {
+    _billData[op] = BILL_CATS.map((cat) =>
+      cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
+    );
+  });
+  _billData['invit'] = BILL_INVIT_CATS.map(() => [{ billets: 0 }]);
+
   function fpOuvrirBilletterie() {
     const ville = document.getElementById('fp-ville').value || '';
     const date = document.getElementById('fp-date-concert').value || '';
@@ -3554,26 +3574,6 @@
     showPage('fiche-billetterie');
   }
 
-  // =============================================
-  // BILLETTERIE
-  // =============================================
-  const BILL_CATS = [
-    { code: 'TN', label: 'Carré Or',    color: '#c9a84c', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
-    { code: 'TN', label: 'Catégorie 1', color: '#e31e24', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
-    { code: 'TN', label: 'Catégorie 2', color: '#3b82f6', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
-    { code: 'TN', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
-  ];
-  const BILL_OPS = ['promo','tm','fnac','salle','weez','invit'];
-  let _billTabActif = 'promo';
-  // Stockage : _billData[op][catIdx][rowIdx] = { billets, tarif, dlDistrib, dlProd }
-  let _billData = {};
-  ['promo','tm','fnac','salle','weez'].forEach(op => {
-    _billData[op] = BILL_CATS.map((cat) =>
-      cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
-    );
-  });
-  _billData['invit'] = BILL_INVIT_CATS.map(() => [{ billets: 0 }]);
-
   function billSetTab(op, btn) {
     _billTabActif = op;
     document.querySelectorAll('.bill-tab').forEach(t => {
@@ -3582,8 +3582,6 @@
     btn.style.background = '#3b82f6'; btn.style.color = '#fff'; btn.style.borderColor = '#3b82f6';
     billRenderTable();
   }
-
-  const BILL_INVIT_CATS = ['OR','Cat 1','Cat 2','Cat 3','Cat PMR'];
 
   function billRenderTable() {
     const tbody = document.getElementById('bill-tbody');
