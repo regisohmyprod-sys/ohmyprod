@@ -3532,6 +3532,15 @@
   // =============================================
   // BILLETTERIE — constantes
   // =============================================
+  const BILL_INVIT_TYPES = [
+    { key: 'prod_artistes', label: 'Invitations Production/Artistes', color: '#c9a84c' },
+    { key: 'invit_salle',   label: 'Invitations Salle',              color: '#3b82f6' },
+    { key: 'servitudes',    label: 'Servitudes Salle',               color: '#f97316' },
+    { key: 'partenaires',   label: 'Invitations Partenaires',        color: '#22c55e' },
+    { key: 'presse',        label: 'Invitations Presse',             color: '#e31e24' },
+    { key: 'autres',        label: 'Invitations Autres',             color: '#888'    },
+  ];
+
   const BILL_CATS = [
     { code: 'TN', label: 'Carré Or',    color: '#c9a84c', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
     { code: 'TN', label: 'Catégorie 1', color: '#e31e24', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
@@ -3803,15 +3812,6 @@
       if (btn) { btn.textContent = '✅ Enregistré !'; btn.style.background = '#22c55e'; setTimeout(() => { btn.textContent = '💾 Enregistrer'; btn.style.background = '#3b82f6'; }, 2000); }
     }
   }
-
-  const BILL_INVIT_TYPES = [
-    { key: 'prod_artistes', label: 'Invitations Production/Artistes', color: '#c9a84c' },
-    { key: 'invit_salle',   label: 'Invitations Salle',              color: '#3b82f6' },
-    { key: 'servitudes',    label: 'Servitudes Salle',               color: '#f97316' },
-    { key: 'partenaires',   label: 'Invitations Partenaires',        color: '#22c55e' },
-    { key: 'presse',        label: 'Invitations Presse',             color: '#e31e24' },
-    { key: 'autres',        label: 'Invitations Autres',             color: '#888'    },
-  ];
 
   function billRenderInvit() {
     const tbody = document.getElementById('bill-tbody');
