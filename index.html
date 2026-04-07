@@ -3602,6 +3602,7 @@
           <td style="padding:4px 6px;">
             <input type="text" value="${descVal}"
               onchange="billUpdate('${op}',${catIdx},${rowIdx},'desc',this.value)"
+              tabindex="-1"
               style="width:100%;background:transparent;border:none;border-bottom:1px solid #333;color:#bbb;padding:3px 4px;font-size:11px;font-family:'Inter',sans-serif;outline:none;"
               onfocus="this.style.borderBottomColor='#3b82f6'" onblur="this.style.borderBottomColor='#333'">
           </td>
@@ -3619,12 +3620,14 @@
           <td style="padding:4px 6px;text-align:right;">
             <input type="number" min="0" step="0.01" value="${d.dlDistrib}"
               onchange="billUpdate('${op}',${catIdx},${rowIdx},'dlDistrib',this.value)"
+              tabindex="-1"
               style="width:70px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#888;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
           </td>
           <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(totDLDistrib)}</td>
           <td style="padding:4px 6px;text-align:right;">
             <input type="number" min="0" step="0.01" value="${d.dlProd}"
               onchange="billUpdate('${op}',${catIdx},${rowIdx},'dlProd',this.value)"
+              tabindex="-1"
               style="width:70px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#888;padding:4px 6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;">
           </td>
           <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(totDLProd)}</td>
@@ -3635,7 +3638,9 @@
       // Ligne sous-total catégorie
       const verseCat = catRecette - catDLDistrib - catDLProd;
       html += `<tr style="background:#2a2a2a;border-top:1px solid #333;">
-        <td colspan="4" style="padding:6px 10px;text-align:right;color:#aaa;font-size:11px;font-style:italic;">Sous-total ${cat.label}</td>
+        <td colspan="2" style="padding:6px 10px;text-align:right;color:#aaa;font-size:11px;font-style:italic;">Sous-total ${cat.label}</td>
+        <td style="padding:6px 10px;text-align:right;color:#3b82f6;font-weight:700;">${catBillets}</td>
+        <td></td>
         <td style="padding:6px 10px;text-align:right;color:#c9a84c;font-weight:700;">${billFmt(catRecette)}</td>
         <td></td>
         <td style="padding:6px 10px;text-align:right;color:#888;">${billFmt(catDLDistrib)}</td>
@@ -3648,6 +3653,17 @@
       opRecette += catRecette;
       opVersement += catRecette - catDLDistrib - catDLProd;
     });
+
+    // Ligne TOTAL GÉNÉRAL de l'onglet
+    html += `<tr style="background:#111;border-top:2px solid #3b82f6;">
+      <td colspan="2" style="padding:10px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#fff;">TOTAL</td>
+      <td style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#3b82f6;font-weight:700;">${opBillets}</td>
+      <td></td>
+      <td style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#c9a84c;font-weight:700;">${billFmt(opRecette)}</td>
+      <td colspan="2"></td>
+      <td colspan="2"></td>
+      <td style="padding:10px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#22c55e;font-weight:700;">${billFmt(opVersement)}</td>
+    </tr>`;
 
     tbody.innerHTML = html;
 
