@@ -3539,7 +3539,7 @@
     { code: 'TN', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
   ];
   const BILL_OPS = ['promo','tm','fnac','salle','weez','invit'];
-  const BILL_INVIT_CATS = ['OR','Cat 1','Cat 2','Cat 3','Cat PMR'];
+  // BILL_INVIT_CATS supprimé - remplacé par BILL_INVIT_TYPES
   let _billTabActif = 'promo';
   let _billData = {};
   ['promo','tm','fnac','salle','weez'].forEach(op => {
@@ -3547,7 +3547,7 @@
       cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
     );
   });
-  _billData['invit'] = BILL_INVIT_CATS.map(() => [{ billets: 0 }]);
+  _billData['invit'] = {};
 
   function fpOuvrirBilletterie() {
     const ville = document.getElementById('fp-ville').value || '';
@@ -3568,7 +3568,7 @@
         cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
       );
     });
-    _billData['invit'] = BILL_INVIT_CATS.map(() => [{ billets: 0 }]);
+    _billData['invit'] = {};
     // Charger puis afficher
     showPage('fiche-billetterie');
     billDemarrerAutoSave();
@@ -3581,6 +3581,9 @@
       t.style.background = '#1a1a1a'; t.style.color = '#888'; t.style.borderColor = '#2a2a2a';
     });
     btn.style.background = '#3b82f6'; btn.style.color = '#fff'; btn.style.borderColor = '#3b82f6';
+    // Masquer le thead standard pour l'onglet invitations
+    const thead = document.querySelector('#bill-table thead');
+    if (thead) thead.style.display = op === 'invit' ? 'none' : '';
     billRenderTable();
   }
 
@@ -3772,7 +3775,7 @@
     document.getElementById('bill-total-recette').textContent  = billFmt(gRecette);
     document.getElementById('bill-total-versement').textContent = billFmt(gVersement);
     // Total invitations + jauge
-    const totalInvit = BILL_INVIT_CATS.reduce((s,_,i) => s + (_billData['invit']?.[i]?.[0]?.billets||0), 0);
+    const totalInvit = BILL_INVIT_TYPES.reduce((s,t) => s + (_billData['invit']?.[t.key]||0), 0);
     document.getElementById('bill-total-invitations').textContent = totalInvit;
     document.getElementById('bill-total-jauge').textContent = gBillets + totalInvit;
   }
@@ -3801,50 +3804,54 @@
     }
   }
 
+  const BILL_INVIT_TYPES = [
+    { key: 'prod_artistes', label: 'Invitations Production/Artistes', color: '#c9a84c' },
+    { key: 'invit_salle',   label: 'Invitations Salle',              color: '#3b82f6' },
+    { key: 'servitudes',    label: 'Servitudes Salle',               color: '#f97316' },
+    { key: 'partenaires',   label: 'Invitations Partenaires',        color: '#22c55e' },
+    { key: 'presse',        label: 'Invitations Presse',             color: '#e31e24' },
+    { key: 'autres',        label: 'Invitations Autres',             color: '#888'    },
+  ];
+
   function billRenderInvit() {
     const tbody = document.getElementById('bill-tbody');
-    // 1 seul carré visible : N°Invitations
-    document.getElementById('bill-op-billets').textContent = '';
-    document.getElementById('bill-op-recette').textContent = '';
-    document.getElementById('bill-op-versement').textContent = '';
-    // Cacher les carrés recette/versement de l'onglet, ne garder que billets
-    document.getElementById('bill-op-billets').closest('div').previousElementSibling?.style && null;
+    if (!tbody) return;
+    if (!_billData['invit']) _billData['invit'] = {};
+    BILL_INVIT_TYPES.forEach(t => { if (!_billData['invit'][t.key]) _billData['invit'][t.key] = 0; });
 
     let total = 0;
-    let html = `<tr style="background:#222;">
-      <td colspan="2" style="padding:10px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#a855f7;border-top:2px solid #a855f722;">INVITATIONS</td>
-      <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:1px solid #2a2a2a;">N° Billets</th>
-    </tr>`;
+    let html = `
+      <tr style="background:#1a1a1a;">
+        <th style="padding:8px 12px;text-align:left;color:#a855f7;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;border-bottom:2px solid #a855f755;width:50%;">Type d'invitation</th>
+        <th style="padding:8px 12px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:50%;">N° Billets</th>
+      </tr>`;
 
-    BILL_INVIT_CATS.forEach((cat, idx) => {
-      const d = _billData['invit']?.[idx]?.[0] || { billets: 0 };
-      total += d.billets || 0;
+    BILL_INVIT_TYPES.forEach((t, idx) => {
+      const val = _billData['invit'][t.key] || 0;
+      total += val;
       const bg = idx % 2 === 0 ? '#242424' : '#1e1e1e';
-      html += `<tr id="bill-invit-row-${idx}" style="background:${bg};">
-        <td style="padding:6px 10px;color:#aaa;font-size:12px;font-weight:700;">${cat}</td>
-        <td></td>
-        <td style="padding:4px 6px;text-align:right;">
-          <input type="number" min="0" value="${d.billets||''}" placeholder="0"
-            oninput="billUpdateInvit(${idx},this.value)"
-            style="width:80px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#a855f7;padding:4px 8px;font-size:13px;text-align:right;font-family:'Inter',sans-serif;">
+      html += `<tr style="background:${bg};">
+        <td style="padding:8px 12px;color:${t.color};font-size:13px;font-weight:600;">${t.label}</td>
+        <td style="padding:4px 12px;text-align:right;">
+          <input type="number" min="0" value="${val||''}" placeholder="0"
+            oninput="billUpdateInvit('${t.key}',this.value)"
+            style="width:90px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#a855f7;padding:5px 8px;font-size:14px;text-align:right;font-family:'Bebas Neue',sans-serif;">
         </td>
       </tr>`;
     });
 
-    // Sous-total
     html += `<tr style="background:#2a2a2a;border-top:2px solid #a855f7;">
-      <td colspan="2" style="padding:8px 10px;color:#aaa;font-size:11px;font-style:italic;text-align:right;">Total invitations</td>
-      <td id="bill-invit-total" style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#a855f7;font-weight:700;">${total}</td>
+      <td style="padding:10px 12px;color:#aaa;font-size:12px;font-style:italic;font-weight:700;">TOTAL INVITATIONS</td>
+      <td id="bill-invit-total" style="padding:10px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#a855f7;font-weight:700;">${total}</td>
     </tr>`;
 
     tbody.innerHTML = html;
     billUpdateInvitTotals();
   }
 
-  function billUpdateInvit(idx, val) {
-    if (!_billData['invit']) _billData['invit'] = BILL_INVIT_CATS.map(() => [{ billets: 0 }]);
-    if (!_billData['invit'][idx]) _billData['invit'][idx] = [{ billets: 0 }];
-    _billData['invit'][idx][0].billets = parseInt(val) || 0;
+  function billUpdateInvit(key, val) {
+    if (!_billData['invit']) _billData['invit'] = {};
+    _billData['invit'][key] = parseInt(val) || 0;
     _billModifie = true;
     billUpdateIndicateur(true);
     billUpdateInvitTotals();
@@ -3852,18 +3859,13 @@
 
   function billUpdateInvitTotals() {
     let total = 0;
-    BILL_INVIT_CATS.forEach((_, idx) => {
-      total += _billData['invit']?.[idx]?.[0]?.billets || 0;
-    });
+    BILL_INVIT_TYPES.forEach(t => { total += _billData['invit']?.[t.key] || 0; });
     const el = document.getElementById('bill-invit-total');
     if (el) el.textContent = total;
-    // Mettre à jour les carrés globaux
     document.getElementById('bill-total-invitations').textContent = total;
-    // Total jauge = billets vendus + invitations
+    document.getElementById('bill-op-billets').textContent = total;
     const billets = parseInt(document.getElementById('bill-total-billets').textContent) || 0;
     document.getElementById('bill-total-jauge').textContent = billets + total;
-    // Carré onglet billets
-    document.getElementById('bill-op-billets').textContent = total;
   }
 
   function billUpdateIndicateur(modifie) {
@@ -5010,11 +5012,12 @@
         <div class="modal-field">
           <label>Type de liste</label>
           <select id="liste-type" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:100%;box-sizing:border-box;">
-            <option value="production">🎬 Liste Production</option>
-            <option value="presse">📰 Liste Presse</option>
-            <option value="vip">⭐ Liste VIP</option>
-            <option value="salle">🏟️ Liste Invitations Salle</option>
-            <option value="autre">📋 Autre</option>
+            <option value="prod_artistes">🎭 Invitations Production/Artistes</option>
+            <option value="invit_salle">🏟️ Invitations Salle</option>
+            <option value="servitudes_salle">🔧 Servitudes Salle</option>
+            <option value="partenaires">🤝 Invitations Partenaires</option>
+            <option value="presse">📰 Invitations Presse</option>
+            <option value="autres">📋 Invitations Autres</option>
           </select>
         </div>
       </div>
@@ -5065,11 +5068,12 @@
         <div class="modal-field">
           <label>Type de liste</label>
           <select id="liste-type2" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:100%;box-sizing:border-box;">
-            <option value="production">🎬 Liste Production</option>
-            <option value="presse">📰 Liste Presse</option>
-            <option value="vip">⭐ Liste VIP</option>
-            <option value="salle">🏟️ Liste Invitations Salle</option>
-            <option value="autre">📋 Autre</option>
+            <option value="prod_artistes">🎭 Invitations Production/Artistes</option>
+            <option value="invit_salle">🏟️ Invitations Salle</option>
+            <option value="servitudes_salle">🔧 Servitudes Salle</option>
+            <option value="partenaires">🤝 Invitations Partenaires</option>
+            <option value="presse">📰 Invitations Presse</option>
+            <option value="autres">📋 Invitations Autres</option>
           </select>
         </div>
       </div>
