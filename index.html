@@ -1743,6 +1743,70 @@
       <button onclick="fpSupprimer()" style="width:100%;background:transparent;color:#555;border:1px solid #333;border-radius:8px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:40px;">🗑️ Supprimer la fiche de production</button>
     </div>
 
+    <!-- PAGE FICHE FINANCIER -->
+    <div id="page-fiche-financier" class="page">
+      <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;margin-top:8px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#c9a84c;">💰 FICHE FINANCIÈRE</div>
+        <div id="fin-ville-date" style="font-size:13px;color:#888;"></div>
+      </div>
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:40px;text-align:center;color:#555;font-size:14px;">
+        🚧 Module financier en cours de construction…
+      </div>
+    </div>
+
+    <!-- PAGE FICHE BILLETTERIE -->
+    <div id="page-fiche-billetterie" class="page">
+      <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;margin-top:8px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;">🎟️ FICHE BILLETTERIE</div>
+          <div id="bill-ville-date" style="font-size:13px;color:#888;"></div>
+        </div>
+        <button onclick="billSauvegarder()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">💾 Enregistrer</button>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:140px;">
+          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Billets vendus</div>
+          <div id="bill-total-billets" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#3b82f6;">0</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:160px;">
+          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Recette HDL</div>
+          <div id="bill-total-recette" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#c9a84c;">0,00 €</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #22c55e;border-radius:8px;padding:12px 20px;text-align:center;min-width:180px;">
+          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Versement Vendeur</div>
+          <div id="bill-total-versement" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#22c55e;">0,00 €</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:0;flex-wrap:wrap;">
+        <button class="bill-tab" onclick="billSetTab('promo', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #3b82f6;border-bottom:none;background:#3b82f6;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Promoteur Local</button>
+        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Ticketmaster</button>
+        <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Fnac</button>
+        <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Salle</button>
+        <button class="bill-tab" onclick="billSetTab('weez', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Weezevent</button>
+      </div>
+      <div style="background:#1a1a1a;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
+        <table id="bill-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:860px;">
+          <thead>
+            <tr style="background:#111;">
+              <th style="padding:8px 10px;text-align:left;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:60px;">Code</th>
+              <th style="padding:8px 10px;text-align:left;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;">Description</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:90px;">N° Billets</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:100px;">Tarif HDL</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:110px;">Recette HDL</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:95px;">DL Distrib</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:120px;">Total DL Distrib</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:90px;">DL Prod</th>
+              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:110px;">Total DL Prod</th>
+              <th style="padding:8px 10px;text-align:right;color:#fff;font-weight:700;border-bottom:2px solid #2a2a2a;width:120px;background:#111;">P. Vente Public</th>
+            </tr>
+          </thead>
+          <tbody id="bill-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- TOURNEES -->
     <div id="page-tournees" class="page">
       <div class="page-title">TOURNÉES</div>
@@ -6069,79 +6133,6 @@
     </div>
   </div>
 </div>
-
-
-    <!-- PAGE FICHE FINANCIER -->
-    <div id="page-fiche-financier" class="page">
-      <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;margin-top:8px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#4caf50;">💰 FICHE FINANCIÈRE</div>
-        <div id="fin-ville-date" style="font-size:13px;color:#888;"></div>
-      </div>
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:40px;text-align:center;color:#555;font-size:14px;">
-        🚧 Module financier en cours de construction…
-      </div>
-    </div>
-
-    <!-- PAGE FICHE BILLETTERIE -->
-    <div id="page-fiche-billetterie" class="page">
-      <button class="back-btn" onclick="showPage('fiche-prod')">← Retour à la fiche</button>
-
-      <!-- HEADER -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;margin-top:8px;flex-wrap:wrap;gap:12px;">
-        <div style="display:flex;align-items:center;gap:16px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;">🎟️ FICHE BILLETTERIE</div>
-          <div id="bill-ville-date" style="font-size:13px;color:#888;"></div>
-        </div>
-        <button onclick="billSauvegarder()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">💾 Enregistrer</button>
-      </div>
-
-      <!-- RECAP -->
-      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:140px;">
-          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Billets vendus</div>
-          <div id="bill-total-billets" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#3b82f6;">0</div>
-        </div>
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:160px;">
-          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Recette HDL</div>
-          <div id="bill-total-recette" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#c9a84c;">0,00 €</div>
-        </div>
-        <div style="background:#1a1a1a;border:1px solid #22c55e;border-radius:8px;padding:12px 20px;text-align:center;min-width:180px;">
-          <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Versement Vendeur</div>
-          <div id="bill-total-versement" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#22c55e;">0,00 €</div>
-        </div>
-      </div>
-
-      <!-- ONGLETS OPERATEURS -->
-      <div style="display:flex;gap:6px;margin-bottom:0;flex-wrap:wrap;">
-        <button class="bill-tab" onclick="billSetTab('promo', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #3b82f6;border-bottom:none;background:#3b82f6;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Promoteur Local</button>
-        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Ticketmaster</button>
-        <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Fnac</button>
-        <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Salle</button>
-        <button class="bill-tab" onclick="billSetTab('weez', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Weezevent</button>
-      </div>
-
-      <!-- TABLEAU -->
-      <div style="background:#1a1a1a;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
-        <table id="bill-table" style="width:100%;border-collapse:collapse;font-size:12px;min-width:860px;">
-          <thead>
-            <tr style="background:#111;">
-              <th style="padding:8px 10px;text-align:left;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:60px;">Code</th>
-              <th style="padding:8px 10px;text-align:left;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;">Description</th>
-              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:90px;">N° Billets</th>
-              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:100px;">Tarif HDL</th>
-              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:110px;">Recette HDL</th>
-              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:95px;">DL Distrib</th>
-              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:120px;">Total DL Distrib</th>
-              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:90px;">DL Prod</th>
-              <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:2px solid #2a2a2a;width:110px;">Total DL Prod</th>
-              <th style="padding:8px 10px;text-align:right;color:#fff;font-weight:700;border-bottom:2px solid #2a2a2a;width:120px;background:#111;">P. Vente Public</th>
-            </tr>
-          </thead>
-          <tbody id="bill-tbody"></tbody>
-        </table>
-      </div>
-    </div>
 
 </div><!-- fin app-screen -->
 </body>
