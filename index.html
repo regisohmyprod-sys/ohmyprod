@@ -1773,6 +1773,14 @@
           <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Billets vendus</div>
           <div id="bill-total-billets" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#3b82f6;">0</div>
         </div>
+        <div style="background:#1a1a1a;border:1px solid #a855f7;border-radius:8px;padding:12px 20px;text-align:center;min-width:140px;">
+          <div style="font-size:11px;color:#a855f7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">N° Invitations</div>
+          <div id="bill-total-invitations" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#a855f7;">0</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #f97316;border-radius:8px;padding:12px 20px;text-align:center;min-width:140px;">
+          <div style="font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total Jauge</div>
+          <div id="bill-total-jauge" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#f97316;">0</div>
+        </div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 20px;text-align:center;min-width:160px;">
           <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Recette HDL</div>
           <div id="bill-total-recette" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#c9a84c;">0,00 €</div>
@@ -1788,6 +1796,7 @@
         <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Fnac</button>
         <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Salle</button>
         <button class="bill-tab" onclick="billSetTab('weez', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Weezevent</button>
+        <button class="bill-tab" onclick="billSetTab('invit', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">🎫 Invitations</button>
       </div>
       <div style="background:#1a1a1a;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
 
@@ -3534,11 +3543,12 @@
       t.style.borderColor = i === 0 ? '#3b82f6' : '#2a2a2a';
     });
     // Réinitialiser les données et charger depuis Supabase
-    BILL_OPS.forEach(op => {
+    ['promo','tm','fnac','salle','weez'].forEach(op => {
       _billData[op] = BILL_CATS.map((cat) =>
         cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
       );
     });
+    _billData['invit'] = BILL_INVIT_CATS.map(() => [{ billets: 0 }]);
     billCharger().then(() => billRenderTable());
     billDemarrerAutoSave();
     showPage('fiche-billetterie');
@@ -3553,15 +3563,16 @@
     { code: 'TN', label: 'Catégorie 2', color: '#3b82f6', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
     { code: 'TN', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
   ];
-  const BILL_OPS = ['promo','tm','fnac','salle','weez'];
+  const BILL_OPS = ['promo','tm','fnac','salle','weez','invit'];
   let _billTabActif = 'promo';
   // Stockage : _billData[op][catIdx][rowIdx] = { billets, tarif, dlDistrib, dlProd }
   let _billData = {};
-  BILL_OPS.forEach(op => {
+  ['promo','tm','fnac','salle','weez'].forEach(op => {
     _billData[op] = BILL_CATS.map((cat) =>
       cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
     );
   });
+  _billData['invit'] = BILL_INVIT_CATS.map(() => [{ billets: 0 }]);
 
   function billSetTab(op, btn) {
     _billTabActif = op;
@@ -3572,10 +3583,19 @@
     billRenderTable();
   }
 
+  const BILL_INVIT_CATS = ['OR','Cat 1','Cat 2','Cat 3','Cat PMR'];
+
   function billRenderTable() {
     const tbody = document.getElementById('bill-tbody');
     if (!tbody) return;
     const op = _billTabActif;
+
+    // Rendu spécial onglet Invitations
+    if (op === 'invit') {
+      billRenderInvit();
+      return;
+    }
+
     let html = '';
     let opBillets = 0, opRecette = 0, opVersement = 0; // onglet actif
 
@@ -3733,12 +3753,13 @@
     document.getElementById('bill-op-recette').textContent  = billFmt(opRecette);
     document.getElementById('bill-op-versement').textContent = billFmt(opVersement);
 
-    // Récap global tous réseaux (3 grands carrés en haut)
+    // Récap global tous réseaux (3 grands carrés en haut) — hors invitations
     let gBillets = 0, gRecette = 0, gVersement = 0;
-    BILL_OPS.forEach(o => {
+    ['promo','tm','fnac','salle','weez'].forEach(o => {
       BILL_CATS.forEach((cat, catIdx) => {
         cat.rows.forEach((_, rowIdx) => {
-          const d = _billData[o][catIdx][rowIdx];
+          const d = _billData[o]?.[catIdx]?.[rowIdx];
+          if (!d) return;
           const rec = d.billets * d.tarif;
           const dlD = d.billets * d.dlDistrib;
           const dlP = d.billets * d.dlProd;
@@ -3751,6 +3772,10 @@
     document.getElementById('bill-total-billets').textContent  = gBillets;
     document.getElementById('bill-total-recette').textContent  = billFmt(gRecette);
     document.getElementById('bill-total-versement').textContent = billFmt(gVersement);
+    // Total invitations + jauge
+    const totalInvit = BILL_INVIT_CATS.reduce((s,_,i) => s + (_billData['invit']?.[i]?.[0]?.billets||0), 0);
+    document.getElementById('bill-total-invitations').textContent = totalInvit;
+    document.getElementById('bill-total-jauge').textContent = gBillets + totalInvit;
   }
 
   function billFmt(n) {
@@ -3775,6 +3800,71 @@
       const btn = document.querySelector('#page-fiche-billetterie button[onclick="billSauvegarder()"]');
       if (btn) { btn.textContent = '✅ Enregistré !'; btn.style.background = '#22c55e'; setTimeout(() => { btn.textContent = '💾 Enregistrer'; btn.style.background = '#3b82f6'; }, 2000); }
     }
+  }
+
+  function billRenderInvit() {
+    const tbody = document.getElementById('bill-tbody');
+    // 1 seul carré visible : N°Invitations
+    document.getElementById('bill-op-billets').textContent = '';
+    document.getElementById('bill-op-recette').textContent = '';
+    document.getElementById('bill-op-versement').textContent = '';
+    // Cacher les carrés recette/versement de l'onglet, ne garder que billets
+    document.getElementById('bill-op-billets').closest('div').previousElementSibling?.style && null;
+
+    let total = 0;
+    let html = `<tr style="background:#222;">
+      <td colspan="2" style="padding:10px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#a855f7;border-top:2px solid #a855f722;">INVITATIONS</td>
+      <th style="padding:8px 10px;text-align:right;color:#aaa;font-weight:600;border-bottom:1px solid #2a2a2a;">N° Billets</th>
+    </tr>`;
+
+    BILL_INVIT_CATS.forEach((cat, idx) => {
+      const d = _billData['invit']?.[idx]?.[0] || { billets: 0 };
+      total += d.billets || 0;
+      const bg = idx % 2 === 0 ? '#242424' : '#1e1e1e';
+      html += `<tr id="bill-invit-row-${idx}" style="background:${bg};">
+        <td style="padding:6px 10px;color:#aaa;font-size:12px;font-weight:700;">${cat}</td>
+        <td></td>
+        <td style="padding:4px 6px;text-align:right;">
+          <input type="number" min="0" value="${d.billets||''}" placeholder="0"
+            oninput="billUpdateInvit(${idx},this.value)"
+            style="width:80px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#a855f7;padding:4px 8px;font-size:13px;text-align:right;font-family:'Inter',sans-serif;">
+        </td>
+      </tr>`;
+    });
+
+    // Sous-total
+    html += `<tr style="background:#2a2a2a;border-top:2px solid #a855f7;">
+      <td colspan="2" style="padding:8px 10px;color:#aaa;font-size:11px;font-style:italic;text-align:right;">Total invitations</td>
+      <td id="bill-invit-total" style="padding:8px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#a855f7;font-weight:700;">${total}</td>
+    </tr>`;
+
+    tbody.innerHTML = html;
+    billUpdateInvitTotals();
+  }
+
+  function billUpdateInvit(idx, val) {
+    if (!_billData['invit']) _billData['invit'] = BILL_INVIT_CATS.map(() => [{ billets: 0 }]);
+    if (!_billData['invit'][idx]) _billData['invit'][idx] = [{ billets: 0 }];
+    _billData['invit'][idx][0].billets = parseInt(val) || 0;
+    _billModifie = true;
+    billUpdateIndicateur(true);
+    billUpdateInvitTotals();
+  }
+
+  function billUpdateInvitTotals() {
+    let total = 0;
+    BILL_INVIT_CATS.forEach((_, idx) => {
+      total += _billData['invit']?.[idx]?.[0]?.billets || 0;
+    });
+    const el = document.getElementById('bill-invit-total');
+    if (el) el.textContent = total;
+    // Mettre à jour les carrés globaux
+    document.getElementById('bill-total-invitations').textContent = total;
+    // Total jauge = billets vendus + invitations
+    const billets = parseInt(document.getElementById('bill-total-billets').textContent) || 0;
+    document.getElementById('bill-total-jauge').textContent = billets + total;
+    // Carré onglet billets
+    document.getElementById('bill-op-billets').textContent = total;
   }
 
   function billUpdateIndicateur(modifie) {
@@ -4915,6 +5005,18 @@
 
       <div class="modal-row">
         <div class="modal-field">
+          <label>Type de liste</label>
+          <select id="liste-type" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:100%;box-sizing:border-box;">
+            <option value="production">🎬 Liste Production</option>
+            <option value="presse">📰 Liste Presse</option>
+            <option value="vip">⭐ Liste VIP</option>
+            <option value="salle">🏟️ Liste Invitations Salle</option>
+            <option value="autre">📋 Autre</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
           <label>Nom de la liste</label>
           <input type="text" id="liste-nom" placeholder="ex: Liste Production, Presse, VIP..." />
           <div style="font-size:11px; color:var(--grey); margin-top:4px;">Facultatif — utile si plusieurs listes dans une même journée</div>
@@ -4956,6 +5058,18 @@
     </div>
     <div class="modal-body">
 
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Type de liste</label>
+          <select id="liste-type2" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:100%;box-sizing:border-box;">
+            <option value="production">🎬 Liste Production</option>
+            <option value="presse">📰 Liste Presse</option>
+            <option value="vip">⭐ Liste VIP</option>
+            <option value="salle">🏟️ Liste Invitations Salle</option>
+            <option value="autre">📋 Autre</option>
+          </select>
+        </div>
+      </div>
       <div class="modal-row">
         <div class="modal-field">
           <label>Nom de la liste</label>
