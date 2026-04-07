@@ -3562,16 +3562,17 @@
       t.style.color = i === 0 ? '#fff' : '#888';
       t.style.borderColor = i === 0 ? '#3b82f6' : '#2a2a2a';
     });
-    // Réinitialiser les données et charger depuis Supabase
+    // Réinitialiser les données
     ['promo','tm','fnac','salle','weez'].forEach(op => {
       _billData[op] = BILL_CATS.map((cat) =>
         cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
       );
     });
     _billData['invit'] = BILL_INVIT_CATS.map(() => [{ billets: 0 }]);
-    billCharger().then(() => billRenderTable());
-    billDemarrerAutoSave();
+    // Charger puis afficher
     showPage('fiche-billetterie');
+    billDemarrerAutoSave();
+    billCharger().then(() => billRenderTable()).catch(() => billRenderTable());
   }
 
   function billSetTab(op, btn) {
@@ -3881,10 +3882,14 @@
 
   async function billCharger() {
     if (!_fpDateId) return;
-    const { data } = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
-    if (data?.billetterie_data) {
-      try { _billData = JSON.parse(data.billetterie_data); } catch(e) {}
-    }
+    try {
+      const { data } = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
+      if (data?.billetterie_data) {
+        const parsed = JSON.parse(data.billetterie_data);
+        // Fusionner avec les données vierges (évite les clés manquantes)
+        BILL_OPS.forEach(op => { if (parsed[op]) _billData[op] = parsed[op]; });
+      }
+    } catch(e) {}
     _billModifie = false;
     billUpdateIndicateur(false);
   }
