@@ -4134,6 +4134,8 @@
     _dateActiveId = date.id;
     _fpDateId = date.id;
     _tourneeActiveId = tourneeId;
+    // Charger les invitations pour cette date
+    loadInvitations(date.id);
     const dt = new Date(date.date_concert);
 
     document.getElementById('dyn-date-ville').textContent = date.ville.toUpperCase();
@@ -4602,32 +4604,34 @@
       .eq('date_concert_id', dateId)
       .order('created_at', { ascending: true });
     if (error) { console.error('loadInvitations:', error); return; }
-    document.querySelectorAll('.invit-tbody').forEach(tb => tb.innerHTML = '');
-    document.querySelectorAll('.inv-total').forEach(el => el.innerHTML = '<span>Total : 0<\/span><span>Validé : 0<\/span>');
+    const tbody = document.getElementById('dyn-invit-tbody');
+    const totalEl = document.getElementById('dyn-invit-total');
+    if (tbody) tbody.innerHTML = '';
+    if (totalEl) totalEl.innerHTML = '<span>Total : 0</span><span>Valid\u00e9 : 0</span>';
     let total = 0, valide = 0;
     (data || []).forEach(inv => {
       const statutBadge = inv.valide
-        ? '<span class="badge badge-green">Validé<\/span>'
-        : '<span class="badge badge-orange">En attente<\/span>';
-      const dateStr = inv.date_demande ? new Date(inv.date_demande).toLocaleDateString('fr-FR') : '–';
+        ? '<span class="badge badge-green">Valid\u00e9</span>'
+        : '<span class="badge badge-orange">En attente</span>';
+      const dateStr = inv.date_demande ? new Date(inv.date_demande).toLocaleDateString('fr-FR') : '-';
       const row = '<tr style="border-bottom:1px solid var(--border); font-size:13px;">'
-        + '<td style="padding:10px 12px; color:var(--grey);">' + dateStr + '<\/td>'
-        + '<td style="padding:10px 12px; color:var(--grey);">' + (inv.demandeur || '–') + '<\/td>'
-        + '<td style="padding:10px 12px; color:var(--white); font-weight:600;">' + (inv.nom_invite || '–') + '<\/td>'
-        + '<td style="padding:10px 12px; color:var(--grey); text-align:center;">' + (inv.nombre || 1) + '<\/td>'
-        + '<td style="padding:10px 12px;">' + statutBadge + '<\/td>'
-        + '<\/tr>';
-      const allTbodies = document.querySelectorAll('.invit-tbody');
-      const tb = allTbodies.length > 0 ? allTbodies[0] : null;
-      if (tb) tb.insertAdjacentHTML('beforeend', row);
+        + '<td style="padding:10px 12px; color:var(--grey);">' + dateStr + '</td>'
+        + '<td style="padding:10px 12px; color:var(--grey);">' + (inv.demandeur || '-') + '</td>'
+        + '<td style="padding:10px 12px; color:var(--white); font-weight:600;">' + (inv.nom_invite || '-') + '</td>'
+        + '<td style="padding:10px 12px; color:var(--grey);">-</td>'
+        + '<td style="padding:10px 12px; color:var(--grey); text-align:center;">' + (inv.nombre || 1) + '</td>'
+        + '<td style="padding:10px 12px; color:var(--grey);">-</td>'
+        + '<td style="padding:10px 12px;">' + statutBadge + '</td>'
+        + '<td style="padding:10px 12px; color:var(--grey);">-</td>'
+        + '<td style="padding:10px 12px; color:var(--grey);">-</td>'
+        + '</tr>';
+      if (tbody) tbody.insertAdjacentHTML('beforeend', row);
       total += parseInt(inv.nombre) || 1;
       if (inv.valide) valide += parseInt(inv.nombre) || 1;
     });
-    document.querySelectorAll('.inv-total').forEach(el => {
-      el.innerHTML = '<span>Total : ' + total + '<\/span><span>Validé : ' + valide + '<\/span>';
-    });
+    if (totalEl) totalEl.innerHTML = '<span>Total : ' + total + '</span><span>Valid\u00e9 : ' + valide + '</span>';
   }
-  function updateBreadcrumb(id) {
+    function updateBreadcrumb(id) {
     const bc = document.getElementById('breadcrumb');
     const map = {
       'dashboard': '<span>OH MY PROD</span>',
