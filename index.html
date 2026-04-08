@@ -4282,6 +4282,10 @@
     // Afficher recette brute TTC et prix moyen
     var elRecTTC = document.getElementById('pilote-rec-ttc');
     if (elRecTTC) elRecTTC.textContent = gRecettePilote > 0 ? billFmt(gRecettePilote) : '';
+    // Recette HT = Recette TTC / 1.021
+    var recHT = gRecettePilote > 0 ? gRecettePilote / 1.021 : 0;
+    var elRecHT = document.getElementById('pilote-rec-ht');
+    if (elRecHT) elRecHT.textContent = recHT > 0 ? billFmt(recHT) : '';
     var prixMoyen = gBilletsPilote > 0 ? (gRecettePilote / gBilletsPilote) : 0;
     var elPrixMoyen = document.getElementById('pilote-prix-moyen');
     if (elPrixMoyen) elPrixMoyen.textContent = prixMoyen > 0 ? billFmt(prixMoyen) : '';
