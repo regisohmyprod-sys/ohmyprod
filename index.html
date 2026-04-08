@@ -4249,14 +4249,31 @@
     const totalJauge = document.getElementById('fp-total-jauge').value || '';
     const dealOmp = document.getElementById('fp-deal-promo').value || '100%';
     const mg = document.getElementById('fp-mg').value || '0';
-    // Lire recette brute TTC et billets depuis le header billetterie (déjà calculé)
+    // Lire recette brute TTC et billets depuis Supabase directement
     var gRecettePilote = 0, gBilletsPilote = 0;
-    var elTotBill = document.getElementById('bill-total-billets');
-    var elTotRec = document.getElementById('bill-total-recette');
-    if (elTotBill) gBilletsPilote = parseInt(elTotBill.textContent.replace(/\s/g,'')) || 0;
-    if (elTotRec) {
-      var recStr = elTotRec.textContent.replace(/[^0-9,]/g,'').replace(',','.');
-      gRecettePilote = parseFloat(recStr) || 0;
+    if (_fpDateId) {
+      try {
+        var bdRes = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
+        if (bdRes.data && bdRes.data.billetterie_data) {
+          var parsed = JSON.parse(bdRes.data.billetterie_data);
+          var ops = ['promo','tm','fnac','salle','weez'];
+          for (var oi=0; oi<ops.length; oi++) {
+            var opData = parsed[ops[oi]];
+            if (!opData) continue;
+            for (var ci=0; ci<opData.length; ci++) {
+              var catData = opData[ci];
+              if (!catData) continue;
+              for (var ri=0; ri<catData.length; ri++) {
+                var d = catData[ri];
+                var b = parseFloat(d.billets) || 0;
+                var t = parseFloat(d.tarif) || 0;
+                gRecettePilote += b * t;
+                gBilletsPilote += b;
+              }
+            }
+          }
+        }
+      } catch(e) { console.log('Pilote recette erreur:', e); }
     }
 
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
