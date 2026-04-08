@@ -1792,8 +1792,8 @@
                 <!-- Location MG -->
                 <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Location</td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Location MG</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-mg" placeholder="0" style="width:90px;"></td><td id="fin-omp-loc-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
-                <tr><td style="padding:5px 10px;color:#ccc;">% sur recette</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-pct" placeholder="0" style="width:90px;"></td><td></td></tr>
-                <tr><td style="padding:5px 10px;color:#ccc;">Sur recette HT</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-ht" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">% sur recette</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-pct" placeholder="0" oninput="finCalcLocHT('omp')" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Sur recette HT</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-ht" placeholder="0" readonly style="width:90px;background:#111;color:#c9a84c;"></td><td></td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">1 par billet</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-loc-billet" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <!-- Prestations Salle -->
                 <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Salle Prestations</td></tr>
@@ -1857,8 +1857,8 @@
               <tbody>
                 <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Location</td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Location MG</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-mg" placeholder="0" style="width:90px;"></td><td id="fin-pl-loc-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
-                <tr><td style="padding:5px 10px;color:#ccc;">% sur recette</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-pct" placeholder="0" style="width:90px;"></td><td></td></tr>
-                <tr><td style="padding:5px 10px;color:#ccc;">Sur recette HT</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-ht" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">% sur recette</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-pct" placeholder="0" oninput="finCalcLocHT('pl')" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Sur recette HT</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-ht" placeholder="0" readonly style="width:90px;background:#111;color:#c9a84c;"></td><td></td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">1 par billet</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-loc-billet" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Salle Prestations</td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Energie</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-prest-energie" placeholder="0" style="width:90px;"></td><td id="fin-pl-prest-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
@@ -4379,12 +4379,42 @@
   // =============================================
   // FINANCIER — sauvegarde
   // =============================================
+  async function finCalcLocHT(side) {
+    // Récupérer recette HT depuis billetterie (TTC / 1.021)
+    var recHT = 0;
+    if (_fpDateId) {
+      try {
+        var r = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
+        if (r.data && r.data.billetterie_data) {
+          var bd = JSON.parse(r.data.billetterie_data);
+          var recTTC = 0;
+          ['promo','tm','fnac','salle','weez'].forEach(function(op) {
+            if (!bd[op]) return;
+            bd[op].forEach(function(cat) {
+              (cat||[]).forEach(function(d) {
+                recTTC += (parseFloat(d.billets)||0) * (parseFloat(d.tarif)||0);
+              });
+            });
+          });
+          recHT = recTTC / 1.021;
+        }
+      } catch(e) {}
+    }
+    var pctId = 'fin-' + side + '-loc-pct';
+    var htId  = 'fin-' + side + '-loc-ht';
+    var pct = parseFloat(document.getElementById(pctId)?.value) || 0;
+    var montant = recHT * pct / 100;
+    var elHT = document.getElementById(htId);
+    if (elHT) elHT.value = montant > 0 ? montant.toFixed(2) : 0;
+    finCalcTotaux();
+  }
+
   function finCalcTotaux() {
     const sum = ids => ids.reduce((t, id) => { const el = document.getElementById(id); return t + (parseFloat(el?.value) || 0); }, 0);
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}); };
 
     // Totaux par SECTION OMP
-    const ompLoc   = sum(['fin-omp-loc-mg','fin-omp-loc-pct','fin-omp-loc-ht','fin-omp-loc-billet']);
+    const ompLoc   = sum(['fin-omp-loc-mg','fin-omp-loc-ht','fin-omp-loc-billet']);
     const ompPrest = sum(['fin-omp-prest-energie','fin-omp-prest-chauf','fin-omp-prest-config','fin-omp-prest-fenwick','fin-omp-prest-accroches','fin-omp-prest-elec']);
     const ompPers  = sum(['fin-omp-pers-nettoyage','fin-omp-pers-nett-supp','fin-omp-pers-elec','fin-omp-pers-hriger','fin-omp-pers-regisseur','fin-omp-pers-forfait','fin-omp-pers-caissier','fin-omp-pers-rigg','fin-omp-pers-hotesses','fin-omp-pers-controle','fin-omp-pers-parking','fin-omp-pers-secu','fin-omp-pers-vigi','fin-omp-pers-consigne','fin-omp-pers-gardien']);
     const ompSecu  = sum(['fin-omp-secu-ssiap1','fin-omp-secu-ssiap2','fin-omp-secu-protciv','fin-omp-secu-vigi2','fin-omp-secu-medical','fin-omp-secu-autres']);
@@ -4400,7 +4430,7 @@
     set('fin-omp-total-salle', totalOmpSalle);
 
     // Totaux par SECTION PROMOTEUR LOCAL
-    const plLoc   = sum(['fin-pl-loc-mg','fin-pl-loc-pct','fin-pl-loc-ht','fin-pl-loc-billet']);
+    const plLoc   = sum(['fin-pl-loc-mg','fin-pl-loc-ht','fin-pl-loc-billet']);
     const plPrest = sum(['fin-pl-prest-energie','fin-pl-prest-chauf','fin-pl-prest-config','fin-pl-prest-fenwick','fin-pl-prest-accroches','fin-pl-prest-elec']);
     const plPers  = sum(['fin-pl-pers-nettoyage','fin-pl-pers-nett-supp','fin-pl-pers-elec','fin-pl-pers-hriger','fin-pl-pers-regisseur','fin-pl-pers-forfait','fin-pl-pers-caissier','fin-pl-pers-rigg','fin-pl-pers-hotesses','fin-pl-pers-controle','fin-pl-pers-parking','fin-pl-pers-secu','fin-pl-pers-vigi','fin-pl-pers-consigne','fin-pl-pers-gardien']);
     const plSecu  = sum(['fin-pl-secu-ssiap1','fin-pl-secu-ssiap2','fin-pl-secu-protciv','fin-pl-secu-vigi2','fin-pl-secu-medical','fin-pl-secu-autres']);
