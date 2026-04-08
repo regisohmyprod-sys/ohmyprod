@@ -4205,11 +4205,17 @@
     const sugDiv = document.getElementById('fp-adresse-suggestions');
     if (!sugDiv) return;
     if (!features || features.length === 0) { sugDiv.style.display='none'; return; }
-    sugDiv.innerHTML = features.map(f => {
-      const label = f.properties.label || '';
-      const esc = label.replace(/'/g, "\'");
-      return '<div onclick="fpSelectAdresse(\'' + esc + '\')" style="padding:8px 12px;cursor:pointer;color:#fff;font-size:13px;border-bottom:1px solid #2a2a2a;font-family:Inter,sans-serif;" onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='transparent'">' + label + '</div>';
-    }).join('');
+    sugDiv.innerHTML = '';
+    features.forEach(function(f) {
+      var label = f.properties.label || '';
+      var div = document.createElement('div');
+      div.textContent = label;
+      div.style.cssText = 'padding:8px 12px;cursor:pointer;color:#fff;font-size:13px;border-bottom:1px solid #2a2a2a;font-family:Inter,sans-serif;';
+      div.addEventListener('mouseover', function(){ this.style.background='#2a2a2a'; });
+      div.addEventListener('mouseout', function(){ this.style.background='transparent'; });
+      div.addEventListener('click', function(){ fpSelectAdresse(label); });
+      sugDiv.appendChild(div);
+    });
     sugDiv.style.display = 'block';
   }
   function fpSelectAdresse(label) {
