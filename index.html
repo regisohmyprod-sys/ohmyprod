@@ -4238,7 +4238,11 @@
     }
   });
 
-  function fpOuvrirPilote() {
+  async function fpOuvrirPilote() {
+    // Charger les données billetterie si pas encore fait
+    if (typeof billCharger === 'function') {
+      try { await billCharger(); } catch(e) {}
+    }
     const ville = document.getElementById('fp-ville').value || '';
     const date = document.getElementById('fp-date-concert').value || '';
     const salle = document.getElementById('fp-salle').value || '';
