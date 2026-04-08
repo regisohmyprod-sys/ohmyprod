@@ -4265,6 +4265,7 @@
     set('pilote-total-jauge', totalJauge);
     set('pilote-mg', mg + ' €');
     set('pilote-deal-omp', dealOmp);
+    set('pilote-bill-gest', document.getElementById('fp-billetterie').value || 'OMP');
     set('pilote-etat-ventes2', ventes);
     set('pilote-date-jour', new Date().toLocaleDateString('fr-FR'));
     set('pilote-jours-restants', date ? Math.max(0, Math.ceil((new Date(date) - new Date()) / 86400000)) : '');
