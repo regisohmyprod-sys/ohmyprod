@@ -2208,8 +2208,8 @@
               <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:6px 10px;color:#ccc;">TICKETMASTER</td><td id="pilote-tm-nb" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-tm-rec" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-tm-recdl" style="padding:6px 10px;text-align:right;color:#fff;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 10px;color:#ccc;">FNAC SPECTACLES</td><td id="pilote-fnac-nb" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-fnac-rec" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-fnac-recdl" style="padding:6px 10px;text-align:right;color:#fff;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:6px 10px;color:#ccc;">SALLE / FIMALAC</td><td id="pilote-salle-nb" style="padding:6px 10px;text-align:right;color:#888;">0</td><td id="pilote-salle-rec" style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td><td id="pilote-salle-recdl" style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 10px;color:#ccc;">PROMOTEUR LOCAL</td><td style="padding:6px 10px;text-align:right;color:#888;">0</td><td style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td><td style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:6px 10px;color:#ccc;">GUICHET OMP</td><td style="padding:6px 10px;text-align:right;color:#888;">0</td><td style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td><td style="padding:6px 10px;text-align:right;color:#888;">0,00 €</td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 10px;color:#ccc;">PROMOTEUR LOCAL</td><td id="pilote-promo-nb" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-promo-rec" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-promo-recdl" style="padding:6px 10px;text-align:right;color:#fff;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:6px 10px;color:#ccc;">GUICHET OMP</td><td id="pilote-weez-nb" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-weez-rec" style="padding:6px 10px;text-align:right;color:#fff;"></td><td id="pilote-weez-recdl" style="padding:6px 10px;text-align:right;color:#fff;"></td></tr>
               <tr style="background:#1a1a2e;border-top:2px solid #c9a84c;">
                 <td style="padding:6px 10px;"></td>
                 <td id="pilote-total-nb" style="padding:6px 10px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#c9a84c;font-weight:700;"></td>
@@ -2485,6 +2485,10 @@
         <div style="background:#1a1a1a;border:1px solid #22c55e;border-radius:8px;padding:12px 20px;text-align:center;min-width:180px;">
           <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Versement Vendeur</div>
           <div id="bill-total-versement" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#22c55e;">0,00 €</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #e31e24;border-radius:8px;padding:12px 20px;text-align:center;min-width:180px;">
+          <div style="font-size:11px;color:#e31e24;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total DL Prod</div>
+          <div id="bill-total-dlprod" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#e31e24;">0,00 €</div>
         </div>
       </div>
       <div style="display:flex;gap:6px;margin-bottom:0;flex-wrap:wrap;">
@@ -4281,6 +4285,40 @@
     var prixMoyen = gBilletsPilote > 0 ? (gRecettePilote / gBilletsPilote) : 0;
     var elPrixMoyen = document.getElementById('pilote-prix-moyen');
     if (elPrixMoyen) elPrixMoyen.textContent = prixMoyen > 0 ? billFmt(prixMoyen) : '';
+    // Alimenter réseaux de vente depuis billetterie
+    if (_fpDateId) {
+      try {
+        var bdRes2 = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
+        if (bdRes2.data && bdRes2.data.billetterie_data) {
+          var bd2 = JSON.parse(bdRes2.data.billetterie_data);
+          // Calculer totaux par réseau : billets, recette, DL prod total
+          var reseaux = { promo: {nb:0,rec:0,dlp:0}, tm: {nb:0,rec:0,dlp:0}, fnac: {nb:0,rec:0,dlp:0}, salle: {nb:0,rec:0,dlp:0}, weez: {nb:0,rec:0,dlp:0} };
+          Object.keys(reseaux).forEach(function(op) {
+            if (!bd2[op]) return;
+            bd2[op].forEach(function(cat) {
+              (cat || []).forEach(function(d) {
+                var b = parseFloat(d.billets) || 0;
+                var t = parseFloat(d.tarif) || 0;
+                var dlp = parseFloat(d.dlProd) || 0;
+                reseaux[op].nb  += b;
+                reseaux[op].rec += b * t;
+                reseaux[op].dlp += b * dlp;
+              });
+            });
+          });
+          var setR = function(nb, rec, recdl, r) {
+            var en = document.getElementById(nb); if(en) en.textContent = r.nb > 0 ? r.nb : '';
+            var er = document.getElementById(rec); if(er) er.textContent = r.rec > 0 ? billFmt(r.rec) : '';
+            var ed = document.getElementById(recdl); if(ed) ed.textContent = r.rec > 0 ? billFmt(r.rec + r.dlp) : '';
+          };
+          setR('pilote-tm-nb',    'pilote-tm-rec',    'pilote-tm-recdl',    reseaux.tm);
+          setR('pilote-fnac-nb',  'pilote-fnac-rec',  'pilote-fnac-recdl',  reseaux.fnac);
+          setR('pilote-salle-nb', 'pilote-salle-rec', 'pilote-salle-recdl', reseaux.salle);
+          setR('pilote-promo-nb', 'pilote-promo-rec', 'pilote-promo-recdl', reseaux.promo);
+          setR('pilote-weez-nb',  'pilote-weez-rec',  'pilote-weez-recdl',  reseaux.weez);
+        }
+      } catch(e) { console.log('Réseaux vente erreur:', e); }
+    }
 
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
     const el = document.getElementById('pilote-ville-date');
@@ -4691,7 +4729,7 @@
     document.getElementById('bill-op-versement').textContent = billFmt(opVersement);
 
     // Récap global tous réseaux (3 grands carrés en haut) — hors invitations
-    let gBillets = 0, gRecette = 0, gVersement = 0;
+    let gBillets = 0, gRecette = 0, gVersement = 0, gDLProd = 0;
     ['promo','tm','fnac','salle','weez'].forEach(o => {
       BILL_CATS.forEach((cat, catIdx) => {
         cat.rows.forEach((_, rowIdx) => {
@@ -4703,12 +4741,14 @@
           gBillets   += d.billets;
           gRecette   += rec;
           gVersement += rec - dlD - dlP;
+          gDLProd    += dlP;
         });
       });
     });
     document.getElementById('bill-total-billets').textContent  = gBillets;
     document.getElementById('bill-total-recette').textContent  = billFmt(gRecette);
     document.getElementById('bill-total-versement').textContent = billFmt(gVersement);
+    document.getElementById('bill-total-dlprod').textContent   = billFmt(gDLProd);
 
     // Total invitations + jauge
     const totalInvit = BILL_INVIT_TYPES.reduce((s,t) => s + (_billData['invit']?.[t.key]||0), 0);
