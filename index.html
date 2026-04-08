@@ -1672,12 +1672,14 @@
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Gestion billetterie</label>
             <select id="fp-billetterie" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="">-- Choix --</option>
               <option value="OMP">OMP</option>
               <option value="LDC">LDC</option>
               <option value="NDA">NDA</option>
               <option value="BLCITRON">BLCITRON</option>
               <option value="PEELPROD">PEELPROD</option>
               <option value="AUTRES">AUTRES</option>
+              <option value="SALLE">SALLE</option>
             </select>
           </div>
           <div>
@@ -1705,9 +1707,10 @@
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Heure <span style="color:#555;">(depuis horaire)</span></label>
             <input id="fp-heure" type="text" readonly style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:6px;color:#c9a84c;padding:8px 10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
-          <div style="grid-column:1/-1;">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Adresse salle <span style="color:#555;font-size:10px;">(auto)</span></label>
-            <input id="fp-adresse-salle" type="text" placeholder="Trouvée automatiquement via le nom de la salle" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          <div style="grid-column:1/-1;position:relative;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Adresse salle <span style="color:#555;font-size:10px;">(tape le nom ou l'adresse)</span></label>
+            <input id="fp-adresse-salle" type="text" placeholder="Ex: Zénith de Pau..." autocomplete="off" oninput="fpSearchAdresse(this.value)" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <div id="fp-adresse-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #3a3a3a;border-radius:6px;z-index:9999;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.5);"></div>
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Jauge de départ</label>
@@ -2283,7 +2286,7 @@
       <!-- CONTACT & IBAN -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;background:#111;font-weight:700;">CONTACT COMPTABILITÉ &amp; DIRECTION</td><td style="padding:7px 16px;color:#fff;">OH MY PROD<br>Alexandrine Marfaing Hugueny<br>06 17 15 70 89 — alex.marfaing@gmail.com</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;background:#111;font-weight:700;">CONTACT COMPTABILITÉ &amp; DIRECTION</td><td style="padding:7px 16px;color:#fff;">OH MY PROD<br>Alexandrine Marfaing Hugueny<br>06 17 15 70 89 — <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e6878a839ec88b879480878f8881a6818b878f8ac885898b">[email&#160;protected]</a></td></tr>
           <tr><td style="padding:7px 16px;color:#888;background:#111;font-weight:700;">IBAN OH MY PROD</td><td style="padding:7px 16px;color:#fff;">Crédit Agricole Anglet<br>FR76 1690 6030 0887 0261 0551 850<br>AGRIFRPP869</td></tr>
         </table>
       </div>
@@ -2769,7 +2772,7 @@
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   function printPlanning(team) {
     const teamNames = {
       artistique: { title: '🎤 PLANNING TEAM ARTISTIQUE', emoji: '🎤' },
@@ -4185,34 +4188,42 @@
   }
 
   let _fpAdresseTimer = null;
-  async function fpAutoAdresse(nomSalle) {
-    if (!nomSalle || nomSalle.length < 3) return;
+  async function fpSearchAdresse(query) {
+    const sugDiv = document.getElementById('fp-adresse-suggestions');
+    if (!query || query.length < 3) { if(sugDiv) sugDiv.style.display='none'; return; }
     clearTimeout(_fpAdresseTimer);
     _fpAdresseTimer = setTimeout(async () => {
-      // Mémoriser la salle
-      const salles = JSON.parse(localStorage.getItem('omp_salles') || '[]');
-      if (!salles.includes(nomSalle)) {
-        salles.push(nomSalle);
-        localStorage.setItem('omp_salles', JSON.stringify(salles));
-        const dl = document.getElementById('fp-salle-list');
-        if (dl) dl.innerHTML = salles.map(s => `<option value="${s}">`).join('');
-      }
-      // Recherche adresse
       try {
-        const ville = document.getElementById('fp-ville').value || '';
-        const q = encodeURIComponent(nomSalle + ' ' + ville + ' France');
-        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=fr`, {
-          headers: { 'Accept': 'application/json', 'Accept-Language': 'fr', 'User-Agent': 'OhMyProd/1.0 (regis.ohmyprod@gmail.com)' }
-        });
+        const q = encodeURIComponent(query);
+        const r = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + q + '&limit=6');
         const data = await r.json();
-        if (data && data[0]) {
-          document.getElementById('fp-adresse-salle').value = data[0].display_name;
-        }
-      } catch(e) {
-        console.log('Adresse auto erreur:', e);
-      }
-    }, 800);
+        fpShowAdresseSuggestions(data.features || []);
+      } catch(e) { console.log('Adresse erreur:', e); }
+    }, 400);
   }
+  function fpShowAdresseSuggestions(features) {
+    const sugDiv = document.getElementById('fp-adresse-suggestions');
+    if (!sugDiv) return;
+    if (!features || features.length === 0) { sugDiv.style.display='none'; return; }
+    sugDiv.innerHTML = features.map(f => {
+      const label = f.properties.label || '';
+      const esc = label.replace(/'/g, "\'");
+      return '<div onclick="fpSelectAdresse(\'' + esc + '\')" style="padding:8px 12px;cursor:pointer;color:#fff;font-size:13px;border-bottom:1px solid #2a2a2a;font-family:Inter,sans-serif;" onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='transparent'">' + label + '</div>';
+    }).join('');
+    sugDiv.style.display = 'block';
+  }
+  function fpSelectAdresse(label) {
+    const inp = document.getElementById('fp-adresse-salle');
+    const sugDiv = document.getElementById('fp-adresse-suggestions');
+    if (inp) inp.value = label;
+    if (sugDiv) sugDiv.style.display = 'none';
+  }
+  document.addEventListener('click', function(e) {
+    const sugDiv = document.getElementById('fp-adresse-suggestions');
+    if (sugDiv && !sugDiv.contains(e.target) && e.target.id !== 'fp-adresse-salle') {
+      sugDiv.style.display = 'none';
+    }
+  });
 
   function fpOuvrirPilote() {
     const ville = document.getElementById('fp-ville').value || '';
@@ -7343,12 +7354,4 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-edit-membre')">Annuler</button>
-      <button class="btn btn-primary" onclick="sauvegarderModifMembre()">💾 Enregistrer</button>
-    </div>
-  </div>
-</div>
-
-</div><!-- fin app-screen -->
-</body>
-</html>
+      <button class="btn btn-ghost
