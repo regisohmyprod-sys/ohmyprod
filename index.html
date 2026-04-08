@@ -4768,7 +4768,16 @@
       const { data } = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
       if (data?.billetterie_data) {
         const parsed = JSON.parse(data.billetterie_data);
-        BILL_OPS.forEach(op => { if (parsed[op]) _billData[op] = parsed[op]; });
+        BILL_OPS.forEach(op => {
+          if (parsed[op]) {
+            _billData[op] = BILL_CATS.map(function(cat, catIdx) {
+              return cat.rows.map(function(rowCode, rowIdx) {
+                var saved = parsed[op][catIdx] && parsed[op][catIdx][rowIdx];
+                return saved || { billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: rowCode };
+              });
+            });
+          }
+        });
       }
     } catch(e) {}
 
