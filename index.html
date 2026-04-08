@@ -4275,6 +4275,12 @@
         }
       } catch(e) { console.log('Pilote recette erreur:', e); }
     }
+    // Afficher recette brute TTC et prix moyen
+    var elRecTTC = document.getElementById('pilote-rec-ttc');
+    if (elRecTTC) elRecTTC.textContent = gRecettePilote > 0 ? billFmt(gRecettePilote) : '';
+    var prixMoyen = gBilletsPilote > 0 ? (gRecettePilote / gBilletsPilote) : 0;
+    var elPrixMoyen = document.getElementById('pilote-prix-moyen');
+    if (elPrixMoyen) elPrixMoyen.textContent = prixMoyen > 0 ? billFmt(prixMoyen) : '';
 
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
     const el = document.getElementById('pilote-ville-date');
@@ -4703,13 +4709,7 @@
     document.getElementById('bill-total-billets').textContent  = gBillets;
     document.getElementById('bill-total-recette').textContent  = billFmt(gRecette);
     document.getElementById('bill-total-versement').textContent = billFmt(gVersement);
-    // Prix moyen = recette brute / billets vendus
-    var prixMoyen = gBilletsPilote > 0 ? (gRecettePilote / gBilletsPilote) : 0;
-    var elPrixMoyen = document.getElementById('pilote-prix-moyen');
-    if (elPrixMoyen) elPrixMoyen.textContent = prixMoyen > 0 ? billFmt(prixMoyen) : '';
-    // Recette Brute TTC
-    var elRecTTC = document.getElementById('pilote-rec-ttc');
-    if (elRecTTC) elRecTTC.textContent = gRecettePilote > 0 ? billFmt(gRecettePilote) : '';
+
     // Total invitations + jauge
     const totalInvit = BILL_INVIT_TYPES.reduce((s,t) => s + (_billData['invit']?.[t.key]||0), 0);
     document.getElementById('bill-total-invitations').textContent = totalInvit;
@@ -5735,8 +5735,10 @@
     try {
       await chargerTournees();
       // Si on est sur une page de date, recharger la fiche aussi
-      if (typeof _fpDateId !== 'undefined' && _fpDateId) {
-        await fpChargerFiche(_fpDateId);
+      if (typeof fpOuvrir === 'function' && _fpDateId) {
+        const ville = document.getElementById('fp-ville') ? document.getElementById('fp-ville').value : '';
+        const date = document.getElementById('fp-date-concert') ? document.getElementById('fp-date-concert').value : '';
+        await fpOuvrir(_fpDateId, ville, date);
       }
     } catch(e) { console.error('Refresh erreur:', e); }
     if (btn) { btn.textContent = '🔄'; btn.disabled = false; }
