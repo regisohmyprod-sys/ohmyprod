@@ -4239,10 +4239,6 @@
   });
 
   async function fpOuvrirPilote() {
-    // Charger les données billetterie si pas encore fait
-    if (typeof billCharger === 'function') {
-      try { await billCharger(); } catch(e) {}
-    }
     const ville = document.getElementById('fp-ville').value || '';
     const date = document.getElementById('fp-date-concert').value || '';
     const salle = document.getElementById('fp-salle').value || '';
@@ -4253,26 +4249,31 @@
     const totalJauge = document.getElementById('fp-total-jauge').value || '';
     const dealOmp = document.getElementById('fp-deal-promo').value || '100%';
     const mg = document.getElementById('fp-mg').value || '0';
-    // Calculer recette brute TTC et billets vendus depuis _billData (après chargement)
+    // Calculer recette brute TTC et billets vendus
     var gRecettePilote = 0, gBilletsPilote = 0;
-    // Recharger depuis Supabase si _fpDateId dispo
-    if (_fpDateId) {
+    var sourceData = null;
+    // 1. Essayer depuis _billData en mémoire
+    if (typeof _billData !== 'undefined' && _billData['promo']) {
+      sourceData = _billData;
+    }
+    // 2. Sinon charger depuis Supabase
+    if (!sourceData && _fpDateId) {
       try {
         const { data: bd } = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
-        if (bd?.billetterie_data) {
-          const parsed = JSON.parse(bd.billetterie_data);
-          ['promo','tm','fnac','salle','weez'].forEach(function(op) {
-            if (parsed[op]) {
-              parsed[op].forEach(function(cat) {
-                (cat || []).forEach(function(d) {
-                  gRecettePilote += (d.billets || 0) * (d.tarif || 0);
-                  gBilletsPilote += (d.billets || 0);
-                });
-              });
-            }
+        if (bd?.billetterie_data) sourceData = JSON.parse(bd.billetterie_data);
+      } catch(e) {}
+    }
+    if (sourceData) {
+      ['promo','tm','fnac','salle','weez'].forEach(function(op) {
+        if (sourceData[op]) {
+          sourceData[op].forEach(function(cat) {
+            (cat || []).forEach(function(d) {
+              gRecettePilote += (parseFloat(d.billets) || 0) * (parseFloat(d.tarif) || 0);
+              gBilletsPilote += (parseFloat(d.billets) || 0);
+            });
           });
         }
-      } catch(e) { console.log('Pilote billetterie erreur:', e); }
+      });
     }
 
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
