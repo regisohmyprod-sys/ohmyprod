@@ -4249,6 +4249,20 @@
     const totalJauge = document.getElementById('fp-total-jauge').value || '';
     const dealOmp = document.getElementById('fp-deal-promo').value || '100%';
     const mg = document.getElementById('fp-mg').value || '0';
+    // Calculer recette brute TTC et billets vendus depuis _billData
+    var gRecettePilote = 0, gBilletsPilote = 0;
+    if (typeof _billData !== 'undefined') {
+      ['promo','tm','fnac','salle','weez'].forEach(function(op) {
+        if (_billData[op]) {
+          _billData[op].forEach(function(cat) {
+            cat.forEach(function(d) {
+              gRecettePilote += (d.billets || 0) * (d.tarif || 0);
+              gBilletsPilote += (d.billets || 0);
+            });
+          });
+        }
+      });
+    }
 
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
     const el = document.getElementById('pilote-ville-date');
@@ -4678,12 +4692,12 @@
     document.getElementById('bill-total-recette').textContent  = billFmt(gRecette);
     document.getElementById('bill-total-versement').textContent = billFmt(gVersement);
     // Prix moyen = recette brute / billets vendus
-    var prixMoyen = gBillets > 0 ? (gRecette / gBillets) : 0;
+    var prixMoyen = gBilletsPilote > 0 ? (gRecettePilote / gBilletsPilote) : 0;
     var elPrixMoyen = document.getElementById('pilote-prix-moyen');
     if (elPrixMoyen) elPrixMoyen.textContent = prixMoyen > 0 ? billFmt(prixMoyen) : '';
     // Recette Brute TTC
     var elRecTTC = document.getElementById('pilote-rec-ttc');
-    if (elRecTTC) elRecTTC.textContent = gRecette > 0 ? billFmt(gRecette) : '';
+    if (elRecTTC) elRecTTC.textContent = gRecettePilote > 0 ? billFmt(gRecettePilote) : '';
     // Total invitations + jauge
     const totalInvit = BILL_INVIT_TYPES.reduce((s,t) => s + (_billData['invit']?.[t.key]||0), 0);
     document.getElementById('bill-total-invitations').textContent = totalInvit;
