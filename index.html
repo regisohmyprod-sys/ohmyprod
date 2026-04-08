@@ -4681,6 +4681,9 @@
     var prixMoyen = gBillets > 0 ? (gRecette / gBillets) : 0;
     var elPrixMoyen = document.getElementById('pilote-prix-moyen');
     if (elPrixMoyen) elPrixMoyen.textContent = prixMoyen > 0 ? billFmt(prixMoyen) : '';
+    // Recette Brute TTC
+    var elRecTTC = document.getElementById('pilote-rec-ttc');
+    if (elRecTTC) elRecTTC.textContent = gRecette > 0 ? billFmt(gRecette) : '';
     // Total invitations + jauge
     const totalInvit = BILL_INVIT_TYPES.reduce((s,t) => s + (_billData['invit']?.[t.key]||0), 0);
     document.getElementById('bill-total-invitations').textContent = totalInvit;
