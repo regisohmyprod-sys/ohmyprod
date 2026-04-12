@@ -7252,7 +7252,7 @@ function _hideTeamSelection() {
               ? '<span style="font-size:11px;color:#4caf50;font-weight:700;background:rgba(76,175,80,0.1);border:1px solid #4caf50;border-radius:4px;padding:2px 8px;">✅ FICHE</span>'
               : '<span style="font-size:11px;color:#888;background:#111;border:1px solid #333;border-radius:4px;padding:2px 8px;">— vide</span>'
             }
-            <button onclick="fpOuvrir('${d.id}','${(d.ville||'').replace(/'/g,"\\'")}','${dateStr}')" style="background:#1a2f4a;color:#7eb8d4;border:1px solid #3b82f6;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+            <button onclick="fpOuvrir('${d.id}','${(d.ville||'').replace(/'/g,"\\'")}','${dateStr.replace(/'/g,"\\'")}')" style="background:#1a2f4a;color:#7eb8d4;border:1px solid #3b82f6;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
               ${hasFiche ? '✏️ FICHE' : '📋 Suivre'}
             </button>
           </div>
@@ -7261,7 +7261,9 @@ function _hideTeamSelection() {
   }
 
   async function fpOuvrir(dateConcertId, ville, dateStr) {
+    try {
     _fpDateId = dateConcertId;
+    console.log('fpOuvrir appelé avec:', dateConcertId, ville, dateStr);
 
     // Réinitialiser tous les champs
     ['fp-ville','fp-salle','fp-heure','fp-horaire','fp-mg','fp-deal-promo','fp-etat-ventes','fp-invitations','fp-total-jauge','fp-jauge-depart','fp-jauge-finale','fp-dl-omp','fp-dl-prod-locale','fp-boost','fp-date-mev','fp-adresse-salle'].forEach(id => {
@@ -7319,6 +7321,7 @@ function _hideTeamSelection() {
     }
 
     showPage('fiche-prod');
+    } catch(e) { console.error('Erreur fpOuvrir:', e); alert('Erreur: ' + e.message); }
   }
 
   function fpCalcTotal() {
