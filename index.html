@@ -10198,9 +10198,14 @@ function _hideTeamSelection() {
   }
 
   // Afficher les cartes tournées dans le dashboard
-  function renderDashboardTournees(tournees) {
+  async function renderDashboardTournees(tournees) {
+    // Bonus spectateurs pour les dates passées non renseignées (par tournée)
+    const BONUS_SPECTATEURS = {
+      '723c3fd9-94e7-4e58-9388-9ca808d82db5': 139021  // TWOQ L'Hommage - dates passées
+    };
+
     // Cette fonction met à jour les cartes tournées du dashboard
-    tournees.forEach(t => {
+    for (const t of tournees) {
       const dates = t.dates_concert || [];
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -10230,8 +10235,22 @@ function _hideTeamSelection() {
       if (elProchaine) elProchaine.textContent = prochaineStr;
       if (elDebut) elDebut.textContent = debut;
       if (elFin) elFin.textContent = fin;
-      if (elSpecsTotal) elSpecsTotal.textContent = t.nb_spectateurs_total?.toLocaleString('fr-FR') || '0';
-    });
+      
+      // Calculer spectateurs = bonus + somme des total_jauge des fiches
+      if (elSpecsTotal) {
+        let spec = BONUS_SPECTATEURS[t.id] || 0;
+        try {
+          const dateIds = dates.map(d => d.id);
+          if (dateIds.length > 0) {
+            const fichesRes = await _supabase.from('fiches_production').select('total_jauge').in('date_concert_id', dateIds);
+            if (fichesRes.data) {
+              fichesRes.data.forEach(f => { spec += parseInt(f.total_jauge) || 0; });
+            }
+          }
+        } catch(e) {}
+        elSpecsTotal.textContent = spec.toLocaleString('fr-FR');
+      }
+    }
   }
 
   // Stats globales du dashboard
@@ -10319,10 +10338,24 @@ function _hideTeamSelection() {
         elFin.textContent = `${MOIS[df.getMonth()]} ${df.getFullYear()}`.toUpperCase();
       }
 
-      // Spectateurs
+      // Spectateurs - calculer avec bonus + fiches
       const elSpecsTotal = document.getElementById(`db-${prefix}-specs-total`);
-      if (elSpecsTotal && t.nb_spectateurs_total) {
-        elSpecsTotal.textContent = t.nb_spectateurs_total.toLocaleString('fr-FR');
+      if (elSpecsTotal) {
+        const BONUS_SPECTATEURS = {
+          '723c3fd9-94e7-4e58-9388-9ca808d82db5': 139021  // TWOQ L'Hommage
+        };
+        let spec = BONUS_SPECTATEURS[t.id] || 0;
+        const dateIds = dates.map(d => d.id);
+        if (dateIds.length > 0) {
+          _supabase.from('fiches_production').select('total_jauge').in('date_concert_id', dateIds).then(fichesRes => {
+            if (fichesRes.data) {
+              fichesRes.data.forEach(f => { spec += parseInt(f.total_jauge) || 0; });
+            }
+            elSpecsTotal.textContent = spec.toLocaleString('fr-FR');
+          });
+        } else {
+          elSpecsTotal.textContent = spec.toLocaleString('fr-FR');
+        }
       }
     });
   }
