@@ -5964,17 +5964,18 @@ function _hideTeamSelection() {
 
     let totalNb = 0, valideNb = 0;
     tbody.innerHTML = data.map(inv => {
-      totalNb += (inv.nb_places||0);
-      if (inv.statut === 'valide') valideNb += (inv.nb_places||0);
+      totalNb += (inv.nombre||0);
+      if (inv.valide) valideNb += (inv.nombre||0);
+      const badge = inv.valide ? statutBadge.valide : statutBadge.en_attente;
       return `<tr>
         <td style="padding:8px 10px;font-size:12px;color:#888;">${inv.created_at ? new Date(inv.created_at).toLocaleDateString('fr-FR') : '–'}</td>
         <td style="padding:8px 10px;font-size:12px;color:#aaa;">${inv.demandeur||'–'}</td>
-        <td style="padding:8px 10px;font-size:12px;color:#fff;font-weight:700;">${inv.invite_nom||'–'}</td>
-        <td style="padding:8px 10px;font-size:12px;color:#888;">${inv.invite_email||'–'}</td>
-        <td style="padding:8px 10px;font-size:12px;color:#fff;text-align:center;">${inv.nb_places||'–'}</td>
+        <td style="padding:8px 10px;font-size:12px;color:#fff;font-weight:700;">${inv.nom_invite||'–'}</td>
+        <td style="padding:8px 10px;font-size:12px;color:#888;">${inv.email||'–'}</td>
+        <td style="padding:8px 10px;font-size:12px;color:#fff;text-align:center;">${inv.nombre||'–'}</td>
         <td style="padding:8px 10px;font-size:12px;color:#888;text-align:center;">${inv.numero_place||'–'}</td>
-        <td style="padding:8px 10px;">${statutBadge[inv.statut]||inv.statut||'–'}</td>
-        <td style="padding:8px 10px;font-size:11px;color:#888;">–</td>
+        <td style="padding:8px 10px;">${badge}</td>
+        <td style="padding:8px 10px;font-size:11px;color:#888;">${inv.nom_liste||'–'}</td>
         <td style="padding:8px 10px;font-size:11px;color:#888;font-style:italic;">${inv.notes||'–'}</td>
       </tr>`;
     }).join('');
