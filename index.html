@@ -7295,7 +7295,10 @@ function _hideTeamSelection() {
     }).join('');
   }
 
+  var _fpOuvrirEnCours = false;
   async function fpOuvrir(dateConcertId, ville, dateStr) {
+    if (_fpOuvrirEnCours) { console.log('fpOuvrir déjà en cours, ignoré'); return; }
+    _fpOuvrirEnCours = true;
     console.log('=== fpOuvrir START ===');
     console.log('dateConcertId:', dateConcertId);
     console.log('ville:', ville);
@@ -7333,7 +7336,9 @@ function _hideTeamSelection() {
 
     // Charger fiche existante
     console.log('Chargement fiche_production...');
-    const { data: fiche } = await _supabase.from('fiches_production').select('*').eq('date_concert_id', dateConcertId).single();
+    const { data: ficheData } = await _supabase.from('fiches_production').select('*').eq('date_concert_id', dateConcertId);
+    const fiche = ficheData && ficheData.length > 0 ? ficheData[0] : null;
+    console.log('fiche chargée:', fiche);
     if (fiche) {
       document.getElementById('fp-producteur').value = fiche.producteur || 'OH MY PROD';
       document.getElementById('fp-promoteur').value = fiche.promoteur_local || 'PAS DE PL';
@@ -7367,6 +7372,7 @@ function _hideTeamSelection() {
     showPage('fiche-prod');
     console.log('=== fpOuvrir END ===');
     } catch(e) { console.error('Erreur fpOuvrir:', e); alert('Erreur: ' + e.message); }
+    finally { _fpOuvrirEnCours = false; }
   }
 
   function fpCalcTotal() {
