@@ -1959,19 +1959,19 @@ function _hideTeamSelection() {
       </div>
 
       <div class="stats-grid" style="margin-bottom:28px;">
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;">
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('tournees')">
           <div class="stat-label">Tournées actives</div>
           <div class="stat-value" id="stat-tournees-actives" style="font-size:48px;color:#c9a84c;">2</div>
           <div class="stat-sub">TWOQ</div>
         </div>
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;">
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('crea-suivi-dates')">
           <div class="stat-label">N° Dates en cours</div>
-          <div class="stat-value" style="font-size:48px;color:#fff;">90</div>
+          <div class="stat-value" id="stat-dates-en-cours" style="font-size:48px;color:#fff;">–</div>
           <div class="stat-sub">jusqu'en 2028</div>
         </div>
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;">
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('membres-equipe')">
           <div class="stat-label">Membres équipe</div>
-          <div class="stat-value" style="font-size:48px;color:#fff;">25</div>
+          <div class="stat-value" id="stat-membres-equipe" style="font-size:48px;color:#fff;">–</div>
           <div class="stat-sub">artistes + technique + prod</div>
         </div>
         <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;">
@@ -1985,30 +1985,30 @@ function _hideTeamSelection() {
       <div class="db-tournees-cols">
 
         <!-- TWOQ L'HOMMAGE -->
-        <div class="db-col-card">
+        <div class="db-col-card" style="cursor:pointer;" onclick="showTournee('twoq')">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">🎸 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'hommage à la légende</span></div>
           <div class="db-col-stats">
-            <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value">62</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" style="color:var(--red)">24</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" style="font-size:16px;">4 AVR – Avignon</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" style="font-size:16px;">FÉV 2023</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" style="font-size:16px;">MAI 2026</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" style="color:var(--green)">148 200</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" style="color:var(--yellow)">198 000</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq-effectuees">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" id="db-twoq-restantes" style="color:var(--red)">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" id="db-twoq-prochaine" style="font-size:16px;">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" id="db-twoq-debut" style="font-size:16px;">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq-fin" style="font-size:16px;">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq-specs-total" style="color:var(--green)">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" id="db-twoq-specs-prev" style="color:var(--yellow)">–</div></div>
           </div>
         </div>
 
         <!-- TWOQ ETERNELLE LEGENDE -->
-        <div class="db-col-card">
+        <div class="db-col-card" style="cursor:pointer;" onclick="showTournee('twoq2')">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">👑 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'Éternelle Légende</span></div>
           <div class="db-col-stats">
-            <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value">0</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" style="color:var(--red)">82</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" style="font-size:16px;">SEPT 2026</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" style="font-size:16px;">SEPT 2026</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" style="font-size:16px;">DÉC 2028</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" style="color:var(--green)">0</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" style="color:var(--yellow)">250 000</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq2-effectuees">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" id="db-twoq2-restantes" style="color:var(--red)">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" id="db-twoq2-prochaine" style="font-size:16px;">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" id="db-twoq2-debut" style="font-size:16px;">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq2-fin" style="font-size:16px;">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq2-specs-total" style="color:var(--green)">–</div></div>
+            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" id="db-twoq2-specs-prev" style="color:var(--yellow)">–</div></div>
           </div>
         </div>
       </div>
@@ -9987,78 +9987,138 @@ function _hideTeamSelection() {
 
   // Afficher les cartes tournées dans le dashboard
   function renderDashboardTournees(tournees) {
-    const container = document.querySelector('#page-dashboard .page-title + .db-tournee-card')?.parentElement;
-    if (!container) return;
-
-    // Supprimer les anciennes cartes dynamiques
-    container.querySelectorAll('.db-tournee-card.dynamic').forEach(c => c.remove());
-
+    // Cette fonction met à jour les cartes tournées du dashboard
     tournees.forEach(t => {
       const dates = t.dates_concert || [];
       const today = new Date();
+      today.setHours(0,0,0,0);
       const avenir = dates.filter(d => parseDate(d.date_concert) >= today);
       const passees = dates.filter(d => parseDate(d.date_concert) < today);
       const prochaine = avenir.sort((a,b) => new Date(a.date_concert) - new Date(b.date_concert))[0];
 
       const prochaineStr = prochaine
-        ? `${new Date(prochaine.date_concert).getDate()} ${MOIS[new Date(prochaine.date_concert).getMonth()]} – ${prochaine.ville}`
+        ? `${new Date(prochaine.date_concert).getDate()} ${MOIS[new Date(prochaine.date_concert).getMonth()]} – ${prochaine.ville.toUpperCase()}`
         : '–';
 
       const debut = t.date_debut ? new Date(t.date_debut).toLocaleDateString('fr-FR', {month:'short', year:'numeric'}).toUpperCase() : '–';
       const fin = t.date_fin ? new Date(t.date_fin).toLocaleDateString('fr-FR', {month:'short', year:'numeric'}).toUpperCase() : '–';
 
       const id = t.nom_spectacle.includes('ternelle') ? 'twoq2' : 'twoq';
-      const icon = '🎸';
 
-      // Mettre à jour la carte existante
-      const existing = document.querySelector(`.db-tournee-card[onclick*="${id}"]`);
-      if (existing) {
-        const vals = existing.querySelectorAll('.db-tournee-value');
-        if (vals[0]) vals[0].textContent = passees.length;
-        if (vals[1]) vals[1].textContent = avenir.length;
-        if (vals[2]) vals[2].style.fontSize = '14px', vals[2].textContent = prochaineStr;
-        if (vals[3]) vals[3].textContent = debut;
-        if (vals[4]) vals[4].textContent = fin;
-        if (vals[5]) vals[5].textContent = t.nb_spectateurs_total?.toLocaleString('fr-FR') || '0';
-        if (vals[6]) vals[6].textContent = t.nb_spectateurs_prevision?.toLocaleString('fr-FR') || '0';
-      }
+      // Mettre à jour via les IDs qu'on a créés
+      const elEffectuees = document.getElementById(`db-${id}-effectuees`);
+      const elRestantes = document.getElementById(`db-${id}-restantes`);
+      const elProchaine = document.getElementById(`db-${id}-prochaine`);
+      const elDebut = document.getElementById(`db-${id}-debut`);
+      const elFin = document.getElementById(`db-${id}-fin`);
+      const elSpecsTotal = document.getElementById(`db-${id}-specs-total`);
+      const elSpecsPrev = document.getElementById(`db-${id}-specs-prev`);
+
+      if (elEffectuees) elEffectuees.textContent = passees.length;
+      if (elRestantes) elRestantes.textContent = avenir.length;
+      if (elProchaine) elProchaine.textContent = prochaineStr;
+      if (elDebut) elDebut.textContent = debut;
+      if (elFin) elFin.textContent = fin;
+      if (elSpecsTotal) elSpecsTotal.textContent = t.nb_spectateurs_total?.toLocaleString('fr-FR') || '0';
+      if (elSpecsPrev) elSpecsPrev.textContent = t.nb_spectateurs_prevision?.toLocaleString('fr-FR') || '0';
     });
   }
 
   // Stats globales du dashboard
   function renderDashboardStats(tournees) {
     const today = new Date();
-    let totalAvenir = 0;
-    let prochaine = null;
-
+    today.setHours(0,0,0,0);
+    
     // Nombre de tournées actives
     const statTournees = document.getElementById('stat-tournees-actives');
     if (statTournees) statTournees.textContent = tournees.length;
+
+    // Calculer dates en cours GLOBALES (toutes tournées)
+    let totalDatesEnCours = 0;
+    let prochaineGlobale = null;
 
     tournees.forEach(t => {
       const dates = t.dates_concert || [];
       dates.forEach(d => {
         if (parseDate(d.date_concert) >= today) {
-          totalAvenir++;
-          if (!prochaine || new Date(d.date_concert) < new Date(prochaine.date_concert)) {
-            prochaine = d;
+          totalDatesEnCours++;
+          if (!prochaineGlobale || new Date(d.date_concert) < new Date(prochaineGlobale.date_concert)) {
+            prochaineGlobale = d;
           }
         }
       });
     });
 
-    // N° date en cours
-    const statNb = document.querySelector('.stat-value[style*="red"]');
-    if (statNb) statNb.textContent = totalAvenir;
+    // N° dates en cours
+    const statDates = document.getElementById('stat-dates-en-cours');
+    if (statDates) statDates.textContent = totalDatesEnCours;
 
-    // Prochaine date
-    if (prochaine) {
-      const d = new Date(prochaine.date_concert);
+    // Prochaine date GLOBALE
+    if (prochaineGlobale) {
+      const d = new Date(prochaineGlobale.date_concert);
       const statDate = document.getElementById('stat-prochaine-date');
       const statVille = document.getElementById('stat-prochaine-ville');
       if (statDate) statDate.textContent = `${d.getDate()} ${MOIS[d.getMonth()]}`;
-      if (statVille) statVille.textContent = prochaine.ville.toUpperCase();
+      if (statVille) statVille.textContent = prochaineGlobale.ville.toUpperCase();
     }
+
+    // Compter membres équipe TOTAL (requête Supabase)
+    _supabase.from('membres').select('id', { count: 'exact', head: true }).then(res => {
+      const statMembres = document.getElementById('stat-membres-equipe');
+      if (statMembres && res.count !== null) statMembres.textContent = res.count;
+    });
+
+    // Remplir les cartes tournées individuelles
+    tournees.forEach(t => {
+      let prefix = '';
+      if (t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage')) prefix = 'twoq';
+      if (t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle')) prefix = 'twoq2';
+      if (!prefix) return;
+
+      const dates = t.dates_concert || [];
+      const passees = dates.filter(d => parseDate(d.date_concert) < today);
+      const avenir = dates.filter(d => parseDate(d.date_concert) >= today);
+      const prochaine = [...avenir].sort((a,b) => new Date(a.date_concert) - new Date(b.date_concert))[0];
+
+      // Dates effectuées / restantes
+      const elEffectuees = document.getElementById(`db-${prefix}-effectuees`);
+      const elRestantes = document.getElementById(`db-${prefix}-restantes`);
+      if (elEffectuees) elEffectuees.textContent = passees.length;
+      if (elRestantes) elRestantes.textContent = avenir.length;
+
+      // Prochaine date
+      const elProchaine = document.getElementById(`db-${prefix}-prochaine`);
+      if (elProchaine) {
+        if (prochaine) {
+          const d = new Date(prochaine.date_concert);
+          elProchaine.textContent = `${d.getDate()} ${MOIS[d.getMonth()]} – ${prochaine.ville.toUpperCase()}`;
+        } else {
+          elProchaine.textContent = '–';
+        }
+      }
+
+      // Dates début/fin
+      const elDebut = document.getElementById(`db-${prefix}-debut`);
+      const elFin = document.getElementById(`db-${prefix}-fin`);
+      if (elDebut && t.date_debut) {
+        const dd = new Date(t.date_debut);
+        elDebut.textContent = `${MOIS[dd.getMonth()]} ${dd.getFullYear()}`.toUpperCase();
+      }
+      if (elFin && t.date_fin) {
+        const df = new Date(t.date_fin);
+        elFin.textContent = `${MOIS[df.getMonth()]} ${df.getFullYear()}`.toUpperCase();
+      }
+
+      // Spectateurs
+      const elSpecsTotal = document.getElementById(`db-${prefix}-specs-total`);
+      const elSpecsPrev = document.getElementById(`db-${prefix}-specs-prev`);
+      if (elSpecsTotal && t.nb_spectateurs_total) {
+        elSpecsTotal.textContent = t.nb_spectateurs_total.toLocaleString('fr-FR');
+      }
+      if (elSpecsPrev && t.nb_spectateurs_prevision) {
+        elSpecsPrev.textContent = t.nb_spectateurs_prevision.toLocaleString('fr-FR');
+      }
+    });
   }
 
   // Afficher les dates d'une tournée
