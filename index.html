@@ -1897,7 +1897,7 @@ function _hideTeamSelection() {
       </div>
 
       <!-- 2 BOUTONS ADMIN ALEXANDRINE + GESTION TOUR RÉGIS -->
-      <div id="bloc-admin-gestion" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;display:none;">
+      <div id="bloc-admin-gestion" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
         
         <!-- BOUTON ADMIN ALEXANDRINE -->
         <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-admin-alexandrine')">
@@ -1915,21 +1915,21 @@ function _hideTeamSelection() {
 
       </div>
 
-      <!-- BLOCS GESTION TECHNIQUE + VHR + ACCES FRAIS sur une ligne -->
+      <!-- BLOCS ACCÈS ESPACES : STAFF / ARTISTIQUE / TECHNIQUE -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('dossier-technique')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🔧 GESTION TECHNIQUE</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Dossier technique & riders</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
+        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('espace-staff')">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">👥 ACCÈS STAFF OMP</div>
+          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Espace staff OMP</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
         </div>
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-vhr-tournee')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🚌 GESTION VHR</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Véhicules & transport par tournée</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
+        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('espace-artistique')">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🎤 ACCÈS TEAM ARTISTIQUE</div>
+          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Espace artistique</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
         </div>
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="ouvrirAccesFrais()">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">💰 ACCÈS FRAIS</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Notes de frais & justificatifs</div>
+        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('espace-technique')">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🔧 ACCÈS TEAM TECHNIQUE</div>
+          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Espace technique</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
         </div>
       </div>
@@ -12527,6 +12527,12 @@ function _hideTeamSelection() {
         <div onclick="closeModal('modal-gestion-tour-regis'); openModal('modal-add-tournee');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
           <span style="font-size:22px;">➕</span>
           <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">CRÉATION TOURNÉE</div><div style="font-size:11px;color:#555;">Nouvelle tournée</div></div>
+          <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
+        </div>
+
+        <div onclick="closeModal('modal-gestion-tour-regis'); openModal('modal-vhr-tournee');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+          <span style="font-size:22px;">🚌</span>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">GESTION VHR</div><div style="font-size:11px;color:#555;">Véhicules & transport</div></div>
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </div>
 
