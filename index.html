@@ -7651,8 +7651,44 @@ function _hideTeamSelection() {
         var fr = await _supabase.from('fiches_production').select('financier_data').eq('date_concert_id', dateId).single();
         if (fr.data && fr.data.financier_data) {
           var fd = JSON.parse(fr.data.financier_data);
-          var sumFin = 0;
-          Object.values(fd).forEach(function(v){ sumFin += parseFloat(v)||0; });
+          var getVal = function(key) { return parseFloat(fd[key]) || 0; };
+          
+          // OMP SALLE
+          var ompLoc = Math.max(getVal('fin-omp-loc-mg'), getVal('fin-omp-loc-ht'));
+          var ompPrest = getVal('fin-omp-prest-energie') + getVal('fin-omp-prest-chauf') + getVal('fin-omp-prest-config') + getVal('fin-omp-prest-fenwick') + getVal('fin-omp-prest-accroches') + getVal('fin-omp-prest-elec');
+          var ompPers = getVal('fin-omp-pers-nettoyage') + getVal('fin-omp-pers-nett-supp') + getVal('fin-omp-pers-elec') + getVal('fin-omp-pers-hriger') + getVal('fin-omp-pers-regisseur') + getVal('fin-omp-pers-forfait') + getVal('fin-omp-pers-caissier') + getVal('fin-omp-pers-rigg') + getVal('fin-omp-pers-hotesses') + getVal('fin-omp-pers-controle') + getVal('fin-omp-pers-parking') + getVal('fin-omp-pers-secu') + getVal('fin-omp-pers-vigi') + getVal('fin-omp-pers-consigne') + getVal('fin-omp-pers-gardien');
+          var ompSecu = getVal('fin-omp-secu-ssiap1') + getVal('fin-omp-secu-ssiap2') + getVal('fin-omp-secu-protciv') + getVal('fin-omp-secu-vigi2') + getVal('fin-omp-secu-medical') + getVal('fin-omp-secu-autres');
+          var totalOmpSalle = ompLoc + ompPrest + ompPers + ompSecu;
+          
+          // PL SALLE
+          var plLoc = Math.max(getVal('fin-pl-loc-mg'), getVal('fin-pl-loc-ht'));
+          var plPrest = getVal('fin-pl-prest-energie') + getVal('fin-pl-prest-chauf') + getVal('fin-pl-prest-config') + getVal('fin-pl-prest-fenwick') + getVal('fin-pl-prest-accroches') + getVal('fin-pl-prest-elec');
+          var plPers = getVal('fin-pl-pers-nettoyage') + getVal('fin-pl-pers-nett-supp') + getVal('fin-pl-pers-elec') + getVal('fin-pl-pers-hriger') + getVal('fin-pl-pers-regisseur') + getVal('fin-pl-pers-forfait') + getVal('fin-pl-pers-caissier') + getVal('fin-pl-pers-rigg') + getVal('fin-pl-pers-hotesses') + getVal('fin-pl-pers-controle') + getVal('fin-pl-pers-parking') + getVal('fin-pl-pers-secu') + getVal('fin-pl-pers-vigi') + getVal('fin-pl-pers-consigne') + getVal('fin-pl-pers-gardien');
+          var plSecu = getVal('fin-pl-secu-ssiap1') + getVal('fin-pl-secu-ssiap2') + getVal('fin-pl-secu-protciv') + getVal('fin-pl-secu-vigi2') + getVal('fin-pl-secu-medical') + getVal('fin-pl-secu-autres');
+          var totalPlSalle = plLoc + plPrest + plPers + plSecu;
+          
+          // OMP AUTRES
+          var ompSal = getVal('fin-omp-sal-tournee') + getVal('fin-omp-sal-road') + getVal('fin-omp-sal-promo');
+          var ompTech = getVal('fin-omp-tech-road') + getVal('fin-omp-tech-figer') + getVal('fin-omp-tech-coulisses') + getVal('fin-omp-tech-autres') + getVal('fin-omp-tech-conso') + getVal('fin-omp-tech-controleur');
+          var ompPromo = getVal('fin-omp-promo-meta') + getVal('fin-omp-promo-autres1') + getVal('fin-omp-promo-autres2');
+          var ompVoy = getVal('fin-omp-voy-prod') + getVal('fin-omp-voy-artiste') + getVal('fin-omp-voy-tech') + getVal('fin-omp-voy-vhr');
+          var ompVhr = getVal('fin-omp-vhr-pkart') + getVal('fin-omp-vhr-pktech') + getVal('fin-omp-vhr-taxiart') + getVal('fin-omp-vhr-taxitech') + getVal('fin-omp-vhr-total2');
+          var ompHotel = getVal('fin-omp-hotel-prod') + getVal('fin-omp-hotel-tech') + getVal('fin-omp-hotel-art') + getVal('fin-omp-hotel-estim');
+          var ompTrai = getVal('fin-omp-trai-total') + getVal('fin-omp-trai-resto') + getVal('fin-omp-trai-loge');
+          var totalOmpAutres = ompSal + ompTech + ompPromo + ompVoy + ompVhr + ompHotel + ompTrai;
+          
+          // PL AUTRES
+          var plSal = getVal('fin-pl-sal-regisseur') + getVal('fin-pl-sal-road') + getVal('fin-pl-sal-caissier');
+          var plTech = getVal('fin-pl-tech-road') + getVal('fin-pl-tech-figer') + getVal('fin-pl-tech-coulisses') + getVal('fin-pl-tech-autres') + getVal('fin-pl-tech-conso') + getVal('fin-pl-tech-controleur');
+          var plPromo = getVal('fin-pl-promo-meta') + getVal('fin-pl-promo-autres1') + getVal('fin-pl-promo-autres2');
+          var plVoy = getVal('fin-pl-voy-prod') + getVal('fin-pl-voy-artiste') + getVal('fin-pl-voy-tech') + getVal('fin-pl-voy-autres');
+          var plVhr = getVal('fin-pl-vhr-pkart') + getVal('fin-pl-vhr-pktech') + getVal('fin-pl-vhr-taxiart') + getVal('fin-pl-vhr-taxitech') + getVal('fin-pl-vhr-total2');
+          var plHotel = getVal('fin-pl-hotel-prod') + getVal('fin-pl-hotel-tech') + getVal('fin-pl-hotel-art') + getVal('fin-pl-hotel-estim');
+          var plTrai = getVal('fin-pl-trai-total') + getVal('fin-pl-trai-resto') + getVal('fin-pl-trai-loge');
+          var totalPlAutres = plSal + plTech + plPromo + plVoy + plVhr + plHotel + plTrai;
+          
+          // TOTAL DEPENSES
+          var sumFin = totalOmpSalle + totalPlSalle + totalOmpAutres + totalPlAutres;
           setEl('pilote-total-dep', sumFin>0 ? fmt(sumFin)+' €' : '');
           // Résultat Date = RecHT - TotalDroitsHorsCNM - TotalDépenses + DroitTirage
           var resultat = recHT2 - totalDroitsHorsCNM - sumFin + droitTirage + dlHT;
