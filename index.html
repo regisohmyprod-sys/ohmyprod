@@ -7766,10 +7766,13 @@ function _hideTeamSelection() {
     setEl('bilan-date-label', dateStr);
     setEl('bilan-ville-date', ville + (dateStr ? ' · ' + dateStr : ''));
 
+    // Récupérer invitations depuis le champ de la fiche
+    var invitations = parseInt(document.getElementById('fp-invitations')?.value) || 0;
+
     if (!_fpDateId) { showPage('bilan-amh'); return; }
 
-    // Charger billetterie_data et financier_data depuis Supabase
-    var recTotal = 0, gBillets = 0, invitations = 0;
+    // Charger billetterie_data depuis Supabase
+    var recTotal = 0, gBillets = 0;
     try {
       var bdRes = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
       if (bdRes.data && bdRes.data.billetterie_data) {
@@ -7791,16 +7794,10 @@ function _hideTeamSelection() {
             }
           }
         }
-        // Invitations
-        if (parsed.invitations) {
-          parsed.invitations.forEach(function(inv) {
-            invitations += parseInt(inv.nombre) || 0;
-          });
-        }
       }
     } catch(e) { console.log('Bilan AMH billetterie erreur:', e); }
 
-    // Calculs recettes
+    // Calculs recettes (identiques au PILOTE)
     var recHT = recTotal / 1.021;
     var tva = recTotal - recHT;
     var parafiscale = recHT * 0.035;
@@ -7814,16 +7811,23 @@ function _hideTeamSelection() {
     setEl('bilan-invit', invitations > 0 ? invitations : '');
     setEl('bilan-nb-billets', gBillets + ' billets · ' + invitations + ' invit');
 
-    // Calcul droits
+    // Calcul droits (EXACTEMENT comme PILOTE - piloteCalcDroits)
     var sacem = recHT * 0.0836;
     var agessaSacem = sacem * 0.011;
-    var totalSacem = sacem + agessaSacem;
     var sacd = recHT * 0.06;
     var ccsa = recHT * 0.012;
     var agessaSacd = sacd * 0.011;
+    var assrcTaux = parseFloat(document.getElementById('pilote-assrc-taux')?.value) || 0;
+    var assrc = recHT * assrcTaux / 100;
+    var organicTaux = parseFloat(document.getElementById('pilote-organic-taux')?.value) || 0;
+    var organic = recHT * organicTaux / 100;
+
+    var totalSacem = sacem + agessaSacem;
     var totalSacd = sacd + ccsa + agessaSacd;
-    var tSacem = totalSacem;
-    var tSacd = totalSacd;
+    var totalCNM = parafiscale;
+    var totalHorsCNM = totalSacem + totalSacd;
+    var tvaDroits = recHT * 0.021;
+    var totalDroits = tvaDroits + totalSacem + parafiscale + totalSacd + assrc + organic;
 
     setEl('bilan-sacem', sacem > 0 ? fmt(sacem) : '');
     setEl('bilan-sacem-agessa', agessaSacem > 0 ? fmt(agessaSacem) : '');
@@ -7832,7 +7836,7 @@ function _hideTeamSelection() {
     setEl('bilan-ccsa', ccsa > 0 ? fmt(ccsa) : '');
     setEl('bilan-sacd-agessa', agessaSacd > 0 ? fmt(agessaSacd) : '');
     setEl('bilan-total-sacd', totalSacd > 0 ? fmt(totalSacd) : '');
-    setEl('bilan-total-droits', fmt(tSacem + tSacd));
+    setEl('bilan-total-droits', fmt(totalDroits));
 
     // Droit au tirage = parafiscale * 0.6
     var droitTirage = parafiscale * 0.6;
@@ -7905,11 +7909,11 @@ function _hideTeamSelection() {
         setEl('bilan-total-frais', totalFrais > 0 ? fmt(totalFrais) : '');
         setEl('bilan-total-frais-pct', pct(totalFrais, recHT));
 
-        // PRÉ-RÉSULTAT = RecHCNM - Total Droits - Total Frais
-        var totalDroits = tSacem + tSacd;
-        var preResultat = recHCNM - totalDroits - totalFrais;
+        // PRÉ-RÉSULTAT = RecHCNM - Total Droits (hors CNM) - Total Frais
+        var droitsHorsCNM = totalSacem + totalSacd;
+        var preResultat = recHCNM - droitsHorsCNM - totalFrais;
         setEl('bilan-pre-hcnm',    fmt(recHCNM));
-        setEl('bilan-pre-droits',  fmt(totalDroits));
+        setEl('bilan-pre-droits',  fmt(droitsHorsCNM));
         setEl('bilan-pre-frais',   fmt(totalFrais));
         setEl('bilan-pre-resultat', fmt(preResultat));
         var elPre = document.getElementById('bilan-pre-resultat');
