@@ -1823,7 +1823,7 @@ function _hideTeamSelection() {
 <!-- APPLICATION PRINCIPALE -->
 <div id="app-screen">
 <!-- SIDEBAR -->
-<nav class="sidebar">
+<nav class="sidebar" id="main-sidebar">
   <div class="logo-area">
     <img src="assets/LOGO OMP OHS.png" alt="OH MY PROD" />
     
@@ -9757,6 +9757,12 @@ function _hideTeamSelection() {
   function applyRoleUI() {
     var role = _currentUserRole;
     var team = window._selectedTeam || 'prod';
+
+    // Masquer la sidebar pour tous les non-admins
+    var sidebar = document.getElementById('main-sidebar');
+    if (sidebar) {
+      sidebar.style.display = (role === 'admin') ? '' : 'none';
+    }
 
     // Redirection selon team choisie
     if (team === 'technique' || role === 'technique') {
