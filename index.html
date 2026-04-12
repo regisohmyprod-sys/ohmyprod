@@ -317,6 +317,11 @@
     min-height: 100vh;
   }
 
+  /* Quand sidebar masquée (non-admins) */
+  .sidebar-hidden .main {
+    margin-left: 0;
+  }
+
   /* TOPBAR */
   .topbar {
     background: var(--dark);
@@ -2006,15 +2011,6 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" style="color:var(--yellow)">250 000</div></div>
           </div>
         </div>
-            <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" style="color:var(--red)">1</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" style="font-size:16px;">23 MAI</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" style="font-size:16px;">MAI 2026</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" style="font-size:16px;">MAI 2026</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" style="color:var(--green)">0</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" style="color:var(--yellow)">5 000</div></div>
-          </div>
-        </div>
-
       </div>
 
     </div>
@@ -9729,8 +9725,15 @@ function _hideTeamSelection() {
 
     // Masquer la sidebar pour tous les non-admins
     var sidebar = document.getElementById('main-sidebar');
+    var appScreen = document.getElementById('app-screen');
     if (sidebar) {
-      sidebar.style.display = (role === 'admin') ? '' : 'none';
+      if (role === 'admin') {
+        sidebar.style.display = '';
+        if (appScreen) appScreen.classList.remove('sidebar-hidden');
+      } else {
+        sidebar.style.display = 'none';
+        if (appScreen) appScreen.classList.add('sidebar-hidden');
+      }
     }
 
     // Redirection selon team choisie
