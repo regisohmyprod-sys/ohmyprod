@@ -3792,6 +3792,10 @@ function _hideTeamSelection() {
         </div>
 
       </div>
+
+      <!-- STATS TOURNÉES -->
+      <div id="artiste-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:28px;"></div>
+
     </div>
 
     
@@ -9779,8 +9783,62 @@ function _hideTeamSelection() {
       var navCrea = document.getElementById('nav-crea-suivi');
       if (navGestion) navGestion.style.display = 'none';
       if (navCrea) navCrea.style.display = 'none';
+      // Afficher les stats tournées dans l'espace artistique
+      renderArtisteStats();
     }
     // admin et staff_omp : page dashboard par défaut
+  }
+
+  function renderArtisteStats() {
+    const grid = document.getElementById('artiste-stats-grid');
+    if (!grid) return;
+
+    const tournees = _allTournees || [];
+    if (!tournees.length) {
+      grid.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;padding:20px;">Chargement des tournées...</div>';
+      // Réessayer après chargement
+      setTimeout(renderArtisteStats, 1500);
+      return;
+    }
+
+    const configs = [
+      { id: 'twoq',  emoji: '🎸', nom: 'THE WORLD OF QUEEN', sous: "L'hommage à la légende",  couleur: '#c9a84c', match: t => t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.toLowerCase().includes('hommage') },
+      { id: 'twoq2', emoji: '👑', nom: 'THE WORLD OF QUEEN', sous: "L'Éternelle Légende",     couleur: '#c9a84c', match: t => t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.toLowerCase().includes('ternelle') },
+      { id: 'greg',  emoji: '🎤', nom: 'GREG PETRAS',        sous: 'Dôme de Marseille',        couleur: '#c9a84c', match: t => t.nom_groupe === 'GREG PETRAS' },
+    ];
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const MOIS_COURT = ['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
+
+    grid.innerHTML = configs.map(cfg => {
+      const t = tournees.find(cfg.match);
+      if (!t) return '';
+      const dates = t.dates_concert || [];
+      const effectuees = dates.filter(d => new Date(d.date_concert) < today).length;
+      const restantes  = dates.filter(d => new Date(d.date_concert) >= today).length;
+      const prochaine  = dates.filter(d => new Date(d.date_concert) >= today).sort((a,b) => new Date(a.date_concert)-new Date(b.date_concert))[0];
+      const prochaineStr = prochaine ? (() => { const d = new Date(prochaine.date_concert); return `${d.getDate()} ${MOIS_COURT[d.getMonth()]} – ${prochaine.ville}`; })() : '–';
+      const debutStr = t.date_debut ? (() => { const d = new Date(t.date_debut); return `${MOIS_COURT[d.getMonth()]} ${d.getFullYear()}`; })() : '–';
+      const finStr   = t.date_fin   ? (() => { const d = new Date(t.date_fin);   return `${MOIS_COURT[d.getMonth()]} ${d.getFullYear()}`; })() : '–';
+      const specJour = dates.filter(d => new Date(d.date_concert) < today).reduce((s,d) => s+(d.jauge_occupee||d.pointage_ventes||0), 0);
+      const specPrev = dates.reduce((s,d) => s+(d.jauge_max||0), 0);
+      const fmt = n => n ? n.toLocaleString('fr-FR') : '0';
+
+      return `<div class="db-col-card">
+        <div class="db-col-header" style="border-bottom:3px solid ${cfg.couleur};background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">
+          ${cfg.emoji} ${cfg.nom}<br><span style="font-size:13px;font-weight:400;opacity:.7;color:${cfg.couleur};">${cfg.sous}</span>
+        </div>
+        <div class="db-col-stats">
+          <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value">${effectuees}</div></div>
+          <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" style="color:var(--red)">${restantes}</div></div>
+          <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" style="font-size:15px;">${prochaineStr}</div></div>
+          <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" style="font-size:15px;">${debutStr}</div></div>
+          <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" style="font-size:15px;">${finStr}</div></div>
+          <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" style="color:var(--green)">${fmt(specJour)}</div></div>
+          <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" style="color:var(--yellow)">${fmt(specPrev)}</div></div>
+        </div>
+      </div>`;
+    }).join('');
   }
 
   function applyAdminUI() {
