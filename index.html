@@ -2609,7 +2609,7 @@ function _hideTeamSelection() {
             <tr style="border-bottom:1px solid #2a2a2a;"><td colspan="2" style="padding:6px 16px;background:#c9a84c;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:#000;text-align:center;font-size:16px;" id="pilote-ville-titre">NIORT</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Salle</td><td id="pilote-salle" style="padding:7px 16px;color:#fff;font-weight:600;text-transform:uppercase;"></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Heure</td><td id="pilote-heure" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Jauge de départ</td><td id="pilote-jauge" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Jauge choisie</td><td id="pilote-jauge" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">État des ventes à ce jour</td><td id="pilote-ventes" style="padding:7px 16px;color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:900;"></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Invitations</td><td id="pilote-invitations" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
             <tr><td style="padding:7px 16px;color:#888;">Total jauge à ce jour</td><td id="pilote-total-jauge" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
@@ -7539,7 +7539,7 @@ function _hideTeamSelection() {
     set('pilote-ville-titre', ville.toUpperCase());
     set('pilote-salle', salle.toUpperCase());
     set('pilote-heure', (heure || '20:30').substring(0,5).replace(':','H'));
-    set('pilote-jauge', jauge);
+    set('pilote-jauge', document.getElementById('fp-jauge-finale').value || jauge);
     set('pilote-ventes', ventes);
     set('pilote-invitations', invits);
     set('pilote-total-jauge', totalJauge);
@@ -7562,7 +7562,8 @@ function _hideTeamSelection() {
     }
     set('pilote-date-jour', new Date().toLocaleDateString('fr-FR'));
     set('pilote-jours-restants', date ? Math.max(0, Math.ceil((new Date(date) - new Date()) / 86400000)) : '');
-    set('pilote-remplissage', jauge > 0 ? (Math.round(parseInt(totalJauge||0) / parseInt(jauge) * 10000) / 100).toFixed(2) + '%' : '');
+    const jaugeFinale = document.getElementById('fp-jauge-finale').value || jauge;
+    set('pilote-remplissage', jaugeFinale > 0 ? (Math.round(parseInt(totalJauge||0) / parseInt(jaugeFinale) * 10000) / 100).toFixed(2) + '%' : '');
 
     if (date) {
       const dt = new Date(date + 'T00:00:00');
