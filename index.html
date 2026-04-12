@@ -5843,12 +5843,29 @@ function _hideTeamSelection() {
       photoContainer.style.display = 'none';
     }
 
+    // Charger les infos depuis fiches_production si disponibles
+    var jaugeChoisie = date.jauge_choisie;
+    var jaugeMax = date.jauge_max;
+    var pointageVentes = date.pointage_ventes || 0;
+    var jaugeOccupee = date.jauge_occupee || 0;
+    
+    try {
+      var ficheRes = await _supabase.from('fiches_production').select('jauge_finale, jauge_depart, etat_ventes, total_jauge').eq('date_concert_id', date.id).single();
+      if (ficheRes.data) {
+        var f = ficheRes.data;
+        if (f.jauge_finale) jaugeChoisie = f.jauge_finale;
+        if (f.jauge_depart) jaugeMax = f.jauge_depart;
+        if (f.etat_ventes) pointageVentes = f.etat_ventes;
+        if (f.total_jauge) jaugeOccupee = f.total_jauge;
+      }
+    } catch(e) {}
+
     // Infos clés
-    const pct = date.jauge_max ? Math.round(((date.jauge_occupee||date.pointage_ventes)||0)/date.jauge_max*100) : 0;
-    document.getElementById('avhr-jauge-choisie').textContent = date.jauge_choisie?.toLocaleString('fr-FR')||'–';
-    document.getElementById('avhr-pointage').textContent = date.pointage_ventes?.toLocaleString('fr-FR')||'–';
-    document.getElementById('avhr-jauge-occ').textContent = date.jauge_occupee?.toLocaleString('fr-FR')||date.pointage_ventes?.toLocaleString('fr-FR')||'–';
-    document.getElementById('avhr-pct').textContent = date.jauge_max ? `${pct}%` : '–';
+    const pct = jaugeChoisie ? Math.round((jaugeOccupee||pointageVentes||0)/jaugeChoisie*100) : 0;
+    document.getElementById('avhr-jauge-choisie').textContent = jaugeChoisie?.toLocaleString('fr-FR')||'–';
+    document.getElementById('avhr-pointage').textContent = pointageVentes?.toLocaleString('fr-FR')||'0';
+    document.getElementById('avhr-jauge-occ').textContent = jaugeOccupee?.toLocaleString('fr-FR')||pointageVentes?.toLocaleString('fr-FR')||'0';
+    document.getElementById('avhr-pct').textContent = jaugeChoisie ? `${pct}%` : '–';
     document.getElementById('avhr-montage').textContent = fmt(date.heure_montage);
     document.getElementById('avhr-dejeuner').textContent = date.heure_dejeuner||'–';
     document.getElementById('avhr-balances').textContent = fmt(date.heure_balances);
@@ -8674,6 +8691,11 @@ function _hideTeamSelection() {
     _billModifie = true;
     billUpdateIndicateur(true);
     billUpdateInvitTotals();
+    // Auto-save billetterie après modification
+    clearTimeout(window._billAutoSaveTimer);
+    window._billAutoSaveTimer = setTimeout(function() {
+      billSauvegarder(true);
+    }, 1500);
   }
 
   function billUpdateInvitTotals() {
@@ -8685,6 +8707,12 @@ function _hideTeamSelection() {
     document.getElementById('bill-op-billets').textContent = total;
     const billets = parseInt(document.getElementById('bill-total-billets').textContent) || 0;
     document.getElementById('bill-total-jauge').textContent = billets + total;
+    // Synchroniser avec fp-invitations et fp-total-jauge
+    var fpInvitEl = document.getElementById('fp-invitations');
+    if (fpInvitEl) fpInvitEl.value = total;
+    var fpVentes = parseInt(document.getElementById('fp-etat-ventes')?.value) || 0;
+    var fpTotalEl = document.getElementById('fp-total-jauge');
+    if (fpTotalEl) fpTotalEl.value = fpVentes + total;
   }
 
   function billUpdateIndicateur(modifie) {
@@ -8982,7 +9010,7 @@ function _hideTeamSelection() {
     });
   }
 
-  function showDateDynamic(date, idx, tournee, tourneeId) {
+  async function showDateDynamic(date, idx, tournee, tourneeId) {
     _dateActiveIdx = idx;
     _dateActiveId = date.id;
     _fpDateId = date.id;
@@ -9007,12 +9035,29 @@ function _hideTeamSelection() {
 
     document.getElementById('dyn-date-back-btn').onclick = () => showTournee(tourneeId);
 
-    const pct = date.jauge_max ? Math.round(((date.jauge_occupee||date.pointage_ventes)||0)/date.jauge_max*100) : 0;
-    document.getElementById('dyn-jauge-choisie').textContent = date.jauge_choisie?.toLocaleString('fr-FR')||'–';
-    document.getElementById('dyn-jauge-max').textContent = date.jauge_max?.toLocaleString('fr-FR')||'–';
-    document.getElementById('dyn-pointage').textContent = date.pointage_ventes?.toLocaleString('fr-FR')||'–';
-    document.getElementById('dyn-jauge-occ').textContent = date.jauge_occupee?.toLocaleString('fr-FR') || date.pointage_ventes?.toLocaleString('fr-FR')||'–';
-    document.getElementById('dyn-pct').textContent = date.jauge_max ? `${pct}%` : '–';
+    // Charger les infos depuis fiches_production si disponibles
+    var jaugeChoisie = date.jauge_choisie;
+    var jaugeMax = date.jauge_max;
+    var pointageVentes = date.pointage_ventes || 0;
+    var jaugeOccupee = date.jauge_occupee || 0;
+    
+    try {
+      var ficheRes = await _supabase.from('fiches_production').select('jauge_finale, jauge_depart, etat_ventes, total_jauge').eq('date_concert_id', date.id).single();
+      if (ficheRes.data) {
+        var f = ficheRes.data;
+        if (f.jauge_finale) jaugeChoisie = f.jauge_finale;
+        if (f.jauge_depart) jaugeMax = f.jauge_depart;
+        if (f.etat_ventes) pointageVentes = f.etat_ventes;
+        if (f.total_jauge) jaugeOccupee = f.total_jauge;
+      }
+    } catch(e) {}
+
+    const pct = jaugeChoisie ? Math.round((jaugeOccupee||pointageVentes||0)/jaugeChoisie*100) : 0;
+    document.getElementById('dyn-jauge-choisie').textContent = jaugeChoisie?.toLocaleString('fr-FR')||'–';
+    document.getElementById('dyn-jauge-max').textContent = jaugeMax?.toLocaleString('fr-FR')||'–';
+    document.getElementById('dyn-pointage').textContent = pointageVentes?.toLocaleString('fr-FR')||'0';
+    document.getElementById('dyn-jauge-occ').textContent = jaugeOccupee?.toLocaleString('fr-FR') || pointageVentes?.toLocaleString('fr-FR')||'0';
+    document.getElementById('dyn-pct').textContent = jaugeChoisie ? `${pct}%` : '–';
 
     const fmt = h => h ? h.substring(0,5).replace(':','h') : '–';
     document.getElementById('dyn-montage').textContent = fmt(date.heure_montage);
