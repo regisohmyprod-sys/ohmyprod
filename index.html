@@ -1964,12 +1964,12 @@ function _hideTeamSelection() {
           <div class="stat-value" id="stat-tournees-actives" style="font-size:48px;color:#c9a84c;">2</div>
           <div class="stat-sub">TWOQ</div>
         </div>
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('crea-suivi-dates')">
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showGestionOMP()">
           <div class="stat-label">N° Dates en cours</div>
           <div class="stat-value" id="stat-dates-en-cours" style="font-size:48px;color:#fff;">–</div>
           <div class="stat-sub">jusqu'en 2028</div>
         </div>
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('membres-equipe')">
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;opacity:0.5;" title="Fonctionnalité en cours de développement">
           <div class="stat-label">Membres équipe</div>
           <div class="stat-value" id="stat-membres-equipe" style="font-size:48px;color:#fff;">–</div>
           <div class="stat-sub">artistes + technique + prod</div>
@@ -1994,7 +1994,6 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" id="db-twoq-debut" style="font-size:16px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq-fin" style="font-size:16px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq-specs-total" style="color:var(--green)">–</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" id="db-twoq-specs-prev" style="color:var(--yellow)">–</div></div>
           </div>
         </div>
 
@@ -2008,7 +2007,6 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" id="db-twoq2-debut" style="font-size:16px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq2-fin" style="font-size:16px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq2-specs-total" style="color:var(--green)">–</div></div>
-            <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" id="db-twoq2-specs-prev" style="color:var(--yellow)">–</div></div>
           </div>
         </div>
       </div>
@@ -3164,26 +3162,26 @@ function _hideTeamSelection() {
       <div class="page-title">TOURNÉES</div>
       <div class="tournees-grid">
         <div class="tournee-card" onclick="showTournee('twoq')">
-          <div class="tournee-poster" style="background:black; overflow:hidden; width:120px; height:60px; border-radius:8px;">
-            <img src="assets/LOGO OMP OHS.png" style="width:100%; height:100%; object-fit:contain; background:black;" />
+          <div class="tournee-poster" style="background:linear-gradient(135deg, #1a1a1a, #0f0f0f); overflow:hidden; width:120px; height:60px; border-radius:8px; border:1px solid #c9a84c;">
+            <div style="display:flex; align-items:center; justify-content:center; height:100%; font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:2px; color:#c9a84c;">🎸 TWOQ</div>
           </div>
           <div class="tournee-info">
-            <div class="tournee-name">ESPACE TOURNÉES</div>
-            <div style="font-size:13px; color:var(--grey-light); margin-bottom:3px;">L'hommage à la légende</div>
-            <div class="tournee-meta">fév. 2023 → mai 2026</div>
+            <div class="tournee-name" id="tournee-twoq-nom">THE WORLD OF QUEEN</div>
+            <div style="font-size:13px; color:var(--grey-light); margin-bottom:3px;" id="tournee-twoq-spectacle">L'hommage à la légende</div>
+            <div class="tournee-meta" id="tournee-twoq-meta">–</div>
           </div>
-          <div class="tournee-stats"><div class="dates-count">86</div><div class="dates-label">dates</div></div>
+          <div class="tournee-stats"><div class="dates-count" id="tournee-twoq-count">–</div><div class="dates-label">dates</div></div>
         </div>
         <div class="tournee-card" onclick="showTournee('twoq2')">
-          <div class="tournee-poster" style="background:black; overflow:hidden; width:120px; height:60px; border-radius:8px;">
-            <img src="assets/LOGO OMP OHS.png" style="width:100%; height:100%; object-fit:contain; background:black;" />
+          <div class="tournee-poster" style="background:linear-gradient(135deg, #1a1a1a, #0f0f0f); overflow:hidden; width:120px; height:60px; border-radius:8px; border:1px solid #c9a84c;">
+            <div style="display:flex; align-items:center; justify-content:center; height:100%; font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:2px; color:#c9a84c;">👑 TWOQ</div>
           </div>
           <div class="tournee-info">
-            <div class="tournee-name">ESPACE TOURNÉES</div>
-            <div style="font-size:13px; color:var(--grey-light); margin-bottom:3px;">L'Éternelle Légende – New Show</div>
-            <div class="tournee-meta">sept. 2026 → déc. 2028</div>
+            <div class="tournee-name" id="tournee-twoq2-nom">THE WORLD OF QUEEN</div>
+            <div style="font-size:13px; color:var(--grey-light); margin-bottom:3px;" id="tournee-twoq2-spectacle">L'Éternelle Légende – New Show</div>
+            <div class="tournee-meta" id="tournee-twoq2-meta">–</div>
           </div>
-          <div class="tournee-stats"><div class="dates-count">82</div><div class="dates-label">dates</div></div>
+          <div class="tournee-stats"><div class="dates-count" id="tournee-twoq2-count">–</div><div class="dates-label">dates</div></div>
         </div>
       </div>
     </div>
@@ -8825,6 +8823,12 @@ function _hideTeamSelection() {
           const statut = row.dataset.statut || 'avenir';
           row.style.display = statut === 'avenir' ? '' : 'none';
         });
+        
+        // Scroll automatique vers la première date à venir visible
+        const firstAvenir = scroll.querySelector('.date-row[data-statut="avenir"]');
+        if (firstAvenir) {
+          firstAvenir.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
     }, 50);
 
@@ -9968,20 +9972,26 @@ function _hideTeamSelection() {
   function renderTourneesGrid(tournees) {
     const grid = document.querySelector('.tournees-grid');
     if (!grid) return;
-    // Garder les cartes existantes statiques pour l'instant (logos)
-    // On met à jour juste les stats
-    tournees.forEach((t, i) => {
-      const cards = grid.querySelectorAll('.tournee-card');
-      if (cards[i]) {
-        const meta = cards[i].querySelector('.tournee-meta');
-        if (meta) {
-          const debut = t.date_debut ? new Date(t.date_debut).toLocaleDateString('fr-FR', {month:'short', year:'numeric'}) : '–';
-          const fin = t.date_fin ? new Date(t.date_fin).toLocaleDateString('fr-FR', {month:'short', year:'numeric'}) : '–';
-          meta.textContent = `${debut} → ${fin}`;
-        }
-        const count = cards[i].querySelector('.dates-count');
-        if (count && t.dates_concert) count.textContent = t.dates_concert.length;
+    
+    tournees.forEach(t => {
+      const id = t.nom_spectacle.includes('ternelle') ? 'twoq2' : 'twoq';
+      
+      // Mettre à jour nom, spectacle, meta et count via les IDs
+      const elNom = document.getElementById(`tournee-${id}-nom`);
+      const elSpectacle = document.getElementById(`tournee-${id}-spectacle`);
+      const elMeta = document.getElementById(`tournee-${id}-meta`);
+      const elCount = document.getElementById(`tournee-${id}-count`);
+      
+      if (elNom) elNom.textContent = t.nom_groupe || 'THE WORLD OF QUEEN';
+      if (elSpectacle) elSpectacle.textContent = t.nom_spectacle || '–';
+      
+      if (elMeta && t.date_debut && t.date_fin) {
+        const debut = new Date(t.date_debut).toLocaleDateString('fr-FR', {month:'short', year:'numeric'});
+        const fin = new Date(t.date_fin).toLocaleDateString('fr-FR', {month:'short', year:'numeric'});
+        elMeta.textContent = `${debut} → ${fin}`;
       }
+      
+      if (elCount && t.dates_concert) elCount.textContent = t.dates_concert.length;
     });
   }
 
@@ -10012,7 +10022,6 @@ function _hideTeamSelection() {
       const elDebut = document.getElementById(`db-${id}-debut`);
       const elFin = document.getElementById(`db-${id}-fin`);
       const elSpecsTotal = document.getElementById(`db-${id}-specs-total`);
-      const elSpecsPrev = document.getElementById(`db-${id}-specs-prev`);
 
       if (elEffectuees) elEffectuees.textContent = passees.length;
       if (elRestantes) elRestantes.textContent = avenir.length;
@@ -10020,7 +10029,6 @@ function _hideTeamSelection() {
       if (elDebut) elDebut.textContent = debut;
       if (elFin) elFin.textContent = fin;
       if (elSpecsTotal) elSpecsTotal.textContent = t.nb_spectateurs_total?.toLocaleString('fr-FR') || '0';
-      if (elSpecsPrev) elSpecsPrev.textContent = t.nb_spectateurs_prevision?.toLocaleString('fr-FR') || '0';
     });
   }
 
@@ -10111,12 +10119,8 @@ function _hideTeamSelection() {
 
       // Spectateurs
       const elSpecsTotal = document.getElementById(`db-${prefix}-specs-total`);
-      const elSpecsPrev = document.getElementById(`db-${prefix}-specs-prev`);
       if (elSpecsTotal && t.nb_spectateurs_total) {
         elSpecsTotal.textContent = t.nb_spectateurs_total.toLocaleString('fr-FR');
-      }
-      if (elSpecsPrev && t.nb_spectateurs_prevision) {
-        elSpecsPrev.textContent = t.nb_spectateurs_prevision.toLocaleString('fr-FR');
       }
     });
   }
