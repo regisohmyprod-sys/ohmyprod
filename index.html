@@ -7562,7 +7562,7 @@ function _hideTeamSelection() {
     }
     set('pilote-date-jour', new Date().toLocaleDateString('fr-FR'));
     set('pilote-jours-restants', date ? Math.max(0, Math.ceil((new Date(date) - new Date()) / 86400000)) : '');
-    set('pilote-remplissage', jauge > 0 ? (Math.round(parseInt(ventes||0) / parseInt(jauge) * 10000) / 100).toFixed(2) + '%' : '');
+    set('pilote-remplissage', jauge > 0 ? (Math.round(parseInt(totalJauge||0) / parseInt(jauge) * 10000) / 100).toFixed(2) + '%' : '');
 
     if (date) {
       const dt = new Date(date + 'T00:00:00');
