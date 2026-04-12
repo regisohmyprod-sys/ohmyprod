@@ -7230,8 +7230,14 @@ function _hideTeamSelection() {
         document.getElementById('cs-mini-debut').textContent = fmt(t.date_debut);
         document.getElementById('cs-mini-fin').textContent = fmt(t.date_fin);
         
-        // Calculer spectateurs à ce jour = somme des total_jauge de toutes les fiches de la tournée
-        var spec = 0;
+        // Bonus spectateurs pour les dates passées non renseignées (par tournée)
+        // TWOQ L'Hommage = 723c3fd9-94e7-4e58-9388-9ca808d82db5
+        var BONUS_SPECTATEURS = {
+          '723c3fd9-94e7-4e58-9388-9ca808d82db5': 139021  // TWOQ L'Hommage - dates passées
+        };
+        
+        // Calculer spectateurs à ce jour = somme des total_jauge de toutes les fiches de la tournée + bonus
+        var spec = BONUS_SPECTATEURS[tourneeId] || 0;
         try {
           // Récupérer les IDs des dates de cette tournée
           var datesRes = await _supabase.from('dates_concert').select('id').eq('tournee_id', tourneeId);
