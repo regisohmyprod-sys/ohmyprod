@@ -1587,6 +1587,20 @@ function closeSplash() {
       if (ts) {
         ts.style.display = 'flex';
         setTimeout(function() { ts.classList.add('ts-animate'); }, 30);
+        // Masquer TEAM PRODUCTION pour les non-admins
+        _supabase.auth.getSession().then(function(res) {
+          if (res.data.session) {
+            var userId = res.data.session.user.id;
+            _supabase.from('membres').select('role').eq('user_id', userId).single().then(function(r) {
+              if (r.data && r.data.role !== 'admin') {
+                var cardProd = document.getElementById('card-team-production');
+                var sepProd = document.getElementById('separator-team-production');
+                if (cardProd) cardProd.style.display = 'none';
+                if (sepProd) sepProd.style.display = 'none';
+              }
+            });
+          }
+        });
       }
     }, 800);
   }
@@ -1684,14 +1698,14 @@ function closeSplash() {
       <div style="display:flex; flex-direction:row; align-items:center; justify-content:center; gap:0; width:100%; max-width:1100px;">
 
         <!-- TEAM PRODUCTION -->
-        <div class="ts-card" onclick="goTeamProd()" style="width:200px;">
+        <div id="card-team-production" class="ts-card" onclick="goTeamProd()" style="width:200px;">
           <div class="ts-card-photo" style="background-image:url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAARCACWAMgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUCAwYBB//EADYQAAIBAwMCBAQFBAIDAQAAAAECAwAEERIhMQVBUWETInGBkTKhscHR8AYU4fEjQlJicoL/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAQIDBAX/xAAeEQEBAQEAAwEBAQAAAAAAAAAAARECITESQVFh8P/aAAwDAQACEQMRAD8A+f0UUV0IooooAoqV3ZR2bG4QMR0yBXQaHqTLuFqxX1oA1RUiY5JX4EV1sNNuL5ys3hBD5Kd6AOdFdJdPuUgeYxExp1INco0LROUkUqw7EUANooooAooooAooooAooooBOPYdutMV61jYXHiS3trO2gC5W8u/DEh9z2H1qWjWb3tysFtE0shGdq96j4ySQPCCcZb0oA9loHxJj0q40WK6025sLB5hHCLhcGXnkKoGf8APejDW/h5Y61pUE2k3F3ayiEySG3KgPkj5gxPT6Ck3XtDm0ae3W4nWWO4Rwgxg4IOCf8AwKi6Fp0+q6nb2VspMs0gRfqef2FAsWXxcurOOeHW9BivLaVy5g8UrFCx6gEDIFSXHxy1CSRG07SpI1HLNNIzMfoBj9a9OtdDs7DT44LK0jt7dF2hI1CiqjX/AIR6bqGLjTnksp3OC0Y+U+voQKAPC179o8k5AtNLCRjjeZNx+uP6VlPa+Odxqkf9nW8cdwrgB5wHOB3GGwPvWesPhtq1wzfa3jtkzz+bJPsPT71pW3w30i2VV8Gd+5Z3Iz6nJ/rQB5bd2d3A5e7t5Y3bksyEE/WmFjqF1p1wJrO4eGQdGU4/+1eh3/w5tbhWNvqQhYjgy2u7HuQSP614+/sZ7G7ktbpCkqHBB9+4oA9z+FXxVk1CJdI1eUC7TiCdj/eHofUfyrpfiV8NFh/43SowIifmkCjmM92+ncelemfDHSrXRtBtktXM0ky+JJMS5yx6AnoAOBRD42NkSaRdwDEtvcLJkdQCMH98UAYJGR6jiikjcSRq46MARSUAFFFFABRRRQAUUUUAFFFOWXTbq7hkmt7dpI4hukIOAooA0NQe6bQ9PWHxza+IwbbvXPft0rPVp2mn3U0oYSTSSSFgMZLE5wKzQMHBFABRRRQAUUUUAFFFFABRRRQAlFFdKAOlFFFABRRRQBbRxIpyuOavaa0fDIJGKfRqfT5Y1wjHcPrVOOUq6nPTpXT5FoA1NtSuAhWQB0HQk9Kqr65l8VkY5IBxUOe+Rt3tXB1IlVSp6UAWsWqSxKyOCr91FQINQuuqTSKf96qvW4HHpRoA1f7TuV6SvU/7Tv9bVQ0akKGZSrY5wc0mDimFb1oAki1e7hUhZWAxyM80sPxFvIl2kbh6kVXjHrSVmzSbwm8hzjBxj71Bqk6avNIgbJKnkjpjNKIpIpXSRGR1OGVhgiu1AHR7eaMYkRkOOjCo2oopWihjViEGcdyakl0m+hjEkkJCHoTiooARxzQTcGJpEJGCVbFXtIRFvvDkXcjg9e9VJLaeCNXkiZVYkAnuRVzRJ4Ypbh5RhfDweev/ADoA6xQ/aIvvKqTUHiCONYkQYVVAA9BVgCK9t0KSq0TDBB61yPTre7tLi3nBMMoyQDjB7EfX+tAFTRXS8gdHG5TwR0rpQAUUUUAFFFFABRRRQAUUUUAFFFWrHTbq8jeSCFnjjXdI+MKo9SaALu5gNMfYNx69q59s4yBgV0jhEY7ZC2DgHGM1Pq9ol1DIkSLG6jKldvI9f2oA5EEHBqrqkPiWxXn5o23D1HUVqC2imH2iPDgdR0Nd7CJrjUoEYBlMgBBGQRQBjKAGFdKsBSRQBWooooAKKKKACiiigAooooAKKKKAP/9k=');"></div>
           <div class="ts-card-icon">💻</div>
           <div class="ts-card-title">Team Production</div>
           <div class="ts-card-names">Régis & Alexandrine</div>
         </div>
 
-        <div style="width:30px; height:2px; background:linear-gradient(to right, rgba(201,168,76,0.4), #c9a84c, rgba(201,168,76,0.4)); flex-shrink:0;"></div>
+        <div id="separator-team-production" style="width:30px; height:2px; background:linear-gradient(to right, rgba(201,168,76,0.4), #c9a84c, rgba(201,168,76,0.4)); flex-shrink:0;"></div>
 
         <!-- STAFF OMP -->
         <div class="ts-card" onclick="goTeamStaff()" style="width:200px;">
