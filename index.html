@@ -7223,13 +7223,30 @@ function _hideTeamSelection() {
       document.getElementById('cs-mini-restantes').textContent = restantes;
       document.getElementById('cs-mini-prochaine').textContent = prochaineStr;
       // Infos tournée depuis Supabase
-      _supabase.from('tournees').select('date_debut,date_fin,nb_spectateurs_total,nb_spectateurs_prevision').eq('id', tourneeId).single().then(function(rt) {
+      _supabase.from('tournees').select('date_debut,date_fin,nb_spectateurs_prevision').eq('id', tourneeId).single().then(async function(rt) {
         if (!rt.data) return;
         var t = rt.data;
         var fmt = function(d){ return d ? new Date(d).toLocaleDateString('fr-FR',{month:'short',year:'numeric'}).toUpperCase() : '–'; };
         document.getElementById('cs-mini-debut').textContent = fmt(t.date_debut);
         document.getElementById('cs-mini-fin').textContent = fmt(t.date_fin);
-        var spec = t.nb_spectateurs_total || 0;
+        
+        // Calculer spectateurs à ce jour = somme des total_jauge de toutes les fiches de la tournée
+        var spec = 0;
+        try {
+          // Récupérer les IDs des dates de cette tournée
+          var datesRes = await _supabase.from('dates_concert').select('id').eq('tournee_id', tourneeId);
+          if (datesRes.data && datesRes.data.length > 0) {
+            var dateIds = datesRes.data.map(function(d) { return d.id; });
+            // Récupérer les fiches de production de ces dates
+            var fichesRes = await _supabase.from('fiches_production').select('total_jauge').in('date_concert_id', dateIds);
+            if (fichesRes.data) {
+              fichesRes.data.forEach(function(f) {
+                spec += parseInt(f.total_jauge) || 0;
+              });
+            }
+          }
+        } catch(e) { console.log('Erreur calcul spectateurs:', e); }
+        
         var prev = t.nb_spectateurs_prevision || 0;
         document.getElementById('cs-mini-spec').textContent = spec.toLocaleString('fr-FR');
         document.getElementById('cs-mini-prevision').textContent = prev.toLocaleString('fr-FR');
