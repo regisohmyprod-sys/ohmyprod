@@ -1848,7 +1848,6 @@ function _hideTeamSelection() {
     <div class="nav-label" style="margin-top:4px;">Tournées actives</div>
     <div class="tournee-item active" onclick="showTournee('twoq')">🎸 TWOQ – L'hommage</div>
     <div class="tournee-item" onclick="showTournee('twoq2')">🎸 TWOQ – Éternelle Légende</div>
-    <div class="tournee-item" onclick="showTournee('greg')">🎤 Greg Petras</div>
 
     <div class="nav-label" style="margin-top:12px;">Compte</div>
     <a class="nav-item" onclick="showPage('equipe')">
@@ -1958,7 +1957,7 @@ function _hideTeamSelection() {
         <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;">
           <div class="stat-label">Tournées actives</div>
           <div class="stat-value" style="font-size:48px;color:#c9a84c;">3</div>
-          <div class="stat-sub">TWOQ + Greg Petras</div>
+          <div class="stat-sub">TWOQ</div>
         </div>
         <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;">
           <div class="stat-label">N° Dates en cours</div>
@@ -2007,12 +2006,6 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs en prévision</div><div class="db-tournee-value" style="color:var(--yellow)">250 000</div></div>
           </div>
         </div>
-
-        <!-- GREG PETRAS -->
-        <div class="db-col-card">
-          <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">🎤 GREG PETRAS<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">Dôme de Marseille</span></div>
-          <div class="db-col-stats">
-            <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value">0</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Dates restantes</div><div class="db-tournee-value" style="color:var(--red)">1</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Prochaine date</div><div class="db-tournee-value" style="font-size:16px;">23 MAI</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Début tournée</div><div class="db-tournee-value" style="font-size:16px;">MAI 2026</div></div>
@@ -2041,10 +2034,7 @@ function _hideTeamSelection() {
         <div id="cs-filter-twoq2" onclick="csSetFilter('twoq2')" style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:10px 16px;cursor:pointer;box-shadow:0 2px 12px rgba(170,180,190,0.2);min-width:140px;">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#3b82f6;margin-bottom:2px;">🎸 TWOQ</div>
           <div style="font-size:11px;color:#888;">Éternelle Légende</div>
-        </div>
-        <div id="cs-filter-greg" onclick="csSetFilter('greg')" style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:10px 16px;cursor:pointer;box-shadow:0 2px 12px rgba(170,180,190,0.2);min-width:140px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#22c55e;margin-bottom:2px;">🎤 GREG PETRAS</div>
-          <div style="font-size:11px;color:#888;">One Man Show</div>
+        </div> <div style="font-size:11px;color:#888;">One Man Show</div>
         </div>
       </div>
 
@@ -3198,17 +3188,6 @@ function _hideTeamSelection() {
             <div class="tournee-meta">sept. 2026 → déc. 2028</div>
           </div>
           <div class="tournee-stats"><div class="dates-count">82</div><div class="dates-label">dates</div></div>
-        </div>
-        <div class="tournee-card" onclick="showTournee('greg')">
-          <div class="tournee-poster" style="background:#000; overflow:hidden; border-radius:8px;">
-            <img src="assets/omp-img-poster-greg.jpg" style="width:100%; height:100%; object-fit:cover; object-position:center center;" />
-          </div>
-          <div class="tournee-info">
-            <div class="tournee-name">GREG PETRAS</div>
-            <div style="font-size:13px; color:var(--grey-light); margin-bottom:3px;">Dôme de Marseille</div>
-            <div class="tournee-meta">mai 2026</div>
-          </div>
-          <div class="tournee-stats"><div class="dates-count">1</div><div class="dates-label">date</div></div>
         </div>
       </div>
     </div>
@@ -5776,7 +5755,7 @@ function _hideTeamSelection() {
     closeModal('modal-artiste-vhr-tournee');
     _avhrTourneeId = tourneeId;
 
-    const noms = { twoq:"🎸 TWOQ – L'Hommage", twoq2:'🎸 TWOQ – Éternelle Légende', greg:'🎤 Greg Petras' };
+    const noms = { twoq:"🎸 TWOQ – L'Hommage", twoq2:'🎸 TWOQ – Éternelle Légende' };
     document.getElementById('avhr-titre').textContent = '🚌 VOS VHR — ' + (noms[tourneeId]||'').toUpperCase();
 
     showPage('artiste-vhr');
@@ -5784,7 +5763,7 @@ function _hideTeamSelection() {
     const tournee = _allTournees?.find(t => {
       if (tourneeId === 'twoq')  return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage');
       if (tourneeId === 'twoq2') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle');
-      if (tourneeId === 'greg')  return t.nom_groupe === 'GREG PETRAS';
+      
       return false;
     });
 
@@ -6007,7 +5986,6 @@ function _hideTeamSelection() {
   const TOURNEE_NOMS_VHR = {
     twoq: "🎸 TWOQ – L'Hommage",
     twoq2: '🎸 TWOQ – Éternelle Légende',
-    greg: '🎤 Greg Petras'
   };
 
   async function ouvrirFicheVHR(tourneeId) {
@@ -6023,7 +6001,7 @@ function _hideTeamSelection() {
     const tournee = _allTournees?.find(t => {
       if (tourneeId === 'twoq') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage');
       if (tourneeId === 'twoq2') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle');
-      if (tourneeId === 'greg') return t.nom_groupe === 'GREG PETRAS';
+      
       return false;
     });
 
@@ -6962,7 +6940,7 @@ function _hideTeamSelection() {
   const CS_BANDEAUX = {
     'twoq': 'assets/omp-img-banner-1.jpg',
     'twoq2': 'assets/omp-img-banner-2.jpg',
-    'greg': 'assets/omp-img-banner-3.jpg'
+    'greg': ''
   };
   let _csFilter = 'avenir';   // période : 'avenir' | 'all' | 'passees'
   let _csTournee = null;      // tournée : 'twoq' | 'twoq2' | 'greg' | null
@@ -6980,7 +6958,6 @@ function _hideTeamSelection() {
   const CS_TOURNEE_IDS = {
     twoq:  '11111111-1111-1111-1111-111111111111',
     twoq2: '22222222-2222-2222-2222-222222222222',
-    greg:  '33333333-3333-3333-3333-333333333333'
   };
 
 
@@ -6989,7 +6966,7 @@ function _hideTeamSelection() {
   }
 
   function csSetFilter(f) {
-    if (['twoq','twoq2','greg'].includes(f)) {
+    if (['twoq','twoq2'].includes(f)) {
       _csTournee = (_csTournee === f) ? null : f; // toggle
     } else {
       _csFilter = f;
@@ -6999,7 +6976,7 @@ function _hideTeamSelection() {
     const btnP = document.getElementById('cs-filter-' + _csFilter);
     if (btnP) btnP.classList.add('active');
     // Visuels boutons tournée
-    ['cs-filter-twoq','cs-filter-twoq2','cs-filter-greg'].forEach(id => {
+    ['cs-filter-twoq','cs-filter-twoq2'].forEach(id => {
       const b = document.getElementById(id);
       if (b) { b.style.border = '1px solid #aab4be'; b.style.boxShadow = '0 2px 12px rgba(170,180,190,0.2)'; }
     });
@@ -7231,8 +7208,8 @@ function _hideTeamSelection() {
       const prochaine = allTournee.filter(d => d.date_concert && new Date(d.date_concert.substring(0,10)+'T00:00:00') >= now2)
         .sort((a,b) => new Date(a.date_concert) - new Date(b.date_concert))[0];
       const prochaineStr = prochaine ? (new Date(prochaine.date_concert.substring(0,10)+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}).toUpperCase() + ' – ' + (prochaine.ville||'').toUpperCase()) : '–';
-      const NOMS = {'twoq':'THE WORLD OF QUEEN','twoq2':'THE WORLD OF QUEEN','greg':'GREG PETRAS'};
-      const SOUS = {'twoq':"L'hommage à la légende",'twoq2':"L'éternelle légende",'greg':'Dôme de Marseille'};
+      const NOMS = {'twoq':'THE WORLD OF QUEEN','twoq2':'THE WORLD OF QUEEN'};
+      const SOUS = {'twoq':"L'hommage à la légende",'twoq2':"L'éternelle légende"};
       document.getElementById('cs-mini-titre').textContent = NOMS[_csTournee] || '';
       document.getElementById('cs-mini-sous').textContent = SOUS[_csTournee] || '';
       document.getElementById('cs-mini-passees').textContent = passees;
@@ -7268,7 +7245,7 @@ function _hideTeamSelection() {
     const TOURNEE_NOMS = {
       '11111111-1111-1111-1111-111111111111': 'TWOQ L\'Hommage',
       '22222222-2222-2222-2222-222222222222': 'TWOQ Éternelle',
-      '33333333-3333-3333-3333-333333333333': 'Greg Petras'
+
     };
 
     container.innerHTML = filtered.map(d => {
@@ -8799,7 +8776,7 @@ function _hideTeamSelection() {
     const tournee = _allTournees?.find(t => {
       if (id === 'twoq') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage');
       if (id === 'twoq2') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle');
-      if (id === 'greg') return t.nom_groupe === 'GREG PETRAS';
+      
       return false;
     });
     if (!tournee) return;
@@ -9792,7 +9769,7 @@ function _hideTeamSelection() {
     const configs = [
       { id: 'twoq',  emoji: '🎸', nom: 'THE WORLD OF QUEEN', sous: "L'hommage à la légende",  couleur: '#c9a84c', match: t => t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.toLowerCase().includes('hommage') },
       { id: 'twoq2', emoji: '👑', nom: 'THE WORLD OF QUEEN', sous: "L'Éternelle Légende",     couleur: '#c9a84c', match: t => t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.toLowerCase().includes('ternelle') },
-      { id: 'greg',  emoji: '🎤', nom: 'GREG PETRAS',        sous: 'Dôme de Marseille',        couleur: '#c9a84c', match: t => t.nom_groupe === 'GREG PETRAS' },
+
     ];
 
     const today = new Date(); today.setHours(0,0,0,0);
@@ -10027,8 +10004,8 @@ function _hideTeamSelection() {
       const debut = t.date_debut ? new Date(t.date_debut).toLocaleDateString('fr-FR', {month:'short', year:'numeric'}).toUpperCase() : '–';
       const fin = t.date_fin ? new Date(t.date_fin).toLocaleDateString('fr-FR', {month:'short', year:'numeric'}).toUpperCase() : '–';
 
-      const id = t.nom_groupe === 'GREG PETRAS' ? 'greg' : (t.nom_spectacle.includes('Éternelle') ? 'twoq2' : 'twoq');
-      const icon = t.nom_groupe === 'GREG PETRAS' ? '🎤' : '🎸';
+      const id = t.nom_spectacle.includes('ternelle') ? 'twoq2' : 'twoq';
+      const icon = '🎸';
 
       // Mettre à jour la carte existante
       const existing = document.querySelector(`.db-tournee-card[onclick*="${id}"]`);
@@ -10975,7 +10952,6 @@ function _hideTeamSelection() {
           <select id="invite-tournee" multiple style="background:var(--black); border:1px solid var(--border); border-radius:8px; color:var(--white); padding:9px 12px; font-size:13px; font-family:'Inter',sans-serif; outline:none; width:100%; box-sizing:border-box; min-height:90px;">
             <option value="twoq">🎸 THE WORLD OF QUEEN – L'hommage à la légende</option>
             <option value="twoq2">👑 THE WORLD OF QUEEN – L'Éternelle Légende</option>
-            <option value="greg">🎤 GREG PETRAS – Dôme de Marseille</option>
           </select>
           <div style="font-size:11px; color:var(--grey); margin-top:4px;">Maintenez Ctrl pour sélectionner plusieurs tournées</div>
         </div>
@@ -11892,10 +11868,6 @@ function _hideTeamSelection() {
           <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#3b82f6;">🎸 TWOQ – ÉTERNELLE LÉGENDE</div>
           <div style="font-size:11px;color:#888;margin-top:3px;">The World of Queen · Nouveau spectacle</div>
         </button>
-        <button onclick="ouvrirFicheVHR('greg')" style="background:#1a1a1a;border:2px solid #22c55e;border-radius:10px;padding:16px 20px;cursor:pointer;text-align:left;transition:background 0.2s;" onmouseover="this.style.background='#1a2a1a'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#22c55e;">🎤 GREG PETRAS</div>
-          <div style="font-size:11px;color:#888;margin-top:3px;">One Man Show</div>
-        </button>
       </div>
     </div>
     <div class="modal-footer">
@@ -11921,10 +11893,6 @@ function _hideTeamSelection() {
         <button onclick="ouvrirArtisteVHR('twoq2')" style="background:#1a1a1a;border:2px solid #3b82f6;border-radius:10px;padding:16px 20px;cursor:pointer;text-align:left;" onmouseover="this.style.background='#1a1a2a'" onmouseout="this.style.background='#1a1a1a'">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#3b82f6;">🎸 TWOQ – ÉTERNELLE LÉGENDE</div>
           <div style="font-size:11px;color:#888;margin-top:3px;">The World of Queen · Nouveau spectacle</div>
-        </button>
-        <button onclick="ouvrirArtisteVHR('greg')" style="background:#1a1a1a;border:2px solid #22c55e;border-radius:10px;padding:16px 20px;cursor:pointer;text-align:left;" onmouseover="this.style.background='#1a2a1a'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#22c55e;">🎤 GREG PETRAS</div>
-          <div style="font-size:11px;color:#888;margin-top:3px;">One Man Show</div>
         </button>
       </div>
     </div>
