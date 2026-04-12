@@ -1896,40 +1896,111 @@ function _hideTeamSelection() {
         </div>
       </div>
 
-      <!-- BLOC GESTION OMP ADMIN -->
-      <div id="bloc-gestion-admin" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#c9a84c;margin-bottom:16px;">💻 GESTION OMP ADMIN</div>
-        <div style="display:grid;grid-template-columns:240px 1fr;gap:12px;">
-
-          <!-- BLOC 1 : ADMIN -->
-          <div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#c9a84c;margin-bottom:10px;border-bottom:1px solid #2a2a2a;padding-bottom:6px;">⚙️ ADMIN</div>
-            <div style="display:flex;flex-direction:column;gap:4px;">
-              <button onclick="openModal('modal-gestion-admin')" style="background:transparent;color:#fff;border:none;padding:5px 0;font-size:12px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#fff'">→ ⚙️ Gestion Admin Alex</button>
-              <button onclick="openModal('modal-gestion-regis')" style="background:transparent;color:#fff;border:none;padding:5px 0;font-size:12px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#fff'">→ ⚙️ Gestion Admin Régis</button>
-            </div>
+      <!-- BLOC ADMIN ALEXANDRINE -->
+      <div id="bloc-admin-alexandrine" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#c9a84c;margin-bottom:16px;">💻 ADMIN ALEXANDRINE</div>
+        
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+          <!-- 1. GESTION ADMIN -->
+          <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-gestion-admin')">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🔧 GESTION ADMIN</div>
+            <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Gestion administrative</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
           </div>
 
-          <!-- BLOC 2 : GESTION TOUR (divisé en 2 colonnes) -->
-          <div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;grid-column:span 1;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#c9a84c;margin-bottom:10px;border-bottom:1px solid #2a2a2a;padding-bottom:6px;">🎸 GESTION TOUR</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px;">
+          <!-- 2. ACCÈS FRAIS -->
+          <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="ouvrirAccesFrais()">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">💰 ACCÈS FRAIS</div>
+            <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Notes de frais & justificatifs</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
+          </div>
 
-              <!-- Gauche : existant -->
-              <div style="display:flex;flex-direction:column;gap:4px;border-right:1px solid #2a2a2a;padding-right:12px;">
-                <button onclick="showPage('gestion-omp')" style="background:transparent;color:#fff;border:none;padding:5px 0;font-size:12px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#fff'">→ 🎸 Gestion Dates Tournées</button>
-                <button onclick="openModal('modal-billetterie-reseaux')" style="background:transparent;color:#fff;border:none;padding:5px 0;font-size:12px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#fff'">→ 🎟️ Billetterie Réseaux</button>
-                <button onclick="openModal('modal-promo')" style="background:transparent;color:#fff;border:none;padding:5px 0;font-size:12px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#fff'">→ 📣 Promo</button>
-              </div>
+          <!-- 3. ACCÈS DATES TOUR -->
+          <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('gestion-omp')">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">📅 ACCÈS DATES TOUR</div>
+            <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Gestion dates tournées</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
+          </div>
 
-              <!-- Droite : nouveaux -->
-              <div style="display:flex;flex-direction:column;gap:4px;padding-left:4px;">
-                <button onclick="showPage('gestion-salles')" style="background:transparent;color:#fff;border:none;padding:5px 0;font-size:12px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#fff'">→ 🏟️ Gestion Salles</button>
-                <button onclick="openModal('modal-add-tournee')" style="background:transparent;color:#fff;border:none;padding:5px 0;font-size:12px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#fff'">→ ➕ Création Tournée</button>
-                <button onclick="alert('Gestion booking — à venir')" style="background:transparent;color:#fff;border:none;padding:5px 0;font-size:12px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;transition:color 0.2s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#fff'">→ 📋 Gestion Booking</button>
-              </div>
+          <!-- 4. ACCÈS FINANCIER -->
+          <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);opacity:0.5;" title="Fonctionnalité à venir">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">📊 ACCÈS FINANCIER</div>
+            <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Suivi financier</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ À VENIR</div>
+          </div>
+        </div>
+      </div>
 
+      <!-- BLOC GESTION TOUR RÉGIS -->
+      <div id="bloc-gestion-tour-regis" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#c9a84c;margin-bottom:16px;">🎸 GESTION TOUR RÉGIS</div>
+        
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+          
+          <!-- COLONNE GAUCHE -->
+          <div style="display:grid;grid-template-columns:1fr;gap:12px;">
+            
+            <!-- 1. GESTION ADMIN RÉGIS -->
+            <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-gestion-regis')">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🔧 GESTION ADMIN RÉGIS</div>
+              <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Gestion administrative</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
             </div>
+
+            <!-- 2. GESTION DATES TOURNÉES -->
+            <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('gestion-omp')">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">📅 GESTION DATES TOURNÉES</div>
+              <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Planning & suivi dates</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
+            </div>
+
+            <!-- 3. CRÉATION TOURNÉE -->
+            <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-add-tournee')">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">➕ CRÉATION TOURNÉE</div>
+              <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Nouvelle tournée</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
+            </div>
+
+            <!-- 4. GESTION BOOKING -->
+            <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);opacity:0.5;" title="Fonctionnalité à venir">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">📋 GESTION BOOKING</div>
+              <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Suivi réservations</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ À VENIR</div>
+            </div>
+
+            <!-- 5. GESTION SALLES -->
+            <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('gestion-salles')">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🏟️ GESTION SALLES</div>
+              <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Base de données salles</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
+            </div>
+
+          </div>
+
+          <!-- COLONNE DROITE -->
+          <div style="display:grid;grid-template-columns:1fr;gap:12px;">
+
+            <!-- 1. BILLETTERIE RÉSEAUX -->
+            <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-billetterie-reseaux')">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🎟️ BILLETTERIE RÉSEAUX</div>
+              <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Accès billetteries</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
+            </div>
+
+            <!-- 2. PROMO -->
+            <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-promo')">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">📣 PROMO</div>
+              <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Outils marketing</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
+            </div>
+
+            <!-- 3. RÉSEAUX SOCIAUX -->
+            <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-reseaux-sociaux')">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">📱 RÉSEAUX SOCIAUX</div>
+              <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Pages officielles</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LA FICHE</div>
+            </div>
+
           </div>
 
         </div>
@@ -9819,8 +9890,21 @@ function _hideTeamSelection() {
     const navGestion = document.getElementById('nav-gestion-omp');
     const navCrea = document.getElementById('nav-crea-suivi');
     if (navGestion) {
-      if (isAdmin) { navGestion.classList.add('admin-unlocked'); navGestion.style.pointerEvents = 'all'; var ba = document.getElementById('bloc-gestion-admin'); if(ba) ba.style.display='block'; }
-      else { navGestion.classList.remove('admin-unlocked'); var ba = document.getElementById('bloc-gestion-admin'); if(ba) ba.style.display='none'; }
+      if (isAdmin) { 
+        navGestion.classList.add('admin-unlocked'); 
+        navGestion.style.pointerEvents = 'all'; 
+        var ba = document.getElementById('bloc-admin-alexandrine'); 
+        if(ba) ba.style.display='block'; 
+        var bt = document.getElementById('bloc-gestion-tour-regis'); 
+        if(bt) bt.style.display='block'; 
+      }
+      else { 
+        navGestion.classList.remove('admin-unlocked'); 
+        var ba = document.getElementById('bloc-admin-alexandrine'); 
+        if(ba) ba.style.display='none'; 
+        var bt = document.getElementById('bloc-gestion-tour-regis'); 
+        if(bt) bt.style.display='none'; 
+      }
     }
     if (navCrea) {
       navCrea.style.opacity = isAdmin ? '1' : '0.35';
@@ -12413,15 +12497,9 @@ function _hideTeamSelection() {
     <div class="modal-body" style="padding:20px;">
       <div style="display:flex;flex-direction:column;gap:10px;">
 
-        <a href="https://www.theworldofqueen.com/" target="_blank" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;text-decoration:none;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
-          <span style="font-size:22px;">🌐</span>
-          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">SITE TWOQ OFFICIEL</div><div style="font-size:11px;color:#555;">theworldofqueen.com</div></div>
-          <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
-        </a>
-
-        <a href="https://www.ohmyprod.com/" target="_blank" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;text-decoration:none;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
-          <span style="font-size:22px;">🎬</span>
-          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">SITE OMP OFFICIEL</div><div style="font-size:11px;color:#555;">ohmyprod.com</div></div>
+        <a href="https://docs.google.com/spreadsheets/d/1caQzs7v3n73P6T5CAOWQfTypDAxWvlS9wKvmFjCNeJ0/edit#gid=0" target="_blank" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;text-decoration:none;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+          <span style="font-size:22px;">📋</span>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">CONTACT PROMO</div><div style="font-size:11px;color:#555;">Google Sheets</div></div>
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </a>
 
@@ -12431,28 +12509,48 @@ function _hideTeamSelection() {
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </a>
 
+        <a href="https://www.theworldofqueen.com/" target="_blank" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;text-decoration:none;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+          <span style="font-size:22px;">🌐</span>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">SITE TWOQ OFF</div><div style="font-size:11px;color:#555;">theworldofqueen.com</div></div>
+          <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
+        </a>
+
+        <a href="https://www.ohmyprod.com/" target="_blank" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;text-decoration:none;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+          <span style="font-size:22px;">🎬</span>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">SITE OMP OFF</div><div style="font-size:11px;color:#555;">ohmyprod.com</div></div>
+          <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
+        </a>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE RÉSEAUX SOCIAUX -->
+<div id="modal-reseaux-sociaux" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box" style="max-width:540px;">
+    <div class="modal-header">
+      <div class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:18px;">📱 RÉSEAUX SOCIAUX</div>
+      <button class="modal-close" onclick="closeModal('modal-reseaux-sociaux')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+
         <a href="https://www.facebook.com/theworldofqueen/?locale=fr_FR" target="_blank" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;text-decoration:none;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
           <span style="font-size:22px;">👍</span>
-          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">TWOQ FACEBOOK OFFICIEL</div><div style="font-size:11px;color:#555;">facebook.com/theworldofqueen</div></div>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">TWOQ FACEBOOK OFF</div><div style="font-size:11px;color:#555;">facebook.com/theworldofqueen</div></div>
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </a>
 
         <a href="https://www.instagram.com/theworldofqueenofficiel/" target="_blank" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;text-decoration:none;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
           <span style="font-size:22px;">📸</span>
-          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">TWOQ INSTAGRAM OFFICIEL</div><div style="font-size:11px;color:#555;">instagram.com/theworldofqueenofficiel</div></div>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">TWOQ INSTAGRAM OFF</div><div style="font-size:11px;color:#555;">instagram.com/theworldofqueenofficiel</div></div>
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </a>
 
         <a href="https://www.youtube.com/channel/UCwyb6LJpE6kDfI3Wx7wP4Xg" target="_blank" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;text-decoration:none;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
           <span style="font-size:22px;">▶️</span>
           <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">YOUTUBE OFFICIEL</div><div style="font-size:11px;color:#555;">youtube.com</div></div>
-          <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
-        </a>
-
-        <a href="https://docs.google.com/spreadsheets/d/1caQzs7v3n73P6T5CAOWQfTypDAxWvlS9wKvmFjCNeJ0/edit#gid=0" target="_blank" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;text-decoration:none;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
-          <span style="font-size:22px;">📋</span>
-          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">CONTACT PROMO</div><div style="font-size:11px;color:#555;">Google Sheets</div></div>
-          <span style=
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </a>
 
