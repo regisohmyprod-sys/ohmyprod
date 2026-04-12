@@ -8552,11 +8552,32 @@ function _hideTeamSelection() {
   async function billSauvegarder(silent = false) {
     if (!_fpDateId) return;
     const payload = JSON.stringify(_billData);
+    
+    // Calculer le total des invitations
+    var totalInvit = 0;
+    BILL_INVIT_TYPES.forEach(function(t) { totalInvit += (_billData['invit'] && _billData['invit'][t.key]) || 0; });
+    
+    // Mettre à jour fp-invitations et fp-total-jauge
+    var fpInvitEl = document.getElementById('fp-invitations');
+    if (fpInvitEl) fpInvitEl.value = totalInvit;
+    var fpVentes = parseInt(document.getElementById('fp-etat-ventes')?.value) || 0;
+    var fpTotalEl = document.getElementById('fp-total-jauge');
+    if (fpTotalEl) fpTotalEl.value = fpVentes + totalInvit;
+    
     const { data: existing } = await _supabase.from('fiches_production').select('id').eq('date_concert_id', _fpDateId).single();
     if (existing) {
-      await _supabase.from('fiches_production').update({ billetterie_data: payload }).eq('date_concert_id', _fpDateId);
+      await _supabase.from('fiches_production').update({ 
+        billetterie_data: payload,
+        invitations: totalInvit,
+        total_jauge: fpVentes + totalInvit
+      }).eq('date_concert_id', _fpDateId);
     } else {
-      await _supabase.from('fiches_production').insert({ date_concert_id: _fpDateId, billetterie_data: payload });
+      await _supabase.from('fiches_production').insert({ 
+        date_concert_id: _fpDateId, 
+        billetterie_data: payload,
+        invitations: totalInvit,
+        total_jauge: fpVentes + totalInvit
+      });
     }
     _billModifie = false;
     billUpdateIndicateur(false);
@@ -8785,13 +8806,17 @@ function _hideTeamSelection() {
       updated_at: new Date().toISOString()
     };
 
-    // Mettre à jour dates_concert (date + heure + ville + salle + statut)
+    // Mettre à jour dates_concert (date + heure + ville + salle + statut + infos clés)
     await _supabase.from('dates_concert').update({
       date_concert: document.getElementById('fp-date-concert').value || null,
       heure_show: heure || null,
       ville: document.getElementById('fp-ville').value || null,
       nom_salle: document.getElementById('fp-salle').value || null,
       statut: document.getElementById('fp-statut').value || null,
+      jauge_choisie: parseInt(document.getElementById('fp-jauge-finale').value) || null,
+      jauge_max: parseInt(document.getElementById('fp-jauge-depart').value) || null,
+      pointage_ventes: parseInt(document.getElementById('fp-etat-ventes').value) || 0,
+      jauge_occupee: parseInt(document.getElementById('fp-total-jauge').value) || 0,
     }).eq('id', _fpDateId);
 
     // Vérifier si fiche existe déjà
