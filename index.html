@@ -6963,8 +6963,8 @@ function _hideTeamSelection() {
   }
 
   const CS_TOURNEE_IDS = {
-    twoq:  '723c3fd9-94e7-4e58-9388-9ca808d82db5',
-    twoq2: '17a150ee-5a26-44a6-bfdb-8a52249fa974',
+    twoq:  '11111111-1111-1111-1111-111111111111',
+    twoq2: '22222222-2222-2222-2222-222222222222',
   };
 
 
@@ -7233,14 +7233,20 @@ function _hideTeamSelection() {
         // Bonus spectateurs pour les dates passées non renseignées (par tournée)
         // TWOQ L'Hommage = 723c3fd9-94e7-4e58-9388-9ca808d82db5
         var BONUS_SPECTATEURS = {
-          '723c3fd9-94e7-4e58-9388-9ca808d82db5': 139021  // TWOQ L'Hommage - dates passées
+          '11111111-1111-1111-1111-111111111111': 139021  // TWOQ L'Hommage - dates passées
         };
+        
+        console.log('=== CALCUL SPECTATEURS ===');
+        console.log('tourneeId:', tourneeId);
+        console.log('BONUS pour cette tournée:', BONUS_SPECTATEURS[tourneeId]);
         
         // Calculer spectateurs à ce jour = somme des total_jauge de toutes les fiches de la tournée + bonus
         var spec = BONUS_SPECTATEURS[tourneeId] || 0;
+        console.log('spec initial (avec bonus):', spec);
         try {
           // Récupérer les IDs des dates de cette tournée
           var datesRes = await _supabase.from('dates_concert').select('id').eq('tournee_id', tourneeId);
+          console.log('dates trouvées:', datesRes.data?.length);
           if (datesRes.data && datesRes.data.length > 0) {
             var dateIds = datesRes.data.map(function(d) { return d.id; });
             // Récupérer les fiches de production de ces dates
@@ -9968,7 +9974,7 @@ function _hideTeamSelection() {
 
     // Bonus spectateurs pour les dates passées non renseignées
     const BONUS_SPECTATEURS = {
-      '723c3fd9-94e7-4e58-9388-9ca808d82db5': 139021  // TWOQ L'Hommage
+      '11111111-1111-1111-1111-111111111111': 139021  // TWOQ L'Hommage
     };
 
     const configs = [
@@ -10221,7 +10227,7 @@ function _hideTeamSelection() {
   async function renderDashboardTournees(tournees) {
     // Bonus spectateurs pour les dates passées non renseignées (par tournée)
     const BONUS_SPECTATEURS = {
-      '723c3fd9-94e7-4e58-9388-9ca808d82db5': 139021  // TWOQ L'Hommage - dates passées
+      '11111111-1111-1111-1111-111111111111': 139021  // TWOQ L'Hommage - dates passées
     };
 
     // Cette fonction met à jour les cartes tournées du dashboard
@@ -10362,7 +10368,7 @@ function _hideTeamSelection() {
       const elSpecsTotal = document.getElementById(`db-${prefix}-specs-total`);
       if (elSpecsTotal) {
         const BONUS_SPECTATEURS = {
-          '723c3fd9-94e7-4e58-9388-9ca808d82db5': 139021  // TWOQ L'Hommage
+          '11111111-1111-1111-1111-111111111111': 139021  // TWOQ L'Hommage
         };
         let spec = BONUS_SPECTATEURS[t.id] || 0;
         const dateIds = dates.map(d => d.id);
