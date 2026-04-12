@@ -7296,9 +7296,13 @@ function _hideTeamSelection() {
   }
 
   async function fpOuvrir(dateConcertId, ville, dateStr) {
+    console.log('=== fpOuvrir START ===');
+    console.log('dateConcertId:', dateConcertId);
+    console.log('ville:', ville);
+    console.log('dateStr:', dateStr);
     try {
     _fpDateId = dateConcertId;
-    console.log('fpOuvrir appelé avec:', dateConcertId, ville, dateStr);
+    console.log('_fpDateId défini:', _fpDateId);
 
     // Réinitialiser tous les champs
     ['fp-ville','fp-salle','fp-heure','fp-horaire','fp-mg','fp-deal-promo','fp-etat-ventes','fp-invitations','fp-total-jauge','fp-jauge-depart','fp-jauge-finale','fp-dl-omp','fp-dl-prod-locale','fp-boost','fp-date-mev','fp-adresse-salle'].forEach(id => {
@@ -7308,12 +7312,15 @@ function _hideTeamSelection() {
     document.getElementById('fp-producteur').value = 'OH MY PROD';
     document.getElementById('fp-cout-plateau-mg').checked = false;
     document.getElementById('fp-ville').value = ville;
+    console.log('Champs réinitialisés');
 
     // Charger salles depuis Supabase
     csChargerSallesDatalist();
 
     // Charger la date depuis dates_concert pour pré-remplir date + heure
+    console.log('Chargement date_concert...');
     const { data: dc } = await _supabase.from('dates_concert').select('date_concert, heure_show, nom_salle, statut').eq('id', dateConcertId).single();
+    console.log('date_concert chargée:', dc);
     if (dc) {
       if (dc.date_concert) document.getElementById('fp-date-concert').value = dc.date_concert;
       if (dc.heure_show) {
@@ -7325,6 +7332,7 @@ function _hideTeamSelection() {
     }
 
     // Charger fiche existante
+    console.log('Chargement fiche_production...');
     const { data: fiche } = await _supabase.from('fiches_production').select('*').eq('date_concert_id', dateConcertId).single();
     if (fiche) {
       document.getElementById('fp-producteur').value = fiche.producteur || 'OH MY PROD';
@@ -7355,7 +7363,9 @@ function _hideTeamSelection() {
       if (fiche.statut_date) document.getElementById('fp-statut').value = fiche.statut_date;
     }
 
+    console.log('Affichage page fiche-prod...');
     showPage('fiche-prod');
+    console.log('=== fpOuvrir END ===');
     } catch(e) { console.error('Erreur fpOuvrir:', e); alert('Erreur: ' + e.message); }
   }
 
