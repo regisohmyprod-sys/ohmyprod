@@ -8506,15 +8506,10 @@ function _hideTeamSelection() {
       .sort((a,b) => new Date(a.date_concert)-new Date(b.date_concert));
     _datesActives = dates;
 
-    // Appliquer filtre À venir par défaut après rendu
+    // Appliquer filtre À venir par défaut après rendu + mettre à jour le bouton actif
     setTimeout(function() {
-      const scroll = document.getElementById('dyn-dates-scroll');
-      if (scroll) {
-        scroll.querySelectorAll('.date-row').forEach(row => {
-          const statut = row.dataset.statut || 'avenir';
-          row.style.display = statut === 'avenir' ? '' : 'none';
-        });
-      }
+      const avenirBtn = document.querySelector('#page-tournee-dynamic .filter-btn[onclick*="avenir"]');
+      if (avenirBtn) filterDates('avenir', avenirBtn);
     }, 50);
 
     const groupes = {};
