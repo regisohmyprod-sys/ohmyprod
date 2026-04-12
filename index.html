@@ -7753,17 +7753,12 @@ function _hideTeamSelection() {
     if (elNet) { elNet.textContent = fmt(net); elNet.style.color = net >= 0 ? '#c9a84c' : '#e31e24'; }
   }
 
-  function fpOuvrirBilanAMH() {
+  async function fpOuvrirBilanAMH() {
     var setEl = function(id, v) { var e = document.getElementById(id); if(e) e.textContent = v; };
-    var getEl = function(id) { var e = document.getElementById(id); return e ? (e.textContent || '').trim() : ''; };
-    var getNum = function(id) {
-      var t = getEl(id).replace(/[^0-9,]/g,'').replace(',','.');
-      return parseFloat(t) || 0;
-    };
     var fmt = function(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
     var pct = function(v, base){ return base > 0 ? (v/base*100).toFixed(2)+'%' : ''; };
 
-    // Infos ville/date
+    // Infos ville/date depuis les champs de la fiche
     var ville = document.getElementById('fp-ville')?.value || '';
     var date  = document.getElementById('fp-date-concert')?.value || '';
     var dateStr = date ? new Date(date+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}) : '';
@@ -7771,42 +7766,96 @@ function _hideTeamSelection() {
     setEl('bilan-date-label', dateStr);
     setEl('bilan-ville-date', ville + (dateStr ? ' · ' + dateStr : ''));
 
-    // Recettes depuis Pilote
-    setEl('bilan-rec-ttc',    getEl('pilote-rec-ttc'));
-    setEl('bilan-tva',        getEl('pilote-tva'));
-    setEl('bilan-rec-ht',     getEl('pilote-rec-ht'));
-    setEl('bilan-parafiscale',getEl('pilote-parafiscale'));
-    setEl('bilan-rec-hcnm',   getEl('pilote-rec-hcnm'));
-    setEl('bilan-invit',      getEl('pilote-invitations'));
-    setEl('bilan-nb-billets', getEl('pilote-ventes') + ' billets · ' + getEl('pilote-invitations') + ' invit');
+    if (!_fpDateId) { showPage('bilan-amh'); return; }
 
-    // Droits depuis Pilote
-    setEl('bilan-sacem',       getEl('pilote-sacem'));
-    setEl('bilan-sacem-agessa',getEl('pilote-agessa'));
-    setEl('bilan-total-sacem', getEl('pilote-total-sacem'));
-    setEl('bilan-sacd',        getEl('pilote-sacd'));
-    setEl('bilan-ccsa',        getEl('pilote-ccsa'));
-    setEl('bilan-sacd-agessa', getEl('pilote-agessa2'));
-    setEl('bilan-total-sacd',  getEl('pilote-total-sacd'));
-    // TOTAL DROITS = TOTAL SACEM + TOTAL SACD (recalculé)
-    var tSacem = parseFloat((getEl('pilote-total-sacem')||'0').replace(/[^0-9,]/g,'').replace(',','.')) || 0;
-    var tSacd  = parseFloat((getEl('pilote-total-sacd') ||'0').replace(/[^0-9,]/g,'').replace(',','.')) || 0;
+    // Charger billetterie_data et financier_data depuis Supabase
+    var recTotal = 0, gBillets = 0, invitations = 0;
+    try {
+      var bdRes = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
+      if (bdRes.data && bdRes.data.billetterie_data) {
+        var parsed = JSON.parse(bdRes.data.billetterie_data);
+        var ops = ['promo','tm','fnac','salle','weez'];
+        for (var oi=0; oi<ops.length; oi++) {
+          var opData = parsed[ops[oi]];
+          if (!opData) continue;
+          for (var ci=0; ci<opData.length; ci++) {
+            var catData = opData[ci];
+            if (!catData) continue;
+            for (var ri=0; ri<catData.length; ri++) {
+              var row = catData[ri];
+              if (!row) continue;
+              var b = parseFloat(row.billets) || 0;
+              var t = parseFloat(row.tarif) || 0;
+              gBillets += b;
+              recTotal += b * t;
+            }
+          }
+        }
+        // Invitations
+        if (parsed.invitations) {
+          parsed.invitations.forEach(function(inv) {
+            invitations += parseInt(inv.nombre) || 0;
+          });
+        }
+      }
+    } catch(e) { console.log('Bilan AMH billetterie erreur:', e); }
+
+    // Calculs recettes
+    var recHT = recTotal / 1.021;
+    var tva = recTotal - recHT;
+    var parafiscale = recHT * 0.035;
+    var recHCNM = recHT - parafiscale;
+
+    setEl('bilan-rec-ttc', recTotal > 0 ? fmt(recTotal) : '');
+    setEl('bilan-tva', tva > 0 ? fmt(tva) : '');
+    setEl('bilan-rec-ht', recHT > 0 ? fmt(recHT) : '');
+    setEl('bilan-parafiscale', parafiscale > 0 ? fmt(parafiscale) : '');
+    setEl('bilan-rec-hcnm', recHCNM > 0 ? fmt(recHCNM) : '');
+    setEl('bilan-invit', invitations > 0 ? invitations : '');
+    setEl('bilan-nb-billets', gBillets + ' billets · ' + invitations + ' invit');
+
+    // Calcul droits
+    var sacem = recHT * 0.0836;
+    var agessaSacem = sacem * 0.011;
+    var totalSacem = sacem + agessaSacem;
+    var sacd = recHT * 0.06;
+    var ccsa = recHT * 0.012;
+    var agessaSacd = sacd * 0.011;
+    var totalSacd = sacd + ccsa + agessaSacd;
+    var tSacem = totalSacem;
+    var tSacd = totalSacd;
+
+    setEl('bilan-sacem', sacem > 0 ? fmt(sacem) : '');
+    setEl('bilan-sacem-agessa', agessaSacem > 0 ? fmt(agessaSacem) : '');
+    setEl('bilan-total-sacem', totalSacem > 0 ? fmt(totalSacem) : '');
+    setEl('bilan-sacd', sacd > 0 ? fmt(sacd) : '');
+    setEl('bilan-ccsa', ccsa > 0 ? fmt(ccsa) : '');
+    setEl('bilan-sacd-agessa', agessaSacd > 0 ? fmt(agessaSacd) : '');
+    setEl('bilan-total-sacd', totalSacd > 0 ? fmt(totalSacd) : '');
     setEl('bilan-total-droits', fmt(tSacem + tSacd));
 
-    // DLT et droit au tirage
-    setEl('bilan-droit-tirage', getEl('pilote-droit-tirage'));
-    setEl('bilan-dlt-omp',      getEl('pilote-dl-total-ttc'));
+    // Droit au tirage = parafiscale * 0.6
+    var droitTirage = parafiscale * 0.6;
+    setEl('bilan-droit-tirage', droitTirage > 0 ? fmt(droitTirage) : '');
 
-    // Frais depuis financier_data Supabase
-    if (_fpDateId) {
-      _supabase.from('fiches_production').select('financier_data').eq('date_concert_id', _fpDateId).single().then(function(r) {
-        if (!r.data || !r.data.financier_data) return;
-        var fd = JSON.parse(r.data.financier_data);
+    // DL depuis fiche production
+    var dlHT = 0;
+    var dlOmpPct = parseFloat(document.getElementById('fp-dl-omp')?.value) || 0;
+    var dlPlPct = parseFloat(document.getElementById('fp-dl-prod-locale')?.value) || 0;
+    var dlTTC = gBillets * 2;
+    dlHT = dlTTC / 1.055;
+    var dlOMP = dlHT * (dlOmpPct / 100);
+    setEl('bilan-dlt-omp', dlOMP > 0 ? fmt(dlOMP) : '');
+
+    // Frais depuis financier_data
+    try {
+      var fr = await _supabase.from('fiches_production').select('financier_data').eq('date_concert_id', _fpDateId).single();
+      if (fr.data && fr.data.financier_data) {
+        var fd = JSON.parse(fr.data.financier_data);
         var g = function(k){ return parseFloat(fd[k])||0; };
-        var recHT = getNum('pilote-rec-ht');
         var totalFrais = 0;
 
-        // COÛT PLATEAU : Salaires + Technique(COULISSES+CONSO) sans Rigger
+        // COÛT PLATEAU : Salaires + Technique(COULISSES+CONSO)
         var salaires = g('fin-omp-sal-tournee')+g('fin-omp-sal-road')+g('fin-omp-sal-promo');
         var technique = g('fin-omp-tech-coulisses')+g('fin-omp-tech-conso');
         var coutPlateau = salaires + technique;
@@ -7816,15 +7865,14 @@ function _hideTeamSelection() {
         setEl('bilan-cout-plateau-pct-ca', pct(coutPlateau, recHT));
         totalFrais += coutPlateau;
 
-        // TECH EXTERNE : Rigger + Roads ext + Autres Technique + Contrôleur
+        // TECH EXTERNE
         var techExt = g('fin-omp-tech-figer')+g('fin-omp-tech-road')+g('fin-omp-tech-autres')+g('fin-omp-tech-controleur');
         setEl('bilan-tech-ext', techExt > 0 ? fmt(techExt) : '');
         setEl('bilan-tech-ext-pct-ca', pct(techExt, recHT));
         totalFrais += techExt;
 
-        // VHR : Voyages + Hotel + Traiteur + Catering
+        // VHR
         var voyages = g('fin-omp-voy-prod')+g('fin-omp-voy-artiste')+g('fin-omp-voy-tech')+g('fin-omp-voy-vhr');
-        // Hotel = somme des lignes hôtel depuis financier_data
         var hotel = g('fin-omp-hotel-prod')+g('fin-omp-hotel-tech')+g('fin-omp-hotel-art')+g('fin-omp-hotel-estim');
         var traiteur= g('fin-omp-trai-total')+g('fin-omp-trai-resto');
         var catering= g('fin-omp-trai-loge');
@@ -7843,13 +7891,12 @@ function _hideTeamSelection() {
         setEl('bilan-comm-pct-ca', pct(comm, recHT));
         totalFrais += comm;
 
-        // SALLE = total OMP salle (loc + prestations)
-        var salleLoc = g('fin-omp-loc-ht') || 0;
-        if (!salleLoc) salleLoc = g('fin-omp-loc-mg') || 0;
+        // SALLE
+        var salleLoc = Math.max(g('fin-omp-loc-ht'), g('fin-omp-loc-mg'));
         var sallePrest = g('fin-omp-prest-energie')+g('fin-omp-prest-chauf')+g('fin-omp-prest-config')+g('fin-omp-prest-fenwick')+g('fin-omp-prest-accroches')+g('fin-omp-prest-elec');
         var sallePers = g('fin-omp-pers-nettoyage')+g('fin-omp-pers-nett-supp')+g('fin-omp-pers-elec')+g('fin-omp-pers-hriger')+g('fin-omp-pers-regisseur')+g('fin-omp-pers-forfait')+g('fin-omp-pers-caissier')+g('fin-omp-pers-rigg')+g('fin-omp-pers-hotesses')+g('fin-omp-pers-controle')+g('fin-omp-pers-parking')+g('fin-omp-pers-secu')+g('fin-omp-pers-vigi')+g('fin-omp-pers-consigne')+g('fin-omp-pers-gardien');
         var salleSecu = g('fin-omp-secu-ssiap1')+g('fin-omp-secu-ssiap2')+g('fin-omp-secu-protciv')+g('fin-omp-secu-vigi2')+g('fin-omp-secu-medical')+g('fin-omp-secu-autres');
-        var salleMT = Math.max(salleLoc, 0) + sallePrest + sallePers + salleSecu;
+        var salleMT = salleLoc + sallePrest + sallePers + salleSecu;
         setEl('bilan-salle', salleMT > 0 ? fmt(salleMT) : '');
         setEl('bilan-salle-pct-ca', pct(salleMT, recHT));
         totalFrais += salleMT;
@@ -7858,11 +7905,8 @@ function _hideTeamSelection() {
         setEl('bilan-total-frais', totalFrais > 0 ? fmt(totalFrais) : '');
         setEl('bilan-total-frais-pct', pct(totalFrais, recHT));
 
-        // Récette HCNM
-        var recHCNM = getNum('pilote-rec-hcnm');
+        // PRÉ-RÉSULTAT = RecHCNM - Total Droits - Total Frais
         var totalDroits = tSacem + tSacd;
-
-        // PRÉ-RÉSULTAT = RecHT/HCNM - Total Droits - Total Frais
         var preResultat = recHCNM - totalDroits - totalFrais;
         setEl('bilan-pre-hcnm',    fmt(recHCNM));
         setEl('bilan-pre-droits',  fmt(totalDroits));
@@ -7871,23 +7915,21 @@ function _hideTeamSelection() {
         var elPre = document.getElementById('bilan-pre-resultat');
         if (elPre) elPre.style.color = preResultat >= 0 ? '#7eb8d4' : '#e31e24';
 
-        // RÉSULTAT FINAL OMP = Pré-résultat + DL HT OMP + CO PROD OMP + Droit Tirage
-        var dlHTOMP = getNum('pilote-dl-total-ht');
-        var droitTirage = getNum('pilote-droit-tirage');
-        var resultatFinal = preResultat + dlHTOMP + droitTirage;
+        // RÉSULTAT FINAL OMP = Pré-résultat + DL HT OMP + Droit Tirage
+        var resultatFinal = preResultat + dlOMP + droitTirage;
         setEl('bilan-rf-pre',         fmt(preResultat));
-        setEl('bilan-dlt-omp',        fmt(dlHTOMP));
+        setEl('bilan-dlt-omp',        fmt(dlOMP));
         setEl('bilan-droit-tirage',   fmt(droitTirage));
         setEl('bilan-resultat-final', fmt(resultatFinal));
         setEl('bilan-rn-final',       fmt(resultatFinal));
         var elFinal = document.getElementById('bilan-resultat-final');
         if (elFinal) elFinal.style.color = resultatFinal >= 0 ? '#22c55e' : '#e31e24';
 
-        // RÉSULTAT NET AVEC STRUCTURE (calcul via bilanCalcNet)
+        // RÉSULTAT NET AVEC STRUCTURE
         window._bilanResultatFinal = resultatFinal;
         bilanCalcNet();
-      });
-    }
+      }
+    } catch(e) { console.log('Bilan AMH financier erreur:', e); }
 
     showPage('bilan-amh');
   }
