@@ -7428,7 +7428,9 @@ function _hideTeamSelection() {
     var totalSacd   = sacd + ccsa + agessaSacd;
     var totalCNM    = parafiscale;
     var totalHorsCNM= totalSacem + totalSacd;
-    var totalDroits = totalSacem + parafiscale + totalSacd + assrc + organic;
+    // TVA = recette TTC - recette HT = rHT * 1.021 - rHT = rHT * 0.021
+    var tva = rHT * 0.021;
+    var totalDroits = tva + totalSacem + parafiscale + totalSacd + assrc + organic;
 
     set('pilote-total-sacem',   totalSacem);
     set('pilote-total-sacd',    totalSacd);
