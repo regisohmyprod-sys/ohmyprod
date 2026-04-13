@@ -4369,6 +4369,7 @@ function _hideTeamSelection() {
   }
 
   function addInvitation() {
+    console.log('addInvitation appelé, _fpDateId =', _fpDateId);
     const prenom = document.getElementById('invit-prenom').value.trim();
     const nom = document.getElementById('invit-nom').value.trim();
     const places = document.getElementById('invit-places').value;
@@ -4400,7 +4401,8 @@ function _hideTeamSelection() {
 
     // Sauvegarde Supabase
     const dateId = _fpDateId;
-    if (!dateId) { alert('Erreur : aucune date sélectionnée.'); return; }
+    console.log('dateId pour sauvegarde:', dateId);
+    if (!dateId) { alert('Erreur : aucune date sélectionnée. (_fpDateId = ' + _fpDateId + ')'); return; }
     const invitData = {
       date_concert_id: dateId,
       nom_liste: liste,
@@ -10204,13 +10206,13 @@ function _hideTeamSelection() {
 
   // Hard reload sans cache (équivalent Ctrl+Shift+R) - utilisé par le bouton 🔃
   function hardReload() {
-    if (window.location.href.indexOf('nocache=') > -1) {
-      window.location.href = window.location.href.replace(/nocache=\d+/, 'nocache=' + Date.now());
-    } else if (window.location.href.indexOf('?') > -1) {
-      window.location.href = window.location.href + '&nocache=' + Date.now();
-    } else {
-      window.location.href = window.location.href + '?nocache=' + Date.now();
-    }
+    // Utiliser cache: 'reload' via fetch pour invalider le cache, puis recharger
+    // Ne pas modifier l'URL pour éviter de casser l'auth Supabase
+    caches.keys().then(names => {
+      names.forEach(name => caches.delete(name));
+    }).finally(() => {
+      window.location.reload(true);
+    });
   }
 
   async function chargerTournees() {
