@@ -1219,11 +1219,11 @@
     
     /* DATES - Titre ville et date réduits */
     .city-title {
-      font-size: 28px !important;
-      letter-spacing: 2px !important;
+      font-size: 22px !important;
+      letter-spacing: 1px !important;
     }
     .city-date {
-      font-size: 12px !important;
+      font-size: 11px !important;
     }
     .city-meta {
       gap: 6px !important;
@@ -1239,6 +1239,63 @@
       width: 24px !important;
       height: 24px !important;
       font-size: 12px !important;
+    }
+    
+    /* BOUTON NOTIFIER L'ÉQUIPE - Réduit */
+    button[onclick="openModal('modal-notifier')"] {
+      padding: 5px 10px !important;
+      font-size: 10px !important;
+      letter-spacing: 0.5px !important;
+    }
+    
+    /* SELECT TYPE DE FRAIS - Menu déroulant réduit */
+    #frais-type {
+      font-size: 11px !important;
+      padding: 7px 10px !important;
+    }
+    #frais-type option {
+      font-size: 11px !important;
+      padding: 4px !important;
+    }
+    
+    /* MODAL ADD FRAIS - Compact sur mobile */
+    #modal-add-frais .modal-content {
+      padding: 16px !important;
+    }
+    #modal-add-frais input,
+    #modal-add-frais select,
+    #modal-add-frais textarea {
+      font-size: 11px !important;
+      padding: 7px 10px !important;
+    }
+    #modal-add-frais label {
+      font-size: 10px !important;
+    }
+    
+    /* LISTE INVITATIONS - Compact */
+    #bill-invit-liste-container {
+      font-size: 10px !important;
+    }
+    #bill-invit-liste-container table {
+      font-size: 10px !important;
+    }
+    #bill-invit-liste-container th,
+    #bill-invit-liste-container td {
+      padding: 5px !important;
+      font-size: 9px !important;
+    }
+    
+    /* BOUTON AJOUTER NOTE DE FRAIS - Réduit */
+    .btn-ajouter-note {
+      padding: 6px 12px !important;
+      font-size: 10px !important;
+      letter-spacing: 0.5px !important;
+    }
+    
+    /* TITRE NOTES DE FRAIS - Réduit */
+    #page-acces-frais > div:nth-of-type(2) > div:first-child > div:first-child {
+      font-size: 24px !important;
+      letter-spacing: 2px !important;
     }
     
     /* INFOS CLÉS DU JOUR - Centré et complet */
@@ -4114,7 +4171,7 @@ function _hideTeamSelection() {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">💰 NOTES DE FRAIS</div>
       <div id="frais-user-label" style="font-size:12px;color:#888;margin-top:2px;"></div>
     </div>
-    <button onclick="openModal('modal-add-frais')" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UNE NOTE</button>
+    <button class="btn-ajouter-note" onclick="openModal('modal-add-frais')" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UNE NOTE</button>
   </div>
 
   <!-- Vue ADMIN : sélecteur membre -->
@@ -4300,10 +4357,8 @@ function _hideTeamSelection() {
   async function chargerSelMembresAdmin() {
     var sel = document.getElementById('frais-admin-select');
     if (!sel) return;
-    var res = await _supabase.from('membres').select('email, prenom, nom').order('prenom');
-    if (!res.data) return;
-    sel.innerHTML = '<button onclick="chargerTousLesFrais()" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">TOUS</button>' +
-      res.data.map(function(m){ return '<button onclick="chargerTousLesFrais(' + JSON.stringify(m.email) + ')" style="background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">' + m.prenom + ' ' + m.nom + '</button>'; }).join('');
+    // Afficher uniquement le bouton TOUS (pas de liste de noms)
+    sel.innerHTML = '<button onclick="chargerTousLesFrais()" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:700;">📋 TOUS LES MEMBRES</button>';
   }
 
   async function soumettreFrais() {
@@ -9352,6 +9407,13 @@ function _hideTeamSelection() {
           </tbody>
         </table>
       `;
+      
+      // Ajouter bouton imprimer en bas (visible surtout sur mobile)
+      body.innerHTML += `
+        <div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px solid #333;">
+          <button onclick="imprimerListeInvitations()" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:8px 16px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER LISTE</button>
+        </div>
+      `;
     } catch(e) {
       console.error('Erreur chargement invitations:', e);
       document.getElementById('bill-invit-liste-body').innerHTML = '<div style="color:#ef4444;text-align:center;padding:20px;">Erreur de chargement</div>';
@@ -9368,6 +9430,43 @@ function _hideTeamSelection() {
     } catch(e) {
       alert('Erreur mise à jour statut');
     }
+  }
+
+  // Imprimer la liste des invitations
+  function imprimerListeInvitations() {
+    const container = document.getElementById('bill-invit-liste-body');
+    if (!container) return;
+    
+    const villeEl = document.getElementById('fb-ville-date');
+    const villeInfo = villeEl ? villeEl.textContent : 'Concert';
+    
+    const printContent = `
+      <html>
+      <head>
+        <title>Liste Invitations - ${villeInfo}</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { font-size: 18px; margin-bottom: 5px; }
+          h2 { font-size: 14px; color: #666; margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; font-size: 11px; }
+          th { background: #f0f0f0; padding: 8px; text-align: left; border: 1px solid #ddd; }
+          td { padding: 8px; border: 1px solid #ddd; }
+          .footer { margin-top: 20px; font-size: 10px; color: #999; }
+        </style>
+      </head>
+      <body>
+        <h1>📋 LISTE DES INVITATIONS</h1>
+        <h2>${villeInfo}</h2>
+        ${container.querySelector('table') ? container.querySelector('table').outerHTML : '<p>Aucune invitation</p>'}
+        <div class="footer">Imprimé le ${new Date().toLocaleDateString('fr-FR')} - OH MY PROD</div>
+      </body>
+      </html>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
   }
 
   // Recalculer les totaux par type à partir des invitations VALIDÉES
