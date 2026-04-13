@@ -11054,7 +11054,7 @@ function _hideTeamSelection() {
     if (!select) return;
     select.innerHTML = '<option value="">-- Chargement... --</option>';
     try {
-      const { data } = await _supabase.from('dates_concerts')
+      const { data } = await _supabase.from('dates_concert')
         .select('id, ville, date_concert, salle')
         .order('date_concert', { ascending: true });
       select.innerHTML = '<option value="">-- Choisir une date --</option>';
@@ -11122,7 +11122,7 @@ function _hideTeamSelection() {
         html = '<div style="color:#ef4444;text-align:center;padding:20px;">❌ Aucune donnée de vente trouvée dans ce fichier</div>';
       } else {
         // Charger les dates existantes pour le matching
-        const { data: datesDb } = await _supabase.from('dates_concerts')
+        const { data: datesDb } = await _supabase.from('dates_concert')
           .select('id, ville, date_concert, salle');
         
         html = '<div style="display:flex;flex-direction:column;gap:12px;">';
@@ -11237,39 +11237,75 @@ function _hideTeamSelection() {
   function findMatchingDate(item, datesDb) {
     if (!datesDb || !item.ville) return null;
     
-    // Normaliser la ville pour le matching
-    const villeNorm = item.ville.toUpperCase()
-      .replace(/[éèêë]/gi, 'E')
-      .replace(/[àâä]/gi, 'A')
-      .replace(/[ùûü]/gi, 'U')
-      .replace(/[îï]/gi, 'I')
-      .replace(/[ôö]/gi, 'O')
-      .replace(/[ç]/gi, 'C')
-      .replace(/[-']/g, ' ')
-      .trim();
-    
-    for (const d of datesDb) {
-      const dbVille = (d.ville || '').toUpperCase()
+    // Normaliser une chaîne pour le matching
+    const normalize = (str) => {
+      return (str || '').toUpperCase()
         .replace(/[éèêë]/gi, 'E')
         .replace(/[àâä]/gi, 'A')
         .replace(/[ùûü]/gi, 'U')
         .replace(/[îï]/gi, 'I')
         .replace(/[ôö]/gi, 'O')
         .replace(/[ç]/gi, 'C')
-        .replace(/[-']/g, ' ')
+        .replace(/[-_'.,]/g, ' ')
+        .replace(/\s+/g, ' ')
         .trim();
+    };
+    
+    const villeNorm = normalize(item.ville);
+    const salleNorm = normalize(item.salle);
+    
+    // Extraire les mots clés de la ville (pour matching partiel)
+    const villeWords = villeNorm.split(' ').filter(w => w.length > 2);
+    
+    let bestMatch = null;
+    let bestScore = 0;
+    
+    for (const d of datesDb) {
+      const dbVille = normalize(d.ville);
+      const dbSalle = normalize(d.salle);
+      let score = 0;
       
-      // Match sur ville (contient ou égal)
-      if (dbVille.includes(villeNorm) || villeNorm.includes(dbVille)) {
-        return d;
+      // Match exact ville
+      if (dbVille === villeNorm) {
+        score = 100;
       }
-      // Match sur salle
-      const dbSalle = (d.salle || '').toUpperCase();
-      if (item.salle && dbSalle.includes(item.salle.toUpperCase())) {
-        return d;
+      // Match ville contient (ex: "CHATEAUROUX" dans "CHATEAUROUX DEOLS")
+      else if (dbVille.includes(villeNorm) || villeNorm.includes(dbVille)) {
+        score = 80;
+      }
+      // Match par mots clés (ex: "CHATEAUROUX" match "CHATEAUROUX-DEOLS")
+      else {
+        const dbWords = dbVille.split(' ').filter(w => w.length > 2);
+        for (const word of villeWords) {
+          if (dbWords.some(dw => dw.includes(word) || word.includes(dw))) {
+            score = Math.max(score, 60);
+          }
+        }
+      }
+      
+      // Bonus si salle match aussi
+      if (salleNorm && dbSalle) {
+        if (dbSalle.includes(salleNorm) || salleNorm.includes(dbSalle)) {
+          score += 20;
+        }
+        // Match partiel sur salle (ex: "MACH 36" dans "MACH36")
+        const salleWords = salleNorm.split(' ').filter(w => w.length > 2);
+        const dbSalleWords = dbSalle.split(' ').filter(w => w.length > 2);
+        for (const sw of salleWords) {
+          if (dbSalleWords.some(dw => dw.includes(sw) || sw.includes(dw))) {
+            score += 10;
+          }
+        }
+      }
+      
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = d;
       }
     }
-    return null;
+    
+    // Retourner seulement si score suffisant (au moins 60 = un mot clé matche)
+    return bestScore >= 60 ? bestMatch : null;
   }
 
   async function executeImport() {
@@ -11342,7 +11378,7 @@ function _hideTeamSelection() {
         }
         
         // Mettre à jour aussi le champ etat_ventes dans dates_concerts
-        await _supabase.from('dates_concerts')
+        await _supabase.from('dates_concert')
           .update({ etat_ventes: item.totalVentes })
           .eq('id', item.matchedDateId);
         
@@ -11389,7 +11425,7 @@ function _hideTeamSelection() {
       }
       
       // Mettre à jour etat_ventes
-      await _supabase.from('dates_concerts')
+      await _supabase.from('dates_concert')
         .update({ etat_ventes: billets })
         .eq('id', dateId);
       
