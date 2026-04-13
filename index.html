@@ -11254,9 +11254,6 @@ function _hideTeamSelection() {
     const villeNorm = normalize(item.ville);
     const salleNorm = normalize(item.salle);
     
-    // Extraire les mots clés de la ville (pour matching partiel)
-    const villeWords = villeNorm.split(' ').filter(w => w.length > 2);
-    
     let bestMatch = null;
     let bestScore = 0;
     
@@ -11265,36 +11262,24 @@ function _hideTeamSelection() {
       const dbSalle = normalize(d.nom_salle);
       let score = 0;
       
-      // Match exact ville
+      // Match exact ville (priorité max)
       if (dbVille === villeNorm) {
         score = 100;
       }
-      // Match ville contient (ex: "CHATEAUROUX" dans "CHATEAUROUX DEOLS")
-      else if (dbVille.includes(villeNorm) || villeNorm.includes(dbVille)) {
+      // Match : ville Excel contenue dans ville DB (ex: "CHATEAUROUX" dans "CHATEAUROUX DEOLS")
+      else if (dbVille.includes(villeNorm)) {
         score = 80;
       }
-      // Match par mots clés (ex: "CHATEAUROUX" match "CHATEAUROUX-DEOLS")
-      else {
-        const dbWords = dbVille.split(' ').filter(w => w.length > 2);
-        for (const word of villeWords) {
-          if (dbWords.some(dw => dw.includes(word) || word.includes(dw))) {
-            score = Math.max(score, 60);
-          }
-        }
+      // Match : ville DB contenue dans ville Excel (ex: si DB = "NICE" et Excel = "NICE CEDEX")
+      else if (villeNorm.includes(dbVille) && dbVille.length >= 4) {
+        score = 70;
       }
+      // Pas de match partiel sur mots-clés (trop de faux positifs)
       
-      // Bonus si salle match aussi
-      if (salleNorm && dbSalle) {
-        if (dbSalle.includes(salleNorm) || salleNorm.includes(dbSalle)) {
+      // Bonus si salle match aussi (renforce la confiance)
+      if (score > 0 && salleNorm && dbSalle) {
+        if (dbSalle === salleNorm || dbSalle.includes(salleNorm) || salleNorm.includes(dbSalle)) {
           score += 20;
-        }
-        // Match partiel sur salle (ex: "MACH 36" dans "MACH36")
-        const salleWords = salleNorm.split(' ').filter(w => w.length > 2);
-        const dbSalleWords = dbSalle.split(' ').filter(w => w.length > 2);
-        for (const sw of salleWords) {
-          if (dbSalleWords.some(dw => dw.includes(sw) || sw.includes(dw))) {
-            score += 10;
-          }
         }
       }
       
@@ -11304,8 +11289,8 @@ function _hideTeamSelection() {
       }
     }
     
-    // Retourner seulement si score suffisant (au moins 60 = un mot clé matche)
-    return bestScore >= 60 ? bestMatch : null;
+    // Retourner seulement si score suffisant (au moins 70)
+    return bestScore >= 70 ? bestMatch : null;
   }
 
   async function executeImport() {
