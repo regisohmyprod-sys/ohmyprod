@@ -4416,23 +4416,25 @@ function _hideTeamSelection() {
     
     // Mode édition ou création ?
     if (window._editingInvitId) {
-      _supabase.from('invitations').update(invitData).eq('id', window._editingInvitId).then(({ error }) => {
+      _supabase.from('invitations').update(invitData).eq('id', window._editingInvitId).then(async ({ error }) => {
         if (error) { alert('Erreur mise à jour : ' + error.message); return; }
         closeModal('modal-add-invit');
         window._editingInvitId = null;
         // Remettre le titre original
         const modalTitle = document.querySelector('#modal-add-invit .modal-title');
         if (modalTitle) modalTitle.textContent = '🎟️ AJOUTER UNE INVITATION';
-        // Recharger les listes
+        // Recharger les listes et recalculer totaux
         loadInvitations(dateId);
         if (typeof billChargerListeInvitations === 'function') billChargerListeInvitations();
+        if (typeof billRecalculerTotauxParType === 'function') await billRecalculerTotauxParType();
       });
     } else {
-      _supabase.from('invitations').insert([invitData]).then(({ error }) => {
+      _supabase.from('invitations').insert([invitData]).then(async ({ error }) => {
         if (error) { alert('Erreur sauvegarde : ' + error.message); return; }
         closeModal('modal-add-invit');
         loadInvitations(dateId);
         if (typeof billChargerListeInvitations === 'function') billChargerListeInvitations();
+        if (typeof billRecalculerTotauxParType === 'function') await billRecalculerTotauxParType();
       });
     }
     ['invit-prenom','invit-nom','invit-email','invit-demandeur','invit-places-num','invit-date','invit-valide-par','invit-notes'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
@@ -8776,26 +8778,90 @@ function _hideTeamSelection() {
       btn.style.fontFamily = 'Bebas Neue, sans-serif';
       btn.style.letterSpacing = '1px';
       btn.style.display = 'block';
-      btn.onclick = function() {
-        // Générer le PDF directement depuis les données _billData (pas besoin du DOM fiche-prod)
+      btn.onclick = async function() {
         var ville = document.getElementById('bill-ville-date') ? document.getElementById('bill-ville-date').textContent : '';
+        
+        // Récap par type
         var total = 0;
-        var rowsHTML = '';
+        var recapHTML = '';
         BILL_INVIT_TYPES.forEach(function(t) {
           var val = (_billData['invit'] && _billData['invit'][t.key]) ? _billData['invit'][t.key] : 0;
           if (val > 0) {
             total += val;
-            rowsHTML += '<tr><td style="padding:9px 12px;color:'+t.color+';font-weight:600;">'+t.label+'</td><td style="padding:9px 12px;text-align:right;font-weight:700;">'+val+'</td></tr>';
+            recapHTML += '<tr><td style="padding:8px 12px;font-weight:600;">'+t.label+'</td><td style="padding:8px 12px;text-align:right;font-weight:700;">'+val+'</td></tr>';
           }
         });
+        
+        // Charger les détails des invitations depuis Supabase
+        var detailsHTML = '';
+        var totalDetails = 0;
+        try {
+          var { data: invitations } = await _supabase
+            .from('invitations')
+            .select('*')
+            .eq('date_concert_id', _fpDateId)
+            .order('nom_liste', { ascending: true });
+          
+          if (invitations && invitations.length > 0) {
+            var statutLabels = { 1: '✅ Validé', 0: '⏳ En attente', '-1': '❌ Refusé' };
+            invitations.forEach(function(inv) {
+              var statut = statutLabels[inv.valide] || '⏳ En attente';
+              totalDetails += inv.nombre || 1;
+              detailsHTML += '<tr>';
+              detailsHTML += '<td style="padding:8px 10px;">'+( inv.nom_invite || '–')+'</td>';
+              detailsHTML += '<td style="padding:8px 10px;">'+(inv.demandeur || '–')+'</td>';
+              detailsHTML += '<td style="padding:8px 10px;">'+(inv.nom_liste || '–')+'</td>';
+              detailsHTML += '<td style="padding:8px 10px;text-align:center;font-weight:700;">'+(inv.nombre || 1)+'</td>';
+              detailsHTML += '<td style="padding:8px 10px;text-align:center;">'+statut+'</td>';
+              detailsHTML += '<td style="padding:8px 10px;font-size:11px;color:#666;">'+(inv.notes || '')+'</td>';
+              detailsHTML += '</tr>';
+            });
+          }
+        } catch(e) { console.error('Erreur chargement invitations PDF:', e); }
+        
         var win = window.open('', '_blank');
-        win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>LISTE INVITATIONS</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,sans-serif;padding:30px;color:#111;}.top-header{text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:3px solid #e31e24;}.spectacle-nom{font-size:26px;font-weight:800;text-transform:uppercase;letter-spacing:2px;}.spectacle-details{font-size:16px;font-weight:700;color:#e31e24;margin-top:6px;text-transform:uppercase;}.liste-titre{font-size:13px;font-weight:700;background:#111;color:#fff;padding:8px 16px;border-radius:4px;display:inline-block;margin:16px 0 12px;text-transform:uppercase;letter-spacing:1px;}table{width:100%;border-collapse:collapse;font-size:13px;}thead tr{background:#e31e24;color:#fff;}thead th{padding:10px 12px;text-align:left;font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:0.5px;}tbody tr{border-bottom:1px solid #eee;}tbody tr:nth-child(even){background:#f9f9f9;}.total-row{background:#111!important;color:#fff;font-weight:700;font-size:15px;}.total-row td{padding:12px!important;color:#fff!important;}@media print{body{padding:15px;}}</style></head><body>');
-        win.document.write('<div class="top-header"><div class="spectacle-nom">THE WORLD OF QUEEN</div><div class="spectacle-details">'+ville+'</div></div>');
-        win.document.write('<div class="liste-titre">🎫 LISTE INVITATIONS</div>');
+        win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>LISTE INVITATIONS</title>');
+        win.document.write('<style>');
+        win.document.write('*{margin:0;padding:0;box-sizing:border-box;}');
+        win.document.write('body{font-family:Inter,Arial,sans-serif;padding:30px;color:#111;font-size:12px;}');
+        win.document.write('.top-header{text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #e31e24;}');
+        win.document.write('.spectacle-nom{font-size:28px;font-weight:800;text-transform:uppercase;letter-spacing:2px;}');
+        win.document.write('.spectacle-details{font-size:18px;font-weight:700;color:#e31e24;margin-top:6px;text-transform:uppercase;}');
+        win.document.write('.section-titre{font-size:14px;font-weight:700;background:#111;color:#fff;padding:10px 16px;margin:20px 0 12px;text-transform:uppercase;letter-spacing:1px;}');
+        win.document.write('table{width:100%;border-collapse:collapse;margin-bottom:20px;}');
+        win.document.write('thead tr{background:#e31e24;color:#fff;}');
+        win.document.write('thead th{padding:10px 12px;text-align:left;font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:0.5px;}');
+        win.document.write('tbody tr{border-bottom:1px solid #ddd;}');
+        win.document.write('tbody tr:nth-child(even){background:#f5f5f5;}');
+        win.document.write('.total-row{background:#111!important;color:#fff;font-weight:700;}');
+        win.document.write('.total-row td{padding:12px!important;color:#fff!important;}');
+        win.document.write('@media print{body{padding:15px;}}');
+        win.document.write('</style></head><body>');
+        
+        // Header
+        win.document.write('<div class="top-header">');
+        win.document.write('<div class="spectacle-nom">THE WORLD OF QUEEN</div>');
+        win.document.write('<div class="spectacle-details">'+ville+'</div>');
+        win.document.write('</div>');
+        
+        // Section 1 : Récap par type
+        win.document.write('<div class="section-titre">📊 RÉCAPITULATIF PAR TYPE</div>');
         win.document.write('<table><thead><tr><th>Type d\'invitation</th><th style="text-align:right;">N° Billets</th></tr></thead><tbody>');
-        win.document.write(rowsHTML || '<tr><td colspan="2" style="padding:12px;color:#888;text-align:center;">Aucune invitation saisie</td></tr>');
-        win.document.write('<tr class="total-row"><td>TOTAL INVITATIONS</td><td style="text-align:right;">'+total+'</td></tr>');
+        win.document.write(recapHTML || '<tr><td colspan="2" style="padding:12px;color:#888;text-align:center;">Aucune invitation</td></tr>');
+        win.document.write('<tr class="total-row"><td>TOTAL</td><td style="text-align:right;">'+total+'</td></tr>');
         win.document.write('</tbody></table>');
+        
+        // Section 2 : Détail des invitations
+        win.document.write('<div class="section-titre">📋 DÉTAIL DES INVITATIONS</div>');
+        win.document.write('<table><thead><tr>');
+        win.document.write('<th>Invité</th><th>Demandeur</th><th>Liste</th><th style="text-align:center;">Nb</th><th style="text-align:center;">Statut</th><th>Notes</th>');
+        win.document.write('</tr></thead><tbody>');
+        win.document.write(detailsHTML || '<tr><td colspan="6" style="padding:12px;color:#888;text-align:center;">Aucune demande enregistrée</td></tr>');
+        if (detailsHTML) {
+          win.document.write('<tr class="total-row"><td colspan="3">TOTAL DEMANDES</td><td style="text-align:center;">'+totalDetails+'</td><td colspan="2"></td></tr>');
+        }
+        win.document.write('</tbody></table>');
+        
         win.document.write('<script>window.onload=function(){window.print();}<\/script>');
         win.document.write('</body></html>');
         win.document.close();
@@ -8899,10 +8965,71 @@ function _hideTeamSelection() {
     const valide = statut === 'valide' ? 1 : (statut === 'refuse' ? -1 : 0);
     try {
       await _supabase.from('invitations').update({ valide }).eq('id', invitId);
-      // Recharger la liste
+      // Recharger la liste et recalculer les totaux
       billChargerListeInvitations();
+      await billRecalculerTotauxParType();
     } catch(e) {
       alert('Erreur mise à jour statut');
+    }
+  }
+
+  // Recalculer les totaux par type à partir des invitations VALIDÉES
+  async function billRecalculerTotauxParType() {
+    if (!_fpDateId) return;
+    
+    try {
+      // Charger toutes les invitations validées pour cette date
+      const { data: invitations } = await _supabase
+        .from('invitations')
+        .select('*')
+        .eq('date_concert_id', _fpDateId)
+        .eq('valide', 1); // Seulement les validées
+      
+      // Mapper les noms de liste vers les clés BILL_INVIT_TYPES
+      const listeToKey = {
+        'Invitations Production/Artistes': 'prod_artistes',
+        'Invitations Salle': 'invit_salle',
+        'Servitudes Salle': 'servitudes',
+        'Invitations Partenaires': 'partenaires',
+        'Invitations Presse': 'presse',
+        'Invitations Autres': 'autres'
+      };
+      
+      // Reset tous les totaux
+      if (!_billData['invit']) _billData['invit'] = {};
+      BILL_INVIT_TYPES.forEach(t => { _billData['invit'][t.key] = 0; });
+      
+      // Calculer les totaux par type
+      if (invitations) {
+        invitations.forEach(inv => {
+          const key = listeToKey[inv.nom_liste];
+          if (key && _billData['invit'][key] !== undefined) {
+            _billData['invit'][key] += (inv.nombre || 1);
+          }
+        });
+      }
+      
+      // Mettre à jour l'affichage des inputs
+      BILL_INVIT_TYPES.forEach(t => {
+        const input = document.querySelector(`input[oninput="billUpdateInvit('${t.key}',this.value)"]`);
+        if (input) {
+          input.value = _billData['invit'][t.key] || '';
+        }
+      });
+      
+      // Mettre à jour les totaux affichés
+      billUpdateInvitTotals();
+      
+      // Marquer comme modifié et sauvegarder
+      _billModifie = true;
+      billUpdateIndicateur(true);
+      clearTimeout(window._billAutoSaveTimer);
+      window._billAutoSaveTimer = setTimeout(function() {
+        billSauvegarder(true);
+      }, 1000);
+      
+    } catch(e) {
+      console.error('Erreur recalcul totaux:', e);
     }
   }
 
@@ -8911,6 +9038,7 @@ function _hideTeamSelection() {
     try {
       await _supabase.from('invitations').delete().eq('id', invitId);
       billChargerListeInvitations();
+      await billRecalculerTotauxParType();
     } catch(e) {
       alert('Erreur suppression');
     }
