@@ -1913,8 +1913,8 @@ function _hideTeamSelection() {
         </div>
       </div>
 
-      <!-- 2 BOUTONS ADMIN ALEXANDRINE + GESTION TOUR RÉGIS -->
-      <div id="bloc-admin-gestion" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <!-- LIGNE 1 : ADMIN ALEX + ADMIN RÉGIS -->
+      <div id="bloc-admin-gestion" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
         
         <!-- BOUTON ADMIN ALEXANDRINE -->
         <div onclick="openModal('modal-admin-alexandrine')" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
@@ -1926,16 +1926,77 @@ function _hideTeamSelection() {
           <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
 
-        <!-- BOUTON GESTION TOUR RÉGIS -->
-        <div onclick="openModal('modal-gestion-tour-regis')" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+        <!-- BOUTON ADMIN RÉGIS -->
+        <div onclick="openModal('modal-gestion-regis')" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
           <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🎸</div>
           <div>
-            <div style="font-size:14px; font-weight:600; color:#fff;">Gestion Tour Régis</div>
-            <div style="font-size:11px; color:#666;">Tournées & production</div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Admin Régis</div>
+            <div style="font-size:11px; color:#666;">Gestion administrative & liens</div>
           </div>
           <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
 
+      </div>
+
+      <!-- LIGNE 2 : GESTION TOUR (pleine largeur avec 3 sous-boutons) -->
+      <div style="background:#1a1a1a; border-radius:10px; padding:20px; margin-bottom:12px; border-left:3px solid #c9a84c;">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🎤</div>
+          <div>
+            <div style="font-size:16px; font-weight:600; color:#fff;">Gestion Tour</div>
+            <div style="font-size:11px; color:#666;">Tournées, promo & billetterie</div>
+          </div>
+        </div>
+        
+        <!-- 3 sous-boutons -->
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          
+          <!-- TOUR -->
+          <div class="dropdown-container" style="position:relative;">
+            <div onclick="toggleDropdown('dropdown-tour')" style="background:#222; border-radius:8px; padding:12px 16px; text-align:center; cursor:pointer; border:1px solid #333; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#333'">
+              <div style="font-size:13px; font-weight:600; color:#c9a84c; letter-spacing:1px;">🚌 TOUR</div>
+            </div>
+            <div id="dropdown-tour" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+              <div onclick="showPage('gestion-omp')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
+              <div onclick="openModal('modal-vhr-tournee')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
+              <div onclick="showPage('fiche-billetterie')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎟️ Fiche Billetterie</div>
+              <div onclick="showPage('gestion-salles')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Gestion Salles</div>
+            </div>
+          </div>
+
+          <!-- PROMO -->
+          <div class="dropdown-container" style="position:relative;">
+            <div onclick="toggleDropdown('dropdown-promo')" style="background:#222; border-radius:8px; padding:12px 16px; text-align:center; cursor:pointer; border:1px solid #333; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#333'">
+              <div style="font-size:13px; font-weight:600; color:#c9a84c; letter-spacing:1px;">📣 PROMO</div>
+            </div>
+            <div id="dropdown-promo" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+              <a href="https://docs.google.com/spreadsheets/d/1caQzs7v3n73P6T5CAOWQfTypDAxWvlS9wKvmFjCNeJ0/edit#gid=0" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📋 Contact Promo</a>
+              <a href="https://business.facebook.com/latest/home?business_id=644890879422593" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📢 Meta Pubs</a>
+              <a href="https://www.theworldofqueen.com/" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🌐 Site TWOQ Off</a>
+              <a href="https://www.ohmyprod.com/" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎬 Site OMP Off</a>
+              <a href="https://www.facebook.com/theworldofqueen/?locale=fr_FR" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">👍 TWOQ Facebook Off</a>
+              <a href="https://www.instagram.com/theworldofqueenofficiel/" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📸 TWOQ Instagram Off</a>
+              <a href="https://www.youtube.com/channel/UCwyb6LJpE6kDfI3Wx7wP4Xg" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">▶️ TWOQ Youtube Off</a>
+            </div>
+          </div>
+
+          <!-- BILLETTERIE RÉSEAUX -->
+          <div class="dropdown-container" style="position:relative;">
+            <div onclick="toggleDropdown('dropdown-billetterie')" style="background:#222; border-radius:8px; padding:12px 16px; text-align:center; cursor:pointer; border:1px solid #333; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#333'">
+              <div style="font-size:13px; font-weight:600; color:#c9a84c; letter-spacing:1px;">🎟️ BILLETTERIE</div>
+            </div>
+            <div id="dropdown-billetterie" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+              <a href="https://lesdernierscouches.com/spectacles/the-world-of-queen/" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎫 Les Derniers Couches</a>
+              <a href="https://stats.trium.fr/auth/auth.html?authnum=0&uid=&time=&pswd=&logout=&url=L3JoczAwMDYvVHJpdW1Qcm9kX0Rpc3RyaWJ1dGlvbi8oUyhod3A0MGU0amF0bmtnYWJ0emhtaDBzbWgpKS9Mb2dpbi5hc3B4&totp=" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎟️ Ticketmaster</a>
+              <a href="https://www.francebillet.pro/signin" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎵 Fnac Spectacles</a>
+              <a href="https://app2.aparteweb.com/?ins=0612507023" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Box Office</a>
+              <a href="https://stats.trium.fr/auth/" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎪 Ticketnet Salle</a>
+              <a href="https://www.ticketmaster.fr/fr/concert/pop-rock-folk" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📊 Classement Ventes TKT</a>
+              <a href="https://accounts.songkick.com/session/new?cancel_url=/&success_url=https://tourbox.songkick.com/performances/79439845/tickets/new&source_product=tourbox" target="_blank" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎸 Songkick - Modif Tour</a>
+            </div>
+          </div>
+
+        </div>
       </div>
 
       <!-- BLOCS ACCÈS ESPACES : STAFF / ARTISTIQUE / TECHNIQUE -->
@@ -5315,6 +5376,36 @@ function _hideTeamSelection() {
       e.target.classList.remove('open');
     }
   }
+
+  // Toggle dropdown menus dans le dashboard
+  function toggleDropdown(dropdownId) {
+    var dropdown = document.getElementById(dropdownId);
+    var allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+    
+    // Fermer tous les autres dropdowns
+    allDropdowns.forEach(function(dd) {
+      if (dd.id !== dropdownId) {
+        dd.style.display = 'none';
+      }
+    });
+    
+    // Toggle celui cliqué
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+      dropdown.style.display = 'block';
+    } else {
+      dropdown.style.display = 'none';
+    }
+  }
+
+  // Fermer dropdowns si on clique ailleurs
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown-container')) {
+      var allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+      allDropdowns.forEach(function(dd) {
+        dd.style.display = 'none';
+      });
+    }
+  });
 
   async function addDate() {
     const ville = document.getElementById('new-ville').value.trim();
