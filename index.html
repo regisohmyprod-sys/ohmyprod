@@ -1917,38 +1917,60 @@ function _hideTeamSelection() {
       <div id="bloc-admin-gestion" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
         
         <!-- BOUTON ADMIN ALEXANDRINE -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-admin-alexandrine')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">💻 ADMIN ALEXANDRINE</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Gestion administrative</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LE MENU</div>
+        <div onclick="openModal('modal-admin-alexandrine')" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">💻</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Admin Alexandrine</div>
+            <div style="font-size:11px; color:#666;">Gestion administrative</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
 
         <!-- BOUTON GESTION TOUR RÉGIS -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-gestion-tour-regis')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🎸 GESTION TOUR RÉGIS</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Tournées & production</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LE MENU</div>
+        <div onclick="openModal('modal-gestion-tour-regis')" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🎸</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Gestion Tour Régis</div>
+            <div style="font-size:11px; color:#666;">Tournées & production</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
 
       </div>
 
       <!-- BLOCS ACCÈS ESPACES : STAFF / ARTISTIQUE / TECHNIQUE -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('espace-staff')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">👥 ACCÈS STAFF OMP</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Espace staff OMP</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
+        
+        <!-- ACCÈS STAFF OMP -->
+        <div onclick="showPage('espace-staff')" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">👥</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Accès Staff OMP</div>
+            <div style="font-size:11px; color:#666;">Espace staff OMP</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('espace-artistique')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🎤 ACCÈS TEAM ARTISTIQUE</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Espace artistique</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
+
+        <!-- ACCÈS TEAM ARTISTIQUE -->
+        <div onclick="showPage('espace-artistique')" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🎤</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Accès Team Artistique</div>
+            <div style="font-size:11px; color:#666;">Espace artistique</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('espace-technique')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🔧 ACCÈS TEAM TECHNIQUE</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Espace technique</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
+
+        <!-- ACCÈS TEAM TECHNIQUE -->
+        <div onclick="showPage('espace-technique')" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🔧</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Accès Team Technique</div>
+            <div style="font-size:11px; color:#666;">Espace technique</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
+
       </div>
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
