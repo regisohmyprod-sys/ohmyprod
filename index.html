@@ -8338,10 +8338,36 @@ function _hideTeamSelection() {
         });
       }
     } catch(e) {}
-    // Attacher les écouteurs pour recalcul en temps réel + auto-save sur blur (quand on quitte un champ)
+    // Attacher les écouteurs pour recalcul en temps réel + auto-save par bloc
+    // Extraire le préfixe de bloc depuis l'ID (ex: fin-omp-vhr-pkart → fin-omp-vhr)
+    function getBlockPrefix(id) {
+      if (!id) return '';
+      const parts = id.split('-');
+      if (parts.length >= 4) return parts.slice(0, 4).join('-');
+      return parts.slice(0, 3).join('-');
+    }
+    let _lastFinBlock = null;
     document.querySelectorAll('#page-fiche-financier .fin-input').forEach(inp => {
       inp.addEventListener('input', finCalcTotaux);
-      inp.addEventListener('blur', function() { autoSave('fin'); });
+      inp.addEventListener('focus', function() {
+        const currentBlock = getBlockPrefix(this.id);
+        // Si on change de bloc, sauvegarder
+        if (_lastFinBlock && _lastFinBlock !== currentBlock) {
+          autoSave('fin');
+        }
+        _lastFinBlock = currentBlock;
+      });
+      // Aussi sauvegarder quand on quitte complètement la zone (clic ailleurs)
+      inp.addEventListener('blur', function() {
+        setTimeout(function() {
+          const active = document.activeElement;
+          if (!active || !active.classList.contains('fin-input')) {
+            // On a quitté la zone des inputs financiers → sauvegarder
+            autoSave('fin');
+            _lastFinBlock = null;
+          }
+        }, 100);
+      });
     });
     finCalcTotaux();
   }
