@@ -3816,28 +3816,23 @@ function _hideTeamSelection() {
         <div style="font-size:13px;color:#888;margin-top:4px;">Importer les pointages de ventes depuis fichiers Excel ou PDF</div>
       </div>
 
-      <!-- Sélection du type de source -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px;">
-        <div onclick="selectImportSource('ldc')" id="import-src-ldc" style="background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#22c55e'" onmouseout="if(!this.classList.contains('selected'))this.style.borderColor='#2a2a2a'">
-          <div style="font-size:28px;margin-bottom:8px;">🎫</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#22c55e;letter-spacing:1px;">LES DERNIERS COUCHES</div>
-          <div style="font-size:11px;color:#666;margin-top:4px;">Excel détaillé par date</div>
-        </div>
-        <div onclick="selectImportSource('salle')" id="import-src-salle" style="background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="if(!this.classList.contains('selected'))this.style.borderColor='#2a2a2a'">
-          <div style="font-size:28px;margin-bottom:8px;">🏟️</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#3b82f6;letter-spacing:1px;">SALLE / EXPLOITANT</div>
-          <div style="font-size:11px;color:#666;margin-top:4px;">Excel ou PDF salle</div>
-        </div>
-        <div onclick="selectImportSource('tm')" id="import-src-tm" style="background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#e31e24'" onmouseout="if(!this.classList.contains('selected'))this.style.borderColor='#2a2a2a'">
-          <div style="font-size:28px;margin-bottom:8px;">🎟️</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#e31e24;letter-spacing:1px;">TICKETMASTER</div>
-          <div style="font-size:11px;color:#666;margin-top:4px;">PDF récapitulatif</div>
-        </div>
-        <div onclick="selectImportSource('manuel')" id="import-src-manuel" style="background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="if(!this.classList.contains('selected'))this.style.borderColor='#2a2a2a'">
-          <div style="font-size:28px;margin-bottom:8px;">✍️</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c9a84c;letter-spacing:1px;">SAISIE MANUELLE</div>
-          <div style="font-size:11px;color:#666;margin-top:4px;">Email ou plateformes</div>
-        </div>
+      <!-- Sélection du type de source - même style que la Fiche Billetterie -->
+      <div style="display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="import-tab" onclick="selectImportSource('ldc')" id="import-src-ldc" style="padding:8px 12px;border-radius:8px;border:2px solid #22c55e;background:#22c55e;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">LDC</button>
+        <button class="import-tab" onclick="selectImportSource('fimalac')" id="import-src-fimalac" style="padding:8px 12px;border-radius:8px;border:2px solid #2a2a2a;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FIMALAC</button>
+        <button class="import-tab" onclick="selectImportSource('nda')" id="import-src-nda" style="padding:8px 12px;border-radius:8px;border:2px solid #2a2a2a;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">NDA</button>
+        <button class="import-tab" onclick="selectImportSource('dome')" id="import-src-dome" style="padding:8px 12px;border-radius:8px;border:2px solid #2a2a2a;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">DÔME</button>
+        <button class="import-tab" onclick="selectImportSource('salle')" id="import-src-salle" style="padding:8px 12px;border-radius:8px;border:2px solid #2a2a2a;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">SALLE</button>
+        <button class="import-tab" onclick="selectImportSource('bleucitron')" id="import-src-bleucitron" style="padding:8px 12px;border-radius:8px;border:2px solid #2a2a2a;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">BLEU CITRON</button>
+        <button class="import-tab" onclick="selectImportSource('tm')" id="import-src-tm" style="padding:8px 12px;border-radius:8px;border:2px solid #2a2a2a;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">TM</button>
+        <button class="import-tab" onclick="selectImportSource('fnac')" id="import-src-fnac" style="padding:8px 12px;border-radius:8px;border:2px solid #2a2a2a;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FNAC</button>
+        <button class="import-tab" onclick="selectImportSource('manuel')" id="import-src-manuel" style="padding:8px 12px;border-radius:8px;border:2px solid #2a2a2a;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">✍️ MANUEL</button>
+      </div>
+
+      <!-- Info source sélectionnée -->
+      <div id="import-source-info" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+        <div id="import-source-title" style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#22c55e;letter-spacing:1px;">LES DERNIERS COUCHÉS</div>
+        <div id="import-source-desc" style="font-size:11px;color:#666;margin-top:4px;">Excel détaillé par date avec catégories (Carré Or, Cat 1, Cat 2, Cat 3/PMR)</div>
       </div>
 
       <!-- Zone d'upload (visible après sélection) -->
@@ -11092,23 +11087,45 @@ function _hideTeamSelection() {
   let _importFile = null;
   let _importData = [];
 
+  // Config des sources d'import
+  const IMPORT_SOURCES = {
+    ldc:        { color: '#22c55e', label: 'LES DERNIERS COUCHÉS', desc: 'Excel détaillé par date avec catégories (Carré Or, Cat 1, Cat 2, Cat 3/PMR)' },
+    fimalac:    { color: '#a855f7', label: 'FIMALAC', desc: 'Excel avec historique de pointages, plusieurs villes par feuille' },
+    nda:        { color: '#f97316', label: 'NUIT D\'ARTISTES', desc: 'Excel avec total billets par ville (pas de détail catégorie)' },
+    dome:       { color: '#ef4444', label: 'DÔME DE PARIS', desc: 'PDF Ticketmaster avec détail par catégorie et recette' },
+    salle:      { color: '#06b6d4', label: 'SALLE / EXPLOITANT', desc: 'Email ou PDF simple avec total billets et jauge' },
+    bleucitron: { color: '#3b82f6', label: 'BLEU CITRON', desc: 'Email avec total billets et jauge (pas de détail catégorie)' },
+    tm:         { color: '#e31e24', label: 'TICKETMASTER', desc: 'PDF RecetteManifestation avec détail par catégorie et tarifs' },
+    fnac:       { color: '#eab308', label: 'FNAC SPECTACLES', desc: 'PDF Etat des ventes avec détail par catégorie' },
+    manuel:     { color: '#c9a84c', label: 'SAISIE MANUELLE', desc: 'Saisir manuellement les totaux depuis email ou plateforme' },
+  };
+
   function selectImportSource(source) {
     _importSource = source;
     // Reset styles
-    ['ldc','salle','tm','manuel'].forEach(s => {
+    Object.keys(IMPORT_SOURCES).forEach(s => {
       const el = document.getElementById('import-src-' + s);
       if (el) {
+        el.style.background = '#1a1a1a';
+        el.style.color = '#888';
         el.style.borderColor = '#2a2a2a';
-        el.classList.remove('selected');
       }
     });
     // Highlight selected
-    const colors = { ldc: '#22c55e', salle: '#3b82f6', tm: '#e31e24', manuel: '#c9a84c' };
+    const config = IMPORT_SOURCES[source];
     const sel = document.getElementById('import-src-' + source);
-    if (sel) {
-      sel.style.borderColor = colors[source];
-      sel.classList.add('selected');
+    if (sel && config) {
+      sel.style.background = config.color;
+      sel.style.color = '#fff';
+      sel.style.borderColor = config.color;
     }
+    // Update info zone
+    const titleEl = document.getElementById('import-source-title');
+    const descEl = document.getElementById('import-source-desc');
+    if (titleEl && config) titleEl.textContent = config.label;
+    if (titleEl) titleEl.style.color = config?.color || '#fff';
+    if (descEl && config) descEl.textContent = config.desc;
+    
     // Show appropriate zone
     document.getElementById('import-upload-zone').style.display = source === 'manuel' ? 'none' : 'block';
     document.getElementById('import-manuel-zone').style.display = source === 'manuel' ? 'block' : 'none';
@@ -11421,25 +11438,46 @@ function _hideTeamSelection() {
           .eq('date_concert_id', item.matchedDateId)
           .single();
         
-        // Déterminer quel réseau mettre à jour selon la source
-        const reseau = _importSource === 'ldc' ? 'ldc' : (_importSource === 'salle' ? 'salle' : 'tm');
+        // Le réseau = la source sélectionnée directement
+        const reseau = _importSource;
+        
+        // Déterminer si c'est une grille TOTAL (1 catégorie) ou SIMPLE/FULL (4 catégories)
+        const isGridTotal = ['nda', 'salle', 'bleucitron'].includes(reseau);
         
         if (existing) {
           let billData = {};
           try { billData = existing.billetterie_data ? JSON.parse(existing.billetterie_data) : {}; } catch(e) {}
           
-          // Initialiser le réseau s'il n'existe pas (4 catégories avec lignes vides)
+          // Initialiser le réseau selon le type de grille
           if (!billData[reseau]) {
-            billData[reseau] = [
-              [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Import' }],
-              [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Import' }],
-              [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Import' }],
-              [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Import' }]
-            ];
+            if (isGridTotal) {
+              // Grille TOTAL : 1 seule catégorie
+              billData[reseau] = [
+                [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Total pointage' }]
+              ];
+            } else {
+              // Grille SIMPLE/FULL : 4 catégories
+              billData[reseau] = [
+                [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Total' }],
+                [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Total' }],
+                [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Total' }],
+                [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Total' }]
+              ];
+            }
           }
           
-          // Remplir chaque catégorie avec les données importées
-          if (item.categories) {
+          // Remplir selon le type de grille
+          if (isGridTotal) {
+            // Grille TOTAL : mettre le total dans la seule ligne
+            if (!billData[reseau][0]) billData[reseau][0] = [];
+            if (!billData[reseau][0][0]) billData[reseau][0][0] = { billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Total pointage' };
+            const tarif = item.totalVentes > 0 ? Math.round((item.totalRecette / item.totalVentes) * 100) / 100 : 0;
+            billData[reseau][0][0].billets = item.totalVentes;
+            billData[reseau][0][0].tarif = tarif;
+            billData[reseau][0][0].desc = 'Import ' + reseau.toUpperCase();
+            log(`   📊 Total: ${item.totalVentes} billets, tarif moyen ${tarif}€`);
+          } else if (item.categories && Object.keys(item.categories).length > 0) {
+            // Grille SIMPLE/FULL avec détail par catégorie
             // D'abord, reset les valeurs existantes pour ce réseau (première ligne de chaque cat)
             for (let i = 0; i < 4; i++) {
               if (billData[reseau][i] && billData[reseau][i][0]) {
@@ -11471,11 +11509,20 @@ function _hideTeamSelection() {
                 
                 billData[reseau][catIndex][0].billets = newBillets;
                 billData[reseau][catIndex][0].tarif = newTarif;
-                billData[reseau][catIndex][0].desc = 'Import LDC';
+                billData[reseau][catIndex][0].desc = 'Import ' + reseau.toUpperCase();
                 
                 log(`   📊 ${catName}: ${catData.ventes} billets, ${catData.recette}€ → tarif ${newTarif}€`);
               }
             }
+          } else {
+            // Pas de détail catégorie mais grille SIMPLE → mettre dans Cat1 par défaut
+            if (!billData[reseau][0]) billData[reseau][0] = [];
+            if (!billData[reseau][0][0]) billData[reseau][0][0] = { billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Total' };
+            const tarif = item.totalVentes > 0 ? Math.round((item.totalRecette / item.totalVentes) * 100) / 100 : 0;
+            billData[reseau][0][0].billets = item.totalVentes;
+            billData[reseau][0][0].tarif = tarif;
+            billData[reseau][0][0].desc = 'Import ' + reseau.toUpperCase();
+            log(`   📊 Total (sans détail): ${item.totalVentes} billets, tarif moyen ${tarif}€`);
           }
           
           // Stocker aussi le total dans _imports pour référence
