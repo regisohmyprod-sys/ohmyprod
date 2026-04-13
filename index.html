@@ -1892,6 +1892,7 @@ function _hideTeamSelection() {
     </div>
     <div class="topbar-actions">
       <button class="btn btn-ghost" onclick="refreshDonnees()" title="Actualiser les données">🔄</button>
+      <button class="btn btn-ghost" onclick="hardReload()" title="Recharger la page (sans cache)">🔃</button>
 
       <button onclick="openModal('modal-notifier')" style="background:#7f1d1d;color:#fff;border:2px solid #e31e24;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📨 Notifier l'équipe</button>
       <button class="btn btn-ghost" onclick="doLogout()" title="Déconnexion">🚪</button>
@@ -5241,6 +5242,12 @@ function _hideTeamSelection() {
 
   function openModal(id) {
     document.getElementById(id).classList.add('open');
+    // Pré-remplir la date du jour pour la modale d'invitation
+    if (id === 'modal-add-invit') {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('invit-date');
+      if (dateInput) dateInput.value = today;
+    }
   }
 
   function closeModal(id) {
@@ -10193,6 +10200,17 @@ function _hideTeamSelection() {
       }
     } catch(e) { console.error('Refresh erreur:', e); }
     if (btn) { btn.textContent = '🔄'; btn.disabled = false; }
+  }
+
+  // Hard reload sans cache (équivalent Ctrl+Shift+R) - utilisé par le bouton 🔃
+  function hardReload() {
+    if (window.location.href.indexOf('nocache=') > -1) {
+      window.location.href = window.location.href.replace(/nocache=\d+/, 'nocache=' + Date.now());
+    } else if (window.location.href.indexOf('?') > -1) {
+      window.location.href = window.location.href + '&nocache=' + Date.now();
+    } else {
+      window.location.href = window.location.href + '?nocache=' + Date.now();
+    }
   }
 
   async function chargerTournees() {
