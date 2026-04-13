@@ -3125,6 +3125,10 @@ function _hideTeamSelection() {
             <div style="font-size:10px;color:#c9a84c;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Recette (ce réseau)</div>
             <div id="bill-op-recette" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;">0,00 €</div>
           </div>
+          <div style="background:#1a1a1a;border:1px solid #888;border-radius:8px;padding:10px 16px;text-align:center;min-width:150px;">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Total DL Prod (ce réseau)</div>
+            <div id="bill-op-dlprod" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;">0,00 €</div>
+          </div>
           <div style="background:#0a1a0f;border:1px solid #22c55e;border-radius:8px;padding:10px 16px;text-align:center;min-width:170px;">
             <div style="font-size:10px;color:#22c55e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Versement (ce réseau)</div>
             <div id="bill-op-versement" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;">0,00 €</div>
@@ -8484,7 +8488,8 @@ function _hideTeamSelection() {
       });
 
       // Ligne sous-total catégorie
-      const verseCat = catRecette - catDLDistrib - catDLProd;
+      // VERSEMENT = Recette + DL Prod (le réseau reverse la recette + les DL Prod collectés)
+      const verseCat = catRecette + catDLProd;
       html += `<tr id="bill-sub-${catIdx}" style="background:#2a2a2a;border-top:1px solid #333;">
         <td colspan="2" style="padding:6px 10px;text-align:right;color:#aaa;font-size:11px;font-style:italic;">Sous-total ${cat.label}</td>
         <td id="bill-sub-${catIdx}-billets" style="padding:6px 10px;text-align:right;color:#3b82f6;font-weight:700;">${catBillets}</td>
@@ -8499,7 +8504,7 @@ function _hideTeamSelection() {
 
       opBillets += catBillets;
       opRecette += catRecette;
-      opVersement += catRecette - catDLDistrib - catDLProd;
+      opVersement += catRecette + catDLProd;
     });
 
     // Ligne TOTAL GÉNÉRAL de l'onglet
@@ -8528,7 +8533,7 @@ function _hideTeamSelection() {
 
   function billUpdateTotals() {
     const op = _billTabActif;
-    let opBillets = 0, opRecette = 0, opVersement = 0;
+    let opBillets = 0, opRecette = 0, opDLProd = 0, opVersement = 0;
 
     BILL_CATS.forEach((cat, catIdx) => {
       let catBillets = 0, catRecette = 0, catDLDistrib = 0, catDLProd = 0;
@@ -8553,7 +8558,8 @@ function _hideTeamSelection() {
       });
 
       // Sous-total catégorie via IDs directs
-      const verse = catRecette - catDLDistrib - catDLProd;
+      // VERSEMENT = Recette + DL Prod (le réseau reverse la recette + les DL Prod collectés)
+      const verse = catRecette + catDLProd;
       const s = (id) => document.getElementById(`bill-sub-${catIdx}-${id}`);
       if (s('billets')) s('billets').textContent = catBillets;
       if (s('recette')) s('recette').textContent = billFmt(catRecette);
@@ -8563,6 +8569,7 @@ function _hideTeamSelection() {
 
       opBillets  += catBillets;
       opRecette  += catRecette;
+      opDLProd   += catDLProd;
       opVersement += verse;
     });
 
@@ -8572,12 +8579,13 @@ function _hideTeamSelection() {
     if (t('recette')) t('recette').textContent = billFmt(opRecette);
     if (t('verse'))   t('verse').textContent   = billFmt(opVersement);
 
-    // Récap onglet (3 carrés dans le bloc)
+    // Récap onglet (4 carrés dans le bloc)
     document.getElementById('bill-op-billets').textContent  = opBillets;
     document.getElementById('bill-op-recette').textContent  = billFmt(opRecette);
+    document.getElementById('bill-op-dlprod').textContent   = billFmt(opDLProd);
     document.getElementById('bill-op-versement').textContent = billFmt(opVersement);
 
-    // Récap global tous réseaux (3 grands carrés en haut) — hors invitations
+    // Récap global tous réseaux (grands carrés en haut) — hors invitations
     let gBillets = 0, gRecette = 0, gVersement = 0, gDLProd = 0;
     ['promo','tm','fnac','salle','weez'].forEach(o => {
       BILL_CATS.forEach((cat, catIdx) => {
@@ -8585,12 +8593,11 @@ function _hideTeamSelection() {
           const d = _billData[o]?.[catIdx]?.[rowIdx];
           if (!d) return;
           const rec = d.billets * d.tarif;
-          const dlD = d.billets * d.dlDistrib;
           const dlP = d.billets * d.dlProd;
           gBillets   += d.billets;
           gRecette   += rec;
-          gVersement += rec - dlD - dlP;
           gDLProd    += dlP;
+          gVersement += rec + dlP;  // Versement = Recette + DL Prod
         });
       });
     });
