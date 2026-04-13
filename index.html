@@ -1066,8 +1066,8 @@
   /* MOBILE */
   @media (max-width: 768px) {
     .sidebar { transform: translateX(-100%); }
-    .main { margin-left: 0; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .main { margin-left: 0; padding: 12px !important; }
+    .stats-grid { grid-template-columns: 1fr !important; }
     #splash-enter-btn {
       font-size: 16px !important;
       letter-spacing: 4px !important;
@@ -1106,6 +1106,87 @@
     }
     #team-selection-screen .ts-org > div > div > div:nth-child(2) > div:last-child {
       font-size: 10px !important;
+    }
+    
+    /* TABLEAU DE BORD - Mobile */
+    .page-title {
+      font-size: 18px !important;
+    }
+    
+    /* 5 boutons ADMINISTRATIF → 2 colonnes sur mobile */
+    #page-dashboard > div:nth-of-type(3) {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 8px !important;
+    }
+    #page-dashboard > div:nth-of-type(3) > div {
+      padding: 10px !important;
+    }
+    #page-dashboard > div:nth-of-type(3) > div > div:first-child {
+      width: 30px !important;
+      height: 30px !important;
+      font-size: 14px !important;
+    }
+    #page-dashboard > div:nth-of-type(3) > div > div:nth-child(2) {
+      font-size: 10px !important;
+    }
+    
+    /* Cartes GESTION TOUR (TOUR/PROMO/BILLETTERIE) → 1 colonne */
+    .stat-card {
+      padding: 14px !important;
+    }
+    .stat-card .stat-label {
+      font-size: 10px !important;
+    }
+    .stat-card .stat-value {
+      font-size: 24px !important;
+    }
+    .stat-card .stat-sub {
+      font-size: 9px !important;
+    }
+    
+    /* Dropdowns plus larges sur mobile */
+    .stat-card .dropdown-container > div[id^="dropdown-"] {
+      min-width: 100% !important;
+    }
+    
+    /* Cartes tournées (TWOQ) → 1 colonne */
+    .db-tournees-cols {
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
+    }
+    .db-col-card {
+      padding: 12px !important;
+    }
+    .db-col-header {
+      font-size: 14px !important;
+      padding: 10px 12px !important;
+    }
+    .db-col-stat {
+      padding: 6px 10px !important;
+    }
+    .db-tournee-label {
+      font-size: 9px !important;
+    }
+    .db-tournee-value {
+      font-size: 14px !important;
+    }
+    
+    /* Header dashboard */
+    #page-dashboard > div:first-child {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 8px !important;
+    }
+    #page-dashboard > div:first-child > div:first-child {
+      font-size: 20px !important;
+    }
+    #page-dashboard > div:first-child > div:last-child {
+      font-size: 10px !important;
+    }
+    
+    /* Lignes dorées shimmer */
+    .gold-line-shimmer {
+      margin: 14px 0 !important;
     }
   }
 
