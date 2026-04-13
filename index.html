@@ -3106,13 +3106,16 @@ function _hideTeamSelection() {
           <div id="bill-total-dlprod" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;">0,00 €</div>
         </div>
       </div>
-      <div style="display:flex;gap:6px;margin-bottom:0;flex-wrap:wrap;">
-        <button class="bill-tab" onclick="billSetTab('promo', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #3b82f6;border-bottom:none;background:#3b82f6;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Promoteur Local</button>
-        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Ticketmaster</button>
-        <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Fnac</button>
-        <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Salle</button>
-        <button class="bill-tab" onclick="billSetTab('weez', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Weezevent</button>
-        <button class="bill-tab" onclick="billSetTab('invit', this)" style="padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">🎫 Invitations</button>
+      <div style="display:flex;gap:4px;margin-bottom:0;flex-wrap:wrap;">
+        <button class="bill-tab" onclick="billSetTab('ldc', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #22c55e;border-bottom:none;background:#22c55e;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">LDC</button>
+        <button class="bill-tab" onclick="billSetTab('fimalac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FIMALAC</button>
+        <button class="bill-tab" onclick="billSetTab('nda', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">NDA</button>
+        <button class="bill-tab" onclick="billSetTab('dome', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">DÔME</button>
+        <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">SALLE</button>
+        <button class="bill-tab" onclick="billSetTab('bleucitron', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">BLEU CITRON</button>
+        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">TM</button>
+        <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FNAC</button>
+        <button class="bill-tab" onclick="billSetTab('invit', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">🎫 INVIT</button>
       </div>
       <div style="background:#1a1a1a;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
 
@@ -3862,11 +3865,14 @@ function _hideTeamSelection() {
             <div>
               <label style="font-size:11px;color:#888;text-transform:uppercase;">Réseau</label>
               <select id="import-manuel-reseau" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:10px;margin-top:4px;font-size:13px;">
-                <option value="promo">PROMO / OMP</option>
+                <option value="ldc">LDC (Les Derniers Couchés)</option>
+                <option value="fimalac">FIMALAC</option>
+                <option value="nda">NDA (Nuit d'Artistes)</option>
+                <option value="dome">DÔME DE PARIS</option>
+                <option value="salle">SALLE</option>
+                <option value="bleucitron">BLEU CITRON</option>
                 <option value="tm">TICKETMASTER</option>
                 <option value="fnac">FNAC</option>
-                <option value="salle">SALLE</option>
-                <option value="weez">WEEZEVENT</option>
               </select>
             </div>
             <div>
@@ -7692,7 +7698,7 @@ function _hideTeamSelection() {
         var bdRes = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
         if (bdRes.data && bdRes.data.billetterie_data) {
           var parsed = JSON.parse(bdRes.data.billetterie_data);
-          var ops = ['promo','tm','fnac','salle','weez'];
+          var ops = ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'];
           for (var oi=0; oi<ops.length; oi++) {
             var opData = parsed[ops[oi]];
             if (!opData) continue;
@@ -7826,7 +7832,7 @@ function _hideTeamSelection() {
       var bd = JSON.parse(r.data.billetterie_data || '{}');
       var dlTotal = 0, recTotal = 0, billTotal = 0;
       var res = {};
-      ['promo','tm','fnac','salle','weez'].forEach(function(op) {
+      ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'].forEach(function(op) {
         res[op] = {nb:0, rec:0, dlp:0};
         if (!bd[op]) return;
         bd[op].forEach(function(cat) {
@@ -7839,22 +7845,27 @@ function _hideTeamSelection() {
       });
       var fmt = function(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
       var setEl = function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
-      // Réseaux
-      setEl('pilote-tm-nb',    res.tm.nb>0?res.tm.nb:'');
-      setEl('pilote-tm-rec',   res.tm.rec>0?fmt(res.tm.rec):'');
-      setEl('pilote-tm-recdl', res.tm.rec>0?fmt(res.tm.rec+res.tm.dlp):'');
+      // Réseaux - regroupés pour affichage simplifié
+      // Total Promoteur Local = LDC + FIMALAC + NDA + BLEU CITRON
+      var promoNb = (res.ldc?.nb||0)+(res.fimalac?.nb||0)+(res.nda?.nb||0)+(res.bleucitron?.nb||0);
+      var promoRec = (res.ldc?.rec||0)+(res.fimalac?.rec||0)+(res.nda?.rec||0)+(res.bleucitron?.rec||0);
+      var promoDlp = (res.ldc?.dlp||0)+(res.fimalac?.dlp||0)+(res.nda?.dlp||0)+(res.bleucitron?.dlp||0);
+      // Total TM = TM + DOME
+      var tmNb = (res.tm?.nb||0)+(res.dome?.nb||0);
+      var tmRec = (res.tm?.rec||0)+(res.dome?.rec||0);
+      var tmDlp = (res.tm?.dlp||0)+(res.dome?.dlp||0);
+      setEl('pilote-tm-nb',    tmNb>0?tmNb:'');
+      setEl('pilote-tm-rec',   tmRec>0?fmt(tmRec):'');
+      setEl('pilote-tm-recdl', tmRec>0?fmt(tmRec+tmDlp):'');
       setEl('pilote-fnac-nb',  res.fnac.nb>0?res.fnac.nb:'');
       setEl('pilote-fnac-rec', res.fnac.rec>0?fmt(res.fnac.rec):'');
       setEl('pilote-fnac-recdl',res.fnac.rec>0?fmt(res.fnac.rec+res.fnac.dlp):'');
       setEl('pilote-salle-nb', res.salle.nb>0?res.salle.nb:'');
       setEl('pilote-salle-rec',res.salle.rec>0?fmt(res.salle.rec):'');
       setEl('pilote-salle-recdl',res.salle.rec>0?fmt(res.salle.rec+res.salle.dlp):'');
-      setEl('pilote-promo-nb', res.promo.nb>0?res.promo.nb:'');
-      setEl('pilote-promo-rec',res.promo.rec>0?fmt(res.promo.rec):'');
-      setEl('pilote-promo-recdl',res.promo.rec>0?fmt(res.promo.rec+res.promo.dlp):'');
-      setEl('pilote-weez-nb',  res.weez.nb>0?res.weez.nb:'');
-      setEl('pilote-weez-rec', res.weez.rec>0?fmt(res.weez.rec):'');
-      setEl('pilote-weez-recdl',res.weez.rec>0?fmt(res.weez.rec+res.weez.dlp):'');
+      setEl('pilote-promo-nb', promoNb>0?promoNb:'');
+      setEl('pilote-promo-rec',promoRec>0?fmt(promoRec):'');
+      setEl('pilote-promo-recdl',promoRec>0?fmt(promoRec+promoDlp):'');
       // DL
       var dlOMP=dlTotal*pctOMP/100, dlPL=dlTotal*pctPL/100;
       var dlTTC=dlOMP+dlPL;
@@ -8007,7 +8018,7 @@ function _hideTeamSelection() {
       var bdRes = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
       if (bdRes.data && bdRes.data.billetterie_data) {
         var parsed = JSON.parse(bdRes.data.billetterie_data);
-        var ops = ['promo','tm','fnac','salle','weez'];
+        var ops = ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'];
         for (var oi=0; oi<ops.length; oi++) {
           var opData = parsed[ops[oi]];
           if (!opData) continue;
@@ -8362,7 +8373,7 @@ function _hideTeamSelection() {
         if (r.data && r.data.billetterie_data) {
           var bd = JSON.parse(r.data.billetterie_data);
           var recTTC = 0;
-          ['promo','tm','fnac','salle','weez'].forEach(function(op) {
+          ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'].forEach(function(op) {
             if (!bd[op]) return;
             bd[op].forEach(function(cat) {
               (cat||[]).forEach(function(d) {
@@ -8544,22 +8555,65 @@ function _hideTeamSelection() {
     { key: 'autres',        label: 'Invitations Autres',             color: '#888'    },
   ];
 
-  const BILL_CATS = [
-    { code: 'TN', label: 'Carré Or',    color: '#c9a84c', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
-    { code: 'TN', label: 'Catégorie 1', color: '#e31e24', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4','Promo 5','Promo 6','Promo 7'] },
-    { code: 'TN', label: 'Catégorie 2', color: '#3b82f6', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4','Promo 5','Promo 6','Promo 7'] },
-    { code: 'TN', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
+  // =================================================================
+  // GRILLES DE BILLETTERIE PAR TYPE DE RÉSEAU
+  // =================================================================
+  
+  // GRILLE COMPLÈTE : pour réseaux avec détail par catégorie ET par tarif
+  // (TM, FNAC)
+  const BILL_CATS_FULL = [
+    { code: 'CO', label: 'Carré Or',    color: '#c9a84c', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
+    { code: 'C1', label: 'Catégorie 1', color: '#e31e24', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4','Promo 5','Promo 6','Promo 7'] },
+    { code: 'C2', label: 'Catégorie 2', color: '#3b82f6', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4','Promo 5','Promo 6','Promo 7'] },
+    { code: 'C3', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['TN','ADH','Promo','Promo 2','Promo 3','Promo 4'] },
   ];
-  const BILL_OPS = ['promo','tm','fnac','salle','weez','invit'];
-  // BILL_INVIT_CATS supprimé - remplacé par BILL_INVIT_TYPES
-  let _billTabActif = 'promo';
+  
+  // GRILLE CATÉGORIE SIMPLE : pour réseaux avec détail catégorie mais 1 ligne par cat
+  // (LDC, FIMALAC, DOME)
+  const BILL_CATS_SIMPLE = [
+    { code: 'CO', label: 'Carré Or',    color: '#c9a84c', rows: ['Total'] },
+    { code: 'C1', label: 'Catégorie 1', color: '#e31e24', rows: ['Total'] },
+    { code: 'C2', label: 'Catégorie 2', color: '#3b82f6', rows: ['Total'] },
+    { code: 'C3', label: 'Cat 3 / PMR', color: '#22c55e', rows: ['Total'] },
+  ];
+  
+  // GRILLE TOTAL SEUL : pour réseaux sans détail catégorie (NDA, SALLE, BLEU CITRON)
+  const BILL_CATS_TOTAL = [
+    { code: 'TOT', label: 'Total Billets', color: '#3b82f6', rows: ['Total pointage'] },
+  ];
+  
+  // Configuration des réseaux
+  const BILL_RESEAUX = {
+    ldc:        { label: 'LDC',           fullLabel: 'Les Derniers Couchés', color: '#22c55e', cats: BILL_CATS_SIMPLE },
+    fimalac:    { label: 'FIMALAC',       fullLabel: 'Fimalac',              color: '#a855f7', cats: BILL_CATS_SIMPLE },
+    nda:        { label: 'NDA',           fullLabel: 'Nuit d\'Artistes',     color: '#f97316', cats: BILL_CATS_TOTAL },
+    dome:       { label: 'DÔME',          fullLabel: 'Dôme de Paris',        color: '#ef4444', cats: BILL_CATS_SIMPLE },
+    salle:      { label: 'SALLE',         fullLabel: 'Salle',                color: '#06b6d4', cats: BILL_CATS_TOTAL },
+    bleucitron: { label: 'BLEU CITRON',   fullLabel: 'Bleu Citron',          color: '#3b82f6', cats: BILL_CATS_TOTAL },
+    tm:         { label: 'TM',            fullLabel: 'Ticketmaster',         color: '#e31e24', cats: BILL_CATS_FULL },
+    fnac:       { label: 'FNAC',          fullLabel: 'Fnac Spectacles',      color: '#eab308', cats: BILL_CATS_FULL },
+    invit:      { label: '🎫 INVITATIONS', fullLabel: 'Invitations',         color: '#c9a84c', cats: null },
+  };
+  
+  const BILL_OPS = ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac','invit'];
+  
+  let _billTabActif = 'ldc';
   let _billData = {};
-  ['promo','tm','fnac','salle','weez'].forEach(op => {
-    _billData[op] = BILL_CATS.map((cat) =>
-      cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
-    );
-  });
-  _billData['invit'] = {};
+  
+  // Initialiser les données avec les bonnes grilles pour chaque réseau
+  function billInitData() {
+    BILL_OPS.forEach(op => {
+      if (op === 'invit') {
+        _billData['invit'] = {};
+      } else {
+        const cats = BILL_RESEAUX[op].cats;
+        _billData[op] = cats.map((cat) =>
+          cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
+        );
+      }
+    });
+  }
+  billInitData();
 
   function fpOuvrirBilletterie() {
     const ville = document.getElementById('fp-ville').value || '';
@@ -8567,19 +8621,15 @@ function _hideTeamSelection() {
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
     const el = document.getElementById('bill-ville-date');
     if (el) el.textContent = label;
-    _billTabActif = 'promo';
+    _billTabActif = 'ldc';
     // Reset visuels onglets
     document.querySelectorAll('.bill-tab').forEach((t,i) => {
       t.style.background = i === 0 ? '#3b82f6' : '#1a1a1a';
       t.style.color = i === 0 ? '#fff' : '#888';
       t.style.borderColor = i === 0 ? '#3b82f6' : '#2a2a2a';
     });
-    // Réinitialiser les données
-    ['promo','tm','fnac','salle','weez'].forEach(op => {
-      _billData[op] = BILL_CATS.map((cat) =>
-        cat.rows.map((r) => ({ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: r }))
-      );
-    });
+    // Réinitialiser les données avec les bonnes grilles
+    billInitData();
     _billData['invit'] = {};
     // Charger puis afficher
     showPage('fiche-billetterie');
@@ -8589,10 +8639,11 @@ function _hideTeamSelection() {
 
   function billSetTab(op, btn) {
     _billTabActif = op;
+    const color = BILL_RESEAUX[op]?.color || '#3b82f6';
     document.querySelectorAll('.bill-tab').forEach(t => {
       t.style.background = '#1a1a1a'; t.style.color = '#888'; t.style.borderColor = '#2a2a2a';
     });
-    btn.style.background = '#3b82f6'; btn.style.color = '#fff'; btn.style.borderColor = '#3b82f6';
+    btn.style.background = color; btn.style.color = '#fff'; btn.style.borderColor = color;
     // Masquer le thead standard pour l'onglet invitations
     const thead = document.querySelector('#bill-table thead');
     if (thead) thead.style.display = op === 'invit' ? 'none' : '';
@@ -8610,10 +8661,13 @@ function _hideTeamSelection() {
       return;
     }
 
+    // Choisir la grille selon l'onglet
+    const cats = BILL_RESEAUX[op].cats;
+
     let html = '';
     let opBillets = 0, opRecette = 0, opVersement = 0; // onglet actif
 
-    BILL_CATS.forEach((cat, catIdx) => {
+    cats.forEach((cat, catIdx) => {
       // Ligne titre catégorie
       html += `<tr>
         <td colspan="10" style="padding:10px 10px 6px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:${cat.color};border-top:2px solid ${cat.color}55;background:#222;">${cat.label}</td>
@@ -8622,7 +8676,7 @@ function _hideTeamSelection() {
       let catBillets = 0, catRecette = 0, catDLDistrib = 0, catDLProd = 0;
 
       cat.rows.forEach((rowCode, rowIdx) => {
-        const d = _billData[op][catIdx][rowIdx];
+        const d = _billData[op][catIdx] && _billData[op][catIdx][rowIdx] ? _billData[op][catIdx][rowIdx] : { billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: rowCode };
         const recette = d.billets * d.tarif;
         const totDLDistrib = d.billets * d.dlDistrib;
         const totDLProd = d.billets * d.dlProd;
@@ -8719,12 +8773,16 @@ function _hideTeamSelection() {
 
   function billUpdateTotals() {
     const op = _billTabActif;
+    if (op === 'invit') return; // pas de calcul pour invitations
+    
+    const cats = BILL_RESEAUX[op].cats;
     let opBillets = 0, opRecette = 0, opDLProd = 0, opVersement = 0;
 
-    BILL_CATS.forEach((cat, catIdx) => {
+    cats.forEach((cat, catIdx) => {
       let catBillets = 0, catRecette = 0, catDLDistrib = 0, catDLProd = 0;
       cat.rows.forEach((_, rowIdx) => {
-        const d = _billData[op][catIdx][rowIdx];
+        const d = _billData[op]?.[catIdx]?.[rowIdx];
+        if (!d) return;
         const rec = d.billets * d.tarif;
         const dlD = d.billets * d.dlDistrib;
         const dlP = d.billets * d.dlProd;
@@ -8766,15 +8824,20 @@ function _hideTeamSelection() {
     if (t('verse'))   t('verse').textContent   = billFmt(opVersement);
 
     // Récap onglet (4 carrés dans le bloc)
-    document.getElementById('bill-op-billets').textContent  = opBillets;
-    document.getElementById('bill-op-recette').textContent  = billFmt(opRecette);
-    document.getElementById('bill-op-dlprod').textContent   = billFmt(opDLProd);
-    document.getElementById('bill-op-versement').textContent = billFmt(opVersement);
+    const opBilletsEl = document.getElementById('bill-op-billets');
+    const opRecetteEl = document.getElementById('bill-op-recette');
+    const opDlprodEl = document.getElementById('bill-op-dlprod');
+    const opVerseEl = document.getElementById('bill-op-versement');
+    if (opBilletsEl) opBilletsEl.textContent  = opBillets;
+    if (opRecetteEl) opRecetteEl.textContent  = billFmt(opRecette);
+    if (opDlprodEl) opDlprodEl.textContent   = billFmt(opDLProd);
+    if (opVerseEl) opVerseEl.textContent = billFmt(opVersement);
 
     // Récap global tous réseaux (grands carrés en haut) — hors invitations
     let gBillets = 0, gRecette = 0, gVersement = 0, gDLProd = 0;
-    ['promo','tm','fnac','salle','weez'].forEach(o => {
-      BILL_CATS.forEach((cat, catIdx) => {
+    BILL_OPS.filter(o => o !== 'invit').forEach(o => {
+      const cats = BILL_RESEAUX[o].cats;
+      cats.forEach((cat, catIdx) => {
         cat.rows.forEach((_, rowIdx) => {
           const d = _billData[o]?.[catIdx]?.[rowIdx];
           if (!d) return;
@@ -8787,15 +8850,21 @@ function _hideTeamSelection() {
         });
       });
     });
-    document.getElementById('bill-total-billets').textContent  = gBillets;
-    document.getElementById('bill-total-recette').textContent  = billFmt(gRecette);
-    document.getElementById('bill-total-versement').textContent = billFmt(gVersement);
-    document.getElementById('bill-total-dlprod').textContent   = billFmt(gDLProd);
+    const gBilletsEl = document.getElementById('bill-total-billets');
+    const gRecetteEl = document.getElementById('bill-total-recette');
+    const gVerseEl = document.getElementById('bill-total-versement');
+    const gDlprodEl = document.getElementById('bill-total-dlprod');
+    if (gBilletsEl) gBilletsEl.textContent  = gBillets;
+    if (gRecetteEl) gRecetteEl.textContent  = billFmt(gRecette);
+    if (gVerseEl) gVerseEl.textContent = billFmt(gVersement);
+    if (gDlprodEl) gDlprodEl.textContent   = billFmt(gDLProd);
 
     // Total invitations + jauge
     const totalInvit = BILL_INVIT_TYPES.reduce((s,t) => s + (_billData['invit']?.[t.key]||0), 0);
-    document.getElementById('bill-total-invitations').textContent = totalInvit;
-    document.getElementById('bill-total-jauge').textContent = gBillets + totalInvit;
+    const invitEl = document.getElementById('bill-total-invitations');
+    const jaugeEl = document.getElementById('bill-total-jauge');
+    if (invitEl) invitEl.textContent = totalInvit;
+    if (jaugeEl) jaugeEl.textContent = gBillets + totalInvit;
   }
 
   function billFmt(n) {
@@ -9242,8 +9311,10 @@ function _hideTeamSelection() {
       if (data?.billetterie_data) {
         const parsed = JSON.parse(data.billetterie_data);
         BILL_OPS.forEach(op => {
+          if (op === 'invit') return; // invitations gérées séparément
           if (parsed[op]) {
-            _billData[op] = BILL_CATS.map(function(cat, catIdx) {
+            const cats = BILL_RESEAUX[op].cats;
+            _billData[op] = cats.map(function(cat, catIdx) {
               return cat.rows.map(function(rowCode, rowIdx) {
                 var saved = parsed[op][catIdx] && parsed[op][catIdx][rowIdx];
                 return saved || { billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: rowCode };
@@ -9251,6 +9322,10 @@ function _hideTeamSelection() {
             });
           }
         });
+        // Charger aussi les anciens champs 'promo' et 'weez' vers les nouveaux si ils existent
+        if (parsed['promo'] && !parsed['ldc']) {
+          _billData['ldc'] = parsed['promo'];
+        }
       }
     } catch(e) {}
 
@@ -11178,7 +11253,7 @@ function _hideTeamSelection() {
     // Chercher la structure du fichier LDC / Salle
     let spectacle = '', ville = '', salle = '', dateStr = '';
     let totalVentes = 0, totalRecette = 0, jauge = 0, prixMoyen = 0;
-    let detailReseaux = {};
+    let categories = {}; // Détail par catégorie
     
     for (let r = 0; r < Math.min(json.length, 50); r++) {
       const row = json[r];
@@ -11200,6 +11275,13 @@ function _hideTeamSelection() {
       // Ligne 3 : Date
       if (r === 2 && cell0 && (cell0.includes('2026') || cell0.includes('2027'))) {
         dateStr = cell0;
+      }
+      // Lignes catégories (commencent par #)
+      if (cell0.startsWith('#')) {
+        const catName = cell0.toUpperCase();
+        const ventes = parseInt(row[1]) || 0;
+        const recette = parseFloat(row[5]) || 0;
+        categories[catName] = { ventes, recette };
       }
       // Ligne Total
       if (cell0.toLowerCase() === 'total') {
@@ -11232,7 +11314,7 @@ function _hideTeamSelection() {
       totalRecette,
       jauge,
       prixMoyen,
-      detailReseaux
+      categories // Nouveau: détail par catégorie
     };
   }
 
@@ -11314,26 +11396,89 @@ function _hideTeamSelection() {
     
     log('Début import...', '#22c55e');
     
+    // Mapping catégories Excel → index fiche billetterie
+    // Index 0 = Carré Or, 1 = Cat1, 2 = Cat2, 3 = Cat3/PMR
+    const catMapping = {
+      '#CARRÉ OR': 0,
+      '#CARRE OR': 0,
+      '#CATÉGORIE 1': 1,
+      '#CATEGORIE 1': 1,
+      '#CATÉGORIE 2': 2,
+      '#CATEGORIE 2': 2,
+      '#CATÉGORIE 3': 3,
+      '#CATEGORIE 3': 3,
+      '#PMR': 3,
+      '#PMR ACC': 3
+    };
+    
     for (const item of matched) {
       try {
         log(`📍 ${item.ville}: ${item.totalVentes} billets...`);
         
         // Mettre à jour la fiche production
-        // D'abord, chercher si une fiche existe
         const { data: existing } = await _supabase.from('fiches_production')
           .select('id, billetterie_data')
           .eq('date_concert_id', item.matchedDateId)
           .single();
         
         // Déterminer quel réseau mettre à jour selon la source
-        const reseau = _importSource === 'ldc' ? 'promo' : (_importSource === 'salle' ? 'salle' : 'tm');
+        const reseau = _importSource === 'ldc' ? 'ldc' : (_importSource === 'salle' ? 'salle' : 'tm');
         
         if (existing) {
-          // Mettre à jour le champ billetterie_data
           let billData = {};
           try { billData = existing.billetterie_data ? JSON.parse(existing.billetterie_data) : {}; } catch(e) {}
           
-          // Stocker le total importé
+          // Initialiser le réseau s'il n'existe pas (4 catégories avec lignes vides)
+          if (!billData[reseau]) {
+            billData[reseau] = [
+              [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Import' }],
+              [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Import' }],
+              [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Import' }],
+              [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Import' }]
+            ];
+          }
+          
+          // Remplir chaque catégorie avec les données importées
+          if (item.categories) {
+            // D'abord, reset les valeurs existantes pour ce réseau (première ligne de chaque cat)
+            for (let i = 0; i < 4; i++) {
+              if (billData[reseau][i] && billData[reseau][i][0]) {
+                billData[reseau][i][0].billets = 0;
+                billData[reseau][i][0].tarif = 0;
+                billData[reseau][i][0].desc = 'Import';
+              }
+            }
+            
+            // Ensuite, remplir avec les nouvelles données
+            for (const [catName, catData] of Object.entries(item.categories)) {
+              const catIndex = catMapping[catName.toUpperCase()];
+              if (catIndex !== undefined && catData.ventes > 0) {
+                // S'assurer que la catégorie existe
+                if (!billData[reseau][catIndex]) {
+                  billData[reseau][catIndex] = [];
+                }
+                if (!billData[reseau][catIndex][0]) {
+                  billData[reseau][catIndex][0] = { billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Import' };
+                }
+                
+                // Cumuler si c'est la même catégorie (ex: PMR + PMR ACC → Cat3)
+                const existingBillets = billData[reseau][catIndex][0].billets || 0;
+                const existingRecette = (billData[reseau][catIndex][0].billets || 0) * (billData[reseau][catIndex][0].tarif || 0);
+                
+                const newBillets = existingBillets + catData.ventes;
+                const newRecette = existingRecette + catData.recette;
+                const newTarif = newBillets > 0 ? Math.round((newRecette / newBillets) * 100) / 100 : 0;
+                
+                billData[reseau][catIndex][0].billets = newBillets;
+                billData[reseau][catIndex][0].tarif = newTarif;
+                billData[reseau][catIndex][0].desc = 'Import LDC';
+                
+                log(`   📊 ${catName}: ${catData.ventes} billets, ${catData.recette}€ → tarif ${newTarif}€`);
+              }
+            }
+          }
+          
+          // Stocker aussi le total dans _imports pour référence
           if (!billData._imports) billData._imports = {};
           billData._imports[reseau] = {
             billets: item.totalVentes,
@@ -11347,26 +11492,66 @@ function _hideTeamSelection() {
           
           log(`   ✅ Mis à jour (fiche existante)`, '#22c55e');
         } else {
-          // Créer une nouvelle fiche
+          // Créer une nouvelle fiche avec les catégories
+          let newBillData = {
+            ldc: [[],[],[],[]],
+            fimalac: [[],[],[],[]],
+            nda: [[]],
+            dome: [[],[],[],[]],
+            salle: [[]],
+            bleucitron: [[]],
+            tm: [[],[],[],[]],
+            fnac: [[],[],[],[]]
+          };
+          
+          // Initialiser avec lignes vides selon le type de grille
+          // Grilles SIMPLE (4 catégories): ldc, fimalac, dome, tm, fnac
+          for (const r of ['ldc','fimalac','dome','tm','fnac']) {
+            for (let i = 0; i < 4; i++) {
+              newBillData[r][i] = [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Total' }];
+            }
+          }
+          // Grilles TOTAL (1 seule catégorie): nda, salle, bleucitron
+          for (const r of ['nda','salle','bleucitron']) {
+            newBillData[r][0] = [{ billets: 0, tarif: 0, dlDistrib: 2.5, dlProd: 2.5, desc: 'Total pointage' }];
+          }
+          
+          // Remplir les catégories importées
+          if (item.categories) {
+            for (const [catName, catData] of Object.entries(item.categories)) {
+              const catIndex = catMapping[catName.toUpperCase()];
+              if (catIndex !== undefined && catData.ventes > 0) {
+                const tarif = catData.ventes > 0 ? Math.round((catData.recette / catData.ventes) * 100) / 100 : 0;
+                newBillData[reseau][catIndex][0] = {
+                  billets: catData.ventes,
+                  tarif: tarif,
+                  dlDistrib: 2.5,
+                  dlProd: 2.5,
+                  desc: 'Import LDC'
+                };
+              }
+            }
+          }
+          
+          newBillData._imports = {
+            [reseau]: {
+              billets: item.totalVentes,
+              recette: item.totalRecette,
+              date: new Date().toISOString()
+            }
+          };
+          
           const newFiche = {
             date_concert_id: item.matchedDateId,
-            billetterie_data: JSON.stringify({
-              _imports: {
-                [reseau]: {
-                  billets: item.totalVentes,
-                  recette: item.totalRecette,
-                  date: new Date().toISOString()
-                }
-              }
-            })
+            billetterie_data: JSON.stringify(newBillData)
           };
           await _supabase.from('fiches_production').insert([newFiche]);
           log(`   ✅ Nouvelle fiche créée`, '#22c55e');
         }
         
-        // Mettre à jour aussi le champ etat_ventes dans dates_concerts
+        // Mettre à jour aussi le champ pointage_ventes dans dates_concert
         await _supabase.from('dates_concert')
-          .update({ etat_ventes: item.totalVentes })
+          .update({ pointage_ventes: item.totalVentes })
           .eq('id', item.matchedDateId);
         
       } catch(e) {
