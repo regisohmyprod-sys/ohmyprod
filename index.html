@@ -2473,7 +2473,7 @@ function _hideTeamSelection() {
                 <tr><td style="padding:5px 10px;color:#ccc;">Road extérieur sur facture</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-road" placeholder="0" style="width:90px;"></td><td id="fin-omp-tech-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Rigger</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-figer" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">COULISSES évents</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-coulisses" placeholder="0" style="width:90px;"></td><td></td></tr>
-                <tr><td style="padding:5px 10px;color:#ccc;">Autres Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-autres" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Camion supp</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-autres" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Consommables</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-conso" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Contrôleur</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-tech-controleur" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <!-- Promo -->
@@ -2527,7 +2527,7 @@ function _hideTeamSelection() {
                 <tr><td style="padding:5px 10px;color:#ccc;">Road extérieur sur facture</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-road" placeholder="0" style="width:90px;"></td><td id="fin-pl-tech-total" style="padding:5px 10px;text-align:right;color:#c084fc;font-weight:700;">0</td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Rigger</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-figer" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">COULISSES évents</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-coulisses" placeholder="0" style="width:90px;"></td><td></td></tr>
-                <tr><td style="padding:5px 10px;color:#ccc;">Autres Technique</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-autres" placeholder="0" style="width:90px;"></td><td></td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Camion supp</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-autres" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Consommables</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-conso" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Contrôleur</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-pl-tech-controleur" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c084fc;font-weight:700;font-size:11px;text-transform:uppercase;">Promo</td></tr>
@@ -8338,10 +8338,10 @@ function _hideTeamSelection() {
         });
       }
     } catch(e) {}
-    // Attacher les écouteurs pour recalcul en temps réel + auto-save
+    // Attacher les écouteurs pour recalcul en temps réel + auto-save sur blur (quand on quitte un champ)
     document.querySelectorAll('#page-fiche-financier .fin-input').forEach(inp => {
       inp.addEventListener('input', finCalcTotaux);
-      inp.addEventListener('input', function() { autoSave('fin'); });
+      inp.addEventListener('blur', function() { autoSave('fin'); });
     });
     finCalcTotaux();
   }
