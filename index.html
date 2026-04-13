@@ -4369,7 +4369,10 @@ function _hideTeamSelection() {
   }
 
   function addInvitation() {
-    console.log('addInvitation appelé, _fpDateId =', _fpDateId);
+    // Utiliser _fpDateId (admin) ou _dateActiveId (team artistique)
+    const dateId = _fpDateId || _dateActiveId;
+    console.log('addInvitation appelé, _fpDateId =', _fpDateId, ', _dateActiveId =', _dateActiveId, '→ dateId =', dateId);
+    
     const prenom = document.getElementById('invit-prenom').value.trim();
     const nom = document.getElementById('invit-nom').value.trim();
     const places = document.getElementById('invit-places').value;
@@ -4400,9 +4403,7 @@ function _hideTeamSelection() {
     tables.forEach(t => { if (t.querySelector('tbody')) invitTable = t.querySelector('tbody'); });
 
     // Sauvegarde Supabase
-    const dateId = _fpDateId;
-    console.log('dateId pour sauvegarde:', dateId);
-    if (!dateId) { alert('Erreur : aucune date sélectionnée. (_fpDateId = ' + _fpDateId + ')'); return; }
+    if (!dateId) { alert('Erreur : aucune date sélectionnée.'); return; }
     const invitData = {
       date_concert_id: dateId,
       nom_liste: liste,
