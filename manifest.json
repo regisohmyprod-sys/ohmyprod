@@ -1,0 +1,17 @@
+{
+  "name": "OH MY PROD – Gestion Tournées",
+  "short_name": "OMP",
+  "description": "Application de gestion de tournées OH MY PROD",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#c9a84c",
+  "icons": [
+    {
+      "src": "assets/omp-icon-200.jpg",
+      "sizes": "200x200",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
