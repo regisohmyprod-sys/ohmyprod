@@ -1695,44 +1695,46 @@ function closeSplash() {
     </div>
 
     <div class="ts-org" style="margin-top:50px;">
-      <div style="display:flex; flex-direction:row; align-items:center; justify-content:center; gap:0; width:100%; max-width:1100px;">
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; width:100%; max-width:520px;">
 
         <!-- TEAM PRODUCTION -->
-        <div id="card-team-production" class="ts-card" onclick="goTeamProd()" style="width:200px;">
-          <div class="ts-card-photo" style="background-image:url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAARCACWAMgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUCAwYBB//EADYQAAIBAwMCBAQFBAIDAQAAAAECAwAEERIhMQVBUWETInGBkTKhscHR8AYU4fEjQlJicoL/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAQIDBAX/xAAeEQEBAQEAAwEBAQAAAAAAAAAAARECITESQVFh8P/aAAwDAQACEQMRAD8A+f0UUV0IooooAoqV3ZR2bG4QMR0yBXQaHqTLuFqxX1oA1RUiY5JX4EV1sNNuL5ys3hBD5Kd6AOdFdJdPuUgeYxExp1INco0LROUkUqw7EUANooooAooooAooooAooooBOPYdutMV61jYXHiS3trO2gC5W8u/DEh9z2H1qWjWb3tysFtE0shGdq96j4ySQPCCcZb0oA9loHxJj0q40WK6025sLB5hHCLhcGXnkKoGf8APejDW/h5Y61pUE2k3F3ayiEySG3KgPkj5gxPT6Ck3XtDm0ae3W4nWWO4Rwgxg4IOCf8AwKi6Fp0+q6nb2VspMs0gRfqef2FAsWXxcurOOeHW9BivLaVy5g8UrFCx6gEDIFSXHxy1CSRG07SpI1HLNNIzMfoBj9a9OtdDs7DT44LK0jt7dF2hI1CiqjX/AIR6bqGLjTnksp3OC0Y+U+voQKAPC179o8k5AtNLCRjjeZNx+uP6VlPa+Odxqkf9nW8cdwrgB5wHOB3GGwPvWesPhtq1wzfa3jtkzz+bJPsPT71pW3w30i2VV8Gd+5Z3Iz6nJ/rQB5bd2d3A5e7t5Y3bksyEE/WmFjqF1p1wJrO4eGQdGU4/+1eh3/w5tbhWNvqQhYjgy2u7HuQSP614+/sZ7G7ktbpCkqHBB9+4oA9z+FXxVk1CJdI1eUC7TiCdj/eHofUfyrpfiV8NFh/43SowIifmkCjmM92+ncelemfDHSrXRtBtktXM0ky+JJMS5yx6AnoAOBRD42NkSaRdwDEtvcLJkdQCMH98UAYJGR6jiikjcSRq46MARSUAFFFFABRRRQAUUUUAFFFOWXTbq7hkmt7dpI4hukIOAooA0NQe6bQ9PWHxza+IwbbvXPft0rPVp2mn3U0oYSTSSSFgMZLE5wKzQMHBFABRRRQAUUUUAFFFFABRRRQAlFFdKAOlFFFABRRRQBbRxIpyuOavaa0fDIJGKfRqfT5Y1wjHcPrVOOUq6nPTpXT5FoA1NtSuAhWQB0HQk9Kqr65l8VkY5IBxUOe+Rt3tXB1IlVSp6UAWsWqSxKyOCr91FQINQuuqTSKf96qvW4HHpRoA1f7TuV6SvU/7Tv9bVQ0akKGZSrY5wc0mDimFb1oAki1e7hUhZWAxyM80sPxFvIl2kbh6kVXjHrSVmzSbwm8hzjBxj71Bqk6avNIgbJKnkjpjNKIpIpXSRGR1OGVhgiu1AHR7eaMYkRkOOjCo2oopWihjViEGcdyakl0m+hjEkkJCHoTiooARxzQTcGJpEJGCVbFXtIRFvvDkXcjg9e9VJLaeCNXkiZVYkAnuRVzRJ4Ypbh5RhfDweev/ADoA6xQ/aIvvKqTUHiCONYkQYVVAA9BVgCK9t0KSq0TDBB61yPTre7tLi3nBMMoyQDjB7EfX+tAFTRXS8gdHG5TwR0rpQAUUUUAFFFFABRRRQAUUUUAFFFWrHTbq8jeSCFnjjXdI+MKo9SaALu5gNMfYNx69q59s4yBgV0jhEY7ZC2DgHGM1Pq9ol1DIkSLG6jKldvI9f2oA5EEHBqrqkPiWxXn5o23D1HUVqC2imH2iPDgdR0Nd7CJrjUoEYBlMgBBGQRQBjKAGFdKsBSRQBWooooAKKKKACiiigAooooAKKKKAP/9k=');"></div>
-          <div class="ts-card-icon">💻</div>
-          <div class="ts-card-title">Team Production</div>
-          <div class="ts-card-names">Régis & Alexandrine</div>
+        <div id="card-team-production" onclick="goTeamProd()" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">💻</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Team Production</div>
+            <div style="font-size:11px; color:#666;">Régis & Alexandrine</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
-
-        <div id="separator-team-production" style="width:30px; height:2px; background:linear-gradient(to right, rgba(201,168,76,0.4), #c9a84c, rgba(201,168,76,0.4)); flex-shrink:0;"></div>
 
         <!-- STAFF OMP -->
-        <div class="ts-card" onclick="goTeamStaff()" style="width:200px;">
-          <div class="ts-card-photo" style="background-image:url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAARCACWAMgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUCAwYBB//EADYQAAIBAwMCBAQFBAIDAQAAAAECAwAEERIhMQVBUWETInGBkTKhscHR8AYU4fEjQlJicoL/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAQIDBAX/xAAeEQEBAQEAAwEBAQAAAAAAAAAAARECITESQVFh8P/aAAwDAQACEQMRAD8A+f0UUV0IooooAoqV3ZR2bG4QMR0yBXQaHqTLuFqxX1oA1RUiY5JX4EV1sNNuL5ys3hBD5Kd6AOdFdJdPuUgeYxExp1INco0LROUkUqw7EUANooooAooooAooooAooooBOPYdutMV61jYXHiS3trO2gC5W8u/DEh9z2H1qWjWb3tysFtE0shGdq96j4ySQPCCcZb0oA9loHxJj0q40WK6025sLB5hHCLhcGXnkKoGf8APejDW/h5Y61pUE2k3F3ayiEySG3KgPkj5gxPT6Ck3XtDm0ae3W4nWWO4Rwgxg4IOCf8AwKi6Fp0+q6nb2VspMs0gRfqef2FAsWXxcurOOeHW9BivLaVy5g8UrFCx6gEDIFSXHxy1CSRG07SpI1HLNNIzMfoBj9a9OtdDs7DT44LK0jt7dF2hI1CiqjX/AIR6bqGLjTnksp3OC0Y+U+voQKAPC179o8k5AtNLCRjjeZNx+uP6VlPa+Odxqkf9nW8cdwrgB5wHOB3GGwPvWesPhtq1wzfa3jtkzz+bJPsPT71pW3w30i2VV8Gd+5Z3Iz6nJ/rQB5bd2d3A5e7t5Y3bksyEE/WmFjqF1p1wJrO4eGQdGU4/+1eh3/w5tbhWNvqQhYjgy2u7HuQSP614+/sZ7G7ktbpCkqHBB9+4oA9z+FXxVk1CJdI1eUC7TiCdj/eHofUfyrpfiV8NFh/43SowIifmkCjmM92+ncelemfDHSrXRtBtktXM0ky+JJMS5yx6AnoAOBRD42NkSaRdwDEtvcLJkdQCMH98UAYJGR6jiikjcSRq46MARSUAFFFFABRRRQAUUUUAFFFOWXTbq7hkmt7dpI4hukIOAooA0NQe6bQ9PWHxza+IwbbvXPft0rPVp2mn3U0oYSTSSSFgMZLE5wKzQMHBFABRRRQAUUUUAFFFFABRRRQAlFFdKAOlFFFABRRRQBbRxIpyuOavaa0fDIJGKfRqfT5Y1wjHcPrVOOUq6nPTpXT5FoA1NtSuAhWQB0HQk9Kqr65l8VkY5IBxUOe+Rt3tXB1IlVSp6UAWsWqSxKyOCr91FQINQuuqTSKf96qvW4HHpRoA1f7TuV6SvU/7Tv9bVQ0akKGZSrY5wc0mDimFb1oAki1e7hUhZWAxyM80sPxFvIl2kbh6kVXjHrSVmzSbwm8hzjBxj71Bqk6avNIgbJKnkjpjNKIpIpXSRGR1OGVhgiu1AHR7eaMYkRkOOjCo2oopWihjViEGcdyakl0m+hjEkkJCHoTiooARxzQTcGJpEJGCVbFXtIRFvvDkXcjg9e9VJLaeCNXkiZVYkAnuRVzRJ4Ypbh5RhfDweev/ADoA6xQ/aIvvKqTUHiCONYkQYVVAA9BVgCK9t0KSq0TDBB61yPTre7tLi3nBMMoyQDjB7EfX+tAFTRXS8gdHG5TwR0rpQAUUUUAFFFFABRRRQAUUUUAFFFWrHTbq8jeSCFnjjXdI+MKo9SaALu5gNMfYNx69q59s4yBgV0jhEY7ZC2DgHGM1Pq9ol1DIkSLG6jKldvI9f2oA5EEHBqrqkPiWxXn5o23D1HUVqC2imH2iPDgdR0Nd7CJrjUoEYBlMgBBGQRQBjKAGFdKsBSRQBWooooAKKKKACiiigAooooAKKKKAP/9k=');"></div>
-          <div class="ts-card-icon">🧑‍💼</div>
-          <div class="ts-card-title">Staff OMP</div>
-          <div class="ts-card-names">Sarah & Jérôme</div>
+        <div onclick="goTeamStaff()" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🧑‍💼</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Staff OMP</div>
+            <div style="font-size:11px; color:#666;">Sarah & Jérôme</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
-
-        <div style="width:30px; height:2px; background:linear-gradient(to right, rgba(201,168,76,0.4), #c9a84c, rgba(201,168,76,0.4)); flex-shrink:0;"></div>
 
         <!-- TEAM ARTISTIQUE -->
-        <div class="ts-card" onclick="goTeamArtistique()" style="width:200px;">
-          <div class="ts-card-photo" style="background-image:url('');"></div>
-          <div class="ts-card-icon">👑</div>
-          <div class="ts-card-title">Team Artistique</div>
-          <div class="ts-card-names">Artistes OMP</div>
+        <div onclick="goTeamArtistique()" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">👑</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Team Artistique</div>
+            <div style="font-size:11px; color:#666;">Artistes OMP</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
 
-        <div style="width:30px; height:2px; background:linear-gradient(to right, rgba(201,168,76,0.4), #c9a84c, rgba(201,168,76,0.4)); flex-shrink:0;"></div>
-
         <!-- TEAM TECHNIQUE -->
-        <div class="ts-card" onclick="goTeamTechnique()" style="width:200px;">
-          <div class="ts-card-photo" style="background-image:url('');"></div>
-          <div class="ts-card-icon">🔦</div>
-          <div class="ts-card-title">Team Technique</div>
-          <div class="ts-card-names">Staff Technique</div>
+        <div onclick="goTeamTechnique()" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🔦</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Team Technique</div>
+            <div style="font-size:11px; color:#666;">Staff Technique</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
 
       </div>
