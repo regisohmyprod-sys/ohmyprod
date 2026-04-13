@@ -3805,6 +3805,108 @@ function _hideTeamSelection() {
       </div>
     </div>
 
+    <!-- PAGE IMPORT VENTES -->
+    <div id="page-import-ventes" class="page">
+      <button class="back-btn" onclick="showPage('dashboard')">← Tableau de bord</button>
+      <div style="margin-bottom:20px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#22c55e;">📥 IMPORT VENTES</div>
+        <div style="font-size:13px;color:#888;margin-top:4px;">Importer les pointages de ventes depuis fichiers Excel ou PDF</div>
+      </div>
+
+      <!-- Sélection du type de source -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px;">
+        <div onclick="selectImportSource('ldc')" id="import-src-ldc" style="background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#22c55e'" onmouseout="if(!this.classList.contains('selected'))this.style.borderColor='#2a2a2a'">
+          <div style="font-size:28px;margin-bottom:8px;">🎫</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#22c55e;letter-spacing:1px;">LES DERNIERS COUCHES</div>
+          <div style="font-size:11px;color:#666;margin-top:4px;">Excel détaillé par date</div>
+        </div>
+        <div onclick="selectImportSource('salle')" id="import-src-salle" style="background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="if(!this.classList.contains('selected'))this.style.borderColor='#2a2a2a'">
+          <div style="font-size:28px;margin-bottom:8px;">🏟️</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#3b82f6;letter-spacing:1px;">SALLE / EXPLOITANT</div>
+          <div style="font-size:11px;color:#666;margin-top:4px;">Excel ou PDF salle</div>
+        </div>
+        <div onclick="selectImportSource('tm')" id="import-src-tm" style="background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#e31e24'" onmouseout="if(!this.classList.contains('selected'))this.style.borderColor='#2a2a2a'">
+          <div style="font-size:28px;margin-bottom:8px;">🎟️</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#e31e24;letter-spacing:1px;">TICKETMASTER</div>
+          <div style="font-size:11px;color:#666;margin-top:4px;">PDF récapitulatif</div>
+        </div>
+        <div onclick="selectImportSource('manuel')" id="import-src-manuel" style="background:#1a1a1a;border:2px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="if(!this.classList.contains('selected'))this.style.borderColor='#2a2a2a'">
+          <div style="font-size:28px;margin-bottom:8px;">✍️</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c9a84c;letter-spacing:1px;">SAISIE MANUELLE</div>
+          <div style="font-size:11px;color:#666;margin-top:4px;">Email ou plateformes</div>
+        </div>
+      </div>
+
+      <!-- Zone d'upload (visible après sélection) -->
+      <div id="import-upload-zone" style="display:none;margin-bottom:24px;">
+        <div style="background:#0a0a0a;border:2px dashed #333;border-radius:12px;padding:40px;text-align:center;cursor:pointer;" onclick="document.getElementById('import-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='#22c55e'" ondragleave="this.style.borderColor='#333'" ondrop="handleImportDrop(event)">
+          <div style="font-size:48px;margin-bottom:12px;">📄</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff;letter-spacing:1px;">GLISSER LE FICHIER ICI</div>
+          <div style="font-size:12px;color:#666;margin-top:8px;">ou cliquer pour parcourir</div>
+          <div id="import-file-name" style="margin-top:12px;color:#22c55e;font-weight:600;"></div>
+        </div>
+        <input type="file" id="import-file-input" accept=".xlsx,.xls,.pdf" style="display:none;" onchange="handleImportFile(this.files[0])">
+      </div>
+
+      <!-- Zone saisie manuelle (visible si manuel sélectionné) -->
+      <div id="import-manuel-zone" style="display:none;margin-bottom:24px;">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:20px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c9a84c;margin-bottom:16px;letter-spacing:1px;">✍️ SAISIE MANUELLE</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;color:#888;text-transform:uppercase;">Sélectionner la date</label>
+              <select id="import-manuel-date" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:10px;margin-top:4px;font-size:13px;">
+                <option value="">-- Choisir une date --</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:#888;text-transform:uppercase;">Réseau</label>
+              <select id="import-manuel-reseau" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:10px;margin-top:4px;font-size:13px;">
+                <option value="promo">PROMO / OMP</option>
+                <option value="tm">TICKETMASTER</option>
+                <option value="fnac">FNAC</option>
+                <option value="salle">SALLE</option>
+                <option value="weez">WEEZEVENT</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:#888;text-transform:uppercase;">Nombre de billets</label>
+              <input type="number" id="import-manuel-billets" placeholder="Ex: 150" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:10px;margin-top:4px;font-size:13px;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#888;text-transform:uppercase;">Recette TTC (€)</label>
+              <input type="number" id="import-manuel-recette" placeholder="Ex: 5250" step="0.01" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:10px;margin-top:4px;font-size:13px;">
+            </div>
+          </div>
+          <button onclick="importManuelSave()" style="margin-top:16px;background:#c9a84c;color:#000;border:none;border-radius:8px;padding:12px 24px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;width:100%;">💾 ENREGISTRER</button>
+        </div>
+      </div>
+
+      <!-- Bouton analyser -->
+      <div id="import-analyze-btn" style="display:none;margin-bottom:24px;">
+        <button onclick="analyzeImportFile()" style="background:#22c55e;color:#000;border:none;border-radius:8px;padding:14px 28px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;width:100%;">🔍 ANALYSER LE FICHIER</button>
+      </div>
+
+      <!-- Résultats de l'analyse -->
+      <div id="import-results" style="display:none;">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#1a3d1a,#22c55e);padding:14px 20px;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;">📊 DONNÉES EXTRAITES</div>
+          </div>
+          <div id="import-results-content" style="padding:16px;max-height:400px;overflow-y:auto;">
+            <!-- Résultats injectés ici -->
+          </div>
+        </div>
+        <button onclick="executeImport()" id="import-execute-btn" style="margin-top:16px;background:#22c55e;color:#000;border:none;border-radius:8px;padding:14px 28px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;width:100%;">✅ IMPORTER LES DONNÉES</button>
+      </div>
+
+      <!-- Log d'import -->
+      <div id="import-log" style="display:none;margin-top:24px;">
+        <div style="background:#0a0a0a;border:1px solid #333;border-radius:8px;padding:16px;font-family:monospace;font-size:12px;color:#888;max-height:200px;overflow-y:auto;">
+        </div>
+      </div>
+    </div>
+
     <div id="page-equipe" class="page">
       <div class="page-title">MEMBRES</div>
       <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
@@ -10907,6 +11009,412 @@ function _hideTeamSelection() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') doLogin();
   });
+
+  // =============================================
+  // IMPORT VENTES - Fonctions
+  // =============================================
+  let _importSource = null;
+  let _importFile = null;
+  let _importData = [];
+
+  function selectImportSource(source) {
+    _importSource = source;
+    // Reset styles
+    ['ldc','salle','tm','manuel'].forEach(s => {
+      const el = document.getElementById('import-src-' + s);
+      if (el) {
+        el.style.borderColor = '#2a2a2a';
+        el.classList.remove('selected');
+      }
+    });
+    // Highlight selected
+    const colors = { ldc: '#22c55e', salle: '#3b82f6', tm: '#e31e24', manuel: '#c9a84c' };
+    const sel = document.getElementById('import-src-' + source);
+    if (sel) {
+      sel.style.borderColor = colors[source];
+      sel.classList.add('selected');
+    }
+    // Show appropriate zone
+    document.getElementById('import-upload-zone').style.display = source === 'manuel' ? 'none' : 'block';
+    document.getElementById('import-manuel-zone').style.display = source === 'manuel' ? 'block' : 'none';
+    document.getElementById('import-analyze-btn').style.display = 'none';
+    document.getElementById('import-results').style.display = 'none';
+    document.getElementById('import-file-name').textContent = '';
+    _importFile = null;
+    _importData = [];
+    
+    // Si manuel, charger les dates disponibles
+    if (source === 'manuel') {
+      loadImportDates();
+    }
+  }
+
+  async function loadImportDates() {
+    const select = document.getElementById('import-manuel-date');
+    if (!select) return;
+    select.innerHTML = '<option value="">-- Chargement... --</option>';
+    try {
+      const { data } = await _supabase.from('dates_concerts')
+        .select('id, ville, date_concert, salle')
+        .order('date_concert', { ascending: true });
+      select.innerHTML = '<option value="">-- Choisir une date --</option>';
+      if (data) {
+        data.forEach(d => {
+          const dt = d.date_concert ? new Date(d.date_concert).toLocaleDateString('fr-FR') : '';
+          select.innerHTML += `<option value="${d.id}">${d.ville} - ${dt} (${d.salle || ''})</option>`;
+        });
+      }
+    } catch(e) {
+      console.error('Erreur chargement dates:', e);
+      select.innerHTML = '<option value="">Erreur chargement</option>';
+    }
+  }
+
+  function handleImportDrop(e) {
+    e.preventDefault();
+    e.target.style.borderColor = '#333';
+    const file = e.dataTransfer.files[0];
+    if (file) handleImportFile(file);
+  }
+
+  function handleImportFile(file) {
+    if (!file) return;
+    _importFile = file;
+    document.getElementById('import-file-name').textContent = '📄 ' + file.name;
+    document.getElementById('import-analyze-btn').style.display = 'block';
+    document.getElementById('import-results').style.display = 'none';
+  }
+
+  async function analyzeImportFile() {
+    if (!_importFile) return;
+    
+    const resultsDiv = document.getElementById('import-results-content');
+    resultsDiv.innerHTML = '<div style="color:#888;text-align:center;padding:20px;">⏳ Analyse en cours...</div>';
+    document.getElementById('import-results').style.display = 'block';
+    
+    try {
+      // Charger SheetJS dynamiquement
+      if (!window.XLSX) {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+      }
+      
+      const data = await _importFile.arrayBuffer();
+      const workbook = XLSX.read(data, { type: 'array' });
+      
+      _importData = [];
+      let html = '';
+      
+      // Parser chaque feuille
+      for (let i = 0; i < workbook.SheetNames.length; i++) {
+        const sheetName = workbook.SheetNames[i];
+        const sheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+        
+        // Extraire les infos
+        const parsed = parseSheetData(json, sheetName);
+        if (parsed && parsed.ville) {
+          _importData.push(parsed);
+        }
+      }
+      
+      // Afficher les résultats
+      if (_importData.length === 0) {
+        html = '<div style="color:#ef4444;text-align:center;padding:20px;">❌ Aucune donnée de vente trouvée dans ce fichier</div>';
+      } else {
+        // Charger les dates existantes pour le matching
+        const { data: datesDb } = await _supabase.from('dates_concerts')
+          .select('id, ville, date_concert, salle');
+        
+        html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+        for (const item of _importData) {
+          // Chercher matching dans la DB
+          const match = findMatchingDate(item, datesDb);
+          const statusColor = match ? '#22c55e' : '#ef4444';
+          const statusIcon = match ? '✅' : '❌';
+          const statusText = match ? 'Date trouvée' : 'Date non trouvée';
+          
+          item.matchedDateId = match ? match.id : null;
+          
+          html += `
+            <div style="background:#0a0a0a;border:1px solid #333;border-radius:8px;padding:12px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div>
+                  <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;letter-spacing:1px;">${item.spectacle || 'THE WORLD OF QUEEN'}</span>
+                  <span style="color:#666;font-size:12px;margin-left:8px;">${item.dateStr || ''}</span>
+                </div>
+                <span style="color:${statusColor};font-size:12px;font-weight:600;">${statusIcon} ${statusText}</span>
+              </div>
+              <div style="font-size:14px;color:#c9a84c;font-weight:600;">${item.ville || '?'} - ${item.salle || ''}</div>
+              <div style="display:flex;gap:20px;margin-top:8px;">
+                <div><span style="color:#888;font-size:11px;">VENTES</span><br><span style="color:#22c55e;font-size:18px;font-weight:700;">${item.totalVentes || 0}</span></div>
+                <div><span style="color:#888;font-size:11px;">RECETTE</span><br><span style="color:#fff;font-size:18px;font-weight:700;">${formatMontant(item.totalRecette || 0)}</span></div>
+                <div><span style="color:#888;font-size:11px;">JAUGE</span><br><span style="color:#888;font-size:18px;font-weight:700;">${item.jauge || '-'}</span></div>
+                <div><span style="color:#888;font-size:11px;">PRIX MOY.</span><br><span style="color:#888;font-size:18px;font-weight:700;">${item.prixMoyen ? formatMontant(item.prixMoyen) : '-'}</span></div>
+              </div>
+            </div>
+          `;
+        }
+        html += '</div>';
+        
+        // Compter les matches
+        const matched = _importData.filter(d => d.matchedDateId).length;
+        html = `<div style="margin-bottom:12px;padding:10px;background:#111;border-radius:6px;display:flex;justify-content:space-between;">
+          <span style="color:#888;">${_importData.length} date(s) trouvée(s) dans le fichier</span>
+          <span style="color:${matched > 0 ? '#22c55e' : '#ef4444'};">${matched} matchée(s) avec la base</span>
+        </div>` + html;
+      }
+      
+      resultsDiv.innerHTML = html;
+      
+    } catch(e) {
+      console.error('Erreur analyse:', e);
+      resultsDiv.innerHTML = `<div style="color:#ef4444;text-align:center;padding:20px;">❌ Erreur: ${e.message}</div>`;
+    }
+  }
+
+  function parseSheetData(json, sheetName) {
+    // Chercher la structure du fichier LDC / Salle
+    let spectacle = '', ville = '', salle = '', dateStr = '';
+    let totalVentes = 0, totalRecette = 0, jauge = 0, prixMoyen = 0;
+    let detailReseaux = {};
+    
+    for (let r = 0; r < Math.min(json.length, 50); r++) {
+      const row = json[r];
+      if (!row || row.length === 0) continue;
+      
+      const cell0 = String(row[0] || '').trim();
+      const cell1 = String(row[1] || '').trim();
+      
+      // Ligne 1 : Spectacle
+      if (r === 0 && (cell0.includes('WORLD OF QUEEN') || cell0.includes('GREG PETRAS') || cell0.includes('RENAUD'))) {
+        spectacle = cell0;
+      }
+      // Ligne 2 : Ville, Salle
+      if (r === 1 && cell0 && !cell0.includes('Point du') && !cell0.includes('Catégorie')) {
+        const parts = cell0.split(',');
+        ville = parts[0]?.trim() || '';
+        salle = parts[1]?.trim() || '';
+      }
+      // Ligne 3 : Date
+      if (r === 2 && cell0 && (cell0.includes('2026') || cell0.includes('2027'))) {
+        dateStr = cell0;
+      }
+      // Ligne Total
+      if (cell0.toLowerCase() === 'total') {
+        totalVentes = parseInt(row[1]) || 0;
+        totalRecette = parseFloat(row[5]) || 0;
+        jauge = parseInt(row[3]) || 0;
+      }
+      // Prix moyen
+      if (cell0.toLowerCase().includes('prix moyen')) {
+        prixMoyen = parseFloat(row[5]) || 0;
+      }
+    }
+    
+    // Si pas trouvé dans les données, utiliser le nom de la feuille
+    if (!ville && sheetName) {
+      const match = sheetName.match(/WORLD OF QUEEN\s*-?\s*(.+)/i);
+      if (match) {
+        ville = match[1].trim();
+      }
+    }
+    
+    if (!ville && !totalVentes) return null;
+    
+    return {
+      spectacle,
+      ville: ville.toUpperCase(),
+      salle,
+      dateStr,
+      totalVentes,
+      totalRecette,
+      jauge,
+      prixMoyen,
+      detailReseaux
+    };
+  }
+
+  function findMatchingDate(item, datesDb) {
+    if (!datesDb || !item.ville) return null;
+    
+    // Normaliser la ville pour le matching
+    const villeNorm = item.ville.toUpperCase()
+      .replace(/[éèêë]/gi, 'E')
+      .replace(/[àâä]/gi, 'A')
+      .replace(/[ùûü]/gi, 'U')
+      .replace(/[îï]/gi, 'I')
+      .replace(/[ôö]/gi, 'O')
+      .replace(/[ç]/gi, 'C')
+      .replace(/[-']/g, ' ')
+      .trim();
+    
+    for (const d of datesDb) {
+      const dbVille = (d.ville || '').toUpperCase()
+        .replace(/[éèêë]/gi, 'E')
+        .replace(/[àâä]/gi, 'A')
+        .replace(/[ùûü]/gi, 'U')
+        .replace(/[îï]/gi, 'I')
+        .replace(/[ôö]/gi, 'O')
+        .replace(/[ç]/gi, 'C')
+        .replace(/[-']/g, ' ')
+        .trim();
+      
+      // Match sur ville (contient ou égal)
+      if (dbVille.includes(villeNorm) || villeNorm.includes(dbVille)) {
+        return d;
+      }
+      // Match sur salle
+      const dbSalle = (d.salle || '').toUpperCase();
+      if (item.salle && dbSalle.includes(item.salle.toUpperCase())) {
+        return d;
+      }
+    }
+    return null;
+  }
+
+  async function executeImport() {
+    const matched = _importData.filter(d => d.matchedDateId);
+    if (matched.length === 0) {
+      alert('Aucune date à importer (pas de matching trouvé)');
+      return;
+    }
+    
+    const logDiv = document.getElementById('import-log');
+    logDiv.style.display = 'block';
+    const logContent = logDiv.querySelector('div');
+    logContent.innerHTML = '';
+    
+    const log = (msg, color = '#888') => {
+      logContent.innerHTML += `<div style="color:${color};">${new Date().toLocaleTimeString()} - ${msg}</div>`;
+      logContent.scrollTop = logContent.scrollHeight;
+    };
+    
+    log('Début import...', '#22c55e');
+    
+    for (const item of matched) {
+      try {
+        log(`📍 ${item.ville}: ${item.totalVentes} billets...`);
+        
+        // Mettre à jour la fiche production
+        // D'abord, chercher si une fiche existe
+        const { data: existing } = await _supabase.from('fiches_production')
+          .select('id, billetterie_data')
+          .eq('date_concert_id', item.matchedDateId)
+          .single();
+        
+        // Déterminer quel réseau mettre à jour selon la source
+        const reseau = _importSource === 'ldc' ? 'promo' : (_importSource === 'salle' ? 'salle' : 'tm');
+        
+        if (existing) {
+          // Mettre à jour le champ billetterie_data
+          let billData = {};
+          try { billData = existing.billetterie_data ? JSON.parse(existing.billetterie_data) : {}; } catch(e) {}
+          
+          // Stocker le total importé
+          if (!billData._imports) billData._imports = {};
+          billData._imports[reseau] = {
+            billets: item.totalVentes,
+            recette: item.totalRecette,
+            date: new Date().toISOString()
+          };
+          
+          await _supabase.from('fiches_production')
+            .update({ billetterie_data: JSON.stringify(billData) })
+            .eq('id', existing.id);
+          
+          log(`   ✅ Mis à jour (fiche existante)`, '#22c55e');
+        } else {
+          // Créer une nouvelle fiche
+          const newFiche = {
+            date_concert_id: item.matchedDateId,
+            billetterie_data: JSON.stringify({
+              _imports: {
+                [reseau]: {
+                  billets: item.totalVentes,
+                  recette: item.totalRecette,
+                  date: new Date().toISOString()
+                }
+              }
+            })
+          };
+          await _supabase.from('fiches_production').insert([newFiche]);
+          log(`   ✅ Nouvelle fiche créée`, '#22c55e');
+        }
+        
+        // Mettre à jour aussi le champ etat_ventes dans dates_concerts
+        await _supabase.from('dates_concerts')
+          .update({ etat_ventes: item.totalVentes })
+          .eq('id', item.matchedDateId);
+        
+      } catch(e) {
+        log(`   ❌ Erreur: ${e.message}`, '#ef4444');
+      }
+    }
+    
+    log('✅ Import terminé !', '#22c55e');
+  }
+
+  async function importManuelSave() {
+    const dateId = document.getElementById('import-manuel-date').value;
+    const reseau = document.getElementById('import-manuel-reseau').value;
+    const billets = parseInt(document.getElementById('import-manuel-billets').value) || 0;
+    const recette = parseFloat(document.getElementById('import-manuel-recette').value) || 0;
+    
+    if (!dateId) { alert('Sélectionne une date'); return; }
+    if (!billets) { alert('Saisis un nombre de billets'); return; }
+    
+    try {
+      // Chercher fiche existante
+      const { data: existing } = await _supabase.from('fiches_production')
+        .select('id, billetterie_data')
+        .eq('date_concert_id', dateId)
+        .single();
+      
+      if (existing) {
+        let billData = {};
+        try { billData = existing.billetterie_data ? JSON.parse(existing.billetterie_data) : {}; } catch(e) {}
+        if (!billData._imports) billData._imports = {};
+        billData._imports[reseau] = { billets, recette, date: new Date().toISOString() };
+        
+        await _supabase.from('fiches_production')
+          .update({ billetterie_data: JSON.stringify(billData) })
+          .eq('id', existing.id);
+      } else {
+        await _supabase.from('fiches_production').insert([{
+          date_concert_id: dateId,
+          billetterie_data: JSON.stringify({
+            _imports: { [reseau]: { billets, recette, date: new Date().toISOString() } }
+          })
+        }]);
+      }
+      
+      // Mettre à jour etat_ventes
+      await _supabase.from('dates_concerts')
+        .update({ etat_ventes: billets })
+        .eq('id', dateId);
+      
+      alert('✅ Ventes enregistrées !');
+      document.getElementById('import-manuel-billets').value = '';
+      document.getElementById('import-manuel-recette').value = '';
+      
+    } catch(e) {
+      alert('❌ Erreur: ' + e.message);
+    }
+  }
+
+  function formatMontant(n) {
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n);
+  }
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
 </script>
 
 <!-- MODALE CRÉER UNE LISTE D'INVITATIONS -->
@@ -13181,6 +13689,12 @@ function _hideTeamSelection() {
         <div onclick="closeModal('modal-gestion-tour-regis'); showPage('gestion-salles');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
           <span style="font-size:22px;">🏟️</span>
           <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">GESTION SALLES</div><div style="font-size:11px;color:#555;">Base de données salles</div></div>
+          <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
+        </div>
+
+        <div onclick="closeModal('modal-gestion-tour-regis'); showPage('import-ventes');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#22c55e'" onmouseout="this.style.borderColor='#2a2a2a'">
+          <span style="font-size:22px;">📥</span>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#22c55e;">IMPORT VENTES</div><div style="font-size:11px;color:#555;">Importer pointages Excel/PDF</div></div>
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </div>
 
