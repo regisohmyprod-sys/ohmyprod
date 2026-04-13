@@ -5827,6 +5827,11 @@ function _hideTeamSelection() {
     const date = _avhrDates.find(d => d.id === dateId);
     if (!date) return;
     _avhrActiveIdx = _avhrDates.indexOf(date);
+    
+    // Définir les IDs pour les invitations
+    _dateActiveId = dateId;
+    _fpDateId = dateId;
+    console.log('ouvrirArtisteDate: _dateActiveId =', _dateActiveId, ', _fpDateId =', _fpDateId);
 
     await avhrAfficherDetail(date);
     showPage('artiste-date');
