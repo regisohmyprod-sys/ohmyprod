@@ -2108,17 +2108,23 @@ function _hideTeamSelection() {
       <div class="page-title">📋 CRÉA / SUIVI DATES</div>
       <div style="font-size:13px;color:#888;margin-bottom:20px;margin-top:-12px;font-style:italic;">Merci de choisir votre tournée !</div>
 
-      <!-- Filtres tournée — ligne 1 : tournées en gros boutons blancs -->
-      <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
-        <div id="cs-filter-twoq" onclick="csSetFilter('twoq')" style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:10px 16px;cursor:pointer;box-shadow:0 2px 12px rgba(170,180,190,0.2);min-width:140px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 TWOQ</div>
-          <div style="font-size:11px;color:#888;">L'Hommage à la Légende</div>
+      <!-- Filtres tournée — boutons style compact comme ADMINISTRATIF -->
+      <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:10px;margin-bottom:16px;">
+        
+        <!-- TWOQ L'Hommage -->
+        <div id="cs-filter-twoq" onclick="csSetFilter('twoq')" style="background:#1a1a1a; border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease; text-align:center;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="if(!this.classList.contains('active')){this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'}">
+          <div style="width:36px; height:36px; background:rgba(201,168,76,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px;">🎸</div>
+          <div style="font-size:12px; font-weight:600; color:#c9a84c;">TWOQ</div>
+          <div style="font-size:10px; color:#666;">L'Hommage à la Légende</div>
         </div>
-        <div id="cs-filter-twoq2" onclick="csSetFilter('twoq2')" style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:10px 16px;cursor:pointer;box-shadow:0 2px 12px rgba(170,180,190,0.2);min-width:140px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#3b82f6;margin-bottom:2px;">🎸 TWOQ</div>
-          <div style="font-size:11px;color:#888;">Éternelle Légende</div>
-        </div> <div style="font-size:11px;color:#888;">One Man Show</div>
+
+        <!-- TWOQ Éternelle Légende -->
+        <div id="cs-filter-twoq2" onclick="csSetFilter('twoq2')" style="background:#1a1a1a; border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease; text-align:center;" onmouseover="this.style.borderLeftColor='#3b82f6'; this.style.background='#222'" onmouseout="if(!this.classList.contains('active')){this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'}">
+          <div style="width:36px; height:36px; background:rgba(59,130,246,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px;">👑</div>
+          <div style="font-size:12px; font-weight:600; color:#3b82f6;">TWOQ</div>
+          <div style="font-size:10px; color:#666;">Éternelle Légende</div>
         </div>
+
       </div>
 
       <!-- Bandeau visuel tournée -->
