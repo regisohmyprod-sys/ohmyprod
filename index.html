@@ -7563,10 +7563,26 @@ function _hideTeamSelection() {
     const heure = document.getElementById('fp-heure').value || '20H30';
     const jauge = document.getElementById('fp-jauge-depart').value || '';
     const ventes = document.getElementById('fp-etat-ventes').value || '';
-    const invits = document.getElementById('fp-invitations').value || '';
+    var invits = document.getElementById('fp-invitations').value || '';
     const totalJauge = document.getElementById('fp-total-jauge').value || '';
     const dealOmp = document.getElementById('fp-deal-promo').value || '100%';
     const mg = document.getElementById('fp-mg').value || '0';
+    
+    // Calculer le total des invitations validées depuis Supabase
+    if (_fpDateId) {
+      try {
+        var { data: invitData } = await _supabase
+          .from('invitations')
+          .select('nombre')
+          .eq('date_concert_id', _fpDateId)
+          .eq('valide', 1);
+        if (invitData && invitData.length > 0) {
+          var totalInvits = invitData.reduce(function(sum, inv) { return sum + (inv.nombre || 1); }, 0);
+          invits = totalInvits.toString();
+        }
+      } catch(e) { console.log('Pilote invitations erreur:', e); }
+    }
+    
     // Lire recette brute TTC et billets depuis Supabase directement
     var gRecettePilote = 0, gBilletsPilote = 0;
     if (_fpDateId) {
