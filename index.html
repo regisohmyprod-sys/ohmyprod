@@ -1076,18 +1076,18 @@
     
     /* TOPBAR / MENU DU HAUT - Mobile */
     .topbar {
-      padding: 6px 10px !important;
+      padding: 4px 6px !important;
     }
     .breadcrumb {
-      font-size: 10px !important;
-      gap: 3px !important;
+      font-size: 8px !important;
+      gap: 2px !important;
     }
     .topbar-actions {
-      gap: 3px !important;
+      gap: 2px !important;
     }
     .topbar-actions .btn {
-      padding: 4px 6px !important;
-      font-size: 10px !important;
+      padding: 3px 5px !important;
+      font-size: 8px !important;
     }
     
     /* Page Choisir Espace - Mobile */
@@ -1207,6 +1207,80 @@
     /* Lignes dorées shimmer */
     .gold-line-shimmer {
       margin: 12px 0 !important;
+    }
+    
+    /* ESPACE ARTISTIQUE - Photo élargie */
+    #page-artistique > div:nth-of-type(3) {
+      max-height: 180px !important;
+    }
+    #page-artistique > div:nth-of-type(3) img {
+      height: 180px !important;
+    }
+    
+    /* DATES - Titre ville et date réduits */
+    .city-title {
+      font-size: 28px !important;
+      letter-spacing: 2px !important;
+    }
+    .city-date {
+      font-size: 12px !important;
+    }
+    .city-meta {
+      gap: 6px !important;
+      flex-wrap: wrap !important;
+    }
+    .venue-name {
+      font-size: 10px !important;
+    }
+    .date-detail-header {
+      padding: 12px 0 !important;
+    }
+    .nav-arrow {
+      width: 24px !important;
+      height: 24px !important;
+      font-size: 12px !important;
+    }
+    
+    /* INFOS CLÉS DU JOUR - Centré et complet */
+    .planning-keys {
+      margin-bottom: 12px !important;
+    }
+    .planning-keys-title {
+      font-size: 12px !important;
+      padding: 6px 10px !important;
+      letter-spacing: 1px !important;
+      text-align: center !important;
+    }
+    .planning-keys-subtitle {
+      font-size: 9px !important;
+      padding: 5px 10px !important;
+      text-align: center !important;
+    }
+    .planning-keys-grid4, .planning-keys-grid5 {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .planning-key-item {
+      padding: 6px 8px !important;
+    }
+    .planning-key-label {
+      font-size: 8px !important;
+    }
+    .planning-key-value {
+      font-size: 12px !important;
+    }
+    
+    /* BOUTON IMPRIMER PDF - Petit et centré */
+    button[onclick="window.print()"] {
+      padding: 5px 10px !important;
+      font-size: 10px !important;
+      letter-spacing: 0.5px !important;
+    }
+    #page-cloture-salle > div:first-child,
+    #page-decla-droits > div:first-child,
+    #page-bilan-amh > div:first-child {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 8px !important;
     }
   }
 
