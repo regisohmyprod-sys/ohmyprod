@@ -4410,14 +4410,31 @@ function _hideTeamSelection() {
       demandeur: demandeur || null,
       nom_invite: `${prenom} ${nom}`.trim(),
       nombre: parseInt(places) || 1,
-      valide: statut === 'valide' ? 1 : 0,
+      valide: statut === 'valide' ? 1 : (statut === 'refuse' ? -1 : 0),
       date_demande: date || null,
     };
-    _supabase.from('invitations').insert([invitData]).then(({ error }) => {
-      if (error) { alert('Erreur sauvegarde : ' + error.message); return; }
-      closeModal('modal-add-invit');
-      loadInvitations(dateId);
-    });
+    
+    // Mode édition ou création ?
+    if (window._editingInvitId) {
+      _supabase.from('invitations').update(invitData).eq('id', window._editingInvitId).then(({ error }) => {
+        if (error) { alert('Erreur mise à jour : ' + error.message); return; }
+        closeModal('modal-add-invit');
+        window._editingInvitId = null;
+        // Remettre le titre original
+        const modalTitle = document.querySelector('#modal-add-invit .modal-title');
+        if (modalTitle) modalTitle.textContent = '🎟️ AJOUTER UNE INVITATION';
+        // Recharger les listes
+        loadInvitations(dateId);
+        if (typeof billChargerListeInvitations === 'function') billChargerListeInvitations();
+      });
+    } else {
+      _supabase.from('invitations').insert([invitData]).then(({ error }) => {
+        if (error) { alert('Erreur sauvegarde : ' + error.message); return; }
+        closeModal('modal-add-invit');
+        loadInvitations(dateId);
+        if (typeof billChargerListeInvitations === 'function') billChargerListeInvitations();
+      });
+    }
     ['invit-prenom','invit-nom','invit-email','invit-demandeur','invit-places-num','invit-date','invit-valide-par','invit-notes'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
     document.getElementById('invit-places').value = '1';
     ['invit-pass','invit-loge','invit-parking','invit-repas'].forEach(id => document.getElementById(id).checked = false);
@@ -5255,6 +5272,12 @@ function _hideTeamSelection() {
 
   function closeModal(id) {
     document.getElementById(id).classList.remove('open');
+    // Reset du mode édition pour les invitations
+    if (id === 'modal-add-invit') {
+      window._editingInvitId = null;
+      const modalTitle = document.querySelector('#modal-add-invit .modal-title');
+      if (modalTitle) modalTitle.textContent = '🎟️ AJOUTER UNE INVITATION';
+    }
   }
 
   function closeModalOutside(e) {
@@ -8778,6 +8801,147 @@ function _hideTeamSelection() {
         win.document.close();
       };
       tbody.closest('table').parentNode.appendChild(btn);
+    }
+
+    // === SECTION LISTE DES DEMANDES D'INVITATIONS ===
+    var listeContainer = document.getElementById('bill-invit-liste-container');
+    if (!listeContainer) {
+      listeContainer = document.createElement('div');
+      listeContainer.id = 'bill-invit-liste-container';
+      listeContainer.style.marginTop = '24px';
+      listeContainer.style.background = '#1a1a1a';
+      listeContainer.style.border = '2px solid #c9a84c';
+      listeContainer.style.borderRadius = '10px';
+      listeContainer.style.overflow = 'hidden';
+      tbody.closest('table').parentNode.appendChild(listeContainer);
+    }
+    // Charger et afficher les demandes
+    billChargerListeInvitations();
+  }
+
+  async function billChargerListeInvitations() {
+    const container = document.getElementById('bill-invit-liste-container');
+    if (!container || !_fpDateId) return;
+
+    // Header
+    container.innerHTML = `
+      <div style="background:linear-gradient(135deg,#2a1f00,#c9a84c);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#000;">📋 LISTE DES DEMANDES D'INVITATIONS</div>
+        <button onclick="openModal('modal-add-invit')" style="background:#111;color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;">+ AJOUTER</button>
+      </div>
+      <div id="bill-invit-liste-body" style="padding:12px;max-height:400px;overflow-y:auto;">
+        <div style="color:#888;text-align:center;padding:20px;">Chargement...</div>
+      </div>
+    `;
+
+    try {
+      const { data: invitations, error } = await _supabase
+        .from('invitations')
+        .select('*')
+        .eq('date_concert_id', _fpDateId)
+        .order('created_at', { ascending: false });
+
+      const body = document.getElementById('bill-invit-liste-body');
+      if (error || !invitations || invitations.length === 0) {
+        body.innerHTML = '<div style="color:#666;text-align:center;padding:20px;font-style:italic;">Aucune demande d\'invitation enregistrée</div>';
+        return;
+      }
+
+      const statutColors = { 'en-attente': '#f59e0b', 'valide': '#22c55e', 'refuse': '#ef4444' };
+      const statutLabels = { 'en-attente': '⏳ En attente', 'valide': '✅ Validé', 'refuse': '❌ Refusé' };
+
+      body.innerHTML = `
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="background:#242424;">
+              <th style="padding:8px;text-align:left;color:#aaa;font-weight:600;">Invité</th>
+              <th style="padding:8px;text-align:left;color:#aaa;font-weight:600;">Demandeur</th>
+              <th style="padding:8px;text-align:left;color:#aaa;font-weight:600;">Liste</th>
+              <th style="padding:8px;text-align:center;color:#aaa;font-weight:600;">Nb</th>
+              <th style="padding:8px;text-align:center;color:#aaa;font-weight:600;">Statut</th>
+              <th style="padding:8px;text-align:center;color:#aaa;font-weight:600;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${invitations.map((inv, idx) => {
+              const bg = idx % 2 === 0 ? '#1e1e1e' : '#242424';
+              const statut = inv.valide === 1 ? 'valide' : (inv.valide === -1 ? 'refuse' : 'en-attente');
+              return `
+                <tr style="background:${bg};border-bottom:1px solid #333;">
+                  <td style="padding:8px;color:#fff;font-weight:600;">${inv.nom_invite || '–'}</td>
+                  <td style="padding:8px;color:#aaa;">${inv.demandeur || '–'}</td>
+                  <td style="padding:8px;color:#7eb8d4;font-size:11px;">${inv.nom_liste || '–'}</td>
+                  <td style="padding:8px;text-align:center;color:#c9a84c;font-weight:700;">${inv.nombre || 1}</td>
+                  <td style="padding:8px;text-align:center;">
+                    <select onchange="billUpdateInvitStatut('${inv.id}', this.value)" style="background:#0a0a0a;border:1px solid ${statutColors[statut]};border-radius:4px;color:${statutColors[statut]};padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer;">
+                      <option value="en-attente" ${statut==='en-attente'?'selected':''}>⏳ En attente</option>
+                      <option value="valide" ${statut==='valide'?'selected':''}>✅ Validé</option>
+                      <option value="refuse" ${statut==='refuse'?'selected':''}>❌ Refusé</option>
+                    </select>
+                  </td>
+                  <td style="padding:8px;text-align:center;">
+                    <button onclick="billEditInvit('${inv.id}')" style="background:transparent;border:1px solid #3b82f6;color:#3b82f6;border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;margin-right:4px;" title="Modifier">✏️</button>
+                    <button onclick="billDeleteInvit('${inv.id}')" style="background:transparent;border:1px solid #ef4444;color:#ef4444;border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;" title="Supprimer">🗑️</button>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    } catch(e) {
+      console.error('Erreur chargement invitations:', e);
+      document.getElementById('bill-invit-liste-body').innerHTML = '<div style="color:#ef4444;text-align:center;padding:20px;">Erreur de chargement</div>';
+    }
+  }
+
+  async function billUpdateInvitStatut(invitId, statut) {
+    const valide = statut === 'valide' ? 1 : (statut === 'refuse' ? -1 : 0);
+    try {
+      await _supabase.from('invitations').update({ valide }).eq('id', invitId);
+      // Recharger la liste
+      billChargerListeInvitations();
+    } catch(e) {
+      alert('Erreur mise à jour statut');
+    }
+  }
+
+  async function billDeleteInvit(invitId) {
+    if (!confirm('Supprimer cette invitation ?')) return;
+    try {
+      await _supabase.from('invitations').delete().eq('id', invitId);
+      billChargerListeInvitations();
+    } catch(e) {
+      alert('Erreur suppression');
+    }
+  }
+
+  async function billEditInvit(invitId) {
+    // Charger l'invitation et ouvrir la modale de modification
+    try {
+      const { data: inv } = await _supabase.from('invitations').select('*').eq('id', invitId).single();
+      if (!inv) return;
+      
+      // Remplir la modale avec les données existantes
+      const parts = (inv.nom_invite || '').split(' ');
+      document.getElementById('invit-prenom').value = parts[0] || '';
+      document.getElementById('invit-nom').value = parts.slice(1).join(' ') || '';
+      document.getElementById('invit-places').value = inv.nombre || 1;
+      document.getElementById('invit-demandeur').value = inv.demandeur || '';
+      document.getElementById('invit-liste').value = inv.nom_liste || '';
+      document.getElementById('invit-date').value = inv.date_demande || new Date().toISOString().split('T')[0];
+      document.getElementById('invit-statut').value = inv.valide === 1 ? 'valide' : (inv.valide === -1 ? 'refuse' : 'en-attente');
+      
+      // Stocker l'ID pour la mise à jour
+      window._editingInvitId = invitId;
+      
+      // Changer le titre de la modale
+      const modalTitle = document.querySelector('#modal-add-invit .modal-title');
+      if (modalTitle) modalTitle.textContent = '✏️ MODIFIER L\'INVITATION';
+      
+      openModal('modal-add-invit');
+    } catch(e) {
+      alert('Erreur chargement invitation');
     }
   }
 
