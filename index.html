@@ -6966,6 +6966,8 @@ function _hideTeamSelection() {
   let _csFilter = 'avenir';   // période : 'avenir' | 'all' | 'passees'
   let _csTournee = null;      // tournée : 'twoq' | 'twoq2' | 'greg' | null
   let _fpDateId = null; // date_concert_id en cours d'édition
+  let _dateActiveId = null;   // date_concert_id pour espace artistique
+  let _tourneeActiveId = null; // tournée active pour espace artistique
 
   function showGestionOMP(tourneeId) {
     const isAdmin = _currentUserRole === 'admin';
@@ -9207,9 +9209,6 @@ function _hideTeamSelection() {
       showDateDynamic(date, _datesActives.indexOf(date), _tourneeActive, 'twoq');
     }
   }
-
-  let _dateActiveId = null;
-  let _tourneeActiveId = null;
 
   async function chargerPageMembres() {
     await chargerMembres();
