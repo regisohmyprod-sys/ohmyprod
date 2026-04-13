@@ -3210,15 +3210,19 @@ function _hideTeamSelection() {
           <div id="bill-total-dlprod" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;">0,00 €</div>
         </div>
       </div>
+
+      <!-- Ligne séparatrice dorée -->
+      <div class="gold-line-shimmer" style="margin:28px 0;"></div>
+
+      <!-- ONGLETS RÉSEAUX -->
       <div style="display:flex;gap:4px;margin-bottom:0;flex-wrap:wrap;">
-        <button class="bill-tab" onclick="billSetTab('ldc', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #22c55e;border-bottom:none;background:#22c55e;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">LDC</button>
-        <button class="bill-tab" onclick="billSetTab('fimalac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FIMALAC</button>
-        <button class="bill-tab" onclick="billSetTab('nda', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">NDA</button>
-        <button class="bill-tab" onclick="billSetTab('dome', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">DÔME</button>
-        <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">SALLE</button>
-        <button class="bill-tab" onclick="billSetTab('bleucitron', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">BLEU CITRON</button>
-        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">TM</button>
+        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #22c55e;border-bottom:none;background:#22c55e;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">TM</button>
         <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FNAC</button>
+        <button class="bill-tab" onclick="billSetTab('ldc', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">LDC</button>
+        <button class="bill-tab" onclick="billSetTab('nda', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">NDA</button>
+        <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">SALLE</button>
+        <button class="bill-tab" onclick="billSetTab('fimalac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FIMALAC</button>
+        <button class="bill-tab" onclick="billSetTab('bleucitron', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">BLEU CITRON</button>
         <button class="bill-tab" onclick="billSetTab('invit', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">🎫 INVIT</button>
       </div>
       <div style="background:#1a1a1a;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
@@ -3670,45 +3674,35 @@ function _hideTeamSelection() {
         <div style="position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;opacity:0.8;">TEAM ARTISTIQUE · THE WORLD OF QUEEN</div>
       </div>
 
-      <!-- BOUTONS -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:12px;margin-top:8px;">
-
-        <!-- Gestion VHR -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-vhr-tournee')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🚌 VOS VHR</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Toutes les infos de vos voyages</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
-        </div>
-
-        <!-- Accès Frais -->
+      <!-- BOUTONS style GESTION TOUR -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
         
+        <!-- Vos VHR -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-vhr-tournee')">
+          <div class="stat-label">🚌 Vos VHR</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">VHR</div>
+          <div class="stat-sub">Infos voyages</div>
+        </div>
 
         <!-- Drive Technique -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="window.open('https://drive.google.com/drive/folders/1Tnhwp4Qo0EVo9C3Nzi_m3lJgg0G7pWWg?usp=drive_link','_blank')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">📁 DRIVE TECHNIQUE</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Documents & ressources</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="window.open('https://drive.google.com/drive/folders/1Tnhwp4Qo0EVo9C3Nzi_m3lJgg0G7pWWg?usp=drive_link','_blank')">
+          <div class="stat-label">📁 Drive Technique</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">DRIVE</div>
+          <div class="stat-sub">Documents</div>
         </div>
 
-        <!-- Fiche Technique TWOQ L'hommage -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="window.open('https://drive.google.com/file/d/1UE5qBm0e8XLX7t7uuXwRuUXRrlatM0ca/view?usp=drive_link','_blank')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 FICHE TECH TWOQ</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">L'Hommage à la Légende</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+        <!-- Fiche Tech TWOQ -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="window.open('https://drive.google.com/file/d/1UE5qBm0e8XLX7t7uuXwRuUXRrlatM0ca/view?usp=drive_link','_blank')">
+          <div class="stat-label">🎸 Fiche Tech</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">TWOQ</div>
+          <div class="stat-sub">L'Hommage</div>
         </div>
 
-        <!-- Fiche Technique TWOQ Éternelle Légende -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:not-allowed;opacity:0.55;display:flex;flex-direction:column;gap:4px;"
-             onclick="alert('Fiche technique TWOQ Éternelle Légende — pas encore disponible.')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 FICHE TECH ÉTERNELLE</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">L'Éternelle Légende</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#555;margin-top:6px;">PAS ENCORE DISPO</div>
+        <!-- Fiche Tech Éternelle -->
+        <div class="stat-card" style="border-left:3px solid #555;padding:20px;cursor:not-allowed;opacity:0.5;">
+          <div class="stat-label">🎸 Fiche Tech</div>
+          <div class="stat-value" style="font-size:24px;color:#555;">ÉTERNELLE</div>
+          <div class="stat-sub">Pas encore dispo</div>
         </div>
 
       </div>
@@ -3734,76 +3728,50 @@ function _hideTeamSelection() {
         <div style="position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;opacity:0.8;">TEAM STAFF OMP</div>
       </div>
 
-      <!-- BOUTONS -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:8px;">
-
+      <!-- BOUTONS style GESTION TOUR -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(5, 1fr);">
+        
         <!-- Gestion VHR -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-vhr-tournee')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🚌 GESTION VHR</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Véhicules & transport par tournée</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-vhr-tournee')">
+          <div class="stat-label">🚌 Gestion VHR</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">VHR</div>
+          <div class="stat-sub">Véhicules & transport</div>
         </div>
 
         <!-- Accès Frais -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="ouvrirAccesFrais()"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">💰 ACCÈS FRAIS</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Notes de frais & justificatifs</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR MON ESPACE</div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="ouvrirAccesFrais()">
+          <div class="stat-label">💰 Accès Frais</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">FRAIS</div>
+          <div class="stat-sub">Notes & justificatifs</div>
         </div>
 
         <!-- Liens Pratiques -->
-        <div id="liens-pratiques-card" style="background:#1a1a1a;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:12px 16px;cursor:pointer;display:flex;flex-direction:column;gap:4px;position:relative;"
-             onclick="var p=document.getElementById('liens-pratiques-panel');p.style.display=p.style.display==='block'?'none':'block'"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🔗 LIENS PRATIQUES</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Outils & Voyages</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR</div>
-        </div>
-
-        <!-- Panel Liens Pratiques -->
-        <div id="liens-pratiques-panel" style="display:none;grid-column:1/-1;background:#111;border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:20px;margin-top:4px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-            <div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(201,168,76,0.2);">📋 PRATIQUE</div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <a href="https://mail.google.com/mail/u/0/" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>📧</span><span>Ma boite mail</span></a>
-                <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>📅</span><span>Mon agenda</span></a>
-                <a href="https://drive.google.com/drive/my-drive" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>📁</span><span>Drive Tour</span></a>
-              </div>
-            </div>
-            <div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(201,168,76,0.2);">✈️ VOYAGES</div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <a href="https://all.accor.com/a/fr.html" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🏨</span><span>Accor Hotels</span></a>
-                <a href="https://fr.mappy.com/itineraire" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🗺️</span><span>Mappy Itineraire</span></a>
-                <a href="https://www.booking.com/index.fr.html" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🏩</span><span>Booking</span></a>
-                <a href="https://www.uber.com/fr" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🚗</span><span>Uber</span></a>
-                <a href="https://www.sncf-connect.com/" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🚄</span><span>SNCF Connect</span></a>
-              </div>
-            </div>
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-liens-staff')">
+          <div class="stat-label">🔗 Liens Pratiques</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">LIENS</div>
+          <div class="stat-sub">Outils & Voyages</div>
+          <div id="dropdown-liens-staff" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <a href="https://mail.google.com/mail/u/0/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📧 Ma boite mail</a>
+            <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Mon agenda</a>
+            <a href="https://drive.google.com/drive/my-drive" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📁 Drive Tour</a>
+            <a href="https://all.accor.com/a/fr.html" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏨 Accor Hotels</a>
+            <a href="https://fr.mappy.com/itineraire" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🗺️ Mappy</a>
+            <a href="https://www.sncf-connect.com/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚄 SNCF Connect</a>
           </div>
         </div>
 
-        
-        <!-- Fiche Technique TWOQ L'hommage -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="window.open('https://drive.google.com/file/d/1UE5qBm0e8XLX7t7uuXwRuUXRrlatM0ca/view?usp=drive_link','_blank')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 FICHE TECH TWOQ</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">L'Hommage à la Légende</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+        <!-- Fiche Tech TWOQ -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="window.open('https://drive.google.com/file/d/1UE5qBm0e8XLX7t7uuXwRuUXRrlatM0ca/view?usp=drive_link','_blank')">
+          <div class="stat-label">🎸 Fiche Tech</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">TWOQ</div>
+          <div class="stat-sub">L'Hommage</div>
         </div>
 
-        <!-- Fiche Technique TWOQ Éternelle Légende -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:not-allowed;opacity:0.55;display:flex;flex-direction:column;gap:4px;"
-             onclick="alert('Fiche technique TWOQ Éternelle Légende — pas encore disponible.')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 FICHE TECH ÉTERNELLE</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">L'Éternelle Légende</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#555;margin-top:6px;">PAS ENCORE DISPO</div>
+        <!-- Fiche Tech Éternelle -->
+        <div class="stat-card" style="border-left:3px solid #555;padding:20px;cursor:not-allowed;opacity:0.5;">
+          <div class="stat-label">🎸 Fiche Tech</div>
+          <div class="stat-value" style="font-size:24px;color:#555;">ÉTERNELLE</div>
+          <div class="stat-sub">Pas encore dispo</div>
         </div>
 
       </div>
@@ -3829,34 +3797,33 @@ function _hideTeamSelection() {
         <div style="position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;opacity:0.8;">TEAM ARTISTIQUE · THE WORLD OF QUEEN</div>
       </div>
 
-      <!-- BOUTONS -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px;">
-
-        <!-- VOS -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-artiste-vhr-tournee')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🚌 VOS VHR</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Toutes les infos de vos voyages</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+      <!-- BOUTONS style GESTION TOUR -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(3, 1fr);">
+        
+        <!-- Vos VHR -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-artiste-vhr-tournee')">
+          <div class="stat-label">🚌 Vos VHR</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">VHR</div>
+          <div class="stat-sub">Infos voyages</div>
         </div>
 
         <!-- Accès Frais -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-add-frais')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">💰 ACCÈS FRAIS</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Ajouter une note de frais</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ NOUVEAU FRAIS</div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-add-frais')">
+          <div class="stat-label">💰 Accès Frais</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">FRAIS</div>
+          <div class="stat-sub">Ajouter une note</div>
         </div>
 
-        <!-- Liens pratiques -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-liens-pratiques-artistique')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🔗 LIENS PRATIQUES</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Accès rapides & ressources</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ VOIR LES LIENS</div>
+        <!-- Liens Pratiques -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-liens-artistique')">
+          <div class="stat-label">🔗 Liens Pratiques</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">LIENS</div>
+          <div class="stat-sub">Accès rapides</div>
+          <div id="dropdown-liens-artistique" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <a href="https://mail.google.com/mail/u/0/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📧 Ma boite mail</a>
+            <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Mon agenda</a>
+            <a href="https://drive.google.com/drive/my-drive" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📁 Drive Tour</a>
+          </div>
         </div>
 
       </div>
