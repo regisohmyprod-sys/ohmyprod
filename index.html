@@ -11121,9 +11121,11 @@ function _hideTeamSelection() {
       if (_importData.length === 0) {
         html = '<div style="color:#ef4444;text-align:center;padding:20px;">❌ Aucune donnée de vente trouvée dans ce fichier</div>';
       } else {
-        // Charger les dates existantes pour le matching
+        // Charger les dates existantes pour le matching (seulement dates futures)
+        const today = new Date().toISOString().split('T')[0];
         const { data: datesDb } = await _supabase.from('dates_concert')
-          .select('id, ville, date_concert, nom_salle');
+          .select('id, ville, date_concert, nom_salle')
+          .gte('date_concert', today);
         
         html = '<div style="display:flex;flex-direction:column;gap:12px;">';
         for (const item of _importData) {
