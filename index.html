@@ -8760,19 +8760,20 @@ function _hideTeamSelection() {
     tbody.innerHTML = html;
     billUpdateInvitTotals();
 
-    // Bouton LISTE INVITATIONS PDF
+    // Bouton LISTE INVITATIONS PDF - toujours recréer pour avoir le dernier code
     var existing = document.getElementById('btn-liste-invitations');
-    if (!existing) {
-      var btn = document.createElement('button');
-      btn.id = 'btn-liste-invitations';
-      btn.textContent = '🖨️ LISTE INVITATIONS — IMPRIMER PDF';
-      btn.style.marginTop = '16px';
-      btn.style.background = '#0a0a0a';
-      btn.style.color = '#fff';
-      btn.style.border = '1px solid #3b82f6';
-      btn.style.borderRadius = '7px';
-      btn.style.padding = '9px 20px';
-      btn.style.fontSize = '13px';
+    if (existing) existing.remove();
+    
+    var btn = document.createElement('button');
+    btn.id = 'btn-liste-invitations';
+    btn.textContent = '🖨️ LISTE INVITATIONS — IMPRIMER PDF';
+    btn.style.marginTop = '16px';
+    btn.style.background = '#0a0a0a';
+    btn.style.color = '#fff';
+    btn.style.border = '1px solid #3b82f6';
+    btn.style.borderRadius = '7px';
+    btn.style.padding = '9px 20px';
+    btn.style.fontSize = '13px';
       btn.style.fontWeight = '700';
       btn.style.cursor = 'pointer';
       btn.style.fontFamily = 'Bebas Neue, sans-serif';
@@ -8866,8 +8867,7 @@ function _hideTeamSelection() {
         win.document.write('</body></html>');
         win.document.close();
       };
-      tbody.closest('table').parentNode.appendChild(btn);
-    }
+    tbody.closest('table').parentNode.appendChild(btn);
 
     // === SECTION LISTE DES DEMANDES D'INVITATIONS ===
     var listeContainer = document.getElementById('bill-invit-liste-container');
