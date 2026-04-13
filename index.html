@@ -11055,13 +11055,13 @@ function _hideTeamSelection() {
     select.innerHTML = '<option value="">-- Chargement... --</option>';
     try {
       const { data } = await _supabase.from('dates_concert')
-        .select('id, ville, date_concert, salle')
+        .select('id, ville, date_concert, nom_salle')
         .order('date_concert', { ascending: true });
       select.innerHTML = '<option value="">-- Choisir une date --</option>';
       if (data) {
         data.forEach(d => {
           const dt = d.date_concert ? new Date(d.date_concert).toLocaleDateString('fr-FR') : '';
-          select.innerHTML += `<option value="${d.id}">${d.ville} - ${dt} (${d.salle || ''})</option>`;
+          select.innerHTML += `<option value="${d.id}">${d.ville} - ${dt} (${d.nom_salle || ''})</option>`;
         });
       }
     } catch(e) {
@@ -11123,7 +11123,7 @@ function _hideTeamSelection() {
       } else {
         // Charger les dates existantes pour le matching
         const { data: datesDb } = await _supabase.from('dates_concert')
-          .select('id, ville, date_concert, salle');
+          .select('id, ville, date_concert, nom_salle');
         
         html = '<div style="display:flex;flex-direction:column;gap:12px;">';
         for (const item of _importData) {
@@ -11262,7 +11262,7 @@ function _hideTeamSelection() {
     
     for (const d of datesDb) {
       const dbVille = normalize(d.ville);
-      const dbSalle = normalize(d.salle);
+      const dbSalle = normalize(d.nom_salle);
       let score = 0;
       
       // Match exact ville
