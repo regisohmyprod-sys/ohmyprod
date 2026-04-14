@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
+<!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
+<meta name="version" content="2026.04.14.01">
+<!-- Désactiver le cache navigateur -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/jpeg" href="assets/omp-icon-200.jpg">
 <link rel="apple-touch-icon" href="assets/omp-icon-200.jpg">
@@ -2296,8 +2302,7 @@ function _hideTeamSelection() {
       <span>OH MY PROD</span>
     </div>
     <div class="topbar-actions">
-      <button class="btn btn-ghost" onclick="refreshDonnees()" title="Actualiser les données">🔄</button>
-      <button class="btn btn-ghost" onclick="hardReload()" title="Recharger la page (sans cache)">🔃</button>
+      <button class="btn btn-ghost" onclick="hardReload()" title="Actualiser la page">🔄</button>
 
       <button onclick="openModal('modal-notifier')" style="background:#7f1d1d;color:#fff;border:2px solid #e31e24;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📨 Notifier l'équipe</button>
       <button class="btn btn-ghost" onclick="doLogout()" title="Déconnexion">🚪</button>
@@ -4282,7 +4287,7 @@ function _hideTeamSelection() {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">📣 CONTACTS PROMO</div>
       <div style="font-size:13px;color:#888;margin-top:4px;">Presse locale · Radios · Médias partenaires</div>
     </div>
-    <button onclick="openModal('modal-add-contact-promo')" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">+ AJOUTER UN CONTACT</button>
+    <button onclick="resetFormContactPromo(); openModal('modal-add-contact-promo');" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">+ AJOUTER UN CONTACT</button>
   </div>
 
   <!-- Barre recherche -->
@@ -7756,7 +7761,7 @@ function _hideTeamSelection() {
         }
         
         if (c.infos) html += `<div style="font-size:11px;color:#666;margin-top:4px;font-style:italic;">💬 ${c.infos}</div>`;
-        if (c.fromDb && c.id) html += `<button onclick="supprimerContactPromo(${c.id})" style="position:absolute;top:0;right:0;background:transparent;border:none;color:#e74c3c;font-size:14px;cursor:pointer;" title="Supprimer">🗑️</button>`;
+        if (c.fromDb && c.id) html += `<div style="position:absolute;top:0;right:0;display:flex;gap:4px;"><button onclick="modifierContactPromo(${c.id})" style="background:transparent;border:none;color:#888;font-size:12px;cursor:pointer;" title="Modifier">✏️</button><button onclick="supprimerContactPromo(${c.id})" style="background:transparent;border:none;color:#e74c3c;font-size:12px;cursor:pointer;" title="Supprimer">🗑️</button></div>`;
         html += `</div>`;
       });
       html += `</div>`;
@@ -7780,6 +7785,11 @@ function _hideTeamSelection() {
   }
 
   async function enregistrerContactPromo() {
+    // Si on est en mode édition, appeler la fonction update
+    if (_editContactPromoId) {
+      return enregistrerContactPromoUpdate();
+    }
+    
     const nomPartenaire = document.getElementById('cp-nom-partenaire').value.trim();
     const ville = document.getElementById('cp-ville').value.trim().toUpperCase();
     const nomContact = document.getElementById('cp-nom-contact').value.trim();
@@ -7817,21 +7827,7 @@ function _hideTeamSelection() {
       }]);
       if (res.error) throw res.error;
       
-      // Vider le formulaire
-      document.getElementById('cp-nom-partenaire').value = '';
-      document.getElementById('cp-ville').value = '';
-      document.getElementById('cp-nom-contact').value = '';
-      document.getElementById('cp-telephone').value = '';
-      document.getElementById('cp-email').value = '';
-      document.getElementById('cp-etat').value = '';
-      document.getElementById('cp-itw').value = '';
-      document.getElementById('cp-date-debut').value = '';
-      document.getElementById('cp-date-fin').value = '';
-      document.getElementById('cp-date-itw').value = '';
-      document.getElementById('cp-heure-itw').value = '';
-      document.getElementById('cp-diffusion').value = '';
-      document.getElementById('cp-infos').value = '';
-      
+      resetFormContactPromo();
       closeModal('modal-add-contact-promo');
       chargerContactsPromo();
       alert('✅ Contact ajouté !');
@@ -7849,6 +7845,101 @@ function _hideTeamSelection() {
     } catch(e) {
       alert('Erreur : ' + e.message);
     }
+  }
+
+  let _editContactPromoId = null;
+
+  async function modifierContactPromo(id) {
+    // Charger les données du contact
+    try {
+      const res = await _supabase.from('contacts_promo').select('*').eq('id', id).single();
+      if (res.error) throw res.error;
+      const c = res.data;
+      
+      // Pré-remplir le formulaire
+      document.getElementById('cp-nom-partenaire').value = c.nom_partenaire || '';
+      document.getElementById('cp-ville').value = c.ville || '';
+      document.getElementById('cp-nom-contact').value = c.nom_contact || '';
+      document.getElementById('cp-telephone').value = c.telephone || '';
+      document.getElementById('cp-email').value = c.email || '';
+      document.getElementById('cp-etat').value = c.etat || '';
+      document.getElementById('cp-itw').value = c.itw || '';
+      document.getElementById('cp-date-debut').value = c.date_debut || '';
+      document.getElementById('cp-date-fin').value = c.date_fin || '';
+      document.getElementById('cp-date-itw').value = c.date_itw || '';
+      document.getElementById('cp-heure-itw').value = c.heure_itw || '';
+      document.getElementById('cp-diffusion').value = c.diffusion || '';
+      document.getElementById('cp-infos').value = c.infos || '';
+      
+      _editContactPromoId = id;
+      openModal('modal-add-contact-promo');
+    } catch(e) {
+      alert('Erreur : ' + e.message);
+    }
+  }
+
+  async function enregistrerContactPromoUpdate() {
+    const nomPartenaire = document.getElementById('cp-nom-partenaire').value.trim();
+    const ville = document.getElementById('cp-ville').value.trim().toUpperCase();
+    const nomContact = document.getElementById('cp-nom-contact').value.trim();
+    const telephone = document.getElementById('cp-telephone').value.trim();
+    const email = document.getElementById('cp-email').value.trim();
+    const etat = document.getElementById('cp-etat').value;
+    const itw = document.getElementById('cp-itw').value;
+    const dateDebut = document.getElementById('cp-date-debut').value || null;
+    const dateFin = document.getElementById('cp-date-fin').value || null;
+    const dateItw = document.getElementById('cp-date-itw').value || null;
+    const heureItw = document.getElementById('cp-heure-itw').value || null;
+    const diffusion = document.getElementById('cp-diffusion').value.trim();
+    const infos = document.getElementById('cp-infos').value.trim();
+
+    if (!nomPartenaire || !ville) {
+      alert('Veuillez remplir au moins le nom du partenaire et la ville.');
+      return;
+    }
+
+    try {
+      const res = await _supabase.from('contacts_promo').update({
+        nom_partenaire: nomPartenaire,
+        ville: ville,
+        nom_contact: nomContact,
+        telephone: telephone,
+        email: email,
+        etat: etat,
+        itw: itw,
+        date_debut: dateDebut,
+        date_fin: dateFin,
+        date_itw: dateItw,
+        heure_itw: heureItw,
+        diffusion: diffusion,
+        infos: infos
+      }).eq('id', _editContactPromoId);
+      if (res.error) throw res.error;
+      
+      resetFormContactPromo();
+      closeModal('modal-add-contact-promo');
+      chargerContactsPromo();
+      alert('✅ Contact mis à jour !');
+    } catch(e) {
+      alert('Erreur : ' + e.message);
+    }
+  }
+
+  function resetFormContactPromo() {
+    document.getElementById('cp-nom-partenaire').value = '';
+    document.getElementById('cp-ville').value = '';
+    document.getElementById('cp-nom-contact').value = '';
+    document.getElementById('cp-telephone').value = '';
+    document.getElementById('cp-email').value = '';
+    document.getElementById('cp-etat').value = '';
+    document.getElementById('cp-itw').value = '';
+    document.getElementById('cp-date-debut').value = '';
+    document.getElementById('cp-date-fin').value = '';
+    document.getElementById('cp-date-itw').value = '';
+    document.getElementById('cp-heure-itw').value = '';
+    document.getElementById('cp-diffusion').value = '';
+    document.getElementById('cp-infos').value = '';
+    _editContactPromoId = null;
   }
 
   // =============================================
