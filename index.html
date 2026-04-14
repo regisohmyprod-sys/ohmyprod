@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.14.05">
+<meta name="version" content="2026.04.14.06">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -14964,10 +14964,22 @@ function _hideTeamSelection() {
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </div>
 
-        <div onclick="closeModal('modal-admin-alexandrine'); ouvrirAccesFrais();" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
-          <span style="font-size:22px;">💰</span>
-          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">ACCÈS FRAIS</div><div style="font-size:11px;color:#555;">Notes de frais & justificatifs</div></div>
-          <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
+        <!-- ACCÈS FRAIS - Sous-menu -->
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;color:#fff;border-bottom:1px solid #2a2a2a;">
+            <span style="font-size:22px;">💰</span>
+            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">ACCÈS FRAIS</div><div style="font-size:11px;color:#555;">Notes de frais & justificatifs</div></div>
+          </div>
+          <div onclick="closeModal('modal-admin-alexandrine'); ouvrirFraisPerso();" style="display:flex;align-items:center;gap:10px;padding:10px 16px 10px 52px;cursor:pointer;color:#fff;border-bottom:1px solid #222;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
+            <span style="font-size:16px;">💳</span>
+            <div style="font-size:13px;">Frais CB PERSO</div>
+            <span style="margin-left:auto;color:#555;font-size:14px;">→</span>
+          </div>
+          <div onclick="closeModal('modal-admin-alexandrine'); ouvrirFraisOMP();" style="display:flex;align-items:center;gap:10px;padding:10px 16px 10px 52px;cursor:pointer;color:#fff;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
+            <span style="font-size:16px;">🏢</span>
+            <div style="font-size:13px;">Frais CB OMP</div>
+            <span style="margin-left:auto;color:#555;font-size:14px;">→</span>
+          </div>
         </div>
 
         <div onclick="closeModal('modal-admin-alexandrine'); showPage('gestion-omp');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
