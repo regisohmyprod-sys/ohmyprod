@@ -1352,6 +1352,11 @@
       font-size: 24px !important;
     }
     
+    /* CONTACTS PROMO - Mobile */
+    #promo-contacts-list {
+      grid-template-columns: 1fr !important;
+    }
+    
     /* SELECT TYPE DE FRAIS - Menu déroulant réduit */
     #frais-type {
       font-size: 11px !important;
@@ -4266,6 +4271,28 @@ function _hideTeamSelection() {
         <div style="color:var(--grey); font-size:13px;">Chargement des membres...</div>
       </div>
     </div>
+
+
+<!-- PAGE CONTACTS PROMO -->
+<div id="page-contacts-promo" class="page">
+  <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Tableau de bord</button>
+  
+  <div style="margin-bottom:20px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">📣 CONTACTS PROMO</div>
+    <div style="font-size:13px;color:#888;margin-top:4px;">Presse locale · Radios · Médias partenaires</div>
+  </div>
+
+  <!-- Barre recherche -->
+  <div style="margin-bottom:16px;">
+    <input id="promo-search" type="text" placeholder="🔍 Rechercher par ville, organisation, email..." oninput="filtrerContactsPromo()"
+           style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;color:#fff;padding:10px 14px;font-size:13px;font-family:'Inter',sans-serif;outline:none;box-sizing:border-box;">
+  </div>
+
+  <!-- Liste contacts -->
+  <div id="promo-contacts-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;">
+    <!-- Contacts injectés par JS -->
+  </div>
+</div>
 
 
 <!-- PAGE ACCÈS FRAIS -->
@@ -7445,6 +7472,7 @@ function _hideTeamSelection() {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     if (id === 'equipe') chargerPageMembres();
     if (id === 'gestion-salles') chargerSalles();
+    if (id === 'contacts-promo') chargerContactsPromo();
     if (id === 'acces-frais') {
       // Afficher vue admin ou membre selon le rôle
       var adminView = document.getElementById('frais-admin-view');
@@ -7462,6 +7490,134 @@ function _hideTeamSelection() {
         chargerFrais('me');
       }
     }
+  }
+
+  // =============================================
+  // MODULE CONTACTS PROMO
+  // =============================================
+  const CONTACTS_PROMO = [
+    {ville:"DUNKERQUE",org:"LA VOIX DU NORD",nom:"Bruno VERHEYDE",tel:"03 28 59 10 00",email:"dunkerque@lavoixdunord.fr"},
+    {ville:"DUNKERQUE",org:"FRANCE BLEU NORD",nom:"GREGORY LAGACHE",tel:"03 20 13 59 62",email:"gregory.lagache@radiofrance.com"},
+    {ville:"DUNKERQUE",org:"NRJ NORD",nom:"ERIC",tel:"06 60 96 77 74",email:"studio@nrjlittoral.fr"},
+    {ville:"DUNKERQUE",org:"FRANCE BLEU NORD",nom:"Laurent DEREUX",tel:"",email:"laurent.dereux@radiofrance.com"},
+    {ville:"DUNKERQUE",org:"DELTA RADIO",nom:"Gilles Senicourt",tel:"03 28 51 88 81",email:""},
+    {ville:"MONTLUCON",org:"LA MONTAGNE",nom:"Martial Delecluse",tel:"06 99 66 04 70",email:"martial.delecluse@centrefrance.com"},
+    {ville:"MONTLUCON",org:"FRANCE BLEU AUVERGNE",nom:"JULIEN TRAMBOUZE",tel:"04 73 34 63 63",email:"julien.trambouze@radiofrance.com"},
+    {ville:"LIMOGES",org:"LE POPULAIRE DU CENTRE",nom:"",tel:"05 55 58 59 60",email:"lepopulaire@centrefrance.com"},
+    {ville:"LIMOGES",org:"FRANCE BLEU LIMOUSIN",nom:"Monsieur Choquené / Stéphane Pigato",tel:"05 55 11 38 11",email:"bleulimousin@radiofrance.com"},
+    {ville:"LIMOGES",org:"RTF RADIO LIMOGES",nom:"",tel:"05 55 05 15 00",email:""},
+    {ville:"LIMOGES",org:"FLASH FM",nom:"Pascal",tel:"05 55 10 00 00",email:"pascal.flashfm.fr"},
+    {ville:"AURILLAC",org:"LA VOIX DU CANTAL",nom:"",tel:"",email:"redaction@voixducantal.fr"},
+    {ville:"AURILLAC",org:"LA MONTAGNE",nom:"Pierre Raynaud",tel:"04 71 45 40 20",email:"aurillac@centrefrance.com"},
+    {ville:"NARBONNE",org:"FRANCE BLEU ROUSSILLON",nom:"Julien TOTARO",tel:"04 68 51 90 00",email:"Julien.TOTARO@radiofrance.com"},
+    {ville:"NARBONNE",org:"Nostalgie Vallée d'Orb",nom:"Thierry Baldacchino",tel:"04 67 95 71 71 / 06 72 84 51 32",email:"thierry.baldacchino@wanadoo.fr"},
+    {ville:"NARBONNE",org:"GRAND SUD FM",nom:"Maryline GRANGER",tel:"04 68 65 03 61 / 06 70 13 96 17",email:"Maryline.granger@grandsudfm.com"},
+    {ville:"NIORT",org:"LA NOUVELLE REP",nom:"Aurélien Douillard",tel:"05 49 55 55 55",email:"aurelien.douillard@nrco.fr"},
+    {ville:"NIORT",org:"FRANCE BLEU LA ROCHELLE",nom:"Christian Opéron",tel:"05 46 35 17 17",email:"christian.operon@radiofrance.com"},
+    {ville:"VENDESPACE",org:"FRANCE BLEU OCEAN",nom:"Jean-Marie Gauthier",tel:"02 40 44 45 46",email:"jean-marie.gauthier@radiofrance.com"},
+    {ville:"LA ROCHE SUR YON",org:"FRANCE BLEU",nom:"Patrick Cathala / Sophie Thomas",tel:"02 40 44 45 46",email:"patrick.cathala@radiofrance.com"},
+    {ville:"LAVAL",org:"FRANCE BLEU MAYENNE",nom:"Pascal Fouchet / Nathalie Jans",tel:"02 43 49 50 50 / 02 43 67 11 11",email:"pascal.fouchet@radiofrance.com"},
+    {ville:"ALENCON",org:"OUEST FRANCE",nom:"",tel:"02 33 82 84 00",email:"redaction.alencon@ouest-france.fr"},
+    {ville:"ALENCON",org:"FRANCE BLEU NORMANDIE",nom:"Stéphanie Sauthon / Anthony Dubac",tel:"02 31 44 48 44",email:"stephanie.sauthon@radiofrance.com"},
+    {ville:"ALENCON",org:"ORNE HEBDO",nom:"",tel:"02 33 82 15 15",email:"orne.hebdo@publihebdos.fr"},
+    {ville:"ALENCON",org:"SWEET FM",nom:"Christophe",tel:"06 12 75 32 24",email:"redaction@sweetfm.fr"},
+    {ville:"ALENCON",org:"France 3 Alençon",nom:"",tel:"02 33 32 23 43",email:"alencon@francetv.fr"},
+    {ville:"CHATEAUROUX",org:"LA NOUVELLE REPUBLIQUE",nom:"Albane Ratsivalaka",tel:"",email:"albane.ratsivalaka@nrco.fr"},
+    {ville:"CHATEAUROUX",org:"L'ECHO DU BERRY",nom:"Ludovic Mesnard",tel:"",email:"ludovic.mesnard@echoduberry.com"},
+    {ville:"POITIERS",org:"LA NOUVELLE REP",nom:"",tel:"05 49 60 36 36",email:"redaction@nr-cp.fr"},
+    {ville:"EPERNAY",org:"FRANCE BLEU CHAMPAGNE",nom:"Lilian Muller / Gilles Seydoux",tel:"03 26 84 51 51",email:"Lilian.MULLER@radiofrance.com"},
+    {ville:"NANCY",org:"FRANCE BLEU SUD LORRAINE",nom:"Luc Humbert / Nathalie Milion / Frédéric Belot",tel:"03 83 36 20 20 / 06 85 81 29 18 / 06 17 45 19 96",email:"bleulorrainenord@radiofrance.com"},
+    {ville:"METZ",org:"FRANCE BLEU LORRAINE NORD",nom:"Bertrand Fissot",tel:"03 87 68 22 22",email:"bertrand.fissot@radiofrance.com"},
+    {ville:"TOULOUSE",org:"FRANCE BLEU OCCITANIE",nom:"Théo Gimeno",tel:"05 34 41 70 00",email:"Theo.GIMENO@radiofrance.com"},
+    {ville:"ANGOULEME",org:"CHARENTE LIBRE",nom:"",tel:"06 71 40 26 73",email:"charente@charentelibre.fr"},
+    {ville:"ANGOULEME",org:"FRANCE BLEU LA ROCHELLE",nom:"David Morel",tel:"06 14 24 22 73",email:"david.morel@radiofrance.com"},
+    {ville:"AGEN",org:"LA DEPECHE DU MIDI",nom:"",tel:"05 53 48 05 05",email:"redaction47@ladepeche.fr"},
+    {ville:"AGEN",org:"47 FM",nom:"Dipapet",tel:"06 37 66 93 67",email:"dipapet@47fm.net"},
+    {ville:"PAU",org:"FRANCE BLEU BEARN",nom:"Eric Bentahar",tel:"05 59 98 30 30",email:"Eric.BENTAHAR@radiofrance.com"},
+    {ville:"ANGERS",org:"OUEST FRANCE",nom:"",tel:"",email:"redaction.angers@ouest-france.fr"},
+    {ville:"ANGERS",org:"FRANCE BLEU LOIRE OCEAN",nom:"Gilles Colliaux",tel:"02 43 29 72 72",email:"gilles.colliaux@radiofrance.com"},
+    {ville:"ANGERS",org:"Journal d'Angers",nom:"Pascal Le Manio",tel:"",email:"pascal.lemanio@ville.angers.fr"},
+    {ville:"BREST",org:"FRANCE BLEU BREIZH IZEL",nom:"Baptiste Mebrouk",tel:"",email:"Baptiste.MEBROUK@radiofrance.com"},
+    {ville:"BORDEAUX",org:"FRANCE BLEU GIRONDE",nom:"Nicolas Fauveau / Thomas Demol",tel:"05 57 81 20 20",email:"Nicolas.FAUVEAU@radiofrance.com"},
+    {ville:"BORDEAUX",org:"NOSTALGIE",nom:"Emmanuel Bos",tel:"06 14 26 29 38",email:"ebos@nostalgie.fr"},
+    {ville:"LE HAVRE",org:"LE HAVRE NORMANDIE",nom:"L. Ferrari",tel:"02 35 14 57 57",email:"l.ferrari@paris-normandie.fr"},
+    {ville:"LE HAVRE",org:"FRANCE BLEU NORMANDIE",nom:"Julien Corbière",tel:"02 31 47 14 14",email:"bleunormandie7627@radiofrance.com"},
+    {ville:"CAEN",org:"FRANCE BLEU NORMANDIE",nom:"Pierre Desaint",tel:"02 35 07 66 66",email:"Pierre.DESAINT@radiofrance.com"},
+    {ville:"BOURGES",org:"FRANCE BLEU BERRY",nom:"Rodolphe Louvet",tel:"02 54 60 60 80",email:"Rodolphe.LOUVET@radiofrance.com"},
+    {ville:"ALBI",org:"LA DEPECHE DU MIDI / LE TARN LIBRE",nom:"",tel:"",email:"redaction1@letarnlibre.com"},
+    {ville:"RODEZ",org:"CENTRE PRESSE AVEYRON",nom:"",tel:"",email:"redaction@centrepresse.com"},
+    {ville:"ROUEN",org:"PARIS NORMANDIE",nom:"",tel:"02 35 14 56 56",email:"redaction.rouen@paris-normandie.fr"},
+    {ville:"BEAUVAIS",org:"FRANCE BLEU PICARDIE",nom:"Vincent Schneider",tel:"03 22 71 15 15",email:"vincent.SCHNEIDER@radiofrance.com"},
+    {ville:"AMIENS",org:"COURRIER PICARD",nom:"",tel:"03 22 82 60 00",email:"magazine@courrier-picard.fr"},
+    {ville:"AMIENS",org:"FRANCE BLEU PICARDIE",nom:"Didier Dhuille",tel:"03 22 71 15 15",email:"Didier.DHUILLE@radiofrance.com"},
+    {ville:"RENNES",org:"FRANCE BLEU MAINE",nom:"Gael Penin / Laurène Ehrhardt",tel:"02 43 29 72 72",email:"gael.penin@radiofrance.com"},
+    {ville:"TOURS",org:"LA NOUVELLE REP",nom:"",tel:"02 47 31 70 00",email:"nr.joue@nrco.fr"},
+    {ville:"TOURS",org:"FRANCE BLEU TOURAINE",nom:"Christophe Braud",tel:"02 47 36 37 37",email:"Christophe.BRAUD@radiofrance.com"},
+    {ville:"NICE",org:"NICE MATIN",nom:"",tel:"04 97 03 24 50",email:"agencenice@nicematin.fr"},
+    {ville:"NICE",org:"NOSTALGIE NICE",nom:"Flamaze Martin",tel:"04 97 25 48 46",email:"flamazemartin@nostalgie.fr"},
+    {ville:"TROYES",org:"L'Est Eclair",nom:"Aurore Chabaud",tel:"",email:"achabaud@lest-eclair.fr"},
+    {ville:"TROYES",org:"TROYES AUBE RADIO",nom:"Rémi",tel:"",email:"remi75c@gmail.com"},
+    {ville:"TROYES",org:"ATTITUDE FM",nom:"Bénédicte Belin",tel:"",email:"benedicte.belin@latitude.fm"},
+    {ville:"TROYES",org:"CANAL 32",nom:"D. Ardeois",tel:"",email:"d.ardeois@canal32.fr"},
+    {ville:"BAR LE DUC",org:"EST REPUBLICAIN",nom:"Nicolas Galmiche",tel:"06 81 95 89 92",email:"nicolas.galmiche@estrepublicain.fr"},
+    {ville:"DIJON",org:"NOSTALGIE",nom:"D. Mothiron",tel:"",email:"dmothiron@nostalgie.fr"},
+    {ville:"BOURG EN BRESSE",org:"NOSTALGIE",nom:"Jean-Christophe Grosshans",tel:"04 72 53 16 98",email:"jcgrosshans@nostalgie.fr"},
+    {ville:"AVIGNON",org:"NOSTALGIE",nom:"M. Slobbe",tel:"",email:"mslobbe@nostalgie.fr"},
+    {ville:"LYON",org:"NOSTALGIE",nom:"Jean-Christophe Grosshans",tel:"04 72 53 16 98",email:"jcgrosshans@nostalgie.fr"},
+    {ville:"CLERMONT",org:"FRANCE BLEU AUVERGNE",nom:"Les Derniers Couchés",tel:"04 73 34 63 63",email:""},
+    {ville:"GRENOBLE",org:"NOSTALGIE",nom:"Jean-Christophe Grosshans",tel:"04 72 53 16 98",email:"jcgrosshans@nostalgie.fr"},
+    {ville:"MACON",org:"NOSTALGIE",nom:"Jean-Christophe Grosshans",tel:"04 72 53 16 98",email:"jcgrosshans@nostalgie.fr"},
+    {ville:"ST OMER",org:"FRANCE BLEU NORD",nom:"Gregory Lagache",tel:"03 20 55 89 89",email:"gregory.lagache@radiofrance.com"},
+    {ville:"MONTELIMAR",org:"FRANCE BLEU DROME",nom:"Florence Beaudet",tel:"",email:""}
+  ];
+
+  function chargerContactsPromo() {
+    afficherContactsPromo(CONTACTS_PROMO);
+  }
+
+  function afficherContactsPromo(contacts) {
+    const container = document.getElementById('promo-contacts-list');
+    if (!contacts.length) {
+      container.innerHTML = '<div style="color:#888;text-align:center;padding:40px;">Aucun contact trouvé.</div>';
+      return;
+    }
+    // Grouper par ville
+    const grouped = {};
+    contacts.forEach(c => {
+      if (!grouped[c.ville]) grouped[c.ville] = [];
+      grouped[c.ville].push(c);
+    });
+    
+    let html = '';
+    Object.keys(grouped).sort().forEach(ville => {
+      html += `<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:16px;margin-bottom:8px;">`;
+      html += `<div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;border-bottom:1px solid #333;padding-bottom:8px;">📍 ${ville}</div>`;
+      grouped[ville].forEach(c => {
+        html += `<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #222;">`;
+        html += `<div style="font-weight:700;color:#fff;font-size:13px;">${c.org || '-'}</div>`;
+        if (c.nom) html += `<div style="font-size:12px;color:#aaa;margin-top:2px;">👤 ${c.nom}</div>`;
+        if (c.tel) html += `<div style="font-size:12px;color:#888;margin-top:2px;"><a href="tel:${c.tel.replace(/[\s\.]/g,'')}" style="color:#3b82f6;text-decoration:none;">📞 ${c.tel}</a></div>`;
+        if (c.email) html += `<div style="font-size:11px;color:#888;margin-top:2px;"><a href="mailto:${c.email}" style="color:#c9a84c;text-decoration:none;">✉️ ${c.email}</a></div>`;
+        html += `</div>`;
+      });
+      html += `</div>`;
+    });
+    container.innerHTML = html;
+  }
+
+  function filtrerContactsPromo() {
+    const search = document.getElementById('promo-search').value.toLowerCase();
+    if (!search) {
+      afficherContactsPromo(CONTACTS_PROMO);
+      return;
+    }
+    const filtered = CONTACTS_PROMO.filter(c => 
+      (c.ville && c.ville.toLowerCase().includes(search)) ||
+      (c.org && c.org.toLowerCase().includes(search)) ||
+      (c.nom && c.nom.toLowerCase().includes(search)) ||
+      (c.email && c.email.toLowerCase().includes(search))
+    );
+    afficherContactsPromo(filtered);
   }
 
   // =============================================
@@ -13797,9 +13953,9 @@ function _hideTeamSelection() {
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </div>
 
-        <div onclick="closeModal('modal-gestion-tour-regis'); openModal('modal-promo');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div onclick="closeModal('modal-gestion-tour-regis'); showPage('contacts-promo');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
           <span style="font-size:22px;">📣</span>
-          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">PROMO</div><div style="font-size:11px;color:#555;">Outils marketing</div></div>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">CONTACTS PROMO</div><div style="font-size:11px;color:#555;">Presse · Radios · Médias</div></div>
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </div>
 
