@@ -1902,7 +1902,13 @@
     font-family:'Trebuchet MS',sans-serif;
     z-index:10;
     white-space:nowrap;
-  ">@OMPdesign — RÉSERVÉ</div>
+    text-align:center;
+  ">
+    @OMPdesign — RÉSERVÉ
+    <div style="margin-top:8px;">
+      <button onclick="superHardRefresh()" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:rgba(255,255,255,0.4);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;font-family:'Trebuchet MS',sans-serif;" onmouseover="this.style.borderColor='#e31e24';this.style.color='#e31e24';" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.4)';">🔄 HARD REFRESH</button>
+    </div>
+  </div>
 </div>
 
 <style>
@@ -11791,6 +11797,57 @@ function _hideTeamSelection() {
     const url = new URL(window.location.href);
     url.searchParams.set('v', Date.now());
     window.location.replace(url.toString());
+  }
+
+  // SUPER HARD REFRESH - Efface TOUT (localStorage, sessionStorage, caches, cookies, IndexedDB)
+  async function superHardRefresh() {
+    if (!confirm('⚠️ ATTENTION !\n\nCeci va effacer TOUTES les données locales :\n- Cache navigateur\n- LocalStorage\n- SessionStorage\n- Cookies du site\n- IndexedDB\n\nLes données Supabase ne seront PAS affectées.\n\nContinuer ?')) return;
+    
+    try {
+      // 1. Vider localStorage
+      localStorage.clear();
+      
+      // 2. Vider sessionStorage
+      sessionStorage.clear();
+      
+      // 3. Supprimer tous les caches
+      if ('caches' in window) {
+        const names = await caches.keys();
+        await Promise.all(names.map(name => caches.delete(name)));
+      }
+      
+      // 4. Désenregistrer tous les Service Workers
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map(reg => reg.unregister()));
+      }
+      
+      // 5. Supprimer les cookies du site
+      document.cookie.split(';').forEach(c => {
+        const name = c.split('=')[0].trim();
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+      });
+      
+      // 6. Vider IndexedDB (bases de données)
+      if ('indexedDB' in window) {
+        const dbs = await indexedDB.databases();
+        dbs.forEach(db => {
+          if (db.name) indexedDB.deleteDatabase(db.name);
+        });
+      }
+      
+      // 7. Forcer le rechargement complet
+      const url = new URL(window.location.origin + window.location.pathname);
+      url.searchParams.set('purge', Date.now());
+      
+      alert('✅ Nettoyage terminé !\n\nLa page va se recharger...');
+      window.location.replace(url.toString());
+      
+    } catch (err) {
+      console.error('Erreur superHardRefresh:', err);
+      alert('Erreur pendant le nettoyage. Rechargement forcé...');
+      window.location.reload(true);
+    }
   }
 
   async function chargerTournees() {
