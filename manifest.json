@@ -9,8 +9,8 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "assets/omp-icon-200.jpg",
-      "sizes": "200x200",
+      "src": "assets/omp-icon-512.jpg",
+      "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"
     }
