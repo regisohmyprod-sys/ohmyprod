@@ -7512,6 +7512,8 @@ function _hideTeamSelection() {
     } else {
       document.getElementById('salle-photo-bloc').style.display = 'none';
     }
+    // Réinitialiser sur onglet INFOS
+    afficherOngletSalle('infos');
     openModal('modal-fiche-salle');
   }
 
@@ -7523,6 +7525,8 @@ function _hideTeamSelection() {
       if (el) el.value = '';
     });
     document.getElementById('salle-photo-bloc').style.display = 'none';
+    // Réinitialiser sur onglet INFOS
+    afficherOngletSalle('infos');
     openModal('modal-fiche-salle');
   }
 
@@ -7552,6 +7556,214 @@ function _hideTeamSelection() {
     await _supabase.from('salles').delete().eq('id', window._salleEditId);
     closeModal('modal-fiche-salle');
     await chargerSalles();
+  }
+
+  // Onglets fiche salle
+  function afficherOngletSalle(onglet) {
+    document.getElementById('salle-onglet-infos').style.display = onglet === 'infos' ? 'block' : 'none';
+    document.getElementById('salle-onglet-dates').style.display = onglet === 'dates' ? 'block' : 'none';
+    document.getElementById('salle-tab-infos').style.background = onglet === 'infos' ? '#c9a84c' : '#333';
+    document.getElementById('salle-tab-infos').style.color = onglet === 'infos' ? '#000' : '#fff';
+    document.getElementById('salle-tab-dates').style.background = onglet === 'dates' ? '#c9a84c' : '#333';
+    document.getElementById('salle-tab-dates').style.color = onglet === 'dates' ? '#000' : '#fff';
+    
+    if (onglet === 'dates') {
+      chargerDatesSalle();
+    }
+  }
+
+  async function chargerDatesSalle() {
+    if (!window._salleEditId) return;
+    const salle = _sallesData.find(s => s.id === window._salleEditId);
+    if (!salle) return;
+    
+    const villeNom = salle.ville_nom || '';
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Charger toutes les dates qui matchent cette salle
+    const { data: dates } = await _supabase
+      .from('dates_concert')
+      .select('*')
+      .or(`nom_salle.ilike.%${villeNom}%,ville.ilike.%${villeNom.split(' ')[0]}%`)
+      .order('date_concert', { ascending: true });
+    
+    const passees = (dates || []).filter(d => d.date_concert < today);
+    const avenir = (dates || []).filter(d => d.date_concert >= today);
+    
+    // Afficher dates passées
+    const containerPassees = document.getElementById('salle-dates-passees');
+    if (passees.length === 0) {
+      containerPassees.innerHTML = '<div style="color:#666;font-style:italic;">Aucune date passée</div>';
+    } else {
+      containerPassees.innerHTML = passees.map(d => {
+        const dateStr = new Date(d.date_concert).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+        return `<div style="padding:6px 0;border-bottom:1px solid #222;">📅 ${dateStr} — <span style="color:#888;">${d.nom_salle || d.ville || ''}</span></div>`;
+      }).join('');
+    }
+    
+    // Afficher dates à venir avec formulaire de suivi
+    const containerAvenir = document.getElementById('salle-dates-avenir');
+    if (avenir.length === 0) {
+      containerAvenir.innerHTML = '<div style="color:#666;font-style:italic;">Aucune date à venir</div>';
+    } else {
+      containerAvenir.innerHTML = avenir.map(d => {
+        const dateStr = new Date(d.date_concert).toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+        const heureStr = d.heure_show || '';
+        return `
+          <div style="background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#c9a84c;">📅 ${dateStr} ${heureStr ? '• ' + heureStr : ''}</div>
+              <span style="font-size:11px;color:#888;">${d.nom_salle || ''}</span>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div>
+                <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">ÉTAT DOSSIER</label>
+                <select id="suivi-etat-${d.id}" onchange="sauvegarderSuiviDate('${d.id}')" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px;font-size:13px;">
+                  <option value="">-- Choisir --</option>
+                  <option value="a_faire" ${d.etat_dossier === 'a_faire' ? 'selected' : ''}>À faire</option>
+                  <option value="demande_en_cours" ${d.etat_dossier === 'demande_en_cours' ? 'selected' : ''}>Demande en cours</option>
+                  <option value="option_posee" ${d.etat_dossier === 'option_posee' ? 'selected' : ''}>Option posée</option>
+                  <option value="confirmee" ${d.etat_dossier === 'confirmee' ? 'selected' : ''}>Confirmée</option>
+                  <option value="reportee" ${d.etat_dossier === 'reportee' ? 'selected' : ''}>Reportée</option>
+                  <option value="annulee" ${d.etat_dossier === 'annulee' ? 'selected' : ''}>Annulée</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">GESTION MEV</label>
+                <select id="suivi-mev-${d.id}" onchange="sauvegarderSuiviDate('${d.id}')" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px;font-size:13px;">
+                  <option value="">-- Choisir --</option>
+                  <option value="OMP" ${d.gestion_mev === 'OMP' ? 'selected' : ''}>OMP</option>
+                  <option value="LDC" ${d.gestion_mev === 'LDC' ? 'selected' : ''}>LDC</option>
+                  <option value="NDA" ${d.gestion_mev === 'NDA' ? 'selected' : ''}>NDA</option>
+                  <option value="BCITRON" ${d.gestion_mev === 'BCITRON' ? 'selected' : ''}>BCITRON</option>
+                  <option value="PEELS" ${d.gestion_mev === 'PEELS' ? 'selected' : ''}>PEELS</option>
+                  <option value="CLIENT" ${d.gestion_mev === 'CLIENT' ? 'selected' : ''}>CLIENT</option>
+                  <option value="AUTRE" ${d.gestion_mev === 'AUTRE' ? 'selected' : ''}>AUTRE</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">ÉTAT MEV</label>
+                <select id="suivi-etat-mev-${d.id}" onchange="sauvegarderSuiviDate('${d.id}')" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px;font-size:13px;">
+                  <option value="">-- Choisir --</option>
+                  <option value="a_faire" ${d.etat_mev === 'a_faire' ? 'selected' : ''}>À faire</option>
+                  <option value="en_prepa" ${d.etat_mev === 'en_prepa' ? 'selected' : ''}>En prépa</option>
+                  <option value="en_vente" ${d.etat_mev === 'en_vente' ? 'selected' : ''}>En vente</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">DATE OPEN MEV</label>
+                <input type="date" id="suivi-date-mev-${d.id}" value="${d.date_open_mev || ''}" onchange="sauvegarderSuiviDate('${d.id}')" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px;font-size:13px;">
+              </div>
+            </div>
+            
+            <div id="suivi-mev-autre-bloc-${d.id}" style="margin-top:10px;display:${d.gestion_mev === 'AUTRE' ? 'block' : 'none'};">
+              <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">PRÉCISER AUTRE</label>
+              <input type="text" id="suivi-mev-autre-${d.id}" value="${d.gestion_mev_autre || ''}" onchange="sauvegarderSuiviDate('${d.id}')" placeholder="Préciser..." style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px;font-size:13px;">
+            </div>
+            
+            <!-- ÉCHANGES -->
+            <div style="margin-top:14px;border-top:1px solid #333;padding-top:12px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-size:12px;color:#c9a84c;font-weight:600;">📧 ÉCHANGES</span>
+                <button onclick="ajouterEchange('${d.id}')" style="background:#333;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;">+ Ajouter</button>
+              </div>
+              <div id="echanges-liste-${d.id}" style="max-height:150px;overflow-y:auto;font-size:12px;">
+                Chargement...
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Charger les échanges pour chaque date
+      avenir.forEach(d => chargerEchanges(d.id));
+      
+      // Gérer affichage du champ "AUTRE"
+      avenir.forEach(d => {
+        const sel = document.getElementById(`suivi-mev-${d.id}`);
+        if (sel) {
+          sel.addEventListener('change', () => {
+            const bloc = document.getElementById(`suivi-mev-autre-bloc-${d.id}`);
+            if (bloc) bloc.style.display = sel.value === 'AUTRE' ? 'block' : 'none';
+          });
+        }
+      });
+    }
+  }
+
+  async function sauvegarderSuiviDate(dateId) {
+    const etatDossier = document.getElementById(`suivi-etat-${dateId}`)?.value || null;
+    const gestionMev = document.getElementById(`suivi-mev-${dateId}`)?.value || null;
+    const gestionMevAutre = document.getElementById(`suivi-mev-autre-${dateId}`)?.value || null;
+    const etatMev = document.getElementById(`suivi-etat-mev-${dateId}`)?.value || null;
+    const dateOpenMev = document.getElementById(`suivi-date-mev-${dateId}`)?.value || null;
+    
+    await _supabase.from('dates_concert').update({
+      etat_dossier: etatDossier,
+      gestion_mev: gestionMev,
+      gestion_mev_autre: gestionMevAutre,
+      etat_mev: etatMev,
+      date_open_mev: dateOpenMev
+    }).eq('id', dateId);
+  }
+
+  async function chargerEchanges(dateId) {
+    const container = document.getElementById(`echanges-liste-${dateId}`);
+    if (!container) return;
+    
+    const { data } = await _supabase
+      .from('echanges_salle')
+      .select('*')
+      .eq('date_concert_id', dateId)
+      .order('date_echange', { ascending: false });
+    
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div style="color:#666;font-style:italic;">Aucun échange enregistré</div>';
+      return;
+    }
+    
+    container.innerHTML = data.map(e => {
+      const dateStr = new Date(e.date_echange).toLocaleDateString('fr-FR');
+      return `
+        <div style="padding:6px 0;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div><span style="color:#c9a84c;">${dateStr}</span> — ${e.contenu}</div>
+          <button onclick="supprimerEchange(${e.id}, '${dateId}')" style="background:transparent;border:none;color:#e74c3c;cursor:pointer;font-size:12px;">🗑️</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function ajouterEchange(dateId) {
+    const dateEchange = prompt('Date de l\'échange (JJ/MM/AAAA) :');
+    if (!dateEchange) return;
+    
+    // Convertir date FR en format ISO
+    const parts = dateEchange.split('/');
+    let dateISO = null;
+    if (parts.length === 3) {
+      dateISO = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+    } else {
+      alert('Format de date invalide. Utilisez JJ/MM/AAAA');
+      return;
+    }
+    
+    const contenu = prompt('Contenu de l\'échange :');
+    if (!contenu) return;
+    
+    await _supabase.from('echanges_salle').insert({
+      date_concert_id: dateId,
+      date_echange: dateISO,
+      contenu: contenu
+    });
+    
+    chargerEchanges(dateId);
+  }
+
+  async function supprimerEchange(echangeId, dateId) {
+    if (!confirm('Supprimer cet échange ?')) return;
+    await _supabase.from('echanges_salle').delete().eq('id', echangeId);
+    chargerEchanges(dateId);
   }
 
   async function uploaderPhotoSalleModal(input) {
@@ -14225,93 +14437,118 @@ function _hideTeamSelection() {
 
 
 <!-- MODALE FICHE SALLE -->
-<div id="modal-fiche-salle" class="modal-overlay" onclick="closeModalOutside(event)">
-  <div class="modal-box" style="max-width:600px;max-height:90vh;overflow-y:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;border-bottom:1px solid #e31e24;padding-bottom:12px;">
-      <div id="modal-salle-titre" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#c9a84c;">FICHE SALLE</div>
-      <button class="modal-close" onclick="closeModal('modal-fiche-salle')">✕</button>
+<div id="modal-fiche-salle" class="modal-overlay" onclick="closeModalOutside(event)" style="background:rgba(0,0,0,0.95);">
+  <div class="modal-box" style="max-width:700px;max-height:90vh;overflow-y:auto;background:#1a1a1a;border:2px solid #c9a84c;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;border-bottom:2px solid #c9a84c;padding-bottom:12px;">
+      <div id="modal-salle-titre" style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#c9a84c;">FICHE SALLE</div>
+      <button class="modal-close" onclick="closeModal('modal-fiche-salle')" style="font-size:24px;">✕</button>
     </div>
 
-    <!-- Photo -->
-    <div id="salle-photo-bloc" style="display:none;margin-bottom:16px;position:relative;border-radius:10px;overflow:hidden;border:2px solid #c9a84c;">
-      <img id="salle-photo-preview" src="" style="width:100%;height:160px;object-fit:cover;">
+    <!-- ONGLETS -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid #333;padding-bottom:12px;">
+      <button onclick="afficherOngletSalle('infos')" id="salle-tab-infos" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;cursor:pointer;">📋 INFOS</button>
+      <button onclick="afficherOngletSalle('dates')" id="salle-tab-dates" style="background:#333;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;cursor:pointer;">📅 DATES & SUIVI</button>
     </div>
-    <label style="display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;color:#7eb8d4;border:1px dashed #3b82f6;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;margin-bottom:16px;">
-      📷 PHOTO SALLE
-      <input type="file" accept="image/*" style="display:none;" onchange="uploaderPhotoSalleModal(this)">
-    </label>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div style="grid-column:span 2;">
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Ville & Nom de la salle *</label>
-        <div style="position:relative;">
-          <input id="salle-ville_nom" type="text" placeholder="Ex: NIORT Acclameur" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-        </div>
+    <!-- ONGLET INFOS -->
+    <div id="salle-onglet-infos">
+      <!-- Photo -->
+      <div id="salle-photo-bloc" style="display:none;margin-bottom:16px;position:relative;border-radius:10px;overflow:hidden;border:2px solid #c9a84c;">
+        <img id="salle-photo-preview" src="" style="width:100%;height:160px;object-fit:cover;">
       </div>
-      <div style="grid-column:span 2;">
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Adresse complète</label>
-        <div style="position:relative;">
+      <label style="display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;color:#7eb8d4;border:1px dashed #3b82f6;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;margin-bottom:16px;">
+        📷 PHOTO SALLE
+        <input type="file" accept="image/*" style="display:none;" onchange="uploaderPhotoSalleModal(this)">
+      </label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="grid-column:span 2;">
+          <label style="font-size:13px;color:#c9a84c;text-transform:uppercase;display:block;margin-bottom:6px;font-weight:600;">Ville & Nom de la salle *</label>
+          <input id="salle-ville_nom" type="text" placeholder="Ex: NIORT Acclameur" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        <div style="grid-column:span 2;">
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Adresse complète</label>
           <div style="position:relative;">
-          <input id="salle-adresse" type="text" placeholder="Tapez pour chercher une adresse..." autocomplete="off"
-                 oninput="searchAdresseSalle(this)"
-                 style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-          <div id="salle-adresse-suggestions" class="adresse-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #3a3a3a;border-radius:6px;z-index:9999;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.5);"></div>
+            <input id="salle-adresse" type="text" placeholder="Tapez pour chercher une adresse..." autocomplete="off"
+                   oninput="searchAdresseSalle(this)"
+                   style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <div id="salle-adresse-suggestions" class="adresse-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #3a3a3a;border-radius:6px;z-index:9999;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.5);"></div>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Capacité Max</label>
+          <input id="salle-capacite_max" type="number" placeholder="Ex: 5000" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Capacité Mini</label>
+          <input id="salle-capacite_min" type="number" placeholder="Ex: 2000" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Contact principal</label>
+          <input id="salle-contact_principal" type="text" placeholder="Nom prénom" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Contact technique</label>
+          <input id="salle-contact_technique" type="text" placeholder="Nom prénom" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Téléphone</label>
+          <input id="salle-telephone" type="tel" placeholder="06 xx xx xx xx" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Email</label>
+          <input id="salle-email" type="email" placeholder="contact@salle.fr" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Zone géo</label>
+          <select id="salle-zone_geo" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <option value="">-- Choisir --</option>
+            <option>HAUTS DE FRANCE</option><option>BRETAGNE</option><option>NOUVELLE AQUITAINE</option>
+            <option>OCCITANIE</option><option>BELGIQUE</option><option>NORMANDIE</option>
+            <option>PAYS DE LA LOIRE</option><option>PROVE/COTE AZUR</option><option>PACA</option>
+            <option>AUVERGNE/ RHONE ALPES</option><option>GRAND EST</option>
+            <option>BOURGOGNE /FRANCHE COMTé</option><option>CENTRE VAL DE LOIRE</option><option>ILE DE FRANCE</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Promoteur local</label>
+          <input id="salle-promoteur_local" type="text" placeholder="Ex: NDA, LDC..." style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        <div style="grid-column:span 2;">
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Conditions location</label>
+          <input id="salle-conditions_location" type="text" placeholder="Ex: 15% recette..." style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        <div style="grid-column:span 2;">
+          <label style="font-size:13px;color:#aaa;text-transform:uppercase;display:block;margin-bottom:6px;">Notes diverses</label>
+          <textarea id="salle-notes" rows="3" placeholder="Infos utiles..." style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:10px 12px;font-size:15px;font-family:'Inter',sans-serif;box-sizing:border-box;resize:vertical;"></textarea>
         </div>
       </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Capacité Max</label>
-        <input id="salle-capacite_max" type="number" placeholder="Ex: 5000" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Capacité Mini</label>
-        <input id="salle-capacite_min" type="number" placeholder="Ex: 2000" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Contact principal</label>
-        <input id="salle-contact_principal" type="text" placeholder="Nom prénom" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Contact technique</label>
-        <input id="salle-contact_technique" type="text" placeholder="Nom prénom" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Téléphone</label>
-        <input id="salle-telephone" type="tel" placeholder="06 xx xx xx xx" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Email</label>
-        <input id="salle-email" type="email" placeholder="contact@salle.fr" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Zone géo</label>
-        <select id="salle-zone_geo" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-          <option value="">-- Choisir --</option>
-          <option>HAUTS DE FRANCE</option><option>BRETAGNE</option><option>NOUVELLE AQUITAINE</option>
-          <option>OCCITANIE</option><option>BELGIQUE</option><option>NORMANDIE</option>
-          <option>PAYS DE LA LOIRE</option><option>PROVE/COTE AZUR</option><option>PACA</option>
-          <option>AUVERGNE/ RHONE ALPES</option><option>GRAND EST</option>
-          <option>BOURGOGNE /FRANCHE COMTé</option><option>CENTRE VAL DE LOIRE</option><option>ILE DE FRANCE</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Promoteur local</label>
-        <input id="salle-promoteur_local" type="text" placeholder="Ex: NDA, LDC..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div style="grid-column:span 2;">
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Conditions location</label>
-        <input id="salle-conditions_location" type="text" placeholder="Ex: 15% recette..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div style="grid-column:span 2;">
-        <label style="font-size:11px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px;">Notes diverses</label>
-        <textarea id="salle-notes" rows="3" placeholder="Infos utiles..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;resize:vertical;"></textarea>
+
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="sauvegarderSalle()" style="flex:1;background:#c9a84c;color:#000;border:none;border-radius:10px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;">💾 SAUVEGARDER</button>
+        <button onclick="supprimerSalle()" id="salle-btn-suppr" style="background:#7f1d1d;color:#fff;border:1px solid #ef4444;border-radius:10px;padding:14px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;cursor:pointer;">🗑️</button>
       </div>
     </div>
 
-    <div style="display:flex;gap:10px;margin-top:16px;">
-      <button onclick="sauvegarderSalle()" style="flex:1;background:#c9a84c;color:#000;border:none;border-radius:8px;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;">💾 SAUVEGARDER</button>
-      <button onclick="supprimerSalle()" id="salle-btn-suppr" style="background:#7f1d1d;color:#fff;border:1px solid #ef4444;border-radius:8px;padding:12px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;cursor:pointer;">🗑️</button>
-    </div>
-  </div>
+    <!-- ONGLET DATES & SUIVI -->
+    <div id="salle-onglet-dates" style="display:none;">
+      
+      <!-- DATES PASSÉES -->
+      <div style="background:#0f0f0f;border-radius:10px;padding:16px;margin-bottom:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#888;margin-bottom:12px;">📆 DATES PASSÉES</div>
+        <div id="salle-dates-passees" style="font-size:14px;color:#666;">
+          Chargement...
+        </div>
+      </div>
+
+      <!-- DATES À VENIR -->
+      <div style="background:#0f0f0f;border-radius:10px;padding:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#c9a84c;margin-bottom:12px;">🎯 DATES À VENIR / EN COURS</div>
+        <div id="salle-dates-avenir" style="display:flex;flex-direction:column;gap:12px;">
+          Chargement...
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
