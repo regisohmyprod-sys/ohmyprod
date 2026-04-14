@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
+
+<!-- Favicon & PWA Icons -->
+<link rel="icon" type="image/jpeg" href="assets/omp-icon-200.jpg">
+<link rel="apple-touch-icon" href="assets/omp-icon-200.jpg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="OH MY PROD">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -1067,21 +1077,294 @@
   @media (max-width: 768px) {
     .sidebar { transform: translateX(-100%); }
     .main { margin-left: 0; padding: 10px !important; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    
-    /* ESPACE ARTISTIQUE - Photo centrée */
-    .artistique-photo-container {
-      max-height: 180px !important;
+    .stats-grid { grid-template-columns: 1fr !important; }
+    #splash-enter-btn {
+      font-size: 16px !important;
+      letter-spacing: 4px !important;
+      padding: 10px 30px !important;
     }
-    .artistique-photo {
-      height: 180px !important;
+    
+    /* TOPBAR / MENU DU HAUT - Mobile */
+    .topbar {
+      padding: 4px 6px !important;
+    }
+    .breadcrumb {
+      font-size: 8px !important;
+      gap: 2px !important;
+    }
+    .topbar-actions {
+      gap: 2px !important;
+    }
+    .topbar-actions .btn {
+      padding: 3px 5px !important;
+      font-size: 8px !important;
+    }
+    
+    /* Page Choisir Espace - Mobile */
+    .ts-main-title {
+      font-size: 22px !important;
+    }
+    .ts-supertitle {
+      font-size: 9px !important;
+      letter-spacing: 0.2em !important;
+    }
+    .ts-subtitle {
+      font-size: 11px !important;
+    }
+    .ts-header {
+      margin-bottom: 30px !important;
+    }
+    #team-selection-screen .ts-org > div {
+      grid-template-columns: 1fr !important;
+      max-width: 100% !important;
+      gap: 8px !important;
+    }
+    #team-selection-screen .ts-org > div > div {
+      padding: 12px 14px !important;
+      gap: 10px !important;
+    }
+    #team-selection-screen .ts-org > div > div > div:first-child {
+      width: 36px !important;
+      height: 36px !important;
+      font-size: 16px !important;
+    }
+    #team-selection-screen .ts-org > div > div > div:nth-child(2) > div:first-child {
+      font-size: 12px !important;
+    }
+    #team-selection-screen .ts-org > div > div > div:nth-child(2) > div:last-child {
+      font-size: 10px !important;
+    }
+    
+    /* TABLEAU DE BORD - Mobile */
+    .page-title {
+      font-size: 14px !important;
+    }
+    
+    /* 5 boutons ADMINISTRATIF → grille compacte sur mobile */
+    .admin-buttons-grid {
+      grid-template-columns: repeat(5, 1fr) !important;
+      gap: 4px !important;
+    }
+    .admin-buttons-grid > div {
+      padding: 6px 4px !important;
+      border-radius: 6px !important;
+    }
+    .admin-buttons-grid > div > div:first-child {
+      width: 24px !important;
+      height: 24px !important;
+      font-size: 12px !important;
+      border-radius: 4px !important;
+    }
+    .admin-buttons-grid > div > div:nth-child(2) {
+      font-size: 7px !important;
+      line-height: 1.2 !important;
+    }
+    
+    /* Dropdowns plus larges sur mobile */
+    .stat-card .dropdown-container > div[id^="dropdown-"] {
+      min-width: 100% !important;
+    }
+    
+    /* Cartes tournées (TWOQ) → 1 colonne */
+    .db-tournees-cols {
+      grid-template-columns: 1fr !important;
+      gap: 10px !important;
+    }
+    .db-col-card {
+      padding: 10px !important;
+    }
+    .db-col-header {
+      font-size: 13px !important;
+      padding: 8px 10px !important;
+    }
+    .db-col-stat {
+      padding: 5px 8px !important;
+    }
+    .db-tournee-label {
+      font-size: 9px !important;
+    }
+    .db-tournee-value {
+      font-size: 13px !important;
+    }
+    
+    /* Header dashboard */
+    #page-dashboard > div:first-child {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 6px !important;
+    }
+    #page-dashboard > div:first-child > div:first-child {
+      font-size: 18px !important;
+    }
+    #page-dashboard > div:first-child > div:last-child {
+      font-size: 9px !important;
+    }
+    
+    /* Lignes dorées shimmer */
+    .gold-line-shimmer {
+      margin: 12px 0 !important;
+    }
+    
+    /* ESPACE ARTISTIQUE - Photo élargie et centrée */
+    #page-artistique > div:nth-of-type(3) {
+      max-height: 200px !important;
+    }
+    #page-artistique > div:nth-of-type(3) img {
+      height: 200px !important;
       object-position: center center !important;
     }
     
-    /* Boutons artistique - 1 colonne + marge */
-    .artistique-boutons {
-      grid-template-columns: 1fr !important;
-      margin-bottom: 60px !important;
+    /* DATES - Titre ville et date réduits */
+    .city-title {
+      font-size: 22px !important;
+      letter-spacing: 1px !important;
+    }
+    .city-date {
+      font-size: 11px !important;
+    }
+    .city-meta {
+      gap: 6px !important;
+      flex-wrap: wrap !important;
+    }
+    .venue-name {
+      font-size: 10px !important;
+    }
+    .date-detail-header {
+      padding: 12px 0 !important;
+    }
+    .nav-arrow {
+      width: 24px !important;
+      height: 24px !important;
+      font-size: 12px !important;
+    }
+    
+    /* BOUTON NOTIFIER L'ÉQUIPE - Très réduit */
+    button[onclick="openModal('modal-notifier')"] {
+      padding: 4px 8px !important;
+      font-size: 8px !important;
+      letter-spacing: 0px !important;
+    }
+    
+    /* CARTES STAT (VHR/FRAIS/LIENS) - Compact sur mobile */
+    .stat-card {
+      padding: 10px !important;
+    }
+    .stat-card .stat-label {
+      font-size: 9px !important;
+    }
+    .stat-card .stat-value {
+      font-size: 18px !important;
+    }
+    .stat-card .stat-sub {
+      font-size: 8px !important;
+    }
+    
+    /* Espacement après boutons sur mobile */
+    #page-artistique .stats-grid {
+      margin-bottom: 40px !important;
+    }
+    #page-staff-omp .stats-grid {
+      margin-bottom: 40px !important;
+    }
+    #page-dossier-technique .stats-grid {
+      margin-bottom: 40px !important;
+    }
+    
+    /* Stats tournées artiste - espacement */
+    #artiste-stats-grid {
+      margin-top: 20px !important;
+    }
+    
+    /* SELECT TYPE DE FRAIS - Menu déroulant réduit */
+    #frais-type {
+      font-size: 11px !important;
+      padding: 7px 10px !important;
+    }
+    #frais-type option {
+      font-size: 11px !important;
+      padding: 4px !important;
+    }
+    
+    /* MODAL ADD FRAIS - Compact sur mobile */
+    #modal-add-frais .modal-content {
+      padding: 16px !important;
+    }
+    #modal-add-frais input,
+    #modal-add-frais select,
+    #modal-add-frais textarea {
+      font-size: 11px !important;
+      padding: 7px 10px !important;
+    }
+    #modal-add-frais label {
+      font-size: 10px !important;
+    }
+    
+    /* LISTE INVITATIONS - Compact */
+    #bill-invit-liste-container {
+      font-size: 10px !important;
+    }
+    #bill-invit-liste-container table {
+      font-size: 10px !important;
+    }
+    #bill-invit-liste-container th,
+    #bill-invit-liste-container td {
+      padding: 5px !important;
+      font-size: 9px !important;
+    }
+    
+    /* BOUTON AJOUTER NOTE DE FRAIS - Réduit */
+    .btn-ajouter-note {
+      padding: 6px 12px !important;
+      font-size: 10px !important;
+      letter-spacing: 0.5px !important;
+    }
+    
+    /* TITRE NOTES DE FRAIS - Réduit */
+    #page-acces-frais > div:nth-of-type(2) > div:first-child > div:first-child {
+      font-size: 24px !important;
+      letter-spacing: 2px !important;
+    }
+    
+    /* INFOS CLÉS DU JOUR - Centré et complet */
+    .planning-keys {
+      margin-bottom: 12px !important;
+    }
+    .planning-keys-title {
+      font-size: 12px !important;
+      padding: 6px 10px !important;
+      letter-spacing: 1px !important;
+      text-align: center !important;
+    }
+    .planning-keys-subtitle {
+      font-size: 9px !important;
+      padding: 5px 10px !important;
+      text-align: center !important;
+    }
+    .planning-keys-grid4, .planning-keys-grid5 {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .planning-key-item {
+      padding: 6px 8px !important;
+    }
+    .planning-key-label {
+      font-size: 8px !important;
+    }
+    .planning-key-value {
+      font-size: 12px !important;
+    }
+    
+    /* BOUTON IMPRIMER PDF - Petit et centré */
+    button[onclick="window.print()"] {
+      padding: 5px 10px !important;
+      font-size: 10px !important;
+      letter-spacing: 0.5px !important;
+    }
+    #page-cloture-salle > div:first-child,
+    #page-decla-droits > div:first-child,
+    #page-bilan-amh > div:first-child {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 8px !important;
     }
   }
 
@@ -1550,6 +1833,29 @@
   0% { transform:translateY(0) scale(1); opacity:0.8; }
   100% { transform:translateY(-120px) scale(0); opacity:0; }
 }
+@keyframes shimmer {
+  0% { left:-100%; }
+  100% { left:100%; }
+}
+.gold-line-shimmer {
+  height:2px;
+  background:linear-gradient(to right, #c9a84c, rgba(201,168,76,0.3), transparent);
+  margin:20px 0;
+  position:relative;
+  overflow:hidden;
+}
+/* ANIMATION DÉSACTIVÉE TEMPORAIREMENT POUR TEST
+.gold-line-shimmer::after {
+  content:'';
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(to right, transparent 0%, rgba(255,255,255,0.8) 50%, transparent 100%);
+  animation: shimmer 1.5s infinite;
+}
+*/
 #splash-screen.fade-out {
   opacity:0;
   transition:opacity 0.8s ease;
@@ -1710,44 +2016,46 @@ function closeSplash() {
     </div>
 
     <div class="ts-org" style="margin-top:50px;">
-      <div style="display:flex; flex-direction:row; align-items:center; justify-content:center; gap:0; width:100%; max-width:1100px;">
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; width:100%; max-width:520px;">
 
         <!-- TEAM PRODUCTION -->
-        <div id="card-team-production" class="ts-card" onclick="goTeamProd()" style="width:200px;">
-          <div class="ts-card-photo" style="background-image:url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAARCACWAMgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUCAwYBB//EADYQAAIBAwMCBAQFBAIDAQAAAAECAwAEERIhMQVBUWETInGBkTKhscHR8AYU4fEjQlJicoL/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAQIDBAX/xAAeEQEBAQEAAwEBAQAAAAAAAAAAARECITESQVFh8P/aAAwDAQACEQMRAD8A+f0UUV0IooooAoqV3ZR2bG4QMR0yBXQaHqTLuFqxX1oA1RUiY5JX4EV1sNNuL5ys3hBD5Kd6AOdFdJdPuUgeYxExp1INco0LROUkUqw7EUANooooAooooAooooAooooBOPYdutMV61jYXHiS3trO2gC5W8u/DEh9z2H1qWjWb3tysFtE0shGdq96j4ySQPCCcZb0oA9loHxJj0q40WK6025sLB5hHCLhcGXnkKoGf8APejDW/h5Y61pUE2k3F3ayiEySG3KgPkj5gxPT6Ck3XtDm0ae3W4nWWO4Rwgxg4IOCf8AwKi6Fp0+q6nb2VspMs0gRfqef2FAsWXxcurOOeHW9BivLaVy5g8UrFCx6gEDIFSXHxy1CSRG07SpI1HLNNIzMfoBj9a9OtdDs7DT44LK0jt7dF2hI1CiqjX/AIR6bqGLjTnksp3OC0Y+U+voQKAPC179o8k5AtNLCRjjeZNx+uP6VlPa+Odxqkf9nW8cdwrgB5wHOB3GGwPvWesPhtq1wzfa3jtkzz+bJPsPT71pW3w30i2VV8Gd+5Z3Iz6nJ/rQB5bd2d3A5e7t5Y3bksyEE/WmFjqF1p1wJrO4eGQdGU4/+1eh3/w5tbhWNvqQhYjgy2u7HuQSP614+/sZ7G7ktbpCkqHBB9+4oA9z+FXxVk1CJdI1eUC7TiCdj/eHofUfyrpfiV8NFh/43SowIifmkCjmM92+ncelemfDHSrXRtBtktXM0ky+JJMS5yx6AnoAOBRD42NkSaRdwDEtvcLJkdQCMH98UAYJGR6jiikjcSRq46MARSUAFFFFABRRRQAUUUUAFFFOWXTbq7hkmt7dpI4hukIOAooA0NQe6bQ9PWHxza+IwbbvXPft0rPVp2mn3U0oYSTSSSFgMZLE5wKzQMHBFABRRRQAUUUUAFFFFABRRRQAlFFdKAOlFFFABRRRQBbRxIpyuOavaa0fDIJGKfRqfT5Y1wjHcPrVOOUq6nPTpXT5FoA1NtSuAhWQB0HQk9Kqr65l8VkY5IBxUOe+Rt3tXB1IlVSp6UAWsWqSxKyOCr91FQINQuuqTSKf96qvW4HHpRoA1f7TuV6SvU/7Tv9bVQ0akKGZSrY5wc0mDimFb1oAki1e7hUhZWAxyM80sPxFvIl2kbh6kVXjHrSVmzSbwm8hzjBxj71Bqk6avNIgbJKnkjpjNKIpIpXSRGR1OGVhgiu1AHR7eaMYkRkOOjCo2oopWihjViEGcdyakl0m+hjEkkJCHoTiooARxzQTcGJpEJGCVbFXtIRFvvDkXcjg9e9VJLaeCNXkiZVYkAnuRVzRJ4Ypbh5RhfDweev/ADoA6xQ/aIvvKqTUHiCONYkQYVVAA9BVgCK9t0KSq0TDBB61yPTre7tLi3nBMMoyQDjB7EfX+tAFTRXS8gdHG5TwR0rpQAUUUUAFFFFABRRRQAUUUUAFFFWrHTbq8jeSCFnjjXdI+MKo9SaALu5gNMfYNx69q59s4yBgV0jhEY7ZC2DgHGM1Pq9ol1DIkSLG6jKldvI9f2oA5EEHBqrqkPiWxXn5o23D1HUVqC2imH2iPDgdR0Nd7CJrjUoEYBlMgBBGQRQBjKAGFdKsBSRQBWooooAKKKKACiiigAooooAKKKKAP/9k=');"></div>
-          <div class="ts-card-icon">💻</div>
-          <div class="ts-card-title">Team Production</div>
-          <div class="ts-card-names">Régis & Alexandrine</div>
+        <div id="card-team-production" onclick="goTeamProd()" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">💻</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Team Production</div>
+            <div style="font-size:11px; color:#666;">Régis & Alexandrine</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
-
-        <div id="separator-team-production" style="width:30px; height:2px; background:linear-gradient(to right, rgba(201,168,76,0.4), #c9a84c, rgba(201,168,76,0.4)); flex-shrink:0;"></div>
 
         <!-- STAFF OMP -->
-        <div class="ts-card" onclick="goTeamStaff()" style="width:200px;">
-          <div class="ts-card-photo" style="background-image:url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAARCACWAMgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUCAwYBB//EADYQAAIBAwMCBAQFBAIDAQAAAAECAwAEERIhMQVBUWETInGBkTKhscHR8AYU4fEjQlJicoL/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAQIDBAX/xAAeEQEBAQEAAwEBAQAAAAAAAAAAARECITESQVFh8P/aAAwDAQACEQMRAD8A+f0UUV0IooooAoqV3ZR2bG4QMR0yBXQaHqTLuFqxX1oA1RUiY5JX4EV1sNNuL5ys3hBD5Kd6AOdFdJdPuUgeYxExp1INco0LROUkUqw7EUANooooAooooAooooAooooBOPYdutMV61jYXHiS3trO2gC5W8u/DEh9z2H1qWjWb3tysFtE0shGdq96j4ySQPCCcZb0oA9loHxJj0q40WK6025sLB5hHCLhcGXnkKoGf8APejDW/h5Y61pUE2k3F3ayiEySG3KgPkj5gxPT6Ck3XtDm0ae3W4nWWO4Rwgxg4IOCf8AwKi6Fp0+q6nb2VspMs0gRfqef2FAsWXxcurOOeHW9BivLaVy5g8UrFCx6gEDIFSXHxy1CSRG07SpI1HLNNIzMfoBj9a9OtdDs7DT44LK0jt7dF2hI1CiqjX/AIR6bqGLjTnksp3OC0Y+U+voQKAPC179o8k5AtNLCRjjeZNx+uP6VlPa+Odxqkf9nW8cdwrgB5wHOB3GGwPvWesPhtq1wzfa3jtkzz+bJPsPT71pW3w30i2VV8Gd+5Z3Iz6nJ/rQB5bd2d3A5e7t5Y3bksyEE/WmFjqF1p1wJrO4eGQdGU4/+1eh3/w5tbhWNvqQhYjgy2u7HuQSP614+/sZ7G7ktbpCkqHBB9+4oA9z+FXxVk1CJdI1eUC7TiCdj/eHofUfyrpfiV8NFh/43SowIifmkCjmM92+ncelemfDHSrXRtBtktXM0ky+JJMS5yx6AnoAOBRD42NkSaRdwDEtvcLJkdQCMH98UAYJGR6jiikjcSRq46MARSUAFFFFABRRRQAUUUUAFFFOWXTbq7hkmt7dpI4hukIOAooA0NQe6bQ9PWHxza+IwbbvXPft0rPVp2mn3U0oYSTSSSFgMZLE5wKzQMHBFABRRRQAUUUUAFFFFABRRRQAlFFdKAOlFFFABRRRQBbRxIpyuOavaa0fDIJGKfRqfT5Y1wjHcPrVOOUq6nPTpXT5FoA1NtSuAhWQB0HQk9Kqr65l8VkY5IBxUOe+Rt3tXB1IlVSp6UAWsWqSxKyOCr91FQINQuuqTSKf96qvW4HHpRoA1f7TuV6SvU/7Tv9bVQ0akKGZSrY5wc0mDimFb1oAki1e7hUhZWAxyM80sPxFvIl2kbh6kVXjHrSVmzSbwm8hzjBxj71Bqk6avNIgbJKnkjpjNKIpIpXSRGR1OGVhgiu1AHR7eaMYkRkOOjCo2oopWihjViEGcdyakl0m+hjEkkJCHoTiooARxzQTcGJpEJGCVbFXtIRFvvDkXcjg9e9VJLaeCNXkiZVYkAnuRVzRJ4Ypbh5RhfDweev/ADoA6xQ/aIvvKqTUHiCONYkQYVVAA9BVgCK9t0KSq0TDBB61yPTre7tLi3nBMMoyQDjB7EfX+tAFTRXS8gdHG5TwR0rpQAUUUUAFFFFABRRRQAUUUUAFFFWrHTbq8jeSCFnjjXdI+MKo9SaALu5gNMfYNx69q59s4yBgV0jhEY7ZC2DgHGM1Pq9ol1DIkSLG6jKldvI9f2oA5EEHBqrqkPiWxXn5o23D1HUVqC2imH2iPDgdR0Nd7CJrjUoEYBlMgBBGQRQBjKAGFdKsBSRQBWooooAKKKKACiiigAooooAKKKKAP/9k=');"></div>
-          <div class="ts-card-icon">🧑‍💼</div>
-          <div class="ts-card-title">Staff OMP</div>
-          <div class="ts-card-names">Sarah & Jérôme</div>
+        <div onclick="goTeamStaff()" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🧑‍💼</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Staff OMP</div>
+            <div style="font-size:11px; color:#666;">Sarah & Jérôme</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
-
-        <div style="width:30px; height:2px; background:linear-gradient(to right, rgba(201,168,76,0.4), #c9a84c, rgba(201,168,76,0.4)); flex-shrink:0;"></div>
 
         <!-- TEAM ARTISTIQUE -->
-        <div class="ts-card" onclick="goTeamArtistique()" style="width:200px;">
-          <div class="ts-card-photo" style="background-image:url('');"></div>
-          <div class="ts-card-icon">👑</div>
-          <div class="ts-card-title">Team Artistique</div>
-          <div class="ts-card-names">Artistes OMP</div>
+        <div onclick="goTeamArtistique()" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">👑</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Team Artistique</div>
+            <div style="font-size:11px; color:#666;">Artistes OMP</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
 
-        <div style="width:30px; height:2px; background:linear-gradient(to right, rgba(201,168,76,0.4), #c9a84c, rgba(201,168,76,0.4)); flex-shrink:0;"></div>
-
         <!-- TEAM TECHNIQUE -->
-        <div class="ts-card" onclick="goTeamTechnique()" style="width:200px;">
-          <div class="ts-card-photo" style="background-image:url('');"></div>
-          <div class="ts-card-icon">🔦</div>
-          <div class="ts-card-title">Team Technique</div>
-          <div class="ts-card-names">Staff Technique</div>
+        <div onclick="goTeamTechnique()" style="background:#1a1a1a; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🔦</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Team Technique</div>
+            <div style="font-size:11px; color:#666;">Staff Technique</div>
+          </div>
+          <div style="margin-left:auto; color:#c9a84c; font-size:18px;">→</div>
         </div>
 
       </div>
@@ -1926,49 +2234,115 @@ function _hideTeamSelection() {
         </div>
       </div>
 
-      <!-- 2 BOUTONS ADMIN ALEXANDRINE + GESTION TOUR RÉGIS -->
-      <div id="bloc-admin-gestion" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <!-- Ligne séparatrice dorée animée -->
+      <div class="gold-line-shimmer"></div>
+
+      <!-- ADMINISTRATIF - Titre -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="page-title" style="font-size:22px;margin-bottom:0;">ADMINISTRATIF</div>
+      </div>
+
+      <!-- 5 BOUTONS ADMINISTRATIF SUR UNE LIGNE -->
+      <div class="admin-buttons-grid" style="display:grid;grid-template-columns:repeat(5, 1fr);gap:10px;margin-bottom:12px;">
         
-        <!-- BOUTON ADMIN ALEXANDRINE -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-admin-alexandrine')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">💻 ADMIN ALEXANDRINE</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Gestion administrative</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LE MENU</div>
+        <!-- ADMIN ALEXANDRINE -->
+        <div onclick="openModal('modal-admin-alexandrine')" style="background:#1a1a1a; border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease; text-align:center;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:36px; height:36px; background:rgba(201,168,76,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px;">💻</div>
+          <div style="font-size:11px; font-weight:600; color:#fff;">Admin Alex</div>
         </div>
 
-        <!-- BOUTON GESTION TOUR RÉGIS -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="openModal('modal-gestion-tour-regis')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🎸 GESTION TOUR RÉGIS</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Tournées & production</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR LE MENU</div>
+        <!-- ADMIN RÉGIS -->
+        <div onclick="openModal('modal-gestion-regis')" style="background:#1a1a1a; border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease; text-align:center;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:36px; height:36px; background:rgba(201,168,76,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px;">🎸</div>
+          <div style="font-size:11px; font-weight:600; color:#fff;">Admin Régis</div>
+        </div>
+
+        <!-- ACCÈS STAFF OMP -->
+        <div onclick="showPage('staff-omp')" style="background:#1a1a1a; border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease; text-align:center;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:36px; height:36px; background:rgba(201,168,76,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px;">👥</div>
+          <div style="font-size:11px; font-weight:600; color:#fff;">Staff OMP</div>
+        </div>
+
+        <!-- ACCÈS TEAM ARTISTIQUE -->
+        <div onclick="showPage('artistique')" style="background:#1a1a1a; border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease; text-align:center;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:36px; height:36px; background:rgba(201,168,76,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px;">🎤</div>
+          <div style="font-size:11px; font-weight:600; color:#fff;">Team Artistique</div>
+        </div>
+
+        <!-- ACCÈS TEAM TECHNIQUE -->
+        <div onclick="showPage('dossier-technique')" style="background:#1a1a1a; border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease; text-align:center;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'">
+          <div style="width:36px; height:36px; background:rgba(201,168,76,0.15); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px;">🔧</div>
+          <div style="font-size:11px; font-weight:600; color:#fff;">Team Technique</div>
         </div>
 
       </div>
 
-      <!-- BLOCS ACCÈS ESPACES : STAFF / ARTISTIQUE / TECHNIQUE -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('espace-staff')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">👥 ACCÈS STAFF OMP</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Espace staff OMP</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
-        </div>
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('espace-artistique')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🎤 ACCÈS TEAM ARTISTIQUE</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Espace artistique</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
-        </div>
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.2);cursor:pointer;" onclick="showPage('espace-technique')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:4px;">🔧 ACCÈS TEAM TECHNIQUE</div>
-          <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:8px;">Espace technique</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;">→ OUVRIR MON ESPACE</div>
-        </div>
+      <!-- Ligne séparatrice dorée animée -->
+      <div class="gold-line-shimmer"></div>
+
+      <!-- GESTION TOUR - Titre -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="page-title" style="font-size:22px;margin-bottom:0;">GESTION TOUR</div>
       </div>
+
+      <!-- 3 cartes TOUR / PROMO / BILLETTERIE style stats -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(3, 1fr);">
+        
+        <!-- TOUR -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-tour')">
+          <div class="stat-label">🚌 Tour</div>
+          <div class="stat-value" style="font-size:32px;color:#c9a84c;">TOUR</div>
+          <div class="stat-sub">Dates, VHR, Salles</div>
+          <div id="dropdown-tour" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <div onclick="event.stopPropagation(); showPage('gestion-omp')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
+            <div onclick="event.stopPropagation(); openModal('modal-vhr-tournee')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
+            <div onclick="event.stopPropagation(); showPage('fiche-billetterie')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎟️ Fiche Billetterie</div>
+            <div onclick="event.stopPropagation(); showPage('gestion-salles')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Gestion Salles</div>
+          </div>
+        </div>
+
+        <!-- PROMO -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-promo')">
+          <div class="stat-label">📣 Promo</div>
+          <div class="stat-value" style="font-size:32px;color:#c9a84c;">PROMO</div>
+          <div class="stat-sub">Marketing & Réseaux</div>
+          <div id="dropdown-promo" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <a href="https://docs.google.com/spreadsheets/d/1caQzs7v3n73P6T5CAOWQfTypDAxWvlS9wKvmFjCNeJ0/edit#gid=0" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📋 Contact Promo</a>
+            <a href="https://business.facebook.com/latest/home?business_id=644890879422593" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📢 Meta Pubs</a>
+            <a href="https://www.theworldofqueen.com/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🌐 Site TWOQ Off</a>
+            <a href="https://www.ohmyprod.com/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎬 Site OMP Off</a>
+            <a href="https://www.facebook.com/theworldofqueen/?locale=fr_FR" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">👍 TWOQ Facebook Off</a>
+            <a href="https://www.instagram.com/theworldofqueenofficiel/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📸 TWOQ Instagram Off</a>
+            <a href="https://www.youtube.com/channel/UCwyb6LJpE6kDfI3Wx7wP4Xg" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">▶️ TWOQ Youtube Off</a>
+          </div>
+        </div>
+
+        <!-- BILLETTERIE -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-billetterie')">
+          <div class="stat-label">🎟️ Billetterie</div>
+          <div class="stat-value" style="font-size:32px;color:#c9a84c;">BILLETTERIE</div>
+          <div class="stat-sub">Réseaux de vente</div>
+          <div id="dropdown-billetterie" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <a href="https://lesdernierscouches.com/spectacles/the-world-of-queen/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎫 Les Derniers Couches</a>
+            <a href="https://stats.trium.fr/auth/auth.html?authnum=0&uid=&time=&pswd=&logout=&url=L3JoczAwMDYvVHJpdW1Qcm9kX0Rpc3RyaWJ1dGlvbi8oUyhod3A0MGU0amF0bmtnYWJ0emhtaDBzbWgpKS9Mb2dpbi5hc3B4&totp=" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎟️ Ticketmaster</a>
+            <a href="https://www.francebillet.pro/signin" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎵 Fnac Spectacles</a>
+            <a href="https://app2.aparteweb.com/?ins=0612507023" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Box Office</a>
+            <a href="https://stats.trium.fr/auth/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎪 Ticketnet Salle</a>
+            <a href="https://www.ticketmaster.fr/fr/concert/pop-rock-folk" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📊 Classement Ventes TKT</a>
+            <a href="https://accounts.songkick.com/session/new?cancel_url=/&success_url=https://tourbox.songkick.com/performances/79439845/tickets/new&source_product=tourbox" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎸 Songkick - Modif Tour</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Ligne séparatrice dorée animée -->
+      <div class="gold-line-shimmer"></div>
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div class="page-title" style="font-size:22px;margin-bottom:0;">TOURNÉES OMP</div>
       </div>
 
-      <div class="stats-grid" style="margin-bottom:28px;">
+      <div class="stats-grid" style="margin-bottom:20px;">
         <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('tournees')">
           <div class="stat-label">Tournées actives</div>
           <div class="stat-value" id="stat-tournees-actives" style="font-size:48px;color:#c9a84c;">2</div>
@@ -1991,11 +2365,14 @@ function _hideTeamSelection() {
         </div>
       </div>
 
+      <!-- Ligne séparatrice dorée animée -->
+      <div class="gold-line-shimmer"></div>
+
       <!-- 3 COLONNES TOURNÉES -->
       <div class="db-tournees-cols">
 
         <!-- TWOQ L'HOMMAGE -->
-        <div class="db-col-card" style="cursor:pointer;" onclick="showTournee('twoq')">
+        <div class="db-col-card">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">🎸 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'hommage à la légende</span></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq-effectuees">–</div></div>
@@ -2008,7 +2385,7 @@ function _hideTeamSelection() {
         </div>
 
         <!-- TWOQ ETERNELLE LEGENDE -->
-        <div class="db-col-card" style="cursor:pointer;" onclick="showTournee('twoq2')">
+        <div class="db-col-card">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">👑 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'Éternelle Légende</span></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq2-effectuees">–</div></div>
@@ -2029,17 +2406,27 @@ function _hideTeamSelection() {
       <div class="page-title">📋 CRÉA / SUIVI DATES</div>
       <div style="font-size:13px;color:#888;margin-bottom:20px;margin-top:-12px;font-style:italic;">Merci de choisir votre tournée !</div>
 
-      <!-- Filtres tournée — ligne 1 : tournées en gros boutons blancs -->
-      <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
-        <div id="cs-filter-twoq" onclick="csSetFilter('twoq')" style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:10px 16px;cursor:pointer;box-shadow:0 2px 12px rgba(170,180,190,0.2);min-width:140px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 TWOQ</div>
-          <div style="font-size:11px;color:#888;">L'Hommage à la Légende</div>
+      <!-- Filtres tournée — boutons style horizontal -->
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        
+        <!-- TWOQ L'Hommage -->
+        <div id="cs-filter-twoq" onclick="csSetFilter('twoq')" style="background:#1a1a1a; border-radius:10px; padding:14px 18px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#c9a84c'; this.style.background='#222'" onmouseout="if(!this.classList.contains('active')){this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'}">
+          <div style="width:44px; height:44px; background:rgba(201,168,76,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🎸</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#c9a84c;">TWOQ – L'HOMMAGE</div>
+            <div style="font-size:11px; color:#666;">The World of Queen · Tournée principale</div>
+          </div>
         </div>
-        <div id="cs-filter-twoq2" onclick="csSetFilter('twoq2')" style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:10px 16px;cursor:pointer;box-shadow:0 2px 12px rgba(170,180,190,0.2);min-width:140px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#3b82f6;margin-bottom:2px;">🎸 TWOQ</div>
-          <div style="font-size:11px;color:#888;">Éternelle Légende</div>
-        </div> <div style="font-size:11px;color:#888;">One Man Show</div>
+
+        <!-- TWOQ Éternelle Légende -->
+        <div id="cs-filter-twoq2" onclick="csSetFilter('twoq2')" style="background:#1a1a1a; border-radius:10px; padding:14px 18px; display:flex; align-items:center; gap:14px; cursor:pointer; border-left:3px solid transparent; transition:all 0.25s ease;" onmouseover="this.style.borderLeftColor='#3b82f6'; this.style.background='#222'" onmouseout="if(!this.classList.contains('active')){this.style.borderLeftColor='transparent'; this.style.background='#1a1a1a'}">
+          <div style="width:44px; height:44px; background:rgba(59,130,246,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🎸</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#3b82f6;">TWOQ – ÉTERNELLE LÉGENDE</div>
+            <div style="font-size:11px; color:#666;">The World of Queen · Nouveau spectacle</div>
+          </div>
         </div>
+
       </div>
 
       <!-- Bandeau visuel tournée -->
@@ -3121,15 +3508,19 @@ function _hideTeamSelection() {
           <div id="bill-total-dlprod" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;">0,00 €</div>
         </div>
       </div>
+
+      <!-- Ligne séparatrice dorée -->
+      <div class="gold-line-shimmer" style="margin:28px 0;"></div>
+
+      <!-- ONGLETS RÉSEAUX -->
       <div style="display:flex;gap:4px;margin-bottom:0;flex-wrap:wrap;">
-        <button class="bill-tab" onclick="billSetTab('ldc', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #22c55e;border-bottom:none;background:#22c55e;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">LDC</button>
-        <button class="bill-tab" onclick="billSetTab('fimalac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FIMALAC</button>
-        <button class="bill-tab" onclick="billSetTab('nda', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">NDA</button>
-        <button class="bill-tab" onclick="billSetTab('dome', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">DÔME</button>
-        <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">SALLE</button>
-        <button class="bill-tab" onclick="billSetTab('bleucitron', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">BLEU CITRON</button>
-        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">TM</button>
+        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #22c55e;border-bottom:none;background:#22c55e;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">TM</button>
         <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FNAC</button>
+        <button class="bill-tab" onclick="billSetTab('ldc', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">LDC</button>
+        <button class="bill-tab" onclick="billSetTab('nda', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">NDA</button>
+        <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">SALLE</button>
+        <button class="bill-tab" onclick="billSetTab('fimalac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FIMALAC</button>
+        <button class="bill-tab" onclick="billSetTab('bleucitron', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">BLEU CITRON</button>
         <button class="bill-tab" onclick="billSetTab('invit', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">🎫 INVIT</button>
       </div>
       <div style="background:#1a1a1a;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
@@ -3581,45 +3972,35 @@ function _hideTeamSelection() {
         <div style="position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;opacity:0.8;">TEAM ARTISTIQUE · THE WORLD OF QUEEN</div>
       </div>
 
-      <!-- BOUTONS -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:12px;margin-top:8px;">
-
-        <!-- Gestion VHR -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-vhr-tournee')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🚌 VOS VHR</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Toutes les infos de vos voyages</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
-        </div>
-
-        <!-- Accès Frais -->
+      <!-- BOUTONS style GESTION TOUR -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
         
+        <!-- Vos VHR -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-vhr-tournee')">
+          <div class="stat-label">🚌 Vos VHR</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">VHR</div>
+          <div class="stat-sub">Infos voyages</div>
+        </div>
 
         <!-- Drive Technique -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="window.open('https://drive.google.com/drive/folders/1Tnhwp4Qo0EVo9C3Nzi_m3lJgg0G7pWWg?usp=drive_link','_blank')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">📁 DRIVE TECHNIQUE</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Documents & ressources</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="window.open('https://drive.google.com/drive/folders/1Tnhwp4Qo0EVo9C3Nzi_m3lJgg0G7pWWg?usp=drive_link','_blank')">
+          <div class="stat-label">📁 Drive Technique</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">DRIVE</div>
+          <div class="stat-sub">Documents</div>
         </div>
 
-        <!-- Fiche Technique TWOQ L'hommage -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="window.open('https://drive.google.com/file/d/1UE5qBm0e8XLX7t7uuXwRuUXRrlatM0ca/view?usp=drive_link','_blank')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 FICHE TECH TWOQ</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">L'Hommage à la Légende</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+        <!-- Fiche Tech TWOQ -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="window.open('https://drive.google.com/file/d/1UE5qBm0e8XLX7t7uuXwRuUXRrlatM0ca/view?usp=drive_link','_blank')">
+          <div class="stat-label">🎸 Fiche Tech</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">TWOQ</div>
+          <div class="stat-sub">L'Hommage</div>
         </div>
 
-        <!-- Fiche Technique TWOQ Éternelle Légende -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:not-allowed;opacity:0.55;display:flex;flex-direction:column;gap:4px;"
-             onclick="alert('Fiche technique TWOQ Éternelle Légende — pas encore disponible.')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 FICHE TECH ÉTERNELLE</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">L'Éternelle Légende</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#555;margin-top:6px;">PAS ENCORE DISPO</div>
+        <!-- Fiche Tech Éternelle -->
+        <div class="stat-card" style="border-left:3px solid #555;padding:20px;cursor:not-allowed;opacity:0.5;">
+          <div class="stat-label">🎸 Fiche Tech</div>
+          <div class="stat-value" style="font-size:24px;color:#555;">ÉTERNELLE</div>
+          <div class="stat-sub">Pas encore dispo</div>
         </div>
 
       </div>
@@ -3645,76 +4026,50 @@ function _hideTeamSelection() {
         <div style="position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;opacity:0.8;">TEAM STAFF OMP</div>
       </div>
 
-      <!-- BOUTONS -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:8px;">
-
+      <!-- BOUTONS style GESTION TOUR -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(5, 1fr);">
+        
         <!-- Gestion VHR -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-vhr-tournee')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🚌 GESTION VHR</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Véhicules & transport par tournée</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-vhr-tournee')">
+          <div class="stat-label">🚌 Gestion VHR</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">VHR</div>
+          <div class="stat-sub">Véhicules & transport</div>
         </div>
 
         <!-- Accès Frais -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="ouvrirAccesFrais()"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">💰 ACCÈS FRAIS</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Notes de frais & justificatifs</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR MON ESPACE</div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="ouvrirAccesFrais()">
+          <div class="stat-label">💰 Accès Frais</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">FRAIS</div>
+          <div class="stat-sub">Notes & justificatifs</div>
         </div>
 
         <!-- Liens Pratiques -->
-        <div id="liens-pratiques-card" style="background:#1a1a1a;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:12px 16px;cursor:pointer;display:flex;flex-direction:column;gap:4px;position:relative;"
-             onclick="var p=document.getElementById('liens-pratiques-panel');p.style.display=p.style.display==='block'?'none':'block'"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🔗 LIENS PRATIQUES</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Outils & Voyages</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR</div>
-        </div>
-
-        <!-- Panel Liens Pratiques -->
-        <div id="liens-pratiques-panel" style="display:none;grid-column:1/-1;background:#111;border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:20px;margin-top:4px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-            <div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(201,168,76,0.2);">📋 PRATIQUE</div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <a href="https://mail.google.com/mail/u/0/" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>📧</span><span>Ma boite mail</span></a>
-                <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>📅</span><span>Mon agenda</span></a>
-                <a href="https://drive.google.com/drive/my-drive" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>📁</span><span>Drive Tour</span></a>
-              </div>
-            </div>
-            <div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(201,168,76,0.2);">✈️ VOYAGES</div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <a href="https://all.accor.com/a/fr.html" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🏨</span><span>Accor Hotels</span></a>
-                <a href="https://fr.mappy.com/itineraire" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🗺️</span><span>Mappy Itineraire</span></a>
-                <a href="https://www.booking.com/index.fr.html" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🏩</span><span>Booking</span></a>
-                <a href="https://www.uber.com/fr" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🚗</span><span>Uber</span></a>
-                <a href="https://www.sncf-connect.com/" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:8px;text-decoration:none;color:#aab4be;font-size:13px;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='#1a1a1a'"><span>🚄</span><span>SNCF Connect</span></a>
-              </div>
-            </div>
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-liens-staff')">
+          <div class="stat-label">🔗 Liens Pratiques</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">LIENS</div>
+          <div class="stat-sub">Outils & Voyages</div>
+          <div id="dropdown-liens-staff" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <a href="https://mail.google.com/mail/u/0/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📧 Ma boite mail</a>
+            <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Mon agenda</a>
+            <a href="https://drive.google.com/drive/my-drive" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📁 Drive Tour</a>
+            <a href="https://all.accor.com/a/fr.html" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏨 Accor Hotels</a>
+            <a href="https://fr.mappy.com/itineraire" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🗺️ Mappy</a>
+            <a href="https://www.sncf-connect.com/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚄 SNCF Connect</a>
           </div>
         </div>
 
-        
-        <!-- Fiche Technique TWOQ L'hommage -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="window.open('https://drive.google.com/file/d/1UE5qBm0e8XLX7t7uuXwRuUXRrlatM0ca/view?usp=drive_link','_blank')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 FICHE TECH TWOQ</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">L'Hommage à la Légende</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+        <!-- Fiche Tech TWOQ -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="window.open('https://drive.google.com/file/d/1UE5qBm0e8XLX7t7uuXwRuUXRrlatM0ca/view?usp=drive_link','_blank')">
+          <div class="stat-label">🎸 Fiche Tech</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">TWOQ</div>
+          <div class="stat-sub">L'Hommage</div>
         </div>
 
-        <!-- Fiche Technique TWOQ Éternelle Légende -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:not-allowed;opacity:0.55;display:flex;flex-direction:column;gap:4px;"
-             onclick="alert('Fiche technique TWOQ Éternelle Légende — pas encore disponible.')">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🎸 FICHE TECH ÉTERNELLE</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">L'Éternelle Légende</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#555;margin-top:6px;">PAS ENCORE DISPO</div>
+        <!-- Fiche Tech Éternelle -->
+        <div class="stat-card" style="border-left:3px solid #555;padding:20px;cursor:not-allowed;opacity:0.5;">
+          <div class="stat-label">🎸 Fiche Tech</div>
+          <div class="stat-value" style="font-size:24px;color:#555;">ÉTERNELLE</div>
+          <div class="stat-sub">Pas encore dispo</div>
         </div>
 
       </div>
@@ -3734,40 +4089,39 @@ function _hideTeamSelection() {
       </div>
 
       <!-- PHOTO ÉQUIPE -->
-      <div class="artistique-photo-container" style="width:100%;border-radius:14px;overflow:hidden;margin-bottom:28px;position:relative;max-height:340px;border:3px solid #c9a84c;box-shadow:0 0 20px rgba(201,168,76,0.4);">
-        <img class="artistique-photo" src="assets/omp-img-banner-3.jpg" style="width:100%;height:340px;object-fit:cover;object-position:center center;" alt="Team Artistique OH MY PROD">
+      <div style="width:100%;border-radius:14px;overflow:hidden;margin-bottom:28px;position:relative;max-height:340px;border:3px solid #c9a84c;box-shadow:0 0 20px rgba(201,168,76,0.4);">
+        <img src="assets/omp-img-banner-3.jpg" style="width:100%;height:340px;object-fit:cover;object-position:center 30%;" alt="Team Technique OH MY PROD">
         <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.6));"></div>
         <div style="position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;opacity:0.8;">TEAM ARTISTIQUE · THE WORLD OF QUEEN</div>
       </div>
 
-      <!-- BOUTONS -->
-      <div class="artistique-boutons" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px;margin-bottom:50px;">
-
-        <!-- VOS -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-artiste-vhr-tournee')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🚌 VOS VHR</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Toutes les infos de vos voyages</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ OUVRIR LA FICHE</div>
+      <!-- BOUTONS style GESTION TOUR -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(3, 1fr);">
+        
+        <!-- Vos VHR + Invitations -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-artiste-vhr-tournee')">
+          <div class="stat-label">🚌 VHR + Invitations</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">VHR</div>
+          <div class="stat-sub">Voyages & invits</div>
         </div>
 
         <!-- Accès Frais -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-add-frais')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">💰 ACCÈS FRAIS</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Ajouter une note de frais</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ NOUVEAU FRAIS</div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-add-frais')">
+          <div class="stat-label">💰 Accès Frais</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">FRAIS</div>
+          <div class="stat-sub">Ajouter une note</div>
         </div>
 
-        <!-- Liens pratiques -->
-        <div style="background:#1a1a1a;border:1px solid #aab4be;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(170,180,190,0.15);cursor:pointer;display:flex;flex-direction:column;gap:4px;"
-             onclick="openModal('modal-liens-pratiques-artistique')"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:2px;">🔗 LIENS PRATIQUES</div>
-          <div style="font-size:11px;color:#888;font-style:italic;">Accès rapides & ressources</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:#7eb8d4;margin-top:6px;">→ VOIR LES LIENS</div>
+        <!-- Liens Pratiques -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-liens-artistique')">
+          <div class="stat-label">🔗 Liens Pratiques</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">LIENS</div>
+          <div class="stat-sub">Accès rapides</div>
+          <div id="dropdown-liens-artistique" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <a href="https://mail.google.com/mail/u/0/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📧 Ma boite mail</a>
+            <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Mon agenda</a>
+            <a href="https://drive.google.com/drive/my-drive" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📁 Drive Tour</a>
+          </div>
         </div>
 
       </div>
@@ -3844,7 +4198,7 @@ function _hideTeamSelection() {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">💰 NOTES DE FRAIS</div>
       <div id="frais-user-label" style="font-size:12px;color:#888;margin-top:2px;"></div>
     </div>
-    <button onclick="openModal('modal-add-frais')" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UNE NOTE</button>
+    <button class="btn-ajouter-note" onclick="openModal('modal-add-frais')" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UNE NOTE</button>
   </div>
 
   <!-- Vue ADMIN : sélecteur membre -->
@@ -3875,11 +4229,10 @@ function _hideTeamSelection() {
         <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Type de frais</label>
         <select id="frais-type" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
           <option value="">-- Choisir --</option>
-          <option value="deplacement_km">🚗 Déplacement kilométrique</option>
           <option value="transport">🚂 Transport (train/avion/taxi)</option>
           <option value="hebergement">🏨 Hébergement</option>
-          <option value="repas">🍽️ Repas professionnel</option>
-          <option value="peage">🛣️ Péage / Parking</option>
+          <option value="repas">🍽️ Repas sur la route</option>
+          <option value="peage">🛣️ Péage / Parking / Essence</option>
           <option value="materiel">🔧 Matériel / Fournitures</option>
           <option value="autre">📋 Autre</option>
         </select>
@@ -3950,7 +4303,7 @@ function _hideTeamSelection() {
       cible.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;padding:20px;">Aucune note de frais.</div>';
       return;
     }
-    var types = {deplacement_km:'Deplacement km',transport:'Transport',hebergement:'Hebergement',repas:'Repas',peage:'Peage',materiel:'Materiel',autre:'Autre'};
+    var types = {transport:'Transport',hebergement:'Hebergement',repas:'Repas route',peage:'Peage/Parking/Essence',materiel:'Materiel',autre:'Autre'};
     data.sort(function(a,b){ return new Date(b.date_depense||0) - new Date(a.date_depense||0); });
     var groups = {};
     data.forEach(function(n) {
@@ -4012,7 +4365,7 @@ function _hideTeamSelection() {
       if (_currentUserRole !== 'admin') notesMois = notesMois.filter(function(n){ return n.user_email===_currentUserEmail; });
       notesMois.sort(function(a,b){ return (a.user_nom||'').localeCompare(b.user_nom||''); });
       var total = notesMois.reduce(function(s,n){ return s+(parseFloat(n.montant)||0); },0);
-      var types = {deplacement_km:'Deplacement km',transport:'Transport',hebergement:'Hebergement',repas:'Repas',peage:'Peage',materiel:'Materiel',autre:'Autre'};
+      var types = {transport:'Transport',hebergement:'Hebergement',repas:'Repas route',peage:'Peage/Parking/Essence',materiel:'Materiel',autre:'Autre'};
       var rows = notesMois.map(function(n) {
         var dt = n.date_depense ? new Date(n.date_depense).toLocaleDateString('fr-FR') : '';
         var mt = (parseFloat(n.montant)||0).toLocaleString('fr-FR',{minimumFractionDigits:2});
@@ -4031,10 +4384,8 @@ function _hideTeamSelection() {
   async function chargerSelMembresAdmin() {
     var sel = document.getElementById('frais-admin-select');
     if (!sel) return;
-    var res = await _supabase.from('membres').select('email, prenom, nom').order('prenom');
-    if (!res.data) return;
-    sel.innerHTML = '<button onclick="chargerTousLesFrais()" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">TOUS</button>' +
-      res.data.map(function(m){ return '<button onclick="chargerTousLesFrais(' + JSON.stringify(m.email) + ')" style="background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">' + m.prenom + ' ' + m.nom + '</button>'; }).join('');
+    // Afficher uniquement le bouton TOUS (pas de liste de noms)
+    sel.innerHTML = '<button onclick="chargerTousLesFrais()" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:700;">📋 TOUS LES MEMBRES</button>';
   }
 
   async function soumettreFrais() {
@@ -5306,6 +5657,36 @@ function _hideTeamSelection() {
       e.target.classList.remove('open');
     }
   }
+
+  // Toggle dropdown menus dans le dashboard
+  function toggleDropdown(dropdownId) {
+    var dropdown = document.getElementById(dropdownId);
+    var allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+    
+    // Fermer tous les autres dropdowns
+    allDropdowns.forEach(function(dd) {
+      if (dd.id !== dropdownId) {
+        dd.style.display = 'none';
+      }
+    });
+    
+    // Toggle celui cliqué
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+      dropdown.style.display = 'block';
+    } else {
+      dropdown.style.display = 'none';
+    }
+  }
+
+  // Fermer dropdowns si on clique ailleurs
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown-container')) {
+      var allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+      allDropdowns.forEach(function(dd) {
+        dd.style.display = 'none';
+      });
+    }
+  });
 
   async function addDate() {
     const ville = document.getElementById('new-ville').value.trim();
@@ -9053,6 +9434,13 @@ function _hideTeamSelection() {
           </tbody>
         </table>
       `;
+      
+      // Ajouter bouton imprimer en bas (visible surtout sur mobile)
+      body.innerHTML += `
+        <div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px solid #333;">
+          <button onclick="imprimerListeInvitations()" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:8px 16px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER LISTE</button>
+        </div>
+      `;
     } catch(e) {
       console.error('Erreur chargement invitations:', e);
       document.getElementById('bill-invit-liste-body').innerHTML = '<div style="color:#ef4444;text-align:center;padding:20px;">Erreur de chargement</div>';
@@ -9069,6 +9457,43 @@ function _hideTeamSelection() {
     } catch(e) {
       alert('Erreur mise à jour statut');
     }
+  }
+
+  // Imprimer la liste des invitations
+  function imprimerListeInvitations() {
+    const container = document.getElementById('bill-invit-liste-body');
+    if (!container) return;
+    
+    const villeEl = document.getElementById('fb-ville-date');
+    const villeInfo = villeEl ? villeEl.textContent : 'Concert';
+    
+    const printContent = `
+      <html>
+      <head>
+        <title>Liste Invitations - ${villeInfo}</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { font-size: 18px; margin-bottom: 5px; }
+          h2 { font-size: 14px; color: #666; margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; font-size: 11px; }
+          th { background: #f0f0f0; padding: 8px; text-align: left; border: 1px solid #ddd; }
+          td { padding: 8px; border: 1px solid #ddd; }
+          .footer { margin-top: 20px; font-size: 10px; color: #999; }
+        </style>
+      </head>
+      <body>
+        <h1>📋 LISTE DES INVITATIONS</h1>
+        <h2>${villeInfo}</h2>
+        ${container.querySelector('table') ? container.querySelector('table').outerHTML : '<p>Aucune invitation</p>'}
+        <div class="footer">Imprimé le ${new Date().toLocaleDateString('fr-FR')} - OH MY PROD</div>
+      </body>
+      </html>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
   }
 
   // Recalculer les totaux par type à partir des invitations VALIDÉES
