@@ -11589,13 +11589,22 @@ function _hideTeamSelection() {
 
   // Hard reload sans cache (équivalent Ctrl+Shift+R) - utilisé par le bouton 🔃
   function hardReload() {
-    // Utiliser cache: 'reload' via fetch pour invalider le cache, puis recharger
-    // Ne pas modifier l'URL pour éviter de casser l'auth Supabase
-    caches.keys().then(names => {
-      names.forEach(name => caches.delete(name));
-    }).finally(() => {
-      window.location.reload(true);
-    });
+    // Supprimer tous les caches (Service Worker, etc.)
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => caches.delete(name));
+      });
+    }
+    // Supprimer le cache du Service Worker si présent
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(registration => registration.unregister());
+      });
+    }
+    // Forcer le rechargement avec un timestamp pour éviter le cache
+    const url = new URL(window.location.href);
+    url.searchParams.set('v', Date.now());
+    window.location.replace(url.toString());
   }
 
   async function chargerTournees() {
