@@ -2384,7 +2384,7 @@ function _hideTeamSelection() {
             <div onclick="event.stopPropagation(); showPage('gestion-omp')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
             <div onclick="event.stopPropagation(); openModal('modal-vhr-tournee')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
             <div onclick="event.stopPropagation(); showPage('fiche-billetterie')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎟️ Fiche Billetterie</div>
-            <div onclick="event.stopPropagation(); showPage('gestion-salles')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Gestion Salles</div>
+            <div onclick="event.stopPropagation(); showPage('gestion-salles')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Booking / Gestion Salles</div>
           </div>
         </div>
 
@@ -4229,7 +4229,7 @@ function _hideTeamSelection() {
       <button class="back-btn" onclick="showPage('dashboard')">← Tableau de bord</button>
       <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">
         <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">🏟️ GESTION SALLES</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">🏟️ BOOKING / GESTION SALLES</div>
           <div style="font-size:13px;color:#888;margin-top:4px;">Base de données des salles de tournée</div>
         </div>
         <button onclick="ouvrirModalCreerSalle()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">+ NOUVELLE SALLE</button>
@@ -6558,7 +6558,6 @@ function _hideTeamSelection() {
     if (error || !data) { content.innerHTML = '<div style="color:#e31e24;text-align:center;padding:20px;">Erreur de chargement.</div>'; return; }
 
     const typeLabels = { voyage_aller:'🚀 Voyage aller', transfert_gare_salle:'🚉 Gare → Salle', transfert_gare_hotel:'🏨 Gare → Hôtel', transfert_salle_hotel:'🎭 Salle → Hôtel', transfert_hotel_gare:'🚉 Hôtel → Gare', voyage_retour:'🏠 Voyage retour' };
-    const teamLabels = { tous:'👥 Tous', artistique:'🎤 Artistique', production:'📋 Production', technique:'🔧 Technique' };
     const jourLabels = { veille:'La veille', jour_j:'Jour J', lendemain:'Lendemain' };
 
     const voyages  = data.filter(v => v.type === 'voyage');
@@ -6576,26 +6575,38 @@ function _hideTeamSelection() {
 
     content.innerHTML =
       section('✈️', 'VOYAGES', voyages, v => card(`
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;">${typeLabels[v.voy_type]||v.voy_type||'–'} · ${teamLabels[v.voy_team]||''} · ${jourLabels[v.voy_jour]||''}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;">${typeLabels[v.voy_type]||v.voy_type||'–'} · ${jourLabels[v.voy_jour]||''}</div>
+          ${v.voy_team ? `<div>${formatTeamsBadges(v.voy_team)}</div>` : ''}
+        </div>
         ${v.voy_heure_debut ? `<div style="font-size:12px;color:#aaa;margin-top:4px;">⏰ ${v.voy_heure_debut}${v.voy_heure_fin?' → '+v.voy_heure_fin:''}</div>` : ''}
         ${v.voy_lieu ? `<div style="font-size:12px;color:#ccc;margin-top:2px;">📍 ${v.voy_lieu}</div>` : ''}
         ${v.voy_notes && !v.voy_notes.startsWith('dosier') ? `<div style="font-size:11px;color:#888;font-style:italic;margin-top:4px;">💬 ${v.voy_notes}</div>` : ''}
       `), 'Aucun voyage renseigné') +
       section('🏨', 'HÉBERGEMENT', hotels, h => card(`
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#fff;">${h.hotel_nom||'–'}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#fff;">${h.hotel_nom||'–'}</div>
+          ${h.hotel_teams ? `<div style="display:flex;gap:4px;flex-wrap:wrap;">${formatTeamsBadges(h.hotel_teams)}</div>` : ''}
+        </div>
         ${h.hotel_adresse ? `<div style="font-size:12px;color:#aaa;margin-top:4px;">📍 ${h.hotel_adresse}</div>` : ''}
         ${h.hotel_dist_salle ? `<div style="font-size:11px;color:#888;margin-top:2px;">🎭 Salle : ${h.hotel_dist_salle}</div>` : ''}
         ${h.hotel_dist_gare ? `<div style="font-size:11px;color:#888;margin-top:2px;">🚉 Gare : ${h.hotel_dist_gare}</div>` : ''}
         ${h.hotel_commentaire ? `<div style="font-size:11px;color:#777;font-style:italic;margin-top:4px;">💬 ${h.hotel_commentaire}</div>` : ''}
       `), 'Aucun hébergement renseigné') +
       section('📞', 'CONTACTS', contacts, c => card(`
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#fff;">${c.contact_prenom||''} ${c.contact_nom||''}${c.contact_fonction?' <span style="color:#888;font-size:11px;">— '+c.contact_fonction+'</span>':''}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#fff;">${c.contact_prenom||''} ${c.contact_nom||''}${c.contact_fonction?' <span style="color:#888;font-size:11px;">— '+c.contact_fonction+'</span>':''}</div>
+          ${c.contact_team ? `<div>${formatTeamsBadges(c.contact_team)}</div>` : ''}
+        </div>
         ${c.contact_tel ? `<div style="font-size:12px;color:#aaa;margin-top:4px;">📱 ${c.contact_tel}</div>` : ''}
         ${c.contact_email ? `<div style="font-size:11px;color:#888;margin-top:2px;">✉️ ${c.contact_email}</div>` : ''}
         ${c.contact_notes ? `<div style="font-size:11px;color:#777;font-style:italic;margin-top:4px;">💬 ${c.contact_notes}</div>` : ''}
       `), 'Aucun contact renseigné') +
       section('📄', 'DOCUMENTS', docs, d => card(`
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#fff;">📄 ${d.doc_type||'–'} <span style="color:#888;font-size:11px;">${d.doc_categorie||''}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#fff;">📄 ${d.doc_type||'–'} <span style="color:#888;font-size:11px;">${d.doc_categorie||''}</span></div>
+          ${d.doc_team ? `<div>${formatTeamsBadges(d.doc_team)}</div>` : ''}
+        </div>
         ${d.doc_deposant ? `<div style="font-size:11px;color:#888;margin-top:4px;">👤 ${d.doc_deposant}${d.doc_date?' · '+d.doc_date:''}</div>` : ''}
         ${d.doc_lien ? `<a href="${d.doc_lien}" target="_blank" style="font-size:12px;color:#3b82f6;margin-top:4px;display:inline-block;">🔗 Ouvrir le document</a>` : ''}
       `), 'Aucun document déposé');
@@ -6757,7 +6768,10 @@ function _hideTeamSelection() {
               ${hotels.length ? hotels.map(h => `
                 <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                   <div style="flex:1;">
-                    <div style="font-size:12px;color:#fff;font-weight:600;">🏨 ${h.hotel_nom||'–'}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+                      <div style="font-size:12px;color:#fff;font-weight:600;">🏨 ${h.hotel_nom||'–'}</div>
+                      ${h.hotel_teams ? `<div style="display:flex;gap:3px;flex-wrap:wrap;">${formatTeamsBadges(h.hotel_teams)}</div>` : ''}
+                    </div>
                     ${h.hotel_adresse?`<div style="font-size:11px;color:#aaa;">📍 ${h.hotel_adresse}</div>`:''}
                     ${h.hotel_dist_salle?`<div style="font-size:11px;color:#888;">🎭 ${h.hotel_dist_salle}</div>`:''}
                     ${h.hotel_dist_gare?`<div style="font-size:11px;color:#888;">🚉 ${h.hotel_dist_gare}</div>`:''}
@@ -6938,6 +6952,7 @@ function _hideTeamSelection() {
     const prenom = document.getElementById('vhr-contact-prenom').value.trim();
     const nom = document.getElementById('vhr-contact-nom').value.trim();
     if (!prenom || !nom) { alert('Prénom et nom obligatoires.'); return; }
+    const teams = ['tous','artistique','production','technique'].filter(t => document.getElementById('vhr-contact-team-'+t)?.checked).join(',');
     const conData = {
       contact_prenom: prenom,
       contact_nom: nom,
@@ -6945,6 +6960,7 @@ function _hideTeamSelection() {
       contact_tel: document.getElementById('vhr-contact-tel').value,
       contact_email: document.getElementById('vhr-contact-email').value,
       contact_notes: document.getElementById('vhr-contact-notes').value,
+      contact_team: teams || null,
     };
     let error;
     if (_vhrEntryEditId) {
@@ -6963,13 +6979,13 @@ function _hideTeamSelection() {
   }
 
   async function sauverDocVHRFiche() {
-    const teams = Array.from(document.querySelectorAll('.vhr-doc-team-cb:checked')).map(cb => cb.value).join(',');
+    const teams = ['tous','artistique','production','technique'].filter(t => document.getElementById('vhr-doc-team-'+t)?.checked).join(',');
     const docData = {
       doc_categorie: document.getElementById('vhr-doc-categorie').value,
       doc_type: document.getElementById('vhr-doc-type').value,
       doc_deposant: document.getElementById('vhr-doc-deposant').value,
       doc_date: document.getElementById('vhr-doc-date').value || null,
-      doc_teams: teams,
+      doc_team: teams || null,
       doc_lien: document.getElementById('vhr-doc-lien').value,
     };
     let error;
@@ -7103,7 +7119,10 @@ function _hideTeamSelection() {
         hListe.innerHTML = hotels.map(h => `
           <div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
             <div style="flex:1;">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#3b82f6;">🏨 ${h.hotel_nom||'–'}</div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#3b82f6;">🏨 ${h.hotel_nom||'–'}</div>
+                ${h.hotel_teams ? `<div style="display:flex;gap:3px;flex-wrap:wrap;">${formatTeamsBadges(h.hotel_teams)}</div>` : ''}
+              </div>
               ${h.hotel_adresse ? `<div style="font-size:11px;color:#aaa;">📍 ${h.hotel_adresse}</div>` : ''}
               ${h.hotel_dist_salle ? `<div style="font-size:11px;color:#888;">🎭 Salle: ${h.hotel_dist_salle}</div>` : ''}
               ${h.hotel_dist_gare ? `<div style="font-size:11px;color:#888;">🚉 Gare: ${h.hotel_dist_gare}</div>` : ''}
@@ -7714,6 +7733,19 @@ function _hideTeamSelection() {
   }
 
   // Toast notification
+  // Fonction pour afficher les badges des teams concernées
+  function formatTeamsBadges(teamsStr) {
+    if (!teamsStr) return '';
+    const teams = teamsStr.split(',').map(t => t.trim().toLowerCase());
+    const badges = {
+      artistique: '<span style="background:#7c3aed;color:#fff;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700;text-transform:uppercase;">🎤 ART</span>',
+      production: '<span style="background:#c9a84c;color:#000;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700;text-transform:uppercase;">📋 PROD</span>',
+      technique: '<span style="background:#e31e24;color:#fff;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700;text-transform:uppercase;">🔧 TECH</span>',
+      tous: '<span style="background:#22c55e;color:#fff;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700;text-transform:uppercase;">👥 TOUS</span>'
+    };
+    return teams.map(t => badges[t] || '').filter(Boolean).join(' ');
+  }
+
   function afficherToast(message) {
     let toast = document.getElementById('toast-notif');
     if (!toast) {
@@ -13710,6 +13742,17 @@ function _hideTeamSelection() {
       </div>
       <div class="modal-row">
         <div class="modal-field">
+          <label>👥 Team concernée</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#ccc;cursor:pointer;"><input type="checkbox" id="vhr-contact-team-tous" value="tous"> 👥 Tous</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#ccc;cursor:pointer;"><input type="checkbox" id="vhr-contact-team-artistique" value="artistique"> 🎤 Artistique</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#ccc;cursor:pointer;"><input type="checkbox" id="vhr-contact-team-production" value="production"> 📋 Production</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#ccc;cursor:pointer;"><input type="checkbox" id="vhr-contact-team-technique" value="technique"> 🔧 Technique</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
           <label>💬 Notes</label>
           <textarea id="vhr-contact-notes" placeholder="Notes libres..." style="background:var(--black);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;resize:vertical;min-height:60px;outline:none;width:100%;box-sizing:border-box;"></textarea>
         </div>
@@ -13767,11 +13810,11 @@ function _hideTeamSelection() {
       <div class="modal-row">
         <div class="modal-field">
           <label>👥 Team concernée</label>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
-            <label class="notif-check"><input type="checkbox" class="vhr-doc-team-cb" value="Toute l'équipe" checked> 👥 Toute l'équipe</label>
-            <label class="notif-check"><input type="checkbox" class="vhr-doc-team-cb" value="Artistique"> 🎤 Artistique</label>
-            <label class="notif-check"><input type="checkbox" class="vhr-doc-team-cb" value="Technique"> 🔧 Technique</label>
-            <label class="notif-check"><input type="checkbox" class="vhr-doc-team-cb" value="Production"> 📋 Production</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#ccc;cursor:pointer;"><input type="checkbox" id="vhr-doc-team-tous" value="tous"> 👥 Tous</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#ccc;cursor:pointer;"><input type="checkbox" id="vhr-doc-team-artistique" value="artistique"> 🎤 Artistique</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#ccc;cursor:pointer;"><input type="checkbox" id="vhr-doc-team-production" value="production"> 📋 Production</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#ccc;cursor:pointer;"><input type="checkbox" id="vhr-doc-team-technique" value="technique"> 🔧 Technique</label>
           </div>
         </div>
       </div>
