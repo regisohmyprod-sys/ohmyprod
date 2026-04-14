@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.14.07">
+<meta name="version" content="2026.04.14.08">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4568,6 +4568,17 @@ function _hideTeamSelection() {
     </div>
     <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
       <div>
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Nom Staff</label>
+        <select id="frais-perso-staff" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
+          <option value="">-- Choisir --</option>
+          <option value="Sarah Prost">Sarah Prost</option>
+          <option value="Jérôme Fillella">Jérôme Fillella</option>
+          <option value="Régis BP">Régis BP</option>
+          <option value="Alex MH">Alex MH</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div>
         <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Type de frais</label>
         <select id="frais-perso-type" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
           <option value="">-- Choisir --</option>
@@ -4612,6 +4623,17 @@ function _hideTeamSelection() {
       <button class="modal-close" onclick="closeModal('modal-add-frais-omp')">✕</button>
     </div>
     <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Nom Staff</label>
+        <select id="frais-omp-staff" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
+          <option value="">-- Choisir --</option>
+          <option value="Sarah Prost">Sarah Prost</option>
+          <option value="Jérôme Fillella">Jérôme Fillella</option>
+          <option value="Régis BP">Régis BP</option>
+          <option value="Alex MH">Alex MH</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
       <div>
         <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Type de frais</label>
         <select id="frais-omp-type" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
@@ -4868,11 +4890,13 @@ function _hideTeamSelection() {
 
   // Soumettre une note CB PERSO
   async function soumettreFraisPerso() {
+    var staff = document.getElementById('frais-perso-staff').value;
     var type = document.getElementById('frais-perso-type').value;
     var date = document.getElementById('frais-perso-date').value;
     var montant = document.getElementById('frais-perso-montant').value;
     var desc = document.getElementById('frais-perso-description').value;
     var fichier = document.getElementById('frais-perso-fichier').files[0];
+    if (!staff) { alert('Merci de sélectionner un nom de staff.'); return; }
     if (!type || !date) { alert('Merci de remplir le type et la date.'); return; }
     var prog = document.getElementById('frais-perso-upload-progress');
     prog.textContent = 'Envoi en cours...';
@@ -4886,7 +4910,7 @@ function _hideTeamSelection() {
       justificatif_url = urlRes.data ? urlRes.data.publicUrl : null;
     }
     var insRes = await _supabase.from('notes_frais').insert({
-      user_email: _currentUserEmail, user_nom: _currentUserNom,
+      user_email: _currentUserEmail, user_nom: staff,
       mode_paiement: 'perso',
       type_frais: type, date_depense: date,
       montant: parseFloat(montant)||0,
@@ -4894,6 +4918,7 @@ function _hideTeamSelection() {
     });
     if (insRes.error) { prog.textContent = 'Erreur : ' + insRes.error.message; return; }
     prog.textContent = '';
+    document.getElementById('frais-perso-staff').value = '';
     document.getElementById('frais-perso-type').value = '';
     document.getElementById('frais-perso-date').value = '';
     document.getElementById('frais-perso-montant').value = '';
@@ -4905,11 +4930,13 @@ function _hideTeamSelection() {
 
   // Soumettre une note CB OMP
   async function soumettreFraisOMP() {
+    var staff = document.getElementById('frais-omp-staff').value;
     var type = document.getElementById('frais-omp-type').value;
     var date = document.getElementById('frais-omp-date').value;
     var montant = document.getElementById('frais-omp-montant').value;
     var desc = document.getElementById('frais-omp-description').value;
     var fichier = document.getElementById('frais-omp-fichier').files[0];
+    if (!staff) { alert('Merci de sélectionner un nom de staff.'); return; }
     if (!type || !date) { alert('Merci de remplir le type et la date.'); return; }
     var prog = document.getElementById('frais-omp-upload-progress');
     prog.textContent = 'Envoi en cours...';
@@ -4923,7 +4950,7 @@ function _hideTeamSelection() {
       justificatif_url = urlRes.data ? urlRes.data.publicUrl : null;
     }
     var insRes = await _supabase.from('notes_frais').insert({
-      user_email: _currentUserEmail, user_nom: _currentUserNom,
+      user_email: _currentUserEmail, user_nom: staff,
       mode_paiement: 'carte_omp',
       type_frais: type, date_depense: date,
       montant: parseFloat(montant)||0,
@@ -4931,6 +4958,7 @@ function _hideTeamSelection() {
     });
     if (insRes.error) { prog.textContent = 'Erreur : ' + insRes.error.message; return; }
     prog.textContent = '';
+    document.getElementById('frais-omp-staff').value = '';
     document.getElementById('frais-omp-type').value = '';
     document.getElementById('frais-omp-date').value = '';
     document.getElementById('frais-omp-montant').value = '';
