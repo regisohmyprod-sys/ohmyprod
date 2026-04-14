@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.14.01">
+<meta name="version" content="2026.04.14.02">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -2321,6 +2321,11 @@ function _hideTeamSelection() {
 
     <!-- DASHBOARD -->
     <div id="page-dashboard" class="page active">
+      <!-- Message de bienvenue personnalisé -->
+      <div id="welcome-msg-dashboard" style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
+        <div style="font-size:18px;color:#fff;">Hey <span id="welcome-prenom-dashboard" style="color:#c9a84c;font-weight:600;"></span> ! Content de te revoir 👋</div>
+      </div>
+
       <div style="margin-bottom:24px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;color:#fff;line-height:1;margin-bottom:8px;">TABLEAU DE BORD</div>
         <div style="display:flex;align-items:center;gap:12px;">
@@ -4055,6 +4060,11 @@ function _hideTeamSelection() {
     <div id="page-dossier-technique" class="page">
       <button class="back-btn" onclick="showPage('dashboard')">← Tableau de bord</button>
 
+      <!-- Message de bienvenue personnalisé -->
+      <div id="welcome-msg-technique" style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
+        <div style="font-size:18px;color:#fff;">Hey <span id="welcome-prenom-technique" style="color:#c9a84c;font-weight:600;"></span> ! Content de te revoir 👋</div>
+      </div>
+
       <!-- HEADER -->
       <div style="margin-bottom:24px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">🔧 ESPACE TECHNIQUE</div>
@@ -4108,6 +4118,11 @@ function _hideTeamSelection() {
 
 <div id="page-staff-omp" class="page">
       <button class="back-btn" onclick="showPage('dashboard')">← Tableau de bord</button>
+
+      <!-- Message de bienvenue personnalisé -->
+      <div id="welcome-msg-staff" style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
+        <div style="font-size:18px;color:#fff;">Hey <span id="welcome-prenom-staff" style="color:#c9a84c;font-weight:600;"></span> ! Content de te revoir 👋</div>
+      </div>
 
       <!-- HEADER -->
       <div style="margin-bottom:24px;">
@@ -4177,6 +4192,11 @@ function _hideTeamSelection() {
 
 <div id="page-artistique" class="page">
       <button class="back-btn" onclick="showPage('dashboard')">← Tableau de bord</button>
+
+      <!-- Message de bienvenue personnalisé -->
+      <div id="welcome-msg-artistique" style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
+        <div style="font-size:18px;color:#fff;">Hey <span id="welcome-prenom-artistique" style="color:#c9a84c;font-weight:600;"></span> ! Content de te revoir 👋</div>
+      </div>
 
       <!-- HEADER -->
       <div style="margin-bottom:24px;">
@@ -11428,6 +11448,7 @@ function _hideTeamSelection() {
           }
           _currentUserEmail = fakeEmail;
           _currentUserNom = (mb.prenom + ' ' + mb.nom).trim();
+          _currentUserPrenom = mb.prenom || '';
           _currentUserRole = role;
           window._selectedTeam = window._selectedTeam || 'prod';
           document.getElementById('app-screen').style.display = 'block';
@@ -11523,6 +11544,7 @@ function _hideTeamSelection() {
     // Connexion réussie
     _currentUserEmail = email;
     _currentUserNom = (mb.prenom + ' ' + mb.nom).trim();
+    _currentUserPrenom = mb.prenom || '';
     _currentUserRole = role;
 
     document.getElementById('login-screen').style.display = 'none';
@@ -11539,6 +11561,7 @@ function _hideTeamSelection() {
   }
 
   let _currentUserRole = 'membre'; // défaut
+  let _currentUserPrenom = ''; // prénom seul pour message bienvenue
 
   function applyRoleUI() {
     var role = _currentUserRole;
@@ -11576,6 +11599,53 @@ function _hideTeamSelection() {
       renderArtisteStats();
     }
     // admin et staff_omp : page dashboard par défaut
+    
+    // Afficher le message de bienvenue personnalisé
+    afficherMessageBienvenue();
+  }
+
+  // Fonction pour afficher le message de bienvenue selon le rôle
+  function afficherMessageBienvenue() {
+    var prenom = _currentUserPrenom || '';
+    if (!prenom) return;
+
+    var role = _currentUserRole;
+    var team = window._selectedTeam || 'prod';
+
+    // Déterminer quelle page affiche le message
+    if (role === 'admin') {
+      // Admin voit le message sur le dashboard
+      var msgEl = document.getElementById('welcome-msg-dashboard');
+      var prenomEl = document.getElementById('welcome-prenom-dashboard');
+      if (msgEl && prenomEl) {
+        prenomEl.textContent = prenom;
+        msgEl.style.display = 'block';
+      }
+    } else if (team === 'technique' || role === 'technique') {
+      // Technique voit le message sur espace technique
+      var msgEl = document.getElementById('welcome-msg-technique');
+      var prenomEl = document.getElementById('welcome-prenom-technique');
+      if (msgEl && prenomEl) {
+        prenomEl.textContent = prenom;
+        msgEl.style.display = 'block';
+      }
+    } else if (team === 'staff_omp' || role === 'staff_omp') {
+      // Staff OMP voit le message sur espace staff
+      var msgEl = document.getElementById('welcome-msg-staff');
+      var prenomEl = document.getElementById('welcome-prenom-staff');
+      if (msgEl && prenomEl) {
+        prenomEl.textContent = prenom;
+        msgEl.style.display = 'block';
+      }
+    } else if (team === 'artiste' || role === 'artiste') {
+      // Artiste voit le message sur espace artistique
+      var msgEl = document.getElementById('welcome-msg-artistique');
+      var prenomEl = document.getElementById('welcome-prenom-artistique');
+      if (msgEl && prenomEl) {
+        prenomEl.textContent = prenom;
+        msgEl.style.display = 'block';
+      }
+    }
   }
 
   async function renderArtisteStats() {
