@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.14.02">
+<meta name="version" content="2026.04.14.04">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3292,7 +3292,8 @@ function _hideTeamSelection() {
           <button onclick="fpOuvrirBilanAMH()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📊 BILAN AMH</button>
         </div>
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;margin-top:8px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;">🏟️ CLÔTURE SALLE</div>
+        <img src="assets/LOGO OMP OHS.png" alt="OMP" style="height:40px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;">CLÔTURE SALLE</div>
         <div id="cs-ville-date" style="font-size:13px;color:#888;"></div>
       </div>
 
@@ -13826,27 +13827,6 @@ function _hideTeamSelection() {
         <div class="modal-field">
           <label>📱 Téléphone chauffeur</label>
           <input type="tel" id="voy-chauffeur-tel" placeholder="06 12 34 56 78" />
-        </div>
-      </div>
-
-      <!-- TRANSFERT : LIEU DÉPART + LIEU ARRIVÉE + DISTANCE AUTO -->
-      <div style="background:#0d1b2a;border:1px solid #1e3a5f;border-radius:8px;padding:12px 14px;margin:4px 0 8px 0;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#3b82f6;margin-bottom:10px;">🚉 TRANSFERT — GARE → SALLE</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div style="position:relative;">
-            <label style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Lieu de départ</label>
-            <input type="text" id="voy-transfert-depart" placeholder="Ex: Gare de Niort..." autocomplete="off" oninput="searchAdresseTransfert(this.value,'depart')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;outline:none;" />
-            <div id="voy-transfert-depart-suggestions" class="adresse-suggestions"></div>
-          </div>
-          <div style="position:relative;">
-            <label style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Lieu d'arrivée</label>
-            <input type="text" id="voy-transfert-arrivee" placeholder="Ex: Zénith de Niort..." autocomplete="off" oninput="searchAdresseTransfert(this.value,'arrivee')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;outline:none;" />
-            <div id="voy-transfert-arrivee-suggestions" class="adresse-suggestions"></div>
-          </div>
-        </div>
-        <div style="margin-top:10px;">
-          <label style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">📏 Distance calculée</label>
-          <div id="voy-transfert-distance" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:7px 10px;font-size:12px;color:#c9a84c;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">—</div>
         </div>
       </div>
 
