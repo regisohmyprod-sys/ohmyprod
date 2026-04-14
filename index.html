@@ -4277,9 +4277,12 @@ function _hideTeamSelection() {
 <div id="page-contacts-promo" class="page">
   <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Tableau de bord</button>
   
-  <div style="margin-bottom:20px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">📣 CONTACTS PROMO</div>
-    <div style="font-size:13px;color:#888;margin-top:4px;">Presse locale · Radios · Médias partenaires</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">📣 CONTACTS PROMO</div>
+      <div style="font-size:13px;color:#888;margin-top:4px;">Presse locale · Radios · Médias partenaires</div>
+    </div>
+    <button onclick="openModal('modal-add-contact-promo')" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">+ AJOUTER UN CONTACT</button>
   </div>
 
   <!-- Barre recherche -->
@@ -4291,6 +4294,102 @@ function _hideTeamSelection() {
   <!-- Liste contacts -->
   <div id="promo-contacts-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;">
     <!-- Contacts injectés par JS -->
+  </div>
+</div>
+
+<!-- MODAL AJOUTER CONTACT PROMO -->
+<div id="modal-add-contact-promo" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-content" style="max-width:500px;">
+    <button class="modal-close" onclick="closeModal('modal-add-contact-promo')">✕</button>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#c9a84c;margin-bottom:20px;">📋 NOUVEAU CONTACT PROMO</div>
+    
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Nom Partenaire / Organisation *</label>
+        <input type="text" id="cp-nom-partenaire" placeholder="Ex: France Bleu Limousin, Nice Matin..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Ville concernée *</label>
+        <input type="text" id="cp-ville" placeholder="Ex: LIMOGES, BORDEAUX..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;text-transform:uppercase;">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Nom du contact</label>
+        <input type="text" id="cp-nom-contact" placeholder="Ex: Jean Dupont" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Téléphone</label>
+        <input type="tel" id="cp-telephone" placeholder="Ex: 05 55 11 38 11" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Email</label>
+        <input type="email" id="cp-email" placeholder="Ex: contact@radiofrance.com" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+      </div>
+      
+      <!-- SECTION SUIVI PROMO -->
+      <div style="border-top:1px solid #333;margin-top:10px;padding-top:14px;">
+        <div style="font-size:11px;color:#c9a84c;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:700;">📊 Suivi Promo</div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">État promo</label>
+            <select id="cp-etat" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="">-- Choisir --</option>
+              <option value="standby">Stand-by</option>
+              <option value="en_cours">En cours</option>
+              <option value="validee">Validée</option>
+              <option value="annulee">Annulée</option>
+              <option value="terminee">Terminée</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">ITW prévue ?</label>
+            <select id="cp-itw" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="">-- Choisir --</option>
+              <option value="oui">Oui</option>
+              <option value="non">Non</option>
+            </select>
+          </div>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Date début</label>
+            <input type="date" id="cp-date-debut" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Date fin</label>
+            <input type="date" id="cp-date-fin" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Date ITW</label>
+            <input type="date" id="cp-date-itw" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Heure ITW</label>
+            <input type="time" id="cp-heure-itw" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+        </div>
+        
+        <div style="margin-top:10px;">
+          <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Diffusion (détails)</label>
+          <textarea id="cp-diffusion" rows="2" placeholder="Ex: Antenne le 15/04 à 8h30, replay sur le site..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;resize:vertical;"></textarea>
+        </div>
+      </div>
+      
+      <!-- COMMENTAIRES GÉNÉRAUX -->
+      <div style="border-top:1px solid #333;margin-top:10px;padding-top:14px;">
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Infos / Commentaires généraux</label>
+        <textarea id="cp-infos" rows="3" placeholder="Notes libres..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;resize:vertical;"></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button onclick="enregistrerContactPromo()" style="flex:1;background:#c9a84c;color:#000;border:none;border-radius:8px;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;font-weight:700;">✓ ENREGISTRER</button>
+      <button onclick="closeModal('modal-add-contact-promo')" style="background:#333;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;cursor:pointer;">Annuler</button>
+    </div>
   </div>
 </div>
 
@@ -7495,7 +7594,7 @@ function _hideTeamSelection() {
   // =============================================
   // MODULE CONTACTS PROMO
   // =============================================
-  const CONTACTS_PROMO = [
+  const CONTACTS_PROMO_BASE = [
     {ville:"DUNKERQUE",org:"LA VOIX DU NORD",nom:"Bruno VERHEYDE",tel:"03 28 59 10 00",email:"dunkerque@lavoixdunord.fr"},
     {ville:"DUNKERQUE",org:"FRANCE BLEU NORD",nom:"GREGORY LAGACHE",tel:"03 20 13 59 62",email:"gregory.lagache@radiofrance.com"},
     {ville:"DUNKERQUE",org:"NRJ NORD",nom:"ERIC",tel:"06 60 96 77 74",email:"studio@nrjlittoral.fr"},
@@ -7571,9 +7670,44 @@ function _hideTeamSelection() {
     {ville:"MONTELIMAR",org:"FRANCE BLEU DROME",nom:"Florence Beaudet",tel:"",email:""}
   ];
 
-  function chargerContactsPromo() {
-    afficherContactsPromo(CONTACTS_PROMO);
+  let _allContactsPromo = [];
+
+  async function chargerContactsPromo() {
+    // Charger contacts depuis Supabase
+    try {
+      const res = await _supabase.from('contacts_promo').select('*').order('ville');
+      const dbContacts = (res.data || []).map(c => ({
+        id: c.id,
+        ville: c.ville || '',
+        org: c.nom_partenaire || '',
+        nom: c.nom_contact || '',
+        tel: c.telephone || '',
+        email: c.email || '',
+        etat: c.etat || '',
+        itw: c.itw || '',
+        dateDebut: c.date_debut || '',
+        dateFin: c.date_fin || '',
+        dateItw: c.date_itw || '',
+        heureItw: c.heure_itw || '',
+        diffusion: c.diffusion || '',
+        infos: c.infos || '',
+        fromDb: true
+      }));
+      // Combiner : contacts DB + contacts de base
+      _allContactsPromo = [...dbContacts, ...CONTACTS_PROMO_BASE];
+    } catch(e) {
+      _allContactsPromo = [...CONTACTS_PROMO_BASE];
+    }
+    afficherContactsPromo(_allContactsPromo);
   }
+
+  const ETAT_LABELS = {
+    'standby': {label: 'Stand-by', color: '#888'},
+    'en_cours': {label: 'En cours', color: '#3b82f6'},
+    'validee': {label: 'Validée', color: '#22c55e'},
+    'annulee': {label: 'Annulée', color: '#e74c3c'},
+    'terminee': {label: 'Terminée', color: '#9ca3af'}
+  };
 
   function afficherContactsPromo(contacts) {
     const container = document.getElementById('promo-contacts-list');
@@ -7584,8 +7718,9 @@ function _hideTeamSelection() {
     // Grouper par ville
     const grouped = {};
     contacts.forEach(c => {
-      if (!grouped[c.ville]) grouped[c.ville] = [];
-      grouped[c.ville].push(c);
+      const v = (c.ville || 'AUTRE').toUpperCase();
+      if (!grouped[v]) grouped[v] = [];
+      grouped[v].push(c);
     });
     
     let html = '';
@@ -7593,11 +7728,35 @@ function _hideTeamSelection() {
       html += `<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:16px;margin-bottom:8px;">`;
       html += `<div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;border-bottom:1px solid #333;padding-bottom:8px;">📍 ${ville}</div>`;
       grouped[ville].forEach(c => {
-        html += `<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #222;">`;
-        html += `<div style="font-weight:700;color:#fff;font-size:13px;">${c.org || '-'}</div>`;
+        const etatInfo = ETAT_LABELS[c.etat] || null;
+        const etatBadge = etatInfo ? `<span style="background:${etatInfo.color};color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:8px;">${etatInfo.label.toUpperCase()}</span>` : '';
+        const isNew = c.fromDb && !etatInfo ? '<span style="background:#22c55e;color:#000;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:8px;">NOUVEAU</span>' : '';
+        
+        html += `<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #222;position:relative;">`;
+        html += `<div style="font-weight:700;color:#fff;font-size:13px;">${c.org || '-'}${etatBadge}${isNew}</div>`;
         if (c.nom) html += `<div style="font-size:12px;color:#aaa;margin-top:2px;">👤 ${c.nom}</div>`;
         if (c.tel) html += `<div style="font-size:12px;color:#888;margin-top:2px;"><a href="tel:${c.tel.replace(/[\s\.]/g,'')}" style="color:#3b82f6;text-decoration:none;">📞 ${c.tel}</a></div>`;
         if (c.email) html += `<div style="font-size:11px;color:#888;margin-top:2px;"><a href="mailto:${c.email}" style="color:#c9a84c;text-decoration:none;">✉️ ${c.email}</a></div>`;
+        
+        // Infos suivi promo
+        if (c.fromDb && (c.dateDebut || c.dateFin || c.itw === 'oui' || c.diffusion)) {
+          html += `<div style="margin-top:6px;padding:6px 8px;background:#0a0a0a;border-radius:6px;font-size:11px;">`;
+          if (c.dateDebut || c.dateFin) {
+            const deb = c.dateDebut ? new Date(c.dateDebut).toLocaleDateString('fr-FR') : '?';
+            const fin = c.dateFin ? new Date(c.dateFin).toLocaleDateString('fr-FR') : '?';
+            html += `<div style="color:#888;">📅 ${deb} → ${fin}</div>`;
+          }
+          if (c.itw === 'oui') {
+            const dateItwStr = c.dateItw ? new Date(c.dateItw).toLocaleDateString('fr-FR') : '';
+            const heureItwStr = c.heureItw || '';
+            html += `<div style="color:#c9a84c;">🎤 ITW : ${dateItwStr} ${heureItwStr}</div>`;
+          }
+          if (c.diffusion) html += `<div style="color:#666;margin-top:2px;">📻 ${c.diffusion}</div>`;
+          html += `</div>`;
+        }
+        
+        if (c.infos) html += `<div style="font-size:11px;color:#666;margin-top:4px;font-style:italic;">💬 ${c.infos}</div>`;
+        if (c.fromDb && c.id) html += `<button onclick="supprimerContactPromo(${c.id})" style="position:absolute;top:0;right:0;background:transparent;border:none;color:#e74c3c;font-size:14px;cursor:pointer;" title="Supprimer">🗑️</button>`;
         html += `</div>`;
       });
       html += `</div>`;
@@ -7608,16 +7767,88 @@ function _hideTeamSelection() {
   function filtrerContactsPromo() {
     const search = document.getElementById('promo-search').value.toLowerCase();
     if (!search) {
-      afficherContactsPromo(CONTACTS_PROMO);
+      afficherContactsPromo(_allContactsPromo);
       return;
     }
-    const filtered = CONTACTS_PROMO.filter(c => 
+    const filtered = _allContactsPromo.filter(c => 
       (c.ville && c.ville.toLowerCase().includes(search)) ||
       (c.org && c.org.toLowerCase().includes(search)) ||
       (c.nom && c.nom.toLowerCase().includes(search)) ||
       (c.email && c.email.toLowerCase().includes(search))
     );
     afficherContactsPromo(filtered);
+  }
+
+  async function enregistrerContactPromo() {
+    const nomPartenaire = document.getElementById('cp-nom-partenaire').value.trim();
+    const ville = document.getElementById('cp-ville').value.trim().toUpperCase();
+    const nomContact = document.getElementById('cp-nom-contact').value.trim();
+    const telephone = document.getElementById('cp-telephone').value.trim();
+    const email = document.getElementById('cp-email').value.trim();
+    const etat = document.getElementById('cp-etat').value;
+    const itw = document.getElementById('cp-itw').value;
+    const dateDebut = document.getElementById('cp-date-debut').value || null;
+    const dateFin = document.getElementById('cp-date-fin').value || null;
+    const dateItw = document.getElementById('cp-date-itw').value || null;
+    const heureItw = document.getElementById('cp-heure-itw').value || null;
+    const diffusion = document.getElementById('cp-diffusion').value.trim();
+    const infos = document.getElementById('cp-infos').value.trim();
+
+    if (!nomPartenaire || !ville) {
+      alert('Veuillez remplir au moins le nom du partenaire et la ville.');
+      return;
+    }
+
+    try {
+      const res = await _supabase.from('contacts_promo').insert([{
+        nom_partenaire: nomPartenaire,
+        ville: ville,
+        nom_contact: nomContact,
+        telephone: telephone,
+        email: email,
+        etat: etat,
+        itw: itw,
+        date_debut: dateDebut,
+        date_fin: dateFin,
+        date_itw: dateItw,
+        heure_itw: heureItw,
+        diffusion: diffusion,
+        infos: infos
+      }]);
+      if (res.error) throw res.error;
+      
+      // Vider le formulaire
+      document.getElementById('cp-nom-partenaire').value = '';
+      document.getElementById('cp-ville').value = '';
+      document.getElementById('cp-nom-contact').value = '';
+      document.getElementById('cp-telephone').value = '';
+      document.getElementById('cp-email').value = '';
+      document.getElementById('cp-etat').value = '';
+      document.getElementById('cp-itw').value = '';
+      document.getElementById('cp-date-debut').value = '';
+      document.getElementById('cp-date-fin').value = '';
+      document.getElementById('cp-date-itw').value = '';
+      document.getElementById('cp-heure-itw').value = '';
+      document.getElementById('cp-diffusion').value = '';
+      document.getElementById('cp-infos').value = '';
+      
+      closeModal('modal-add-contact-promo');
+      chargerContactsPromo();
+      alert('✅ Contact ajouté !');
+    } catch(e) {
+      alert('Erreur : ' + e.message);
+    }
+  }
+
+  async function supprimerContactPromo(id) {
+    if (!confirm('Supprimer ce contact ?')) return;
+    try {
+      const res = await _supabase.from('contacts_promo').delete().eq('id', id);
+      if (res.error) throw res.error;
+      chargerContactsPromo();
+    } catch(e) {
+      alert('Erreur : ' + e.message);
+    }
   }
 
   // =============================================
