@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.15.13">
+<meta name="version" content="2026.04.15.15">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4609,6 +4609,58 @@ function _hideTeamSelection() {
   </div>
 </div>
 
+<!-- ========== PAGE EXPLORATEUR FICHIERS JUSTIFICATIFS ========== -->
+<div id="page-fichiers-justificatifs" class="page">
+  <button class="back-btn" onclick="ouvrirRecapFrais()" style="margin-bottom:12px;">← Retour au Récap Frais</button>
+  
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">📁 FICHIERS JUSTIFICATIFS</div>
+      <div style="font-size:12px;color:#888;margin-top:4px;">Tous les justificatifs reçus • Classés par mois et membre</div>
+    </div>
+    <button onclick="chargerFichiersJustificatifs()" style="background:#333;color:#fff;border:1px solid #555;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;">🔄 ACTUALISER</button>
+  </div>
+
+  <!-- FILTRES -->
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div style="flex:1;min-width:140px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Mois</label>
+        <select id="filtre-fichiers-mois" onchange="filtrerFichiersJustificatifs()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
+          <option value="">-- Tous les mois --</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:140px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Membre</label>
+        <select id="filtre-fichiers-membre" onchange="filtrerFichiersJustificatifs()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
+          <option value="">-- Tous --</option>
+        </select>
+      </div>
+      <div>
+        <button onclick="resetFiltresFichiers()" style="background:#333;color:#888;border:none;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;">✕ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div style="display:flex;gap:12px;margin-bottom:16px;">
+    <div style="background:#1a1a1a;border-left:3px solid #c9a84c;border-radius:8px;padding:12px 16px;">
+      <div style="font-size:10px;color:#888;text-transform:uppercase;">Total fichiers</div>
+      <div id="stat-fichiers-total" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#c9a84c;">0</div>
+    </div>
+    <div style="background:#1a1a1a;border-left:3px solid #3b82f6;border-radius:8px;padding:12px 16px;">
+      <div style="font-size:10px;color:#888;text-transform:uppercase;">Affichés</div>
+      <div id="stat-fichiers-affiches" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#3b82f6;">0</div>
+    </div>
+  </div>
+
+  <!-- LISTE FICHIERS -->
+  <div id="liste-fichiers-justificatifs" style="display:flex;flex-direction:column;gap:8px;">
+    <div style="text-align:center;padding:40px;color:#666;">Chargement des fichiers...</div>
+  </div>
+</div>
+
 <script>
   // ========== NOUVEAU SYSTÈME NOTES DE FRAIS ==========
   
@@ -4928,11 +4980,200 @@ function _hideTeamSelection() {
     document.getElementById('recap-frais-total').textContent = total.toFixed(2) + ' €';
   }
 
-  // Ouvrir le bucket Supabase des justificatifs (accès direct aux fichiers)
+  // Variables pour l'explorateur de fichiers
+  var _fichiersJustificatifs = [];
+  var _fichiersFiltres = [];
+
+  // Ouvrir la page explorateur de fichiers justificatifs
   function ouvrirBucketJustificatifs() {
-    // URL du dashboard Supabase Storage pour le bucket justificatifs
-    var bucketUrl = 'https://supabase.com/dashboard/project/nhxqcavianozskxgfcbt/storage/buckets/justificatifs';
-    window.open(bucketUrl, '_blank');
+    showPage('fichiers-justificatifs');
+    chargerFichiersJustificatifs();
+  }
+
+  // Charger tous les fichiers du bucket justificatifs
+  async function chargerFichiersJustificatifs() {
+    var container = document.getElementById('liste-fichiers-justificatifs');
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#666;">⏳ Chargement des fichiers...</div>';
+    
+    try {
+      // Lister tous les fichiers du bucket
+      var res = await _supabase.storage.from('justificatifs').list('', {
+        limit: 1000,
+        sortBy: { column: 'created_at', order: 'desc' }
+      });
+      
+      if (res.error) throw res.error;
+      
+      // Filtrer les dossiers et garder les fichiers
+      var fichiers = [];
+      var dossiers = res.data.filter(function(f) { return f.id === null; }); // dossiers
+      
+      // Pour chaque dossier (mois), lister les sous-dossiers (membres)
+      for (var d of dossiers) {
+        var resMois = await _supabase.storage.from('justificatifs').list(d.name, { limit: 100 });
+        if (resMois.data) {
+          for (var m of resMois.data) {
+            if (m.id === null) {
+              // C'est un dossier membre, lister les fichiers dedans
+              var resFichiers = await _supabase.storage.from('justificatifs').list(d.name + '/' + m.name, { limit: 100 });
+              if (resFichiers.data) {
+                resFichiers.data.filter(function(f) { return f.id !== null; }).forEach(function(f) {
+                  fichiers.push({
+                    nom: f.name,
+                    mois: d.name,
+                    membre: m.name,
+                    chemin: d.name + '/' + m.name + '/' + f.name,
+                    taille: f.metadata ? f.metadata.size : 0,
+                    date: f.created_at || f.updated_at
+                  });
+                });
+              }
+            } else {
+              // Fichier directement dans le dossier mois
+              fichiers.push({
+                nom: m.name,
+                mois: d.name,
+                membre: '—',
+                chemin: d.name + '/' + m.name,
+                taille: m.metadata ? m.metadata.size : 0,
+                date: m.created_at || m.updated_at
+              });
+            }
+          }
+        }
+      }
+      
+      // Fichiers à la racine
+      res.data.filter(function(f) { return f.id !== null; }).forEach(function(f) {
+        fichiers.push({
+          nom: f.name,
+          mois: '—',
+          membre: '—',
+          chemin: f.name,
+          taille: f.metadata ? f.metadata.size : 0,
+          date: f.created_at || f.updated_at
+        });
+      });
+      
+      _fichiersJustificatifs = fichiers;
+      
+      // Remplir les filtres
+      remplirFiltresMois();
+      remplirFiltresMembres();
+      
+      // Afficher
+      filtrerFichiersJustificatifs();
+      document.getElementById('stat-fichiers-total').textContent = fichiers.length;
+      
+    } catch(e) {
+      console.error('Erreur chargement fichiers:', e);
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:#e31e24;">❌ Erreur: ' + e.message + '</div>';
+    }
+  }
+
+  // Remplir le select des mois
+  function remplirFiltresMois() {
+    var select = document.getElementById('filtre-fichiers-mois');
+    var moisUniques = [...new Set(_fichiersJustificatifs.map(function(f) { return f.mois; }))].filter(function(m) { return m !== '—'; }).sort().reverse();
+    select.innerHTML = '<option value="">-- Tous les mois --</option>';
+    moisUniques.forEach(function(m) {
+      select.innerHTML += '<option value="' + m + '">' + m + '</option>';
+    });
+  }
+
+  // Remplir le select des membres
+  function remplirFiltresMembres() {
+    var select = document.getElementById('filtre-fichiers-membre');
+    var membresUniques = [...new Set(_fichiersJustificatifs.map(function(f) { return f.membre; }))].filter(function(m) { return m !== '—'; }).sort();
+    select.innerHTML = '<option value="">-- Tous --</option>';
+    membresUniques.forEach(function(m) {
+      select.innerHTML += '<option value="' + m + '">' + m + '</option>';
+    });
+  }
+
+  // Filtrer et afficher les fichiers
+  function filtrerFichiersJustificatifs() {
+    var moisFilter = document.getElementById('filtre-fichiers-mois').value;
+    var membreFilter = document.getElementById('filtre-fichiers-membre').value;
+    
+    _fichiersFiltres = _fichiersJustificatifs.filter(function(f) {
+      if (moisFilter && f.mois !== moisFilter) return false;
+      if (membreFilter && f.membre !== membreFilter) return false;
+      return true;
+    });
+    
+    afficherFichiersJustificatifs(_fichiersFiltres);
+    document.getElementById('stat-fichiers-affiches').textContent = _fichiersFiltres.length;
+  }
+
+  // Afficher la liste des fichiers
+  function afficherFichiersJustificatifs(fichiers) {
+    var container = document.getElementById('liste-fichiers-justificatifs');
+    
+    if (!fichiers || !fichiers.length) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:#666;">📭 Aucun fichier trouvé</div>';
+      return;
+    }
+    
+    var html = '';
+    fichiers.forEach(function(f) {
+      var dateStr = f.date ? new Date(f.date).toLocaleDateString('fr-FR') : '—';
+      var tailleStr = f.taille ? (f.taille / 1024).toFixed(1) + ' Ko' : '—';
+      var ext = f.nom.split('.').pop().toLowerCase();
+      var icon = ext === 'pdf' ? '📄' : (ext === 'jpg' || ext === 'jpeg' || ext === 'png' ? '🖼️' : '📎');
+      
+      html += '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;">';
+      html += '<span style="font-size:24px;">' + icon + '</span>';
+      html += '<div style="flex:1;min-width:0;">';
+      html += '<div style="font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + f.nom + '</div>';
+      html += '<div style="font-size:11px;color:#666;margin-top:2px;">';
+      html += '<span style="color:#c9a84c;">' + f.mois + '</span>';
+      html += ' • <span style="color:#3b82f6;">' + f.membre + '</span>';
+      html += ' • ' + dateStr + ' • ' + tailleStr;
+      html += '</div></div>';
+      html += '<button onclick="telechargerFichierJustificatif(\'' + f.chemin.replace(/'/g, "\\'") + '\', \'' + f.nom.replace(/'/g, "\\'") + '\')" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;white-space:nowrap;">⬇️ Télécharger</button>';
+      html += '<button onclick="voirFichierJustificatif(\'' + f.chemin.replace(/'/g, "\\'") + '\')" style="background:#2d2510;color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;white-space:nowrap;">👁️ Voir</button>';
+      html += '</div>';
+    });
+    
+    container.innerHTML = html;
+  }
+
+  // Voir un fichier (ouvrir dans nouvel onglet)
+  async function voirFichierJustificatif(chemin) {
+    try {
+      var res = await _supabase.storage.from('justificatifs').createSignedUrl(chemin, 3600);
+      if (res.error) throw res.error;
+      window.open(res.data.signedUrl, '_blank');
+    } catch(e) {
+      alert('Erreur: ' + e.message);
+    }
+  }
+
+  // Télécharger un fichier
+  async function telechargerFichierJustificatif(chemin, nomFichier) {
+    try {
+      var res = await _supabase.storage.from('justificatifs').download(chemin);
+      if (res.error) throw res.error;
+      
+      var url = URL.createObjectURL(res.data);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = nomFichier;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch(e) {
+      alert('Erreur téléchargement: ' + e.message);
+    }
+  }
+
+  // Reset filtres fichiers
+  function resetFiltresFichiers() {
+    document.getElementById('filtre-fichiers-mois').value = '';
+    document.getElementById('filtre-fichiers-membre').value = '';
+    filtrerFichiersJustificatifs();
   }
 
   // Reset filtres récap
@@ -4983,14 +5224,12 @@ function _hideTeamSelection() {
   function imprimerRecapFrais() {
     var membreFilter = document.getElementById('filtre-recap-membre').value;
     var typeCBFilter = document.getElementById('filtre-recap-typecb').value;
-    var statutFilter = document.getElementById('filtre-recap-statut').value;
     var dateDebut = document.getElementById('filtre-recap-date-debut').value;
     var dateFin = document.getElementById('filtre-recap-date-fin').value;
     
     var filtered = _fraisDataAll.filter(function(f) {
       if (membreFilter && f.user_nom !== membreFilter) return false;
       if (typeCBFilter && f.mode_paiement !== typeCBFilter) return false;
-      if (statutFilter && f.statut !== statutFilter) return false;
       if (dateDebut && f.date_depense < dateDebut) return false;
       if (dateFin && f.date_depense > dateFin) return false;
       return true;
@@ -4999,17 +5238,16 @@ function _hideTeamSelection() {
     var filtresTexte = [];
     if (membreFilter) filtresTexte.push('Membre: ' + membreFilter);
     if (typeCBFilter) filtresTexte.push('Type: CB ' + typeCBFilter);
-    if (statutFilter) filtresTexte.push('Statut: ' + statutFilter);
     if (dateDebut) filtresTexte.push('Du ' + new Date(dateDebut).toLocaleDateString('fr-FR'));
     if (dateFin) filtresTexte.push('Au ' + new Date(dateFin).toLocaleDateString('fr-FR'));
     var filtresLabel = filtresTexte.length ? filtresTexte.join(' · ') : 'Toutes les notes';
     
-    var total = filtered.filter(function(f) { return f.statut !== 'refusé'; }).reduce(function(s,f) { return s + (parseFloat(f.montant)||0); }, 0);
+    var total = filtered.reduce(function(s,f) { return s + (parseFloat(f.montant)||0); }, 0);
     var typeLabels = {transport:'Transport',hebergement:'Hébergement',repas:'Repas',peage:'Péage/Parking',materiel:'Matériel',autre:'Autre'};
     
     var rows = filtered.map(function(f) {
       var dt = f.date_depense ? new Date(f.date_depense).toLocaleDateString('fr-FR') : '';
-      return '<tr><td style="border:1px solid #ddd;padding:7px;">' + (f.user_nom||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + dt + '</td><td style="border:1px solid #ddd;padding:7px;">CB ' + (f.mode_paiement||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + (typeLabels[f.type_frais]||f.type_frais||'') + '</td><td style="border:1px solid #ddd;padding:7px;text-align:right;font-weight:bold;">' + (parseFloat(f.montant)||0).toFixed(2) + ' €</td><td style="border:1px solid #ddd;padding:7px;text-align:center;">' + (f.statut||'') + '</td></tr>';
+      return '<tr><td style="border:1px solid #ddd;padding:7px;">' + (f.user_nom||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + dt + '</td><td style="border:1px solid #ddd;padding:7px;">CB ' + (f.mode_paiement||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + (typeLabels[f.type_frais]||f.type_frais||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + (f.description||'—') + '</td><td style="border:1px solid #ddd;padding:7px;text-align:right;font-weight:bold;">' + (parseFloat(f.montant)||0).toFixed(2) + ' €</td></tr>';
     }).join('');
     
     var existing = document.getElementById('print-overlay');
@@ -5037,14 +5275,13 @@ function _hideTeamSelection() {
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Date</th>' +
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Type CB</th>' +
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Type Frais</th>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Description</th>' +
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:right;font-size:11px;text-transform:uppercase;">Montant</th>' +
-        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:center;font-size:11px;text-transform:uppercase;">Statut</th>' +
       '</tr></thead>' +
       '<tbody>' + rows +
         '<tr style="background:#e0e0e0;font-weight:bold;">' +
-          '<td colspan="4" style="border:1px solid #ddd;padding:10px;text-align:right;font-size:14px;">TOTAL</td>' +
+          '<td colspan="5" style="border:1px solid #ddd;padding:10px;text-align:right;font-size:14px;">TOTAL</td>' +
           '<td style="border:1px solid #ddd;padding:10px;text-align:right;font-size:16px;color:#c9a84c;">' + total.toFixed(2) + ' €</td>' +
-          '<td></td>' +
         '</tr>' +
       '</tbody>' +
     '</table>' +
