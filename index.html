@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.15.15">
+<meta name="version" content="2026.04.15.17">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4643,8 +4643,8 @@ function _hideTeamSelection() {
     </div>
   </div>
 
-  <!-- STATS -->
-  <div style="display:flex;gap:12px;margin-bottom:16px;">
+  <!-- STATS + BOUTON EXPORT -->
+  <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
     <div style="background:#1a1a1a;border-left:3px solid #c9a84c;border-radius:8px;padding:12px 16px;">
       <div style="font-size:10px;color:#888;text-transform:uppercase;">Total fichiers</div>
       <div id="stat-fichiers-total" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#c9a84c;">0</div>
@@ -4652,6 +4652,22 @@ function _hideTeamSelection() {
     <div style="background:#1a1a1a;border-left:3px solid #3b82f6;border-radius:8px;padding:12px 16px;">
       <div style="font-size:10px;color:#888;text-transform:uppercase;">Affichés</div>
       <div id="stat-fichiers-affiches" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#3b82f6;">0</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button onclick="telechargerTousLesFichiers()" id="btn-telecharger-selection" style="background:#22c55e;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;gap:8px;">
+        <span>📥</span> TÉLÉCHARGER LA SÉLECTION
+      </button>
+    </div>
+  </div>
+
+  <!-- PROGRESS BAR TÉLÉCHARGEMENT -->
+  <div id="download-progress-container" style="display:none;background:#1a1a1a;border:1px solid #22c55e;border-radius:8px;padding:16px;margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:12px;color:#888;">Téléchargement en cours...</span>
+      <span id="download-progress-text" style="font-size:12px;color:#22c55e;">0 / 0</span>
+    </div>
+    <div style="background:#333;border-radius:4px;height:8px;overflow:hidden;">
+      <div id="download-progress-bar" style="background:#22c55e;height:100%;width:0%;transition:width 0.3s;"></div>
     </div>
   </div>
 
@@ -4996,7 +5012,7 @@ function _hideTeamSelection() {
     container.innerHTML = '<div style="text-align:center;padding:40px;color:#666;">⏳ Chargement des fichiers...</div>';
     
     try {
-      // Lister tous les fichiers du bucket
+      // Lister le premier niveau du bucket
       var res = await _supabase.storage.from('justificatifs').list('', {
         limit: 1000,
         sortBy: { column: 'created_at', order: 'desc' }
@@ -5004,56 +5020,61 @@ function _hideTeamSelection() {
       
       if (res.error) throw res.error;
       
-      // Filtrer les dossiers et garder les fichiers
       var fichiers = [];
-      var dossiers = res.data.filter(function(f) { return f.id === null; }); // dossiers
       
-      // Pour chaque dossier (mois), lister les sous-dossiers (membres)
-      for (var d of dossiers) {
-        var resMois = await _supabase.storage.from('justificatifs').list(d.name, { limit: 100 });
-        if (resMois.data) {
-          for (var m of resMois.data) {
-            if (m.id === null) {
-              // C'est un dossier membre, lister les fichiers dedans
-              var resFichiers = await _supabase.storage.from('justificatifs').list(d.name + '/' + m.name, { limit: 100 });
-              if (resFichiers.data) {
-                resFichiers.data.filter(function(f) { return f.id !== null; }).forEach(function(f) {
-                  fichiers.push({
-                    nom: f.name,
-                    mois: d.name,
-                    membre: m.name,
-                    chemin: d.name + '/' + m.name + '/' + f.name,
-                    taille: f.metadata ? f.metadata.size : 0,
-                    date: f.created_at || f.updated_at
+      // Parcourir les éléments du premier niveau
+      for (var item of res.data) {
+        if (item.id === null) {
+          // C'est un dossier (probablement un membre ou un mois)
+          var nomDossier1 = item.name;
+          
+          // Lister le contenu de ce dossier
+          var resNiveau2 = await _supabase.storage.from('justificatifs').list(nomDossier1, { limit: 500 });
+          if (resNiveau2.data) {
+            for (var item2 of resNiveau2.data) {
+              if (item2.id === null) {
+                // C'est un sous-dossier, lister son contenu
+                var resNiveau3 = await _supabase.storage.from('justificatifs').list(nomDossier1 + '/' + item2.name, { limit: 500 });
+                if (resNiveau3.data) {
+                  resNiveau3.data.filter(function(f) { return f.id !== null; }).forEach(function(f) {
+                    var infos = extraireInfosFichier(f, nomDossier1, item2.name);
+                    fichiers.push({
+                      nom: f.name,
+                      mois: infos.mois,
+                      membre: infos.membre,
+                      chemin: nomDossier1 + '/' + item2.name + '/' + f.name,
+                      taille: f.metadata ? f.metadata.size : 0,
+                      date: f.created_at || f.updated_at
+                    });
                   });
+                }
+              } else {
+                // Fichier directement dans le dossier niveau 1
+                var infos = extraireInfosFichier(item2, nomDossier1, null);
+                fichiers.push({
+                  nom: item2.name,
+                  mois: infos.mois,
+                  membre: infos.membre,
+                  chemin: nomDossier1 + '/' + item2.name,
+                  taille: item2.metadata ? item2.metadata.size : 0,
+                  date: item2.created_at || item2.updated_at
                 });
               }
-            } else {
-              // Fichier directement dans le dossier mois
-              fichiers.push({
-                nom: m.name,
-                mois: d.name,
-                membre: '—',
-                chemin: d.name + '/' + m.name,
-                taille: m.metadata ? m.metadata.size : 0,
-                date: m.created_at || m.updated_at
-              });
             }
           }
+        } else {
+          // Fichier à la racine
+          var infos = extraireInfosFichier(item, null, null);
+          fichiers.push({
+            nom: item.name,
+            mois: infos.mois,
+            membre: infos.membre,
+            chemin: item.name,
+            taille: item.metadata ? item.metadata.size : 0,
+            date: item.created_at || item.updated_at
+          });
         }
       }
-      
-      // Fichiers à la racine
-      res.data.filter(function(f) { return f.id !== null; }).forEach(function(f) {
-        fichiers.push({
-          nom: f.name,
-          mois: '—',
-          membre: '—',
-          chemin: f.name,
-          taille: f.metadata ? f.metadata.size : 0,
-          date: f.created_at || f.updated_at
-        });
-      });
       
       _fichiersJustificatifs = fichiers;
       
@@ -5071,13 +5092,64 @@ function _hideTeamSelection() {
     }
   }
 
+  // Extraire les infos (mois, membre) depuis les noms de dossiers et la date
+  function extraireInfosFichier(fichier, dossier1, dossier2) {
+    var mois = '—';
+    var membre = '—';
+    
+    // Détecter si c'est un email (membre) ou un format mois (YYYY-MM ou MM-YYYY)
+    var regexEmail = /@/;
+    var regexMois = /^(\d{4}-\d{2}|\d{2}-\d{4}|\d{4}_\d{2})$/;
+    
+    if (dossier1) {
+      if (regexEmail.test(dossier1)) {
+        membre = dossier1;
+      } else if (regexMois.test(dossier1)) {
+        mois = dossier1;
+      } else {
+        // Peut-être un nom de membre sans email
+        membre = dossier1;
+      }
+    }
+    
+    if (dossier2) {
+      if (regexEmail.test(dossier2)) {
+        membre = dossier2;
+      } else if (regexMois.test(dossier2)) {
+        mois = dossier2;
+      } else if (membre === '—') {
+        membre = dossier2;
+      }
+    }
+    
+    // Si pas de mois trouvé, essayer de le déduire de la date du fichier
+    if (mois === '—' && fichier.created_at) {
+      var d = new Date(fichier.created_at);
+      mois = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    }
+    
+    // Nettoyer l'affichage du membre (enlever @gmail.com etc.)
+    if (membre !== '—' && regexEmail.test(membre)) {
+      // Garder l'email complet pour le filtre mais on pourrait le simplifier si besoin
+    }
+    
+    return { mois: mois, membre: membre };
+  }
+
   // Remplir le select des mois
   function remplirFiltresMois() {
     var select = document.getElementById('filtre-fichiers-mois');
     var moisUniques = [...new Set(_fichiersJustificatifs.map(function(f) { return f.mois; }))].filter(function(m) { return m !== '—'; }).sort().reverse();
     select.innerHTML = '<option value="">-- Tous les mois --</option>';
     moisUniques.forEach(function(m) {
-      select.innerHTML += '<option value="' + m + '">' + m + '</option>';
+      // Formater le mois pour l'affichage (2025-04 → Avril 2025)
+      var label = m;
+      var match = m.match(/^(\d{4})-(\d{2})$/);
+      if (match) {
+        var moisNoms = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+        label = moisNoms[parseInt(match[2])-1] + ' ' + match[1];
+      }
+      select.innerHTML += '<option value="' + m + '">' + label + '</option>';
     });
   }
 
@@ -5087,7 +5159,14 @@ function _hideTeamSelection() {
     var membresUniques = [...new Set(_fichiersJustificatifs.map(function(f) { return f.membre; }))].filter(function(m) { return m !== '—'; }).sort();
     select.innerHTML = '<option value="">-- Tous --</option>';
     membresUniques.forEach(function(m) {
-      select.innerHTML += '<option value="' + m + '">' + m + '</option>';
+      // Afficher l'email ou le nom
+      var label = m;
+      // Si c'est un email, on peut garder juste la partie avant @
+      if (m.includes('@')) {
+        label = m.split('@')[0].replace(/[._]/g, ' ');
+        label = label.charAt(0).toUpperCase() + label.slice(1);
+      }
+      select.innerHTML += '<option value="' + m + '">' + label + ' (' + m + ')</option>';
     });
   }
 
@@ -5109,6 +5188,7 @@ function _hideTeamSelection() {
   // Afficher la liste des fichiers
   function afficherFichiersJustificatifs(fichiers) {
     var container = document.getElementById('liste-fichiers-justificatifs');
+    var moisNoms = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
     
     if (!fichiers || !fichiers.length) {
       container.innerHTML = '<div style="text-align:center;padding:40px;color:#666;">📭 Aucun fichier trouvé</div>';
@@ -5122,13 +5202,27 @@ function _hideTeamSelection() {
       var ext = f.nom.split('.').pop().toLowerCase();
       var icon = ext === 'pdf' ? '📄' : (ext === 'jpg' || ext === 'jpeg' || ext === 'png' ? '🖼️' : '📎');
       
+      // Formater le mois
+      var moisLabel = f.mois;
+      var matchMois = f.mois.match(/^(\d{4})-(\d{2})$/);
+      if (matchMois) {
+        moisLabel = moisNoms[parseInt(matchMois[2])-1] + ' ' + matchMois[1];
+      }
+      
+      // Formater le membre (simplifier l'email)
+      var membreLabel = f.membre;
+      if (f.membre.includes('@')) {
+        membreLabel = f.membre.split('@')[0].replace(/[._]/g, ' ');
+        membreLabel = membreLabel.split(' ').map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+      }
+      
       html += '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;">';
       html += '<span style="font-size:24px;">' + icon + '</span>';
       html += '<div style="flex:1;min-width:0;">';
       html += '<div style="font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + f.nom + '</div>';
       html += '<div style="font-size:11px;color:#666;margin-top:2px;">';
-      html += '<span style="color:#c9a84c;">' + f.mois + '</span>';
-      html += ' • <span style="color:#3b82f6;">' + f.membre + '</span>';
+      html += '<span style="color:#c9a84c;">' + moisLabel + '</span>';
+      html += ' • <span style="color:#3b82f6;">' + membreLabel + '</span>';
       html += ' • ' + dateStr + ' • ' + tailleStr;
       html += '</div></div>';
       html += '<button onclick="telechargerFichierJustificatif(\'' + f.chemin.replace(/'/g, "\\'") + '\', \'' + f.nom.replace(/'/g, "\\'") + '\')" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;white-space:nowrap;">⬇️ Télécharger</button>';
@@ -5167,6 +5261,119 @@ function _hideTeamSelection() {
     } catch(e) {
       alert('Erreur téléchargement: ' + e.message);
     }
+  }
+
+  // Télécharger tous les fichiers affichés (sélection) en ZIP
+  async function telechargerTousLesFichiers() {
+    if (!_fichiersFiltres || _fichiersFiltres.length === 0) {
+      alert('Aucun fichier à télécharger.');
+      return;
+    }
+    
+    // Confirmer si beaucoup de fichiers
+    if (_fichiersFiltres.length > 20) {
+      if (!confirm('Vous allez télécharger ' + _fichiersFiltres.length + ' fichiers. Continuer ?')) {
+        return;
+      }
+    }
+    
+    // Afficher la progress bar
+    var progressContainer = document.getElementById('download-progress-container');
+    var progressBar = document.getElementById('download-progress-bar');
+    var progressText = document.getElementById('download-progress-text');
+    var btnTelecharger = document.getElementById('btn-telecharger-selection');
+    
+    progressContainer.style.display = 'block';
+    btnTelecharger.disabled = true;
+    btnTelecharger.style.opacity = '0.5';
+    btnTelecharger.innerHTML = '<span>⏳</span> TÉLÉCHARGEMENT...';
+    
+    try {
+      // Charger JSZip dynamiquement si pas déjà chargé
+      if (typeof JSZip === 'undefined') {
+        await chargerScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+      }
+      
+      var zip = new JSZip();
+      var total = _fichiersFiltres.length;
+      var done = 0;
+      var errors = [];
+      
+      // Télécharger chaque fichier et l'ajouter au ZIP
+      for (var f of _fichiersFiltres) {
+        try {
+          progressText.textContent = (done + 1) + ' / ' + total;
+          progressBar.style.width = ((done / total) * 100) + '%';
+          
+          var res = await _supabase.storage.from('justificatifs').download(f.chemin);
+          if (res.error) throw res.error;
+          
+          // Organiser dans des dossiers par membre
+          var membreFolder = f.membre !== '—' ? f.membre.replace(/[^a-zA-Z0-9@._-]/g, '_') : 'autres';
+          var fileName = f.nom;
+          
+          // Ajouter au ZIP dans un dossier par membre
+          zip.folder(membreFolder).file(fileName, res.data);
+          
+        } catch(e) {
+          console.error('Erreur fichier ' + f.nom + ':', e);
+          errors.push(f.nom);
+        }
+        done++;
+      }
+      
+      progressBar.style.width = '100%';
+      progressText.textContent = 'Création du ZIP...';
+      
+      // Générer le ZIP
+      var content = await zip.generateAsync({ type: 'blob' }, function(metadata) {
+        progressText.textContent = 'Compression: ' + metadata.percent.toFixed(0) + '%';
+      });
+      
+      // Télécharger le ZIP
+      var moisFilter = document.getElementById('filtre-fichiers-mois').value;
+      var membreFilter = document.getElementById('filtre-fichiers-membre').value;
+      var nomZip = 'justificatifs';
+      if (moisFilter) nomZip += '_' + moisFilter;
+      if (membreFilter) nomZip += '_' + membreFilter.split('@')[0];
+      nomZip += '_' + new Date().toISOString().split('T')[0] + '.zip';
+      
+      var url = URL.createObjectURL(content);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = nomZip;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      // Afficher les erreurs s'il y en a
+      if (errors.length > 0) {
+        alert('Téléchargement terminé avec ' + errors.length + ' erreur(s):\n' + errors.join('\n'));
+      }
+      
+    } catch(e) {
+      alert('Erreur lors de la création du ZIP: ' + e.message);
+      console.error(e);
+    } finally {
+      // Cacher la progress bar et réactiver le bouton
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+      btnTelecharger.disabled = false;
+      btnTelecharger.style.opacity = '1';
+      btnTelecharger.innerHTML = '<span>📥</span> TÉLÉCHARGER LA SÉLECTION';
+    }
+  }
+
+  // Charger un script JS dynamiquement
+  function chargerScript(url) {
+    return new Promise(function(resolve, reject) {
+      var script = document.createElement('script');
+      script.src = url;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
   }
 
   // Reset filtres fichiers
