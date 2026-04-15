@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.14.08">
+<meta name="version" content="2026.04.14.09">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4443,6 +4443,36 @@ function _hideTeamSelection() {
     <button onclick="openModal('modal-add-frais-perso')" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UNE NOTE</button>
   </div>
 
+  <!-- FILTRES -->
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#888;margin-bottom:10px;">🔍 FILTRES</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div style="flex:1;min-width:150px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Nom Staff</label>
+        <select id="filtre-perso-staff" onchange="appliquerFiltresPerso()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
+          <option value="">-- Tous --</option>
+          <option value="Sarah Prost">Sarah Prost</option>
+          <option value="Jérôme Fillella">Jérôme Fillella</option>
+          <option value="Régis BP">Régis BP</option>
+          <option value="Alex MH">Alex MH</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:130px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date début</label>
+        <input type="date" id="filtre-perso-date-debut" onchange="appliquerFiltresPerso()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
+      </div>
+      <div style="flex:1;min-width:130px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date fin</label>
+        <input type="date" id="filtre-perso-date-fin" onchange="appliquerFiltresPerso()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="resetFiltresPerso()" style="background:#333;color:#888;border:none;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;">✕ Reset</button>
+        <button onclick="imprimerFraisFiltresPerso()" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 14px;font-size:11px;cursor:pointer;font-weight:600;">🖨️ IMPRIMER</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Vue ADMIN : sélecteur membre -->
   <div id="frais-perso-admin-view" style="display:none;margin-bottom:20px;">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;">👁️ VUE ADMIN — TOUS LES MEMBRES</div>
@@ -4468,6 +4498,36 @@ function _hideTeamSelection() {
       <div id="frais-omp-user-label" style="font-size:12px;color:#888;margin-top:2px;"></div>
     </div>
     <button onclick="openModal('modal-add-frais-omp')" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UNE NOTE</button>
+  </div>
+
+  <!-- FILTRES -->
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#888;margin-bottom:10px;">🔍 FILTRES</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div style="flex:1;min-width:150px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Nom Staff</label>
+        <select id="filtre-omp-staff" onchange="appliquerFiltresOMP()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
+          <option value="">-- Tous --</option>
+          <option value="Sarah Prost">Sarah Prost</option>
+          <option value="Jérôme Fillella">Jérôme Fillella</option>
+          <option value="Régis BP">Régis BP</option>
+          <option value="Alex MH">Alex MH</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:130px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date début</label>
+        <input type="date" id="filtre-omp-date-debut" onchange="appliquerFiltresOMP()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
+      </div>
+      <div style="flex:1;min-width:130px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date fin</label>
+        <input type="date" id="filtre-omp-date-fin" onchange="appliquerFiltresOMP()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="resetFiltresOMP()" style="background:#333;color:#888;border:none;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;">✕ Reset</button>
+        <button onclick="imprimerFraisFiltresOMP()" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 14px;font-size:11px;cursor:pointer;font-weight:600;">🖨️ IMPRIMER</button>
+      </div>
+    </div>
   </div>
 
   <!-- Vue ADMIN : sélecteur membre -->
@@ -4677,11 +4737,39 @@ function _hideTeamSelection() {
   // Nouvelles fonctions pour les 2 types de frais
   function ouvrirFraisPerso() { 
     showPage('frais-perso'); 
-    chargerFraisParMode('perso');
+    // Reset les filtres
+    document.getElementById('filtre-perso-staff').value = '';
+    document.getElementById('filtre-perso-date-debut').value = '';
+    document.getElementById('filtre-perso-date-fin').value = '';
+    // Afficher vue admin
+    var adminView = document.getElementById('frais-perso-admin-view');
+    var membreView = document.getElementById('frais-perso-membre-view');
+    if (_currentUserRole === 'admin') {
+      if (adminView) adminView.style.display = 'block';
+      if (membreView) membreView.style.display = 'none';
+    } else {
+      if (adminView) adminView.style.display = 'none';
+      if (membreView) membreView.style.display = 'block';
+    }
+    chargerEtStockerFraisPerso();
   }
   function ouvrirFraisOMP() { 
     showPage('frais-omp'); 
-    chargerFraisParMode('carte_omp');
+    // Reset les filtres
+    document.getElementById('filtre-omp-staff').value = '';
+    document.getElementById('filtre-omp-date-debut').value = '';
+    document.getElementById('filtre-omp-date-fin').value = '';
+    // Afficher vue admin
+    var adminView = document.getElementById('frais-omp-admin-view');
+    var membreView = document.getElementById('frais-omp-membre-view');
+    if (_currentUserRole === 'admin') {
+      if (adminView) adminView.style.display = 'block';
+      if (membreView) membreView.style.display = 'none';
+    } else {
+      if (adminView) adminView.style.display = 'none';
+      if (membreView) membreView.style.display = 'block';
+    }
+    chargerEtStockerFraisOMP();
   }
 
   // Charger les frais filtrés par mode de paiement
@@ -4793,6 +4881,184 @@ function _hideTeamSelection() {
       await _supabase.from('notes_frais').delete().eq('id', id);
       chargerFraisParMode(mode);
     } catch(e) { alert('Erreur : ' + e.message); }
+  }
+
+  // Variables pour stocker les données chargées (pour filtrage côté client)
+  var _fraisDataPerso = [];
+  var _fraisDataOMP = [];
+
+  // Charger et stocker les données pour filtrage PERSO
+  async function chargerEtStockerFraisPerso() {
+    try {
+      var res = await _supabase.from('notes_frais').select('*')
+        .eq('mode_paiement', 'perso')
+        .order('date_depense', {ascending: false});
+      if (res.error) throw res.error;
+      _fraisDataPerso = res.data || [];
+      appliquerFiltresPerso();
+    } catch(e) { console.error('Erreur:', e); }
+  }
+
+  // Charger et stocker les données pour filtrage OMP
+  async function chargerEtStockerFraisOMP() {
+    try {
+      var res = await _supabase.from('notes_frais').select('*')
+        .eq('mode_paiement', 'carte_omp')
+        .order('date_depense', {ascending: false});
+      if (res.error) throw res.error;
+      _fraisDataOMP = res.data || [];
+      appliquerFiltresOMP();
+    } catch(e) { console.error('Erreur:', e); }
+  }
+
+  // Appliquer les filtres PERSO
+  function appliquerFiltresPerso() {
+    var staffFilter = document.getElementById('filtre-perso-staff').value;
+    var dateDebut = document.getElementById('filtre-perso-date-debut').value;
+    var dateFin = document.getElementById('filtre-perso-date-fin').value;
+    
+    var filtered = _fraisDataPerso.filter(function(f) {
+      if (staffFilter && f.user_nom !== staffFilter) return false;
+      if (dateDebut && f.date_depense < dateDebut) return false;
+      if (dateFin && f.date_depense > dateFin) return false;
+      return true;
+    });
+    
+    var container = document.getElementById('frais-perso-admin-liste') || document.getElementById('frais-perso-liste');
+    afficherFraisListe(filtered, container, 'perso');
+  }
+
+  // Appliquer les filtres OMP
+  function appliquerFiltresOMP() {
+    var staffFilter = document.getElementById('filtre-omp-staff').value;
+    var dateDebut = document.getElementById('filtre-omp-date-debut').value;
+    var dateFin = document.getElementById('filtre-omp-date-fin').value;
+    
+    var filtered = _fraisDataOMP.filter(function(f) {
+      if (staffFilter && f.user_nom !== staffFilter) return false;
+      if (dateDebut && f.date_depense < dateDebut) return false;
+      if (dateFin && f.date_depense > dateFin) return false;
+      return true;
+    });
+    
+    var container = document.getElementById('frais-omp-admin-liste') || document.getElementById('frais-omp-liste');
+    afficherFraisListe(filtered, container, 'carte_omp');
+  }
+
+  // Reset filtres PERSO
+  function resetFiltresPerso() {
+    document.getElementById('filtre-perso-staff').value = '';
+    document.getElementById('filtre-perso-date-debut').value = '';
+    document.getElementById('filtre-perso-date-fin').value = '';
+    appliquerFiltresPerso();
+  }
+
+  // Reset filtres OMP
+  function resetFiltresOMP() {
+    document.getElementById('filtre-omp-staff').value = '';
+    document.getElementById('filtre-omp-date-debut').value = '';
+    document.getElementById('filtre-omp-date-fin').value = '';
+    appliquerFiltresOMP();
+  }
+
+  // Imprimer avec les filtres PERSO
+  async function imprimerFraisFiltresPerso() {
+    var staffFilter = document.getElementById('filtre-perso-staff').value;
+    var dateDebut = document.getElementById('filtre-perso-date-debut').value;
+    var dateFin = document.getElementById('filtre-perso-date-fin').value;
+    
+    var filtered = _fraisDataPerso.filter(function(f) {
+      if (staffFilter && f.user_nom !== staffFilter) return false;
+      if (dateDebut && f.date_depense < dateDebut) return false;
+      if (dateFin && f.date_depense > dateFin) return false;
+      return true;
+    });
+    
+    imprimerFraisFiltres(filtered, 'perso', staffFilter, dateDebut, dateFin);
+  }
+
+  // Imprimer avec les filtres OMP
+  async function imprimerFraisFiltresOMP() {
+    var staffFilter = document.getElementById('filtre-omp-staff').value;
+    var dateDebut = document.getElementById('filtre-omp-date-debut').value;
+    var dateFin = document.getElementById('filtre-omp-date-fin').value;
+    
+    var filtered = _fraisDataOMP.filter(function(f) {
+      if (staffFilter && f.user_nom !== staffFilter) return false;
+      if (dateDebut && f.date_depense < dateDebut) return false;
+      if (dateFin && f.date_depense > dateFin) return false;
+      return true;
+    });
+    
+    imprimerFraisFiltres(filtered, 'carte_omp', staffFilter, dateDebut, dateFin);
+  }
+
+  // Fonction d'impression avec filtres
+  function imprimerFraisFiltres(data, mode, staffFilter, dateDebut, dateFin) {
+    var isPerso = (mode === 'perso');
+    var modeLabel = isPerso ? 'CB PERSO' : 'CB OMP';
+    
+    // Construire le titre des filtres
+    var filtresTexte = [];
+    if (staffFilter) filtresTexte.push('Staff: ' + staffFilter);
+    if (dateDebut) filtresTexte.push('Du ' + new Date(dateDebut).toLocaleDateString('fr-FR'));
+    if (dateFin) filtresTexte.push('Au ' + new Date(dateFin).toLocaleDateString('fr-FR'));
+    var filtresLabel = filtresTexte.length ? filtresTexte.join(' · ') : 'Toutes les notes';
+    
+    data.sort(function(a,b){ return (a.user_nom||'').localeCompare(b.user_nom||''); });
+    
+    var total = data.reduce(function(s,n){ return s+(parseFloat(n.montant)||0); },0);
+    var types = {transport:'Transport',hebergement:'Hébergement',repas:'Repas route',peage:'Péage/Parking/Essence',materiel:'Matériel',autre:'Autre'};
+    
+    var rows = data.map(function(n) {
+      var dt = n.date_depense ? new Date(n.date_depense).toLocaleDateString('fr-FR') : '';
+      var mt = (parseFloat(n.montant)||0).toLocaleString('fr-FR',{minimumFractionDigits:2});
+      return '<tr><td style="border:1px solid #ddd;padding:7px 8px;">'+(n.user_nom||n.user_email||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+dt+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+(types[n.type_frais]||n.type_frais||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+(n.description||'').substring(0,50)+'</td><td style="border:1px solid #ddd;padding:7px 8px;text-align:right;font-weight:bold;">'+mt+' €</td></tr>';
+    }).join('');
+    
+    var existing = document.getElementById('print-overlay');
+    if (existing) existing.remove();
+    
+    var overlay = document.createElement('div');
+    overlay.id = 'print-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#fff;color:#000;overflow:auto;padding:40px;font-family:Arial,sans-serif;font-size:13px;';
+    
+    var headerColor = isPerso ? '#3b82f6' : '#c9a84c';
+    var headerBg = isPerso ? '#e8f0fe' : '#fef6e0';
+    
+    overlay.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">' +
+      '<div>' +
+        '<img src="assets/LOGO OMP OHS.png" alt="OMP" style="height:50px;margin-bottom:10px;">' +
+        '<h1 style="font-size:20px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;color:#000;">Notes de Frais ' + modeLabel + '</h1>' +
+        '<h2 style="font-size:13px;color:' + headerColor + ';letter-spacing:1px;font-weight:bold;">' + filtresLabel + '</h2>' +
+        '<div style="font-size:11px;color:#888;margin-top:4px;">Édité le ' + new Date().toLocaleDateString('fr-FR') + ' · ' + data.length + ' note(s)</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;">' +
+        '<button onclick="window.print()" style="padding:10px 20px;background:#000;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;">🖨️ Imprimer</button>' +
+        '<button onclick="fermerPrintOverlay()" style="padding:10px 20px;background:#e74c3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">✕ Fermer</button>' +
+      '</div>' +
+    '</div>' +
+    '<div style="background:' + headerBg + ';border-left:4px solid ' + headerColor + ';padding:10px 14px;margin-bottom:20px;font-size:12px;color:#333;">' +
+      (isPerso ? '💳 Frais payés avec carte bancaire personnelle - À rembourser' : '🏢 Frais payés avec carte bancaire OH MY PROD') +
+    '</div>' +
+    '<table style="width:100%;border-collapse:collapse;">' +
+      '<thead><tr>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Membre</th>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Date</th>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Type</th>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Description</th>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:right;font-size:11px;text-transform:uppercase;">Montant</th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows +
+        '<tr style="background:#e0e0e0;font-weight:bold;">' +
+          '<td colspan="4" style="border:1px solid #ddd;padding:10px;text-align:right;font-size:14px;">TOTAL</td>' +
+          '<td style="border:1px solid #ddd;padding:10px;text-align:right;font-size:16px;color:' + headerColor + ';">' + total.toLocaleString('fr-FR',{minimumFractionDigits:2}) + ' €</td>' +
+        '</tr>' +
+      '</tbody>' +
+    '</table>' +
+    '<div style="margin-top:24px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px;">Document généré par OH MY PROD · Confidentiel</div>';
+    
+    document.body.appendChild(overlay);
   }
 
   // Imprimer les frais d'un mois (filtré par mode)
@@ -4925,7 +5191,7 @@ function _hideTeamSelection() {
     document.getElementById('frais-perso-description').value = '';
     document.getElementById('frais-perso-fichier').value = '';
     closeModal('modal-add-frais-perso');
-    chargerFraisParMode('perso');
+    chargerEtStockerFraisPerso();
   }
 
   // Soumettre une note CB OMP
@@ -4965,7 +5231,7 @@ function _hideTeamSelection() {
     document.getElementById('frais-omp-description').value = '';
     document.getElementById('frais-omp-fichier').value = '';
     closeModal('modal-add-frais-omp');
-    chargerFraisParMode('carte_omp');
+    chargerEtStockerFraisOMP();
   }
 
   function fermerPrintOverlay() { var o=document.getElementById('print-overlay'); if(o) o.remove(); }
