@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.15.11">
+<meta name="version" content="2026.04.15.12">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4438,39 +4438,14 @@ function _hideTeamSelection() {
     <div style="font-size:12px;color:#888;margin-top:4px;">Déposez vos justificatifs de frais rapidement</div>
   </div>
 
-  <!-- ÉCRAN CONNEXION MEMBRE -->
-  <div id="frais-connexion-screen">
-    <div style="max-width:400px;margin:40px auto;">
-      <div style="background:#1a1a1a;border:2px solid #c9a84c;border-radius:16px;padding:30px;text-align:center;">
-        <div style="font-size:50px;margin-bottom:16px;">🔐</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#c9a84c;margin-bottom:20px;">IDENTIFICATION MEMBRE</div>
-        
-        <div style="text-align:left;margin-bottom:14px;">
-          <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Votre email</label>
-          <input type="email" id="frais-login-email" placeholder="votreemail@exemple.com" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-        </div>
-        
-        <div style="text-align:left;margin-bottom:20px;">
-          <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Code d'accès</label>
-          <input type="password" id="frais-login-code" placeholder="••••••••" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-        </div>
-        
-        <div id="frais-login-error" style="color:#e31e24;font-size:12px;margin-bottom:12px;display:none;"></div>
-        
-        <button onclick="connecterMembreFrais()" style="width:100%;background:#c9a84c;color:#000;border:none;border-radius:10px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;font-weight:700;">SE CONNECTER</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ÉCRAN FORMULAIRE DÉPÔT (après connexion) -->
-  <div id="frais-depot-screen" style="display:none;">
+  <!-- ÉCRAN FORMULAIRE DÉPÔT (direct - plus de connexion) -->
+  <div id="frais-depot-screen">
     <!-- Info membre connecté -->
     <div style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">
       <div>
         <span style="font-size:13px;color:#888;">Connecté en tant que :</span>
         <span id="frais-membre-nom" style="font-size:15px;color:#c9a84c;font-weight:600;margin-left:8px;"></span>
       </div>
-      <button onclick="deconnecterMembreFrais()" style="background:#333;color:#888;border:1px solid #444;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;">Déconnexion</button>
     </div>
 
     <!-- FORMULAIRE DE DÉPÔT -->
@@ -4668,17 +4643,17 @@ function _hideTeamSelection() {
     'technique': 'TECHTWOQ2026!'
   };
 
-  // Ouvrir la page FRAIS (dépôt justificatif)
+  // Ouvrir la page FRAIS (dépôt justificatif) - Utilise l'utilisateur déjà connecté
   function ouvrirFrais() {
     showPage('frais');
-    // Vérifier si déjà connecté en session
-    var saved = sessionStorage.getItem('frais_membre');
-    if (saved) {
-      _fraisMembreConnecte = JSON.parse(saved);
-      afficherFormulaireDepot();
-    } else {
-      afficherConnexionFrais();
-    }
+    // L'utilisateur est déjà connecté à l'appli, on utilise directement ses infos
+    _fraisMembreConnecte = {
+      email: _currentUserEmail,
+      prenom: _currentUserPrenom,
+      nom: _currentUserNom.replace(_currentUserPrenom, '').trim(),
+      role: _currentUserRole
+    };
+    afficherFormulaireDepot();
   }
 
   // Ouvrir la page RÉCAP FRAIS (admin)
@@ -4690,18 +4665,8 @@ function _hideTeamSelection() {
     chargerRecapFrais();
   }
 
-  // Afficher l'écran de connexion
-  function afficherConnexionFrais() {
-    document.getElementById('frais-connexion-screen').style.display = 'block';
-    document.getElementById('frais-depot-screen').style.display = 'none';
-    document.getElementById('frais-login-email').value = '';
-    document.getElementById('frais-login-code').value = '';
-    document.getElementById('frais-login-error').style.display = 'none';
-  }
-
   // Afficher le formulaire de dépôt
   function afficherFormulaireDepot() {
-    document.getElementById('frais-connexion-screen').style.display = 'none';
     document.getElementById('frais-depot-screen').style.display = 'block';
     document.getElementById('frais-membre-nom').textContent = _fraisMembreConnecte.prenom + ' ' + _fraisMembreConnecte.nom;
     // Reset le formulaire
@@ -4719,56 +4684,6 @@ function _hideTeamSelection() {
     document.getElementById('frais-upload-progress').textContent = '';
     // Charger les dépôts récents du membre
     chargerMesDepots();
-  }
-
-  // Connexion membre
-  async function connecterMembreFrais() {
-    var email = document.getElementById('frais-login-email').value.trim().toLowerCase();
-    var code = document.getElementById('frais-login-code').value.trim();
-    var errEl = document.getElementById('frais-login-error');
-    
-    if (!email || !code) {
-      errEl.textContent = 'Merci de remplir tous les champs.';
-      errEl.style.display = 'block';
-      return;
-    }
-    
-    try {
-      // Rechercher le membre par email
-      var res = await _supabase.from('membres').select('*').eq('email', email).single();
-      if (res.error || !res.data) {
-        errEl.textContent = 'Email non reconnu.';
-        errEl.style.display = 'block';
-        return;
-      }
-      
-      var membre = res.data;
-      var role = membre.role || 'artiste';
-      var codeAttendu = _codesAccesFrais[role];
-      
-      if (code !== codeAttendu) {
-        errEl.textContent = 'Code d\'accès incorrect.';
-        errEl.style.display = 'block';
-        return;
-      }
-      
-      // Connexion réussie
-      _fraisMembreConnecte = membre;
-      sessionStorage.setItem('frais_membre', JSON.stringify(membre));
-      afficherFormulaireDepot();
-      
-    } catch(e) {
-      errEl.textContent = 'Erreur de connexion.';
-      errEl.style.display = 'block';
-      console.error(e);
-    }
-  }
-
-  // Déconnexion membre
-  function deconnecterMembreFrais() {
-    _fraisMembreConnecte = null;
-    sessionStorage.removeItem('frais_membre');
-    afficherConnexionFrais();
   }
 
   // Sélectionner le type de CB
@@ -15153,22 +15068,11 @@ function _hideTeamSelection() {
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </div>
 
-        <!-- ACCÈS FRAIS - Sous-menu -->
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden;">
-          <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;color:#fff;border-bottom:1px solid #2a2a2a;">
-            <span style="font-size:22px;">💰</span>
-            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">NOTES DE FRAIS</div><div style="font-size:11px;color:#555;">Gestion des justificatifs</div></div>
-          </div>
-          <div onclick="closeModal('modal-admin-alexandrine'); ouvrirFrais();" style="display:flex;align-items:center;gap:10px;padding:10px 16px 10px 52px;cursor:pointer;color:#fff;border-bottom:1px solid #222;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-            <span style="font-size:16px;">📤</span>
-            <div style="font-size:13px;">Dépôt Justificatif</div>
-            <span style="margin-left:auto;color:#555;font-size:14px;">→</span>
-          </div>
-          <div onclick="closeModal('modal-admin-alexandrine'); ouvrirRecapFrais();" style="display:flex;align-items:center;gap:10px;padding:10px 16px 10px 52px;cursor:pointer;color:#fff;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-            <span style="font-size:16px;">📊</span>
-            <div style="font-size:13px;">Récap Admin (Validation)</div>
-            <span style="margin-left:auto;color:#555;font-size:14px;">→</span>
-          </div>
+        <!-- NOTES DE FRAIS - Bouton unique vers récap admin -->
+        <div onclick="closeModal('modal-admin-alexandrine'); ouvrirRecapFrais();" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+          <span style="font-size:22px;">💰</span>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">NOTES DE FRAIS</div><div style="font-size:11px;color:#555;">Validation & récap</div></div>
+          <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </div>
 
         <div onclick="closeModal('modal-admin-alexandrine'); showPage('gestion-omp');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
