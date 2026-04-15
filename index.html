@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.14.10">
+<meta name="version" content="2026.04.15.11">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4148,15 +4148,11 @@ function _hideTeamSelection() {
           <div class="stat-sub">Véhicules & transport</div>
         </div>
 
-        <!-- Accès Frais - Dropdown -->
-        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-frais-staff')">
+        <!-- Accès Frais - Bouton direct -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="ouvrirFrais()">
           <div class="stat-label">💰 Accès Frais</div>
           <div class="stat-value" style="font-size:24px;color:#c9a84c;">FRAIS</div>
-          <div class="stat-sub">Notes & justificatifs</div>
-          <div id="dropdown-frais-staff" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
-            <div onclick="event.stopPropagation(); toggleDropdown('dropdown-frais-staff'); ouvrirFraisPerso();" style="display:block; padding:12px 14px; font-size:13px; color:#fff; cursor:pointer; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">💳 FRAIS CB PERSO</div>
-            <div onclick="event.stopPropagation(); toggleDropdown('dropdown-frais-staff'); ouvrirFraisOMP();" style="display:block; padding:12px 14px; font-size:13px; color:#fff; cursor:pointer;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏢 FRAIS CB OMP</div>
-          </div>
+          <div class="stat-sub">Dépôt justificatifs</div>
         </div>
 
         <!-- Liens Pratiques -->
@@ -4432,293 +4428,507 @@ function _hideTeamSelection() {
 </div>
 
 
-<!-- PAGE FRAIS CB PERSO -->
-<div id="page-frais-perso" class="page">
-  <button class="back-btn" onclick="showPage('staff-omp')" style="margin-bottom:12px;">← Retour à l'Espace Staff</button>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-    <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">💳 NOTES DE FRAIS CB PERSO</div>
-      <div id="frais-perso-user-label" style="font-size:12px;color:#888;margin-top:2px;"></div>
-    </div>
-    <button onclick="openModal('modal-add-frais-perso')" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UNE NOTE</button>
-  </div>
-
-  <!-- FILTRES -->
-  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#888;margin-bottom:10px;">🔍 FILTRES</div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-      <div style="flex:1;min-width:150px;">
-        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Nom Staff</label>
-        <select id="filtre-perso-staff" onchange="appliquerFiltresPerso()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
-          <option value="">-- Tous --</option>
-        </select>
-      </div>
-      <div style="flex:1;min-width:130px;">
-        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date début</label>
-        <input type="date" id="filtre-perso-date-debut" onchange="appliquerFiltresPerso()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
-      </div>
-      <div style="flex:1;min-width:130px;">
-        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date fin</label>
-        <input type="date" id="filtre-perso-date-fin" onchange="appliquerFiltresPerso()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="resetFiltresPerso()" style="background:#333;color:#888;border:none;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;">✕ Reset</button>
-        <button onclick="imprimerFraisFiltresPerso()" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 14px;font-size:11px;cursor:pointer;font-weight:600;">🖨️ IMPRIMER</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Vue ADMIN : sélecteur membre -->
-  <div id="frais-perso-admin-view" style="display:none;margin-bottom:20px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;">👁️ VUE ADMIN — TOUS LES MEMBRES</div>
-    <div id="frais-perso-admin-select" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
-    <div id="frais-perso-admin-liste" style="display:flex;flex-direction:column;gap:8px;"></div>
-  </div>
-
-  <!-- Vue membre -->
-  <div id="frais-perso-membre-view">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;margin-bottom:12px;">📁 MES NOTES DE FRAIS CB PERSO</div>
-    <div id="frais-perso-liste" style="display:flex;flex-direction:column;gap:10px;">
-      <div style="color:#888;font-size:13px;text-align:center;padding:20px;">Chargement...</div>
-    </div>
-  </div>
-</div>
-
-<!-- PAGE FRAIS CB OMP -->
-<div id="page-frais-omp" class="page">
-  <button class="back-btn" onclick="showPage('staff-omp')" style="margin-bottom:12px;">← Retour à l'Espace Staff</button>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-    <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">🏢 NOTES DE FRAIS CB OMP</div>
-      <div id="frais-omp-user-label" style="font-size:12px;color:#888;margin-top:2px;"></div>
-    </div>
-    <button onclick="openModal('modal-add-frais-omp')" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UNE NOTE</button>
-  </div>
-
-  <!-- FILTRES -->
-  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#888;margin-bottom:10px;">🔍 FILTRES</div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-      <div style="flex:1;min-width:150px;">
-        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Nom Staff</label>
-        <select id="filtre-omp-staff" onchange="appliquerFiltresOMP()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
-          <option value="">-- Tous --</option>
-        </select>
-      </div>
-      <div style="flex:1;min-width:130px;">
-        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date début</label>
-        <input type="date" id="filtre-omp-date-debut" onchange="appliquerFiltresOMP()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
-      </div>
-      <div style="flex:1;min-width:130px;">
-        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date fin</label>
-        <input type="date" id="filtre-omp-date-fin" onchange="appliquerFiltresOMP()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="resetFiltresOMP()" style="background:#333;color:#888;border:none;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;">✕ Reset</button>
-        <button onclick="imprimerFraisFiltresOMP()" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 14px;font-size:11px;cursor:pointer;font-weight:600;">🖨️ IMPRIMER</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Vue ADMIN : sélecteur membre -->
-  <div id="frais-omp-admin-view" style="display:none;margin-bottom:20px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;">👁️ VUE ADMIN — TOUS LES MEMBRES</div>
-    <div id="frais-omp-admin-select" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
-    <div id="frais-omp-admin-liste" style="display:flex;flex-direction:column;gap:8px;"></div>
-  </div>
-
-  <!-- Vue membre -->
-  <div id="frais-omp-membre-view">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;margin-bottom:12px;">📁 MES NOTES DE FRAIS CB OMP</div>
-    <div id="frais-omp-liste" style="display:flex;flex-direction:column;gap:10px;">
-      <div style="color:#888;font-size:13px;text-align:center;padding:20px;">Chargement...</div>
-    </div>
-  </div>
-</div>
-
-
-<!-- PAGE ACCÈS FRAIS -->
-<div id="page-acces-frais" class="page">
+<!-- ========== PAGE FRAIS - DÉPÔT JUSTIFICATIF (NOUVEAU SYSTÈME) ========== -->
+<div id="page-frais" class="page">
   <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
+  
+  <!-- HEADER -->
+  <div style="margin-bottom:24px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">💰 DÉPÔT DE JUSTIFICATIF</div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">Déposez vos justificatifs de frais rapidement</div>
+  </div>
+
+  <!-- ÉCRAN CONNEXION MEMBRE -->
+  <div id="frais-connexion-screen">
+    <div style="max-width:400px;margin:40px auto;">
+      <div style="background:#1a1a1a;border:2px solid #c9a84c;border-radius:16px;padding:30px;text-align:center;">
+        <div style="font-size:50px;margin-bottom:16px;">🔐</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#c9a84c;margin-bottom:20px;">IDENTIFICATION MEMBRE</div>
+        
+        <div style="text-align:left;margin-bottom:14px;">
+          <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Votre email</label>
+          <input type="email" id="frais-login-email" placeholder="votreemail@exemple.com" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        
+        <div style="text-align:left;margin-bottom:20px;">
+          <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Code d'accès</label>
+          <input type="password" id="frais-login-code" placeholder="••••••••" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+        </div>
+        
+        <div id="frais-login-error" style="color:#e31e24;font-size:12px;margin-bottom:12px;display:none;"></div>
+        
+        <button onclick="connecterMembreFrais()" style="width:100%;background:#c9a84c;color:#000;border:none;border-radius:10px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;font-weight:700;">SE CONNECTER</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉCRAN FORMULAIRE DÉPÔT (après connexion) -->
+  <div id="frais-depot-screen" style="display:none;">
+    <!-- Info membre connecté -->
+    <div style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <span style="font-size:13px;color:#888;">Connecté en tant que :</span>
+        <span id="frais-membre-nom" style="font-size:15px;color:#c9a84c;font-weight:600;margin-left:8px;"></span>
+      </div>
+      <button onclick="deconnecterMembreFrais()" style="background:#333;color:#888;border:1px solid #444;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;">Déconnexion</button>
+    </div>
+
+    <!-- FORMULAIRE DE DÉPÔT -->
+    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:24px;max-width:500px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;margin-bottom:20px;">📤 NOUVEAU JUSTIFICATIF</div>
+      
+      <!-- Type CB -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px;">Type de carte bancaire *</label>
+        <div style="display:flex;gap:10px;">
+          <button type="button" id="btn-cb-perso" onclick="selectTypeCB('PERSO')" style="flex:1;background:#0a0a0a;border:2px solid #333;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;cursor:pointer;transition:all 0.2s;">💳 CB PERSO</button>
+          <button type="button" id="btn-cb-omp" onclick="selectTypeCB('OMP')" style="flex:1;background:#0a0a0a;border:2px solid #333;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;cursor:pointer;transition:all 0.2s;">🏢 CB OMP</button>
+        </div>
+        <input type="hidden" id="frais-type-cb" value="">
+      </div>
+
+      <!-- Type de frais -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Type de frais *</label>
+        <select id="frais-type-depense" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          <option value="">-- Choisir --</option>
+          <option value="transport">🚂 Transport (train/avion/taxi)</option>
+          <option value="hebergement">🏨 Hébergement</option>
+          <option value="repas">🍽️ Repas</option>
+          <option value="peage">🛣️ Péage / Parking / Essence</option>
+          <option value="materiel">🔧 Matériel / Fournitures</option>
+          <option value="autre">📋 Autre</option>
+        </select>
+      </div>
+
+      <!-- Date de la dépense -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Date de la dépense *</label>
+        <input type="date" id="frais-date-depense" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+      </div>
+
+      <!-- Montant -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Montant (€) *</label>
+        <input type="number" id="frais-montant-depense" placeholder="0.00" step="0.01" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+      </div>
+
+      <!-- Description -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Description (optionnel)</label>
+        <input type="text" id="frais-description-depense" placeholder="Ex: Péage A63 Bordeaux-Bayonne" style="width:100%;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+      </div>
+
+      <!-- Upload justificatif -->
+      <div style="margin-bottom:20px;">
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Justificatif (photo/PDF) *</label>
+        <div id="frais-dropzone" onclick="document.getElementById('frais-fichier-input').click()" style="background:#0a0a0a;border:2px dashed #333;border-radius:10px;padding:30px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#333'">
+          <div style="font-size:36px;margin-bottom:8px;">📎</div>
+          <div style="font-size:13px;color:#888;">Cliquez ou glissez votre fichier ici</div>
+          <div style="font-size:11px;color:#555;margin-top:4px;">JPG, PNG ou PDF (max 5 Mo)</div>
+        </div>
+        <input type="file" id="frais-fichier-input" accept=".jpg,.jpeg,.png,.pdf" style="display:none;" onchange="previewFichierFrais(this)">
+        <div id="frais-fichier-preview" style="margin-top:10px;display:none;"></div>
+        <div id="frais-upload-progress" style="font-size:11px;color:#888;margin-top:6px;"></div>
+      </div>
+
+      <!-- Bouton soumettre -->
+      <button onclick="soumettreJustificatif()" id="btn-soumettre-frais" style="width:100%;background:#22c55e;color:#fff;border:none;border-radius:10px;padding:16px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;font-weight:700;transition:all 0.2s;" onmouseover="this.style.background='#16a34a'" onmouseout="this.style.background='#22c55e'">✅ ENVOYER LE JUSTIFICATIF</button>
+    </div>
+
+    <!-- MES DÉPÔTS RÉCENTS -->
+    <div style="margin-top:30px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;">📋 MES DÉPÔTS RÉCENTS</div>
+      <div id="frais-mes-depots" style="display:flex;flex-direction:column;gap:8px;">
+        <div style="color:#666;font-size:13px;text-align:center;padding:20px;">Aucun dépôt récent</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE RÉCAP FRAIS ADMIN ========== -->
+<div id="page-recap-frais" class="page">
+  <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
+  
+  <!-- HEADER -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
     <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">💰 NOTES DE FRAIS</div>
-      <div id="frais-user-label" style="font-size:12px;color:#888;margin-top:2px;"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">📊 RÉCAP NOTES DE FRAIS</div>
+      <div style="font-size:12px;color:#888;margin-top:4px;">Administration et validation des justificatifs</div>
     </div>
-    <button class="btn-ajouter-note" onclick="openModal('modal-add-frais')" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UNE NOTE</button>
+    <button onclick="exporterFraisCSV()" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📥 EXPORT CSV</button>
   </div>
 
-  <!-- Vue ADMIN : sélecteur membre -->
-  <div id="frais-admin-view" style="display:none;margin-bottom:20px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;">👁️ VUE ADMIN — TOUS LES MEMBRES</div>
-    <div id="frais-admin-select" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
-    <div id="frais-admin-liste" style="display:flex;flex-direction:column;gap:8px;"></div>
-  </div>
-
-  <!-- Vue membre -->
-  <div id="frais-membre-view">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;margin-bottom:12px;">📁 MES NOTES DE FRAIS</div>
-    <div id="frais-liste" style="display:flex;flex-direction:column;gap:10px;">
-      <div style="color:#888;font-size:13px;text-align:center;padding:20px;">Chargement...</div>
+  <!-- STATS RAPIDES -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+    <div style="background:#1a1a1a;border-left:3px solid #f59e0b;border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;">À valider</div>
+      <div id="stat-frais-avalider" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#f59e0b;">0</div>
+    </div>
+    <div style="background:#1a1a1a;border-left:3px solid #22c55e;border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;">Validés</div>
+      <div id="stat-frais-valides" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#22c55e;">0</div>
+    </div>
+    <div style="background:#1a1a1a;border-left:3px solid #3b82f6;border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;">Total CB PERSO</div>
+      <div id="stat-frais-perso" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#3b82f6;">0 €</div>
+    </div>
+    <div style="background:#1a1a1a;border-left:3px solid #c9a84c;border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;">Total CB OMP</div>
+      <div id="stat-frais-omp" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#c9a84c;">0 €</div>
     </div>
   </div>
-</div>
 
-<!-- MODALE AJOUT NOTE DE FRAIS -->
-<div id="modal-add-frais" class="modal-overlay" onclick="closeModalOutside(event)">
-  <div class="modal-box" style="max-width:560px;">
-    <div class="modal-header">
-      <div class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:18px;">💰 NOUVELLE NOTE DE FRAIS</div>
-      <button class="modal-close" onclick="closeModal('modal-add-frais')">✕</button>
-    </div>
-    <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Type de frais</label>
-        <select id="frais-type" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
-          <option value="">-- Choisir --</option>
-          <option value="transport">🚂 Transport (train/avion/taxi)</option>
-          <option value="hebergement">🏨 Hébergement</option>
-          <option value="repas">🍽️ Repas sur la route</option>
-          <option value="peage">🛣️ Péage / Parking / Essence</option>
-          <option value="materiel">🔧 Matériel / Fournitures</option>
-          <option value="autre">📋 Autre</option>
+  <!-- FILTRES -->
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#888;margin-bottom:10px;">🔍 FILTRES</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div style="flex:1;min-width:140px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Membre</label>
+        <select id="filtre-recap-membre" onchange="appliquerFiltresRecap()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
+          <option value="">-- Tous --</option>
         </select>
       </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Date de la dépense</label>
-        <input type="date" id="frais-date" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Montant (€)</label>
-        <input type="number" id="frais-montant" placeholder="0.00" step="0.01" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Description / Motif</label>
-        <textarea id="frais-description" rows="3" placeholder="Ex: Trajet Paris → Lyon pour répétitions TWOQ..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;resize:vertical;box-sizing:border-box;"></textarea>
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Justificatif (photo JPG ou PDF)</label>
-        <input type="file" id="frais-fichier" accept=".jpg,.jpeg,.pdf,.png" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#888;padding:9px 12px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-        <div id="frais-upload-progress" style="font-size:11px;color:#888;margin-top:4px;"></div>
-      </div>
-      <div style="display:flex;gap:10px;margin-top:8px;">
-        <button onclick="closeModal('modal-add-frais')" style="flex:1;background:#2a2a2a;color:#888;border:1px solid #333;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">ANNULER</button>
-        <button onclick="soumettreFrais()" style="flex:2;background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✅ SOUMETTRE LA NOTE</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODALE AJOUT NOTE DE FRAIS CB PERSO -->
-<div id="modal-add-frais-perso" class="modal-overlay" onclick="closeModalOutside(event)">
-  <div class="modal-box" style="max-width:560px;">
-    <div class="modal-header">
-      <div class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:18px;">💳 NOUVELLE NOTE CB PERSO</div>
-      <button class="modal-close" onclick="closeModal('modal-add-frais-perso')">✕</button>
-    </div>
-    <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Nom Staff</label>
-        <select id="frais-perso-staff" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
-          <option value="">-- Chargement... --</option>
+      <div style="flex:1;min-width:120px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Type CB</label>
+        <select id="filtre-recap-typecb" onchange="appliquerFiltresRecap()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
+          <option value="">-- Tous --</option>
+          <option value="PERSO">CB PERSO</option>
+          <option value="OMP">CB OMP</option>
         </select>
       </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Type de frais</label>
-        <select id="frais-perso-type" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
-          <option value="">-- Choisir --</option>
-          <option value="transport">🚂 Transport (train/avion/taxi)</option>
-          <option value="hebergement">🏨 Hébergement</option>
-          <option value="repas">🍽️ Repas sur la route</option>
-          <option value="peage">🛣️ Péage / Parking / Essence</option>
-          <option value="materiel">🔧 Matériel / Fournitures</option>
-          <option value="autre">📋 Autre</option>
+      <div style="flex:1;min-width:120px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Statut</label>
+        <select id="filtre-recap-statut" onchange="appliquerFiltresRecap()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
+          <option value="">-- Tous --</option>
+          <option value="à valider">À valider</option>
+          <option value="validé">Validé</option>
+          <option value="refusé">Refusé</option>
         </select>
       </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Date de la dépense</label>
-        <input type="date" id="frais-perso-date" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+      <div style="flex:1;min-width:120px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date début</label>
+        <input type="date" id="filtre-recap-date-debut" onchange="appliquerFiltresRecap()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
       </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Montant (€)</label>
-        <input type="number" id="frais-perso-montant" placeholder="0.00" step="0.01" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+      <div style="flex:1;min-width:120px;">
+        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date fin</label>
+        <input type="date" id="filtre-recap-date-fin" onchange="appliquerFiltresRecap()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
       </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Description / Motif</label>
-        <textarea id="frais-perso-description" rows="3" placeholder="Ex: Trajet Paris → Lyon pour répétitions TWOQ..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;resize:vertical;box-sizing:border-box;"></textarea>
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Justificatif (photo JPG ou PDF)</label>
-        <input type="file" id="frais-perso-fichier" accept=".jpg,.jpeg,.pdf,.png" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#888;padding:9px 12px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-        <div id="frais-perso-upload-progress" style="font-size:11px;color:#888;margin-top:4px;"></div>
-      </div>
-      <div style="display:flex;gap:10px;margin-top:8px;">
-        <button onclick="closeModal('modal-add-frais-perso')" style="flex:1;background:#2a2a2a;color:#888;border:1px solid #333;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">ANNULER</button>
-        <button onclick="soumettreFraisPerso()" style="flex:2;background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✅ SOUMETTRE LA NOTE</button>
+      <div style="display:flex;gap:8px;">
+        <button onclick="resetFiltresRecap()" style="background:#333;color:#888;border:none;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;">✕ Reset</button>
+        <button onclick="imprimerRecapFrais()" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 14px;font-size:11px;cursor:pointer;font-weight:600;">🖨️ IMPRIMER</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MODALE AJOUT NOTE DE FRAIS CB OMP -->
-<div id="modal-add-frais-omp" class="modal-overlay" onclick="closeModalOutside(event)">
-  <div class="modal-box" style="max-width:560px;">
-    <div class="modal-header">
-      <div class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:18px;">🏢 NOUVELLE NOTE CB OMP</div>
-      <button class="modal-close" onclick="closeModal('modal-add-frais-omp')">✕</button>
-    </div>
-    <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Nom Staff</label>
-        <select id="frais-omp-staff" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
-          <option value="">-- Chargement... --</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Type de frais</label>
-        <select id="frais-omp-type" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
-          <option value="">-- Choisir --</option>
-          <option value="transport">🚂 Transport (train/avion/taxi)</option>
-          <option value="hebergement">🏨 Hébergement</option>
-          <option value="repas">🍽️ Repas sur la route</option>
-          <option value="peage">🛣️ Péage / Parking / Essence</option>
-          <option value="materiel">🔧 Matériel / Fournitures</option>
-          <option value="autre">📋 Autre</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Date de la dépense</label>
-        <input type="date" id="frais-omp-date" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Montant (€)</label>
-        <input type="number" id="frais-omp-montant" placeholder="0.00" step="0.01" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Description / Motif</label>
-        <textarea id="frais-omp-description" rows="3" placeholder="Ex: Achat matériel scène..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;resize:vertical;box-sizing:border-box;"></textarea>
-      </div>
-      <div>
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Justificatif (photo JPG ou PDF)</label>
-        <input type="file" id="frais-omp-fichier" accept=".jpg,.jpeg,.pdf,.png" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#888;padding:9px 12px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-        <div id="frais-omp-upload-progress" style="font-size:11px;color:#888;margin-top:4px;"></div>
-      </div>
-      <div style="display:flex;gap:10px;margin-top:8px;">
-        <button onclick="closeModal('modal-add-frais-omp')" style="flex:1;background:#2a2a2a;color:#888;border:1px solid #333;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">ANNULER</button>
-        <button onclick="soumettreFraisOMP()" style="flex:2;background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✅ SOUMETTRE LA NOTE</button>
-      </div>
+  <!-- TABLEAU RÉCAP -->
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#111;">
+          <th style="padding:12px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Date</th>
+          <th style="padding:12px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Membre</th>
+          <th style="padding:12px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Type CB</th>
+          <th style="padding:12px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Type frais</th>
+          <th style="padding:12px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Description</th>
+          <th style="padding:12px 10px;text-align:right;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Montant</th>
+          <th style="padding:12px 10px;text-align:center;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Justif</th>
+          <th style="padding:12px 10px;text-align:center;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Statut</th>
+          <th style="padding:12px 10px;text-align:center;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="recap-frais-tbody">
+        <tr><td colspan="9" style="padding:30px;text-align:center;color:#666;">Chargement...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOTAL -->
+  <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+    <div style="background:#111;border:2px solid #c9a84c;border-radius:10px;padding:16px 24px;text-align:right;">
+      <div style="font-size:12px;color:#888;text-transform:uppercase;">Total filtré</div>
+      <div id="recap-frais-total" style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#c9a84c;">0.00 €</div>
     </div>
   </div>
 </div>
 
 <script>
-  function ouvrirAccesFrais() { showPage('acces-frais'); }
+  // ========== NOUVEAU SYSTÈME NOTES DE FRAIS ==========
   
-  // Nouvelles fonctions pour les 2 types de frais
-  // Variable pour stocker la liste des membres
+  // Variables globales pour le système de frais
+  var _fraisMembreConnecte = null; // Membre actuellement connecté pour déposer
+  var _fraisDataAll = []; // Toutes les notes de frais (pour admin)
   var _listeMembres = [];
 
-  // Charger la liste des membres depuis Supabase
+  // Codes d'accès par rôle
+  var _codesAccesFrais = {
+    'admin': 'OMP1504!',
+    'staff_omp': 'STAFFTWOQ2026!',
+    'artiste': 'ARTISTWOQ2026!',
+    'technique': 'TECHTWOQ2026!'
+  };
+
+  // Ouvrir la page FRAIS (dépôt justificatif)
+  function ouvrirFrais() {
+    showPage('frais');
+    // Vérifier si déjà connecté en session
+    var saved = sessionStorage.getItem('frais_membre');
+    if (saved) {
+      _fraisMembreConnecte = JSON.parse(saved);
+      afficherFormulaireDepot();
+    } else {
+      afficherConnexionFrais();
+    }
+  }
+
+  // Ouvrir la page RÉCAP FRAIS (admin)
+  function ouvrirRecapFrais() {
+    showPage('recap-frais');
+    chargerListeMembres().then(function() {
+      remplirSelectMembres('filtre-recap-membre', true);
+    });
+    chargerRecapFrais();
+  }
+
+  // Afficher l'écran de connexion
+  function afficherConnexionFrais() {
+    document.getElementById('frais-connexion-screen').style.display = 'block';
+    document.getElementById('frais-depot-screen').style.display = 'none';
+    document.getElementById('frais-login-email').value = '';
+    document.getElementById('frais-login-code').value = '';
+    document.getElementById('frais-login-error').style.display = 'none';
+  }
+
+  // Afficher le formulaire de dépôt
+  function afficherFormulaireDepot() {
+    document.getElementById('frais-connexion-screen').style.display = 'none';
+    document.getElementById('frais-depot-screen').style.display = 'block';
+    document.getElementById('frais-membre-nom').textContent = _fraisMembreConnecte.prenom + ' ' + _fraisMembreConnecte.nom;
+    // Reset le formulaire
+    document.getElementById('frais-type-cb').value = '';
+    document.getElementById('btn-cb-perso').style.borderColor = '#333';
+    document.getElementById('btn-cb-perso').style.background = '#0a0a0a';
+    document.getElementById('btn-cb-omp').style.borderColor = '#333';
+    document.getElementById('btn-cb-omp').style.background = '#0a0a0a';
+    document.getElementById('frais-type-depense').value = '';
+    document.getElementById('frais-date-depense').value = new Date().toISOString().split('T')[0];
+    document.getElementById('frais-montant-depense').value = '';
+    document.getElementById('frais-description-depense').value = '';
+    document.getElementById('frais-fichier-input').value = '';
+    document.getElementById('frais-fichier-preview').style.display = 'none';
+    document.getElementById('frais-upload-progress').textContent = '';
+    // Charger les dépôts récents du membre
+    chargerMesDepots();
+  }
+
+  // Connexion membre
+  async function connecterMembreFrais() {
+    var email = document.getElementById('frais-login-email').value.trim().toLowerCase();
+    var code = document.getElementById('frais-login-code').value.trim();
+    var errEl = document.getElementById('frais-login-error');
+    
+    if (!email || !code) {
+      errEl.textContent = 'Merci de remplir tous les champs.';
+      errEl.style.display = 'block';
+      return;
+    }
+    
+    try {
+      // Rechercher le membre par email
+      var res = await _supabase.from('membres').select('*').eq('email', email).single();
+      if (res.error || !res.data) {
+        errEl.textContent = 'Email non reconnu.';
+        errEl.style.display = 'block';
+        return;
+      }
+      
+      var membre = res.data;
+      var role = membre.role || 'artiste';
+      var codeAttendu = _codesAccesFrais[role];
+      
+      if (code !== codeAttendu) {
+        errEl.textContent = 'Code d\'accès incorrect.';
+        errEl.style.display = 'block';
+        return;
+      }
+      
+      // Connexion réussie
+      _fraisMembreConnecte = membre;
+      sessionStorage.setItem('frais_membre', JSON.stringify(membre));
+      afficherFormulaireDepot();
+      
+    } catch(e) {
+      errEl.textContent = 'Erreur de connexion.';
+      errEl.style.display = 'block';
+      console.error(e);
+    }
+  }
+
+  // Déconnexion membre
+  function deconnecterMembreFrais() {
+    _fraisMembreConnecte = null;
+    sessionStorage.removeItem('frais_membre');
+    afficherConnexionFrais();
+  }
+
+  // Sélectionner le type de CB
+  function selectTypeCB(type) {
+    document.getElementById('frais-type-cb').value = type;
+    if (type === 'PERSO') {
+      document.getElementById('btn-cb-perso').style.borderColor = '#3b82f6';
+      document.getElementById('btn-cb-perso').style.background = '#1e3a5f';
+      document.getElementById('btn-cb-omp').style.borderColor = '#333';
+      document.getElementById('btn-cb-omp').style.background = '#0a0a0a';
+    } else {
+      document.getElementById('btn-cb-omp').style.borderColor = '#c9a84c';
+      document.getElementById('btn-cb-omp').style.background = '#2d2510';
+      document.getElementById('btn-cb-perso').style.borderColor = '#333';
+      document.getElementById('btn-cb-perso').style.background = '#0a0a0a';
+    }
+  }
+
+  // Preview du fichier uploadé
+  function previewFichierFrais(input) {
+    var preview = document.getElementById('frais-fichier-preview');
+    if (input.files && input.files[0]) {
+      var file = input.files[0];
+      var html = '<div style="display:flex;align-items:center;gap:10px;background:#111;border:1px solid #333;border-radius:8px;padding:10px;">';
+      html += '<span style="font-size:24px;">' + (file.type.includes('pdf') ? '📄' : '🖼️') + '</span>';
+      html += '<div>';
+      html += '<div style="font-size:13px;color:#fff;">' + file.name + '</div>';
+      html += '<div style="font-size:11px;color:#888;">' + (file.size / 1024).toFixed(1) + ' Ko</div>';
+      html += '</div>';
+      html += '<button onclick="document.getElementById(\'frais-fichier-input\').value=\'\';document.getElementById(\'frais-fichier-preview\').style.display=\'none\';" style="margin-left:auto;background:#7f1d1d;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">✕</button>';
+      html += '</div>';
+      preview.innerHTML = html;
+      preview.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  // Soumettre le justificatif
+  async function soumettreJustificatif() {
+    var typeCB = document.getElementById('frais-type-cb').value;
+    var typeDepense = document.getElementById('frais-type-depense').value;
+    var dateDepense = document.getElementById('frais-date-depense').value;
+    var montant = document.getElementById('frais-montant-depense').value;
+    var description = document.getElementById('frais-description-depense').value;
+    var fichier = document.getElementById('frais-fichier-input').files[0];
+    var prog = document.getElementById('frais-upload-progress');
+    
+    // Validations
+    if (!typeCB) { alert('Merci de sélectionner le type de carte (PERSO ou OMP).'); return; }
+    if (!typeDepense) { alert('Merci de sélectionner le type de frais.'); return; }
+    if (!dateDepense) { alert('Merci d\'indiquer la date de la dépense.'); return; }
+    if (!montant || parseFloat(montant) <= 0) { alert('Merci d\'indiquer un montant valide.'); return; }
+    if (!fichier) { alert('Merci d\'ajouter un justificatif (photo ou PDF).'); return; }
+    
+    // Vérifier taille fichier (max 5 Mo)
+    if (fichier.size > 5 * 1024 * 1024) {
+      alert('Le fichier est trop volumineux (max 5 Mo).');
+      return;
+    }
+    
+    prog.textContent = '📤 Envoi en cours...';
+    
+    try {
+      // Upload du fichier
+      var ext = fichier.name.split('.').pop().toLowerCase();
+      var timestamp = Date.now();
+      var safeEmail = (_fraisMembreConnecte.email || 'user').replace(/@/g, '_').replace(/\./g, '_');
+      var path = safeEmail + '/' + timestamp + '.' + ext;
+      
+      var upRes = await _supabase.storage.from('justificatifs').upload(path, fichier);
+      if (upRes.error) throw new Error('Erreur upload: ' + upRes.error.message);
+      
+      var urlRes = _supabase.storage.from('justificatifs').getPublicUrl(path);
+      var justificatif_url = urlRes.data ? urlRes.data.publicUrl : null;
+      
+      // Insérer la note de frais
+      var insRes = await _supabase.from('notes_frais').insert({
+        user_id: _fraisMembreConnecte.id,
+        user_email: _fraisMembreConnecte.email,
+        user_nom: _fraisMembreConnecte.prenom + ' ' + _fraisMembreConnecte.nom,
+        mode_paiement: typeCB,
+        type_frais: typeDepense,
+        date_depense: dateDepense,
+        montant: parseFloat(montant),
+        description: description,
+        justificatif_url: justificatif_url,
+        statut: 'à valider'
+      });
+      
+      if (insRes.error) throw new Error('Erreur enregistrement: ' + insRes.error.message);
+      
+      prog.textContent = '✅ Justificatif envoyé avec succès !';
+      prog.style.color = '#22c55e';
+      
+      // Reset le formulaire après 2 secondes
+      setTimeout(function() {
+        prog.textContent = '';
+        prog.style.color = '#888';
+        afficherFormulaireDepot();
+      }, 2000);
+      
+    } catch(e) {
+      prog.textContent = '❌ ' + e.message;
+      prog.style.color = '#e31e24';
+      console.error(e);
+    }
+  }
+
+  // Charger mes dépôts récents
+  async function chargerMesDepots() {
+    var container = document.getElementById('frais-mes-depots');
+    if (!container || !_fraisMembreConnecte) return;
+    
+    container.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;padding:20px;">Chargement...</div>';
+    
+    try {
+      var res = await _supabase.from('notes_frais').select('*')
+        .eq('user_email', _fraisMembreConnecte.email)
+        .order('created_at', {ascending: false})
+        .limit(10);
+      
+      if (res.error) throw res.error;
+      var data = res.data || [];
+      
+      if (!data.length) {
+        container.innerHTML = '<div style="color:#666;font-size:13px;text-align:center;padding:20px;">Aucun dépôt récent</div>';
+        return;
+      }
+      
+      var typeLabels = {transport:'Transport',hebergement:'Hébergement',repas:'Repas',peage:'Péage/Parking',materiel:'Matériel',autre:'Autre'};
+      var statutColors = {'à valider':'#f59e0b','validé':'#22c55e','refusé':'#e31e24'};
+      
+      var html = '';
+      data.forEach(function(f) {
+        var dt = f.date_depense ? new Date(f.date_depense).toLocaleDateString('fr-FR') : '';
+        var statutColor = statutColors[f.statut] || '#888';
+        html += '<div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:space-between;">';
+        html += '<div>';
+        html += '<div style="font-size:13px;color:#fff;">' + (typeLabels[f.type_frais] || f.type_frais) + ' · <span style="color:' + (f.mode_paiement === 'PERSO' ? '#3b82f6' : '#c9a84c') + ';">CB ' + f.mode_paiement + '</span></div>';
+        html += '<div style="font-size:11px;color:#666;margin-top:2px;">' + dt + '</div>';
+        html += '</div>';
+        html += '<div style="text-align:right;">';
+        html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:#c9a84c;">' + (parseFloat(f.montant)||0).toFixed(2) + ' €</div>';
+        html += '<div style="font-size:10px;color:' + statutColor + ';text-transform:uppercase;margin-top:2px;">' + (f.statut || 'à valider') + '</div>';
+        html += '</div>';
+        html += '</div>';
+      });
+      
+      container.innerHTML = html;
+      
+    } catch(e) {
+      container.innerHTML = '<div style="color:#e31e24;font-size:12px;text-align:center;padding:20px;">Erreur chargement</div>';
+      console.error(e);
+    }
+  }
+
+  // ========== ADMIN - RÉCAP FRAIS ==========
+
+  // Charger la liste des membres
   async function chargerListeMembres() {
     try {
       var res = await _supabase.from('membres').select('prenom, nom').order('nom', {ascending: true});
@@ -4726,7 +4936,6 @@ function _hideTeamSelection() {
       _listeMembres = (res.data || []).map(function(m) {
         return (m.prenom || '') + ' ' + (m.nom || '');
       }).filter(function(n) { return n.trim(); });
-      // Trier par ordre alphabétique
       _listeMembres.sort(function(a, b) { return a.localeCompare(b, 'fr'); });
     } catch(e) { console.error('Erreur chargement membres:', e); }
   }
@@ -4742,293 +4951,209 @@ function _hideTeamSelection() {
     sel.innerHTML = html;
   }
 
-  function ouvrirFraisPerso() { 
-    showPage('frais-perso'); 
-    // Charger membres puis remplir les selects
-    chargerListeMembres().then(function() {
-      remplirSelectMembres('frais-perso-staff', false);
-      remplirSelectMembres('filtre-perso-staff', true);
-    });
-    // Reset les filtres
-    document.getElementById('filtre-perso-date-debut').value = '';
-    document.getElementById('filtre-perso-date-fin').value = '';
-    // Afficher vue admin
-    var adminView = document.getElementById('frais-perso-admin-view');
-    var membreView = document.getElementById('frais-perso-membre-view');
-    if (_currentUserRole === 'admin') {
-      if (adminView) adminView.style.display = 'block';
-      if (membreView) membreView.style.display = 'none';
-    } else {
-      if (adminView) adminView.style.display = 'none';
-      if (membreView) membreView.style.display = 'block';
-    }
-    chargerEtStockerFraisPerso();
-  }
-  function ouvrirFraisOMP() { 
-    showPage('frais-omp'); 
-    // Charger membres puis remplir les selects
-    chargerListeMembres().then(function() {
-      remplirSelectMembres('frais-omp-staff', false);
-      remplirSelectMembres('filtre-omp-staff', true);
-    });
-    // Reset les filtres
-    document.getElementById('filtre-omp-date-debut').value = '';
-    document.getElementById('filtre-omp-date-fin').value = '';
-    // Afficher vue admin
-    var adminView = document.getElementById('frais-omp-admin-view');
-    var membreView = document.getElementById('frais-omp-membre-view');
-    if (_currentUserRole === 'admin') {
-      if (adminView) adminView.style.display = 'block';
-      if (membreView) membreView.style.display = 'none';
-    } else {
-      if (adminView) adminView.style.display = 'none';
-      if (membreView) membreView.style.display = 'block';
-    }
-    chargerEtStockerFraisOMP();
-  }
-
-  // Charger les frais filtrés par mode de paiement
-  async function chargerFraisParMode(mode) {
-    var isPerso = (mode === 'perso');
-    var container = document.getElementById(isPerso ? 'frais-perso-liste' : 'frais-omp-liste');
-    var adminView = document.getElementById(isPerso ? 'frais-perso-admin-view' : 'frais-omp-admin-view');
-    var membreView = document.getElementById(isPerso ? 'frais-perso-membre-view' : 'frais-omp-membre-view');
-    var userLabel = document.getElementById(isPerso ? 'frais-perso-user-label' : 'frais-omp-user-label');
-    
-    if (userLabel) userLabel.textContent = _currentUserNom || '';
-    if (container) container.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;padding:20px;">Chargement...</div>';
-    
-    // Afficher vue admin ou membre
-    if (_currentUserRole === 'admin') {
-      if (adminView) adminView.style.display = 'block';
-      if (membreView) membreView.style.display = 'none';
-      chargerTousLesFraisParMode(mode);
-    } else {
-      if (adminView) adminView.style.display = 'none';
-      if (membreView) membreView.style.display = 'block';
-      try {
-        var q = _supabase.from('notes_frais').select('*')
-          .eq('user_email', _currentUserEmail)
-          .eq('mode_paiement', mode)
-          .order('date_depense', {ascending: false});
-        var res = await q;
-        if (res.error) throw res.error;
-        afficherFraisListe(res.data || [], container, mode);
-      } catch(e) { console.error('Erreur frais:', e); }
-    }
-  }
-
-  // Charger tous les frais pour admin (filtrés par mode)
-  async function chargerTousLesFraisParMode(mode) {
-    var isPerso = (mode === 'perso');
-    var adminListe = document.getElementById(isPerso ? 'frais-perso-admin-liste' : 'frais-omp-admin-liste');
-    var adminSelect = document.getElementById(isPerso ? 'frais-perso-admin-select' : 'frais-omp-admin-select');
-    
-    if (adminSelect) adminSelect.innerHTML = '<button onclick="chargerTousLesFraisParMode(\'' + mode + '\')" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:700;">📋 TOUS LES MEMBRES</button>';
-    if (adminListe) adminListe.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;padding:20px;">Chargement...</div>';
-    
+  // Charger toutes les notes de frais (admin)
+  async function chargerRecapFrais() {
     try {
-      var res = await _supabase.from('notes_frais').select('*')
-        .eq('mode_paiement', mode)
-        .order('date_depense', {ascending: false});
+      var res = await _supabase.from('notes_frais').select('*').order('date_depense', {ascending: false});
       if (res.error) throw res.error;
-      afficherFraisListe(res.data || [], adminListe, mode);
-    } catch(e) { console.error('Erreur frais admin:', e); }
+      _fraisDataAll = res.data || [];
+      appliquerFiltresRecap();
+      majStatsRecap();
+    } catch(e) { console.error('Erreur:', e); }
   }
 
-  // Afficher la liste des frais (réutilisable)
-  function afficherFraisListe(data, container, mode) {
-    if (!container) return;
+  // Mettre à jour les stats
+  function majStatsRecap() {
+    var aValider = _fraisDataAll.filter(function(f) { return f.statut === 'à valider'; }).length;
+    var valides = _fraisDataAll.filter(function(f) { return f.statut === 'validé'; }).length;
+    var totalPerso = _fraisDataAll.filter(function(f) { return f.mode_paiement === 'PERSO' && f.statut !== 'refusé'; }).reduce(function(s,f) { return s + (parseFloat(f.montant)||0); }, 0);
+    var totalOMP = _fraisDataAll.filter(function(f) { return f.mode_paiement === 'OMP' && f.statut !== 'refusé'; }).reduce(function(s,f) { return s + (parseFloat(f.montant)||0); }, 0);
+    
+    document.getElementById('stat-frais-avalider').textContent = aValider;
+    document.getElementById('stat-frais-valides').textContent = valides;
+    document.getElementById('stat-frais-perso').textContent = totalPerso.toFixed(2) + ' €';
+    document.getElementById('stat-frais-omp').textContent = totalOMP.toFixed(2) + ' €';
+  }
+
+  // Appliquer les filtres du récap
+  function appliquerFiltresRecap() {
+    var membreFilter = document.getElementById('filtre-recap-membre').value;
+    var typeCBFilter = document.getElementById('filtre-recap-typecb').value;
+    var statutFilter = document.getElementById('filtre-recap-statut').value;
+    var dateDebut = document.getElementById('filtre-recap-date-debut').value;
+    var dateFin = document.getElementById('filtre-recap-date-fin').value;
+    
+    var filtered = _fraisDataAll.filter(function(f) {
+      if (membreFilter && f.user_nom !== membreFilter) return false;
+      if (typeCBFilter && f.mode_paiement !== typeCBFilter) return false;
+      if (statutFilter && f.statut !== statutFilter) return false;
+      if (dateDebut && f.date_depense < dateDebut) return false;
+      if (dateFin && f.date_depense > dateFin) return false;
+      return true;
+    });
+    
+    afficherTableauRecap(filtered);
+  }
+
+  // Afficher le tableau récap
+  function afficherTableauRecap(data) {
+    var tbody = document.getElementById('recap-frais-tbody');
+    if (!tbody) return;
+    
     if (!data || !data.length) {
-      container.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;padding:20px;">Aucune note de frais.</div>';
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:30px;text-align:center;color:#666;">Aucune note de frais.</td></tr>';
+      document.getElementById('recap-frais-total').textContent = '0.00 €';
       return;
     }
-    // Grouper par mois
-    var groups = {};
-    data.forEach(function(f) {
-      var d = new Date(f.date_depense);
-      var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(f);
-    });
-    var keys = Object.keys(groups).sort().reverse();
+    
+    var typeLabels = {transport:'Transport',hebergement:'Hébergement',repas:'Repas',peage:'Péage/Parking',materiel:'Matériel',autre:'Autre'};
+    var statutColors = {'à valider':'#f59e0b','validé':'#22c55e','refusé':'#e31e24'};
+    var total = 0;
+    
     var html = '';
-    var moisNoms = ['JANVIER','FÉVRIER','MARS','AVRIL','MAI','JUIN','JUILLET','AOÛT','SEPTEMBRE','OCTOBRE','NOVEMBRE','DÉCEMBRE'];
-    keys.forEach(function(k, idx) {
-      var arr = groups[k];
-      var total = arr.reduce(function(s,f){return s+(parseFloat(f.montant)||0);},0);
-      var parts = k.split('-');
-      var moisNom = moisNoms[parseInt(parts[1])-1] + ' ' + parts[0];
-      html += '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:12px;">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#111;border-bottom:1px solid #2a2a2a;">';
-      html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">📅 ' + moisNom + '</div>';
-      html += '<div style="display:flex;align-items:center;gap:12px;">';
-      html += '<span style="font-size:13px;color:#888;">Total : <strong style="color:#c9a84c;">' + total.toFixed(2) + ' €</strong></span>';
-      html += '<button onclick="imprimerFraisMoisMode(\'' + k + '\',\'' + mode + '\')" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;">🖨️ IMPRIMER</button>';
-      html += '</div></div>';
-      arr.forEach(function(f) {
-        var typeLabels = {transport:'TRANSPORT',hebergement:'HEBERGEMENT',repas:'REPAS',peage:'PEAGE/PARKING',materiel:'MATERIEL',autre:'AUTRE'};
-        var typeLabel = typeLabels[f.type_frais] || f.type_frais || '—';
-        html += '<div style="padding:12px 14px;border-bottom:1px solid #222;">';
-        html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
-        html += '<div>';
-        html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;letter-spacing:1px;color:#fff;">' + typeLabel + '</div>';
-        html += '<div style="font-size:11px;color:#666;margin-top:2px;">' + (f.date_depense||'') + '</div>';
-        html += '<div style="font-size:12px;color:#888;margin-top:4px;">' + (f.description||'').substring(0,60) + '</div>';
-        html += '<div style="font-size:11px;color:#3b82f6;margin-top:4px;font-weight:600;">' + (f.user_nom||f.user_email||'') + '</div>';
-        html += '</div>';
-        html += '<div style="text-align:right;">';
-        html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:#c9a84c;">' + (parseFloat(f.montant)||0).toFixed(2) + ' EUR</div>';
-        html += '<div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;">';
-        if (f.justificatif_url) html += '<a href="' + f.justificatif_url + '" target="_blank" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:4px;padding:3px 8px;font-size:10px;text-decoration:none;">VOIR</a>';
-        html += '<button onclick="supprimerFraisNote(\'' + f.id + '\',\'' + mode + '\')" style="background:#7f1d1d;color:#fff;border:1px solid #ef4444;border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer;">SUPPR</button>';
-        html += '</div></div></div></div>';
-      });
-      html += '</div>';
+    data.forEach(function(f) {
+      var dt = f.date_depense ? new Date(f.date_depense).toLocaleDateString('fr-FR') : '';
+      var montant = parseFloat(f.montant) || 0;
+      if (f.statut !== 'refusé') total += montant;
+      var statutColor = statutColors[f.statut] || '#888';
+      var cbColor = f.mode_paiement === 'PERSO' ? '#3b82f6' : '#c9a84c';
+      
+      html += '<tr style="border-bottom:1px solid #222;">';
+      html += '<td style="padding:10px;font-size:12px;color:#888;">' + dt + '</td>';
+      html += '<td style="padding:10px;font-size:12px;color:#fff;">' + (f.user_nom || '—') + '</td>';
+      html += '<td style="padding:10px;font-size:12px;color:' + cbColor + ';font-weight:600;">CB ' + (f.mode_paiement || '—') + '</td>';
+      html += '<td style="padding:10px;font-size:12px;color:#aaa;">' + (typeLabels[f.type_frais] || f.type_frais || '—') + '</td>';
+      html += '<td style="padding:10px;font-size:11px;color:#666;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (f.description || '—') + '</td>';
+      html += '<td style="padding:10px;font-size:13px;color:#c9a84c;text-align:right;font-weight:600;">' + montant.toFixed(2) + ' €</td>';
+      html += '<td style="padding:10px;text-align:center;">';
+      if (f.justificatif_url) {
+        html += '<a href="' + f.justificatif_url + '" target="_blank" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:4px;padding:4px 8px;font-size:10px;text-decoration:none;">VOIR</a>';
+      } else {
+        html += '<span style="color:#555;font-size:10px;">—</span>';
+      }
+      html += '</td>';
+      html += '<td style="padding:10px;text-align:center;">';
+      html += '<span style="background:' + statutColor + '22;color:' + statutColor + ';padding:3px 8px;border-radius:4px;font-size:10px;text-transform:uppercase;font-weight:600;">' + (f.statut || 'à valider') + '</span>';
+      html += '</td>';
+      html += '<td style="padding:10px;text-align:center;">';
+      if (f.statut === 'à valider') {
+        html += '<button onclick="validerFrais(\'' + f.id + '\')" style="background:#22c55e;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;margin-right:4px;">✓</button>';
+        html += '<button onclick="refuserFrais(\'' + f.id + '\')" style="background:#7f1d1d;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;">✗</button>';
+      } else {
+        html += '<button onclick="supprimerFraisAdmin(\'' + f.id + '\')" style="background:#333;color:#888;border:none;border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;">🗑️</button>';
+      }
+      html += '</td>';
+      html += '</tr>';
     });
-    container.innerHTML = html;
+    
+    tbody.innerHTML = html;
+    document.getElementById('recap-frais-total').textContent = total.toFixed(2) + ' €';
   }
 
-  // Supprimer une note de frais
-  async function supprimerFraisNote(id, mode) {
-    if (!confirm('Supprimer cette note de frais ?')) return;
+  // Valider une note de frais
+  async function validerFrais(id) {
+    try {
+      await _supabase.from('notes_frais').update({ statut: 'validé', valide_par: _currentUserNom }).eq('id', id);
+      chargerRecapFrais();
+    } catch(e) { alert('Erreur: ' + e.message); }
+  }
+
+  // Refuser une note de frais
+  async function refuserFrais(id) {
+    if (!confirm('Refuser cette note de frais ?')) return;
+    try {
+      await _supabase.from('notes_frais').update({ statut: 'refusé', valide_par: _currentUserNom }).eq('id', id);
+      chargerRecapFrais();
+    } catch(e) { alert('Erreur: ' + e.message); }
+  }
+
+  // Supprimer une note de frais (admin)
+  async function supprimerFraisAdmin(id) {
+    if (!confirm('Supprimer définitivement cette note de frais ?')) return;
     try {
       await _supabase.from('notes_frais').delete().eq('id', id);
-      chargerFraisParMode(mode);
-    } catch(e) { alert('Erreur : ' + e.message); }
+      chargerRecapFrais();
+    } catch(e) { alert('Erreur: ' + e.message); }
   }
 
-  // Variables pour stocker les données chargées (pour filtrage côté client)
-  var _fraisDataPerso = [];
-  var _fraisDataOMP = [];
-
-  // Charger et stocker les données pour filtrage PERSO
-  async function chargerEtStockerFraisPerso() {
-    try {
-      var res = await _supabase.from('notes_frais').select('*')
-        .eq('mode_paiement', 'perso')
-        .order('date_depense', {ascending: false});
-      if (res.error) throw res.error;
-      _fraisDataPerso = res.data || [];
-      appliquerFiltresPerso();
-    } catch(e) { console.error('Erreur:', e); }
+  // Reset filtres récap
+  function resetFiltresRecap() {
+    document.getElementById('filtre-recap-membre').value = '';
+    document.getElementById('filtre-recap-typecb').value = '';
+    document.getElementById('filtre-recap-statut').value = '';
+    document.getElementById('filtre-recap-date-debut').value = '';
+    document.getElementById('filtre-recap-date-fin').value = '';
+    appliquerFiltresRecap();
   }
 
-  // Charger et stocker les données pour filtrage OMP
-  async function chargerEtStockerFraisOMP() {
-    try {
-      var res = await _supabase.from('notes_frais').select('*')
-        .eq('mode_paiement', 'carte_omp')
-        .order('date_depense', {ascending: false});
-      if (res.error) throw res.error;
-      _fraisDataOMP = res.data || [];
-      appliquerFiltresOMP();
-    } catch(e) { console.error('Erreur:', e); }
-  }
-
-  // Appliquer les filtres PERSO
-  function appliquerFiltresPerso() {
-    var staffFilter = document.getElementById('filtre-perso-staff').value;
-    var dateDebut = document.getElementById('filtre-perso-date-debut').value;
-    var dateFin = document.getElementById('filtre-perso-date-fin').value;
+  // Export CSV
+  function exporterFraisCSV() {
+    var membreFilter = document.getElementById('filtre-recap-membre').value;
+    var typeCBFilter = document.getElementById('filtre-recap-typecb').value;
+    var statutFilter = document.getElementById('filtre-recap-statut').value;
+    var dateDebut = document.getElementById('filtre-recap-date-debut').value;
+    var dateFin = document.getElementById('filtre-recap-date-fin').value;
     
-    var filtered = _fraisDataPerso.filter(function(f) {
-      if (staffFilter && f.user_nom !== staffFilter) return false;
+    var filtered = _fraisDataAll.filter(function(f) {
+      if (membreFilter && f.user_nom !== membreFilter) return false;
+      if (typeCBFilter && f.mode_paiement !== typeCBFilter) return false;
+      if (statutFilter && f.statut !== statutFilter) return false;
       if (dateDebut && f.date_depense < dateDebut) return false;
       if (dateFin && f.date_depense > dateFin) return false;
       return true;
     });
     
-    var container = document.getElementById('frais-perso-admin-liste') || document.getElementById('frais-perso-liste');
-    afficherFraisListe(filtered, container, 'perso');
+    var csv = 'Date;Membre;Type CB;Type Frais;Description;Montant;Statut;Lien Justificatif\n';
+    var typeLabels = {transport:'Transport',hebergement:'Hébergement',repas:'Repas',peage:'Péage/Parking',materiel:'Matériel',autre:'Autre'};
+    filtered.forEach(function(f) {
+      csv += (f.date_depense||'') + ';';
+      csv += (f.user_nom||'') + ';';
+      csv += 'CB ' + (f.mode_paiement||'') + ';';
+      csv += (typeLabels[f.type_frais]||f.type_frais||'') + ';';
+      csv += '"' + (f.description||'').replace(/"/g, '""') + '";';
+      csv += (parseFloat(f.montant)||0).toFixed(2) + ';';
+      csv += (f.statut||'') + ';';
+      csv += (f.justificatif_url||'') + '\n';
+    });
+    
+    var blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8;'});
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'notes_frais_omp_' + new Date().toISOString().split('T')[0] + '.csv';
+    link.click();
   }
 
-  // Appliquer les filtres OMP
-  function appliquerFiltresOMP() {
-    var staffFilter = document.getElementById('filtre-omp-staff').value;
-    var dateDebut = document.getElementById('filtre-omp-date-debut').value;
-    var dateFin = document.getElementById('filtre-omp-date-fin').value;
+  // Imprimer le récap filtré
+  function imprimerRecapFrais() {
+    var membreFilter = document.getElementById('filtre-recap-membre').value;
+    var typeCBFilter = document.getElementById('filtre-recap-typecb').value;
+    var statutFilter = document.getElementById('filtre-recap-statut').value;
+    var dateDebut = document.getElementById('filtre-recap-date-debut').value;
+    var dateFin = document.getElementById('filtre-recap-date-fin').value;
     
-    var filtered = _fraisDataOMP.filter(function(f) {
-      if (staffFilter && f.user_nom !== staffFilter) return false;
+    var filtered = _fraisDataAll.filter(function(f) {
+      if (membreFilter && f.user_nom !== membreFilter) return false;
+      if (typeCBFilter && f.mode_paiement !== typeCBFilter) return false;
+      if (statutFilter && f.statut !== statutFilter) return false;
       if (dateDebut && f.date_depense < dateDebut) return false;
       if (dateFin && f.date_depense > dateFin) return false;
       return true;
     });
     
-    var container = document.getElementById('frais-omp-admin-liste') || document.getElementById('frais-omp-liste');
-    afficherFraisListe(filtered, container, 'carte_omp');
-  }
-
-  // Reset filtres PERSO
-  function resetFiltresPerso() {
-    document.getElementById('filtre-perso-staff').value = '';
-    document.getElementById('filtre-perso-date-debut').value = '';
-    document.getElementById('filtre-perso-date-fin').value = '';
-    appliquerFiltresPerso();
-  }
-
-  // Reset filtres OMP
-  function resetFiltresOMP() {
-    document.getElementById('filtre-omp-staff').value = '';
-    document.getElementById('filtre-omp-date-debut').value = '';
-    document.getElementById('filtre-omp-date-fin').value = '';
-    appliquerFiltresOMP();
-  }
-
-  // Imprimer avec les filtres PERSO
-  async function imprimerFraisFiltresPerso() {
-    var staffFilter = document.getElementById('filtre-perso-staff').value;
-    var dateDebut = document.getElementById('filtre-perso-date-debut').value;
-    var dateFin = document.getElementById('filtre-perso-date-fin').value;
-    
-    var filtered = _fraisDataPerso.filter(function(f) {
-      if (staffFilter && f.user_nom !== staffFilter) return false;
-      if (dateDebut && f.date_depense < dateDebut) return false;
-      if (dateFin && f.date_depense > dateFin) return false;
-      return true;
-    });
-    
-    imprimerFraisFiltres(filtered, 'perso', staffFilter, dateDebut, dateFin);
-  }
-
-  // Imprimer avec les filtres OMP
-  async function imprimerFraisFiltresOMP() {
-    var staffFilter = document.getElementById('filtre-omp-staff').value;
-    var dateDebut = document.getElementById('filtre-omp-date-debut').value;
-    var dateFin = document.getElementById('filtre-omp-date-fin').value;
-    
-    var filtered = _fraisDataOMP.filter(function(f) {
-      if (staffFilter && f.user_nom !== staffFilter) return false;
-      if (dateDebut && f.date_depense < dateDebut) return false;
-      if (dateFin && f.date_depense > dateFin) return false;
-      return true;
-    });
-    
-    imprimerFraisFiltres(filtered, 'carte_omp', staffFilter, dateDebut, dateFin);
-  }
-
-  // Fonction d'impression avec filtres
-  function imprimerFraisFiltres(data, mode, staffFilter, dateDebut, dateFin) {
-    var isPerso = (mode === 'perso');
-    var modeLabel = isPerso ? 'CB PERSO' : 'CB OMP';
-    
-    // Construire le titre des filtres
     var filtresTexte = [];
-    if (staffFilter) filtresTexte.push('Staff: ' + staffFilter);
+    if (membreFilter) filtresTexte.push('Membre: ' + membreFilter);
+    if (typeCBFilter) filtresTexte.push('Type: CB ' + typeCBFilter);
+    if (statutFilter) filtresTexte.push('Statut: ' + statutFilter);
     if (dateDebut) filtresTexte.push('Du ' + new Date(dateDebut).toLocaleDateString('fr-FR'));
     if (dateFin) filtresTexte.push('Au ' + new Date(dateFin).toLocaleDateString('fr-FR'));
     var filtresLabel = filtresTexte.length ? filtresTexte.join(' · ') : 'Toutes les notes';
     
-    data.sort(function(a,b){ return (a.user_nom||'').localeCompare(b.user_nom||''); });
+    var total = filtered.filter(function(f) { return f.statut !== 'refusé'; }).reduce(function(s,f) { return s + (parseFloat(f.montant)||0); }, 0);
+    var typeLabels = {transport:'Transport',hebergement:'Hébergement',repas:'Repas',peage:'Péage/Parking',materiel:'Matériel',autre:'Autre'};
     
-    var total = data.reduce(function(s,n){ return s+(parseFloat(n.montant)||0); },0);
-    var types = {transport:'Transport',hebergement:'Hébergement',repas:'Repas route',peage:'Péage/Parking/Essence',materiel:'Matériel',autre:'Autre'};
-    
-    var rows = data.map(function(n) {
-      var dt = n.date_depense ? new Date(n.date_depense).toLocaleDateString('fr-FR') : '';
-      var mt = (parseFloat(n.montant)||0).toLocaleString('fr-FR',{minimumFractionDigits:2});
-      return '<tr><td style="border:1px solid #ddd;padding:7px 8px;">'+(n.user_nom||n.user_email||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+dt+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+(types[n.type_frais]||n.type_frais||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+(n.description||'').substring(0,50)+'</td><td style="border:1px solid #ddd;padding:7px 8px;text-align:right;font-weight:bold;">'+mt+' €</td></tr>';
+    var rows = filtered.map(function(f) {
+      var dt = f.date_depense ? new Date(f.date_depense).toLocaleDateString('fr-FR') : '';
+      return '<tr><td style="border:1px solid #ddd;padding:7px;">' + (f.user_nom||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + dt + '</td><td style="border:1px solid #ddd;padding:7px;">CB ' + (f.mode_paiement||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + (typeLabels[f.type_frais]||f.type_frais||'') + '</td><td style="border:1px solid #ddd;padding:7px;text-align:right;font-weight:bold;">' + (parseFloat(f.montant)||0).toFixed(2) + ' €</td><td style="border:1px solid #ddd;padding:7px;text-align:center;">' + (f.statut||'') + '</td></tr>';
     }).join('');
     
     var existing = document.getElementById('print-overlay');
@@ -5038,36 +5163,32 @@ function _hideTeamSelection() {
     overlay.id = 'print-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#fff;color:#000;overflow:auto;padding:40px;font-family:Arial,sans-serif;font-size:13px;';
     
-    var headerColor = isPerso ? '#3b82f6' : '#c9a84c';
-    var headerBg = isPerso ? '#e8f0fe' : '#fef6e0';
-    
     overlay.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">' +
       '<div>' +
         '<img src="assets/LOGO OMP OHS.png" alt="OMP" style="height:50px;margin-bottom:10px;">' +
-        '<h1 style="font-size:20px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;color:#000;">Notes de Frais ' + modeLabel + '</h1>' +
-        '<h2 style="font-size:13px;color:' + headerColor + ';letter-spacing:1px;font-weight:bold;">' + filtresLabel + '</h2>' +
-        '<div style="font-size:11px;color:#888;margin-top:4px;">Édité le ' + new Date().toLocaleDateString('fr-FR') + ' · ' + data.length + ' note(s)</div>' +
+        '<h1 style="font-size:20px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">Récapitulatif Notes de Frais</h1>' +
+        '<h2 style="font-size:13px;color:#c9a84c;letter-spacing:1px;font-weight:bold;">' + filtresLabel + '</h2>' +
+        '<div style="font-size:11px;color:#888;margin-top:4px;">Édité le ' + new Date().toLocaleDateString('fr-FR') + ' · ' + filtered.length + ' note(s)</div>' +
       '</div>' +
       '<div style="display:flex;gap:10px;">' +
         '<button onclick="window.print()" style="padding:10px 20px;background:#000;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;">🖨️ Imprimer</button>' +
         '<button onclick="fermerPrintOverlay()" style="padding:10px 20px;background:#e74c3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">✕ Fermer</button>' +
       '</div>' +
     '</div>' +
-    '<div style="background:' + headerBg + ';border-left:4px solid ' + headerColor + ';padding:10px 14px;margin-bottom:20px;font-size:12px;color:#333;">' +
-      (isPerso ? '💳 Frais payés avec carte bancaire personnelle - À rembourser' : '🏢 Frais payés avec carte bancaire OH MY PROD') +
-    '</div>' +
     '<table style="width:100%;border-collapse:collapse;">' +
       '<thead><tr>' +
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Membre</th>' +
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Date</th>' +
-        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Type</th>' +
-        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Description</th>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Type CB</th>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Type Frais</th>' +
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:right;font-size:11px;text-transform:uppercase;">Montant</th>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:center;font-size:11px;text-transform:uppercase;">Statut</th>' +
       '</tr></thead>' +
       '<tbody>' + rows +
         '<tr style="background:#e0e0e0;font-weight:bold;">' +
           '<td colspan="4" style="border:1px solid #ddd;padding:10px;text-align:right;font-size:14px;">TOTAL</td>' +
-          '<td style="border:1px solid #ddd;padding:10px;text-align:right;font-size:16px;color:' + headerColor + ';">' + total.toLocaleString('fr-FR',{minimumFractionDigits:2}) + ' €</td>' +
+          '<td style="border:1px solid #ddd;padding:10px;text-align:right;font-size:16px;color:#c9a84c;">' + total.toFixed(2) + ' €</td>' +
+          '<td></td>' +
         '</tr>' +
       '</tbody>' +
     '</table>' +
@@ -5076,341 +5197,12 @@ function _hideTeamSelection() {
     document.body.appendChild(overlay);
   }
 
-  // Imprimer les frais d'un mois (filtré par mode)
-  async function imprimerFraisMoisMode(moisKey, mode) {
-    try {
-      var isPerso = (mode === 'perso');
-      var modeLabel = isPerso ? 'CB PERSO' : 'CB OMP';
-      var moisNoms = ['JANVIER','FÉVRIER','MARS','AVRIL','MAI','JUIN','JUILLET','AOÛT','SEPTEMBRE','OCTOBRE','NOVEMBRE','DÉCEMBRE'];
-      var parts = moisKey.split('-');
-      var moisNom = moisNoms[parseInt(parts[1])-1] + ' ' + parts[0];
-      
-      // Récupérer les frais du mois filtré par mode
-      var q = _supabase.from('notes_frais').select('*')
-        .eq('mode_paiement', mode)
-        .order('date_depense', {ascending: false});
-      
-      var res = await q;
-      if (res.error) throw res.error;
-      var data = res.data || [];
-      
-      // Filtrer par mois
-      var notesMois = data.filter(function(n) {
-        if (!n.date_depense) return false;
-        var d = new Date(n.date_depense);
-        var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-        return key === moisKey;
-      });
-      
-      // Si pas admin, filtrer par utilisateur
-      if (_currentUserRole !== 'admin') {
-        notesMois = notesMois.filter(function(n){ return n.user_email === _currentUserEmail; });
-      }
-      
-      // Trier par nom
-      notesMois.sort(function(a,b){ return (a.user_nom||'').localeCompare(b.user_nom||''); });
-      
-      var total = notesMois.reduce(function(s,n){ return s+(parseFloat(n.montant)||0); },0);
-      var types = {transport:'Transport',hebergement:'Hébergement',repas:'Repas route',peage:'Péage/Parking/Essence',materiel:'Matériel',autre:'Autre'};
-      
-      var rows = notesMois.map(function(n) {
-        var dt = n.date_depense ? new Date(n.date_depense).toLocaleDateString('fr-FR') : '';
-        var mt = (parseFloat(n.montant)||0).toLocaleString('fr-FR',{minimumFractionDigits:2});
-        return '<tr><td style="border:1px solid #ddd;padding:7px 8px;">'+(n.user_nom||n.user_email||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+dt+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+(types[n.type_frais]||n.type_frais||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+(n.description||'').substring(0,50)+'</td><td style="border:1px solid #ddd;padding:7px 8px;text-align:right;font-weight:bold;">'+mt+' €</td></tr>';
-      }).join('');
-      
-      // Supprimer overlay existant
-      var existing = document.getElementById('print-overlay');
-      if (existing) existing.remove();
-      
-      // Créer overlay d'impression
-      var overlay = document.createElement('div');
-      overlay.id = 'print-overlay';
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#fff;color:#000;overflow:auto;padding:40px;font-family:Arial,sans-serif;font-size:13px;';
-      
-      var headerColor = isPerso ? '#3b82f6' : '#c9a84c';
-      var headerBg = isPerso ? '#e8f0fe' : '#fef6e0';
-      
-      overlay.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">' +
-        '<div>' +
-          '<img src="assets/LOGO OMP OHS.png" alt="OMP" style="height:50px;margin-bottom:10px;">' +
-          '<h1 style="font-size:20px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;color:#000;">Notes de Frais ' + modeLabel + '</h1>' +
-          '<h2 style="font-size:15px;color:' + headerColor + ';text-transform:uppercase;letter-spacing:1px;font-weight:bold;">' + moisNom + '</h2>' +
-          '<div style="font-size:11px;color:#888;margin-top:4px;">Édité le ' + new Date().toLocaleDateString('fr-FR') + ' · ' + notesMois.length + ' note(s)</div>' +
-        '</div>' +
-        '<div style="display:flex;gap:10px;">' +
-          '<button onclick="window.print()" style="padding:10px 20px;background:#000;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;">🖨️ Imprimer</button>' +
-          '<button onclick="fermerPrintOverlay()" style="padding:10px 20px;background:#e74c3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">✕ Fermer</button>' +
-        '</div>' +
-      '</div>' +
-      '<div style="background:' + headerBg + ';border-left:4px solid ' + headerColor + ';padding:10px 14px;margin-bottom:20px;font-size:12px;color:#333;">' +
-        (isPerso ? '💳 Frais payés avec carte bancaire personnelle - À rembourser' : '🏢 Frais payés avec carte bancaire OH MY PROD') +
-      '</div>' +
-      '<table style="width:100%;border-collapse:collapse;">' +
-        '<thead><tr>' +
-          '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Membre</th>' +
-          '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Date</th>' +
-          '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Type</th>' +
-          '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Description</th>' +
-          '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:right;font-size:11px;text-transform:uppercase;">Montant</th>' +
-        '</tr></thead>' +
-        '<tbody>' + rows +
-          '<tr style="background:#e0e0e0;font-weight:bold;">' +
-            '<td colspan="4" style="border:1px solid #ddd;padding:10px;text-align:right;font-size:14px;">TOTAL DU MOIS</td>' +
-            '<td style="border:1px solid #ddd;padding:10px;text-align:right;font-size:16px;color:' + headerColor + ';">' + total.toLocaleString('fr-FR',{minimumFractionDigits:2}) + ' €</td>' +
-          '</tr>' +
-        '</tbody>' +
-      '</table>' +
-      '<div style="margin-top:24px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px;">Document généré par OH MY PROD · Confidentiel</div>';
-      
-      document.body.appendChild(overlay);
-    } catch(e) { 
-      alert('Erreur : ' + e.message); 
-    }
-  }
+  function fermerPrintOverlay() { var o = document.getElementById('print-overlay'); if (o) o.remove(); }
 
-  // Soumettre une note CB PERSO
-  async function soumettreFraisPerso() {
-    var staff = document.getElementById('frais-perso-staff').value;
-    var type = document.getElementById('frais-perso-type').value;
-    var date = document.getElementById('frais-perso-date').value;
-    var montant = document.getElementById('frais-perso-montant').value;
-    var desc = document.getElementById('frais-perso-description').value;
-    var fichier = document.getElementById('frais-perso-fichier').files[0];
-    if (!staff) { alert('Merci de sélectionner un nom de staff.'); return; }
-    if (!type || !date) { alert('Merci de remplir le type et la date.'); return; }
-    var prog = document.getElementById('frais-perso-upload-progress');
-    prog.textContent = 'Envoi en cours...';
-    var justificatif_url = null;
-    if (fichier) {
-      var ext = fichier.name.split('.').pop();
-      var path = (_currentUserEmail||'user').replace('@','_').replace('.','_') + '/' + Date.now() + '.' + ext;
-      var upRes = await _supabase.storage.from('justificatifs').upload(path, fichier);
-      if (upRes.error) { prog.textContent = 'Erreur upload : ' + upRes.error.message; return; }
-      var urlRes = _supabase.storage.from('justificatifs').getPublicUrl(path);
-      justificatif_url = urlRes.data ? urlRes.data.publicUrl : null;
-    }
-    var insRes = await _supabase.from('notes_frais').insert({
-      user_email: _currentUserEmail, user_nom: staff,
-      mode_paiement: 'perso',
-      type_frais: type, date_depense: date,
-      montant: parseFloat(montant)||0,
-      description: desc, justificatif_url: justificatif_url
-    });
-    if (insRes.error) { prog.textContent = 'Erreur : ' + insRes.error.message; return; }
-    prog.textContent = '';
-    document.getElementById('frais-perso-staff').value = '';
-    document.getElementById('frais-perso-type').value = '';
-    document.getElementById('frais-perso-date').value = '';
-    document.getElementById('frais-perso-montant').value = '';
-    document.getElementById('frais-perso-description').value = '';
-    document.getElementById('frais-perso-fichier').value = '';
-    closeModal('modal-add-frais-perso');
-    chargerEtStockerFraisPerso();
-  }
-
-  // Soumettre une note CB OMP
-  async function soumettreFraisOMP() {
-    var staff = document.getElementById('frais-omp-staff').value;
-    var type = document.getElementById('frais-omp-type').value;
-    var date = document.getElementById('frais-omp-date').value;
-    var montant = document.getElementById('frais-omp-montant').value;
-    var desc = document.getElementById('frais-omp-description').value;
-    var fichier = document.getElementById('frais-omp-fichier').files[0];
-    if (!staff) { alert('Merci de sélectionner un nom de staff.'); return; }
-    if (!type || !date) { alert('Merci de remplir le type et la date.'); return; }
-    var prog = document.getElementById('frais-omp-upload-progress');
-    prog.textContent = 'Envoi en cours...';
-    var justificatif_url = null;
-    if (fichier) {
-      var ext = fichier.name.split('.').pop();
-      var path = (_currentUserEmail||'user').replace('@','_').replace('.','_') + '/' + Date.now() + '.' + ext;
-      var upRes = await _supabase.storage.from('justificatifs').upload(path, fichier);
-      if (upRes.error) { prog.textContent = 'Erreur upload : ' + upRes.error.message; return; }
-      var urlRes = _supabase.storage.from('justificatifs').getPublicUrl(path);
-      justificatif_url = urlRes.data ? urlRes.data.publicUrl : null;
-    }
-    var insRes = await _supabase.from('notes_frais').insert({
-      user_email: _currentUserEmail, user_nom: staff,
-      mode_paiement: 'carte_omp',
-      type_frais: type, date_depense: date,
-      montant: parseFloat(montant)||0,
-      description: desc, justificatif_url: justificatif_url
-    });
-    if (insRes.error) { prog.textContent = 'Erreur : ' + insRes.error.message; return; }
-    prog.textContent = '';
-    document.getElementById('frais-omp-staff').value = '';
-    document.getElementById('frais-omp-type').value = '';
-    document.getElementById('frais-omp-date').value = '';
-    document.getElementById('frais-omp-montant').value = '';
-    document.getElementById('frais-omp-description').value = '';
-    document.getElementById('frais-omp-fichier').value = '';
-    closeModal('modal-add-frais-omp');
-    chargerEtStockerFraisOMP();
-  }
-
-  function fermerPrintOverlay() { var o=document.getElementById('print-overlay'); if(o) o.remove(); }
-  window._groupKeys = [];
-  window._imprimerMois = function(idx) { imprimerFraisMois(window._groupKeys[idx]); };
-
-  async function chargerFrais(membreFilter) {
-    var container = document.getElementById('frais-liste');
-    if (container) container.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;padding:20px;">Chargement...</div>';
-    try {
-      var q = _supabase.from('notes_frais').select('*').order('date_depense', {ascending: false});
-      if (membreFilter === 'me' || !membreFilter) q = q.eq('user_email', _currentUserEmail);
-      else if (membreFilter !== 'all') q = q.eq('user_email', membreFilter);
-      var res = await q;
-      if (res.error) throw res.error;
-      var data = res.data || [];
-      var cible = container;
-      afficherFrais(data, cible);
-    } catch(e) { console.error('Erreur frais:', e); }
-  }
-
-  async function chargerTousLesFrais(filtreEmail) {
-    var container = document.getElementById('frais-admin-liste');
-    if (!container) return;
-    container.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;padding:20px;">Chargement...</div>';
-    try {
-      var q = _supabase.from('notes_frais').select('*').order('date_depense', {ascending: false});
-      if (filtreEmail) q = q.eq('user_email', filtreEmail);
-      var res = await q;
-      if (res.error) throw res.error;
-      var data = res.data || [];
-      afficherFrais(data, container);
-      chargerSelMembresAdmin();
-    } catch(e) { console.error('Erreur frais admin:', e); }
-  }
-
-  function afficherFrais(data, cible) {
-    if (!data || !data.length) {
-      cible.innerHTML = '<div style="color:#888;font-size:13px;text-align:center;padding:20px;">Aucune note de frais.</div>';
-      return;
-    }
-    var types = {transport:'Transport',hebergement:'Hebergement',repas:'Repas route',peage:'Peage/Parking/Essence',materiel:'Materiel',autre:'Autre'};
-    data.sort(function(a,b){ return new Date(b.date_depense||0) - new Date(a.date_depense||0); });
-    var groups = {};
-    data.forEach(function(n) {
-      var d = n.date_depense ? new Date(n.date_depense) : new Date();
-      var mois = d.toLocaleDateString('fr-FR', {month:'long', year:'numeric'});
-      if (!groups[mois]) groups[mois] = [];
-      groups[mois].push(n);
-    });
-    Object.keys(groups).forEach(function(k){ groups[k].sort(function(a,b){ return (a.user_nom||'').localeCompare(b.user_nom||''); }); });
-    window._groupKeys = Object.keys(groups);
-    var html = '';
-    window._groupKeys.forEach(function(mois, idx) {
-      var notes = groups[mois];
-      var total = notes.reduce(function(s,n){ return s+(parseFloat(n.montant)||0); },0);
-      html += '<div style="background:linear-gradient(135deg,#1a1a1a,#252525);border:2px solid #c9a84c;border-radius:10px;padding:12px 16px;margin:20px 0 12px;box-shadow:0 4px 12px rgba(201,168,76,0.15);">';
-      html += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">';
-      html += '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;">📅 ' + mois + '</div>';
-      html += '<div style="display:flex;align-items:center;gap:10px;">';
-      html += '<span style="font-size:12px;color:#888;">Total : <strong style="color:#fff;">' + total.toLocaleString('fr-FR',{minimumFractionDigits:2}) + ' €</strong></span>';
-      html += '<button onclick="window._imprimerMois(' + idx + ')" style="background:#1a3a1a;color:#4caf50;border:1px solid #4caf50;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;">IMPRIMER</button>';
-      html += '</div></div></div>';
-      notes.forEach(function(n) {
-        var dt = n.date_depense ? new Date(n.date_depense).toLocaleDateString('fr-FR') : '';
-        var mt = n.montant ? parseFloat(n.montant).toLocaleString('fr-FR',{minimumFractionDigits:2})+' EUR' : '';
-        var fichierBtn = n.justificatif_url ? '<a href="'+n.justificatif_url+'" target="_blank" style="background:#1e3a5f;color:#7eb8d4;border:1px solid #3b82f6;border-radius:4px;padding:3px 10px;font-size:11px;text-decoration:none;">VOIR</a>' : '<span style="color:#555;font-size:11px;">Pas de justificatif</span>';
-        var canDelete = (n.user_email === _currentUserEmail || _currentUserRole === 'admin');
-        var delBtn = canDelete ? '<button onclick="supprimerFrais(' + n.id + ')" style="background:transparent;color:#e74c3c;border:1px solid #e74c3c;border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer;">SUPPR</button>' : '';
-        html += '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:12px 16px;margin-bottom:6px;">';
-        html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">';
-        html += '<div><div style="font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;">' + (types[n.type_frais]||n.type_frais||'') + '</div>';
-        html += '<div style="font-size:11px;color:#888;">' + dt + (n.km ? ' · '+n.km+' km' : '') + '</div></div>';
-        html += '<div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:#fff;">' + mt + '</div></div>';
-        if (n.description) html += '<div style="font-size:12px;color:#aaa;margin-bottom:8px;">' + n.description + '</div>';
-        html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
-        html += '<span style="font-size:12px;color:#c9a84c;font-weight:600;">' + (n.user_nom||n.user_email||'') + '</span>';
-        html += '<div style="display:flex;gap:6px;">' + fichierBtn + delBtn + '</div></div></div>';
-      });
-    });
-    cible.innerHTML = html;
-  }
-
-  async function supprimerFrais(id) {
-    if (!confirm('Supprimer cette note ?')) return;
-    var res = await _supabase.from('notes_frais').delete().eq('id', id);
-    if (res.error) { alert('Erreur : ' + res.error.message); return; }
-    chargerFrais(_currentUserRole === 'admin' ? 'all' : 'me');
-  }
-
-  async function imprimerFraisMois(mois) {
-    try {
-      var q = _supabase.from('notes_frais').select('*').order('date_depense', {ascending: false});
-      var res = await q;
-      if (res.error) throw res.error;
-      var data = res.data || [];
-      var notesMois = data.filter(function(n) {
-        if (!n.date_depense) return false;
-        var d = new Date(n.date_depense);
-        return d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}) === mois;
-      });
-      if (_currentUserRole !== 'admin') notesMois = notesMois.filter(function(n){ return n.user_email===_currentUserEmail; });
-      notesMois.sort(function(a,b){ return (a.user_nom||'').localeCompare(b.user_nom||''); });
-      var total = notesMois.reduce(function(s,n){ return s+(parseFloat(n.montant)||0); },0);
-      var types = {transport:'Transport',hebergement:'Hebergement',repas:'Repas route',peage:'Peage/Parking/Essence',materiel:'Materiel',autre:'Autre'};
-      var rows = notesMois.map(function(n) {
-        var dt = n.date_depense ? new Date(n.date_depense).toLocaleDateString('fr-FR') : '';
-        var mt = (parseFloat(n.montant)||0).toLocaleString('fr-FR',{minimumFractionDigits:2});
-        return '<tr><td style="border:1px solid #ddd;padding:7px 8px;">'+(n.user_nom||n.user_email||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+dt+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+(types[n.type_frais]||n.type_frais||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;">'+(n.description||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;text-align:center;">'+(n.km||'')+'</td><td style="border:1px solid #ddd;padding:7px 8px;text-align:right;font-weight:bold;">'+mt+' EUR</td></tr>';
-      }).join('');
-      var existing = document.getElementById('print-overlay');
-      if (existing) existing.remove();
-      var overlay = document.createElement('div');
-      overlay.id = 'print-overlay';
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#fff;color:#000;overflow:auto;padding:40px;font-family:Arial,sans-serif;font-size:13px;';
-      overlay.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;"><div><h1 style="font-size:20px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;color:#000;">OH MY PROD - Notes de Frais</h1><h2 style="font-size:13px;color:#555;text-transform:uppercase;letter-spacing:1px;">'+mois+'</h2><div style="font-size:11px;color:#888;margin-top:4px;">Edite le '+new Date().toLocaleDateString('fr-FR')+' · '+notesMois.length+' note(s)</div></div><div style="display:flex;gap:10px;"><button onclick="window.print()" style="padding:10px 20px;background:#000;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;">Imprimer</button><button onclick="fermerPrintOverlay()" style="padding:10px 20px;background:#e74c3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">Fermer</button></div></div><hr style="margin-bottom:20px;border:2px solid #000;"><table style="width:100%;border-collapse:collapse;"><thead><tr><th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Membre</th><th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Date</th><th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Type</th><th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Description</th><th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:center;font-size:11px;text-transform:uppercase;">Km</th><th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:right;font-size:11px;text-transform:uppercase;">Montant</th></tr></thead><tbody>'+rows+'<tr style="background:#e0e0e0;font-weight:bold;"><td colspan="5" style="border:1px solid #ddd;padding:8px;text-align:right;">TOTAL DU MOIS</td><td style="border:1px solid #ddd;padding:8px;text-align:right;">'+total.toLocaleString('fr-FR',{minimumFractionDigits:2})+' EUR</td></tr></tbody></table><div style="margin-top:24px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px;">Document genere par OH MY PROD · Confidentiel</div>';
-      document.body.appendChild(overlay);
-    } catch(e) { alert('Erreur : ' + e.message); }
-  }
-
-  async function chargerSelMembresAdmin() {
-    var sel = document.getElementById('frais-admin-select');
-    if (!sel) return;
-    // Afficher uniquement le bouton TOUS (pas de liste de noms)
-    sel.innerHTML = '<button onclick="chargerTousLesFrais()" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:700;">📋 TOUS LES MEMBRES</button>';
-  }
-
-  async function soumettreFrais() {
-    var type = document.getElementById('frais-type').value;
-    var date = document.getElementById('frais-date').value;
-    var montant = document.getElementById('frais-montant').value;
-    var km = document.getElementById('frais-km').value;
-    var desc = document.getElementById('frais-description').value;
-    var fichier = document.getElementById('frais-fichier').files[0];
-    if (!type || !date) { alert('Merci de remplir le type et la date.'); return; }
-    var prog = document.getElementById('frais-upload-progress');
-    prog.textContent = 'Envoi en cours...';
-    var justificatif_url = null;
-    if (fichier) {
-      var ext = fichier.name.split('.').pop();
-      var path = (_currentUserEmail||'user').replace('@','_').replace('.','_') + '/' + Date.now() + '.' + ext;
-      var upRes = await _supabase.storage.from('justificatifs').upload(path, fichier);
-      if (upRes.error) { prog.textContent = 'Erreur upload : ' + upRes.error.message; return; }
-      var urlRes = _supabase.storage.from('justificatifs').getPublicUrl(path);
-      justificatif_url = urlRes.data ? urlRes.data.publicUrl : null;
-    }
-    var insRes = await _supabase.from('notes_frais').insert({
-      user_email: _currentUserEmail, user_nom: _currentUserNom,
-      type_frais: type, date_depense: date,
-      montant: parseFloat(montant)||0, km: parseInt(km)||0,
-      description: desc, justificatif_url: justificatif_url
-    });
-    if (insRes.error) { prog.textContent = 'Erreur : ' + insRes.error.message; return; }
-    prog.textContent = '';
-    document.getElementById('frais-type').value = '';
-    document.getElementById('frais-date').value = '';
-    document.getElementById('frais-montant').value = '';
-    document.getElementById('frais-km').value = '';
-    document.getElementById('frais-description').value = '';
-    document.getElementById('frais-fichier').value = '';
-    closeModal('modal-add-frais');
-    if (_currentUserRole === 'admin') chargerTousLesFrais();
-    else chargerFrais('me');
-  }
+  // Fonctions legacy (redirigent vers le nouveau système)
+  function ouvrirAccesFrais() { ouvrirFrais(); }
+  function ouvrirFraisPerso() { ouvrirFrais(); }
+  function ouvrirFraisOMP() { ouvrirFrais(); }
 </script>
 
   </div>
@@ -15365,16 +15157,16 @@ function _hideTeamSelection() {
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden;">
           <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;color:#fff;border-bottom:1px solid #2a2a2a;">
             <span style="font-size:22px;">💰</span>
-            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">ACCÈS FRAIS</div><div style="font-size:11px;color:#555;">Notes de frais & justificatifs</div></div>
+            <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">NOTES DE FRAIS</div><div style="font-size:11px;color:#555;">Gestion des justificatifs</div></div>
           </div>
-          <div onclick="closeModal('modal-admin-alexandrine'); ouvrirFraisPerso();" style="display:flex;align-items:center;gap:10px;padding:10px 16px 10px 52px;cursor:pointer;color:#fff;border-bottom:1px solid #222;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-            <span style="font-size:16px;">💳</span>
-            <div style="font-size:13px;">Frais CB PERSO</div>
+          <div onclick="closeModal('modal-admin-alexandrine'); ouvrirFrais();" style="display:flex;align-items:center;gap:10px;padding:10px 16px 10px 52px;cursor:pointer;color:#fff;border-bottom:1px solid #222;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
+            <span style="font-size:16px;">📤</span>
+            <div style="font-size:13px;">Dépôt Justificatif</div>
             <span style="margin-left:auto;color:#555;font-size:14px;">→</span>
           </div>
-          <div onclick="closeModal('modal-admin-alexandrine'); ouvrirFraisOMP();" style="display:flex;align-items:center;gap:10px;padding:10px 16px 10px 52px;cursor:pointer;color:#fff;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-            <span style="font-size:16px;">🏢</span>
-            <div style="font-size:13px;">Frais CB OMP</div>
+          <div onclick="closeModal('modal-admin-alexandrine'); ouvrirRecapFrais();" style="display:flex;align-items:center;gap:10px;padding:10px 16px 10px 52px;cursor:pointer;color:#fff;" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
+            <span style="font-size:16px;">📊</span>
+            <div style="font-size:13px;">Récap Admin (Validation)</div>
             <span style="margin-left:auto;color:#555;font-size:14px;">→</span>
           </div>
         </div>
