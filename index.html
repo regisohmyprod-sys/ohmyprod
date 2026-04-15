@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.14.09">
+<meta name="version" content="2026.04.14.10">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4451,11 +4451,6 @@ function _hideTeamSelection() {
         <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Nom Staff</label>
         <select id="filtre-perso-staff" onchange="appliquerFiltresPerso()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
           <option value="">-- Tous --</option>
-          <option value="Sarah Prost">Sarah Prost</option>
-          <option value="Jérôme Fillella">Jérôme Fillella</option>
-          <option value="Régis BP">Régis BP</option>
-          <option value="Alex MH">Alex MH</option>
-          <option value="Autre">Autre</option>
         </select>
       </div>
       <div style="flex:1;min-width:130px;">
@@ -4508,11 +4503,6 @@ function _hideTeamSelection() {
         <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Nom Staff</label>
         <select id="filtre-omp-staff" onchange="appliquerFiltresOMP()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
           <option value="">-- Tous --</option>
-          <option value="Sarah Prost">Sarah Prost</option>
-          <option value="Jérôme Fillella">Jérôme Fillella</option>
-          <option value="Régis BP">Régis BP</option>
-          <option value="Alex MH">Alex MH</option>
-          <option value="Autre">Autre</option>
         </select>
       </div>
       <div style="flex:1;min-width:130px;">
@@ -4630,12 +4620,7 @@ function _hideTeamSelection() {
       <div>
         <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Nom Staff</label>
         <select id="frais-perso-staff" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
-          <option value="">-- Choisir --</option>
-          <option value="Sarah Prost">Sarah Prost</option>
-          <option value="Jérôme Fillella">Jérôme Fillella</option>
-          <option value="Régis BP">Régis BP</option>
-          <option value="Alex MH">Alex MH</option>
-          <option value="Autre">Autre</option>
+          <option value="">-- Chargement... --</option>
         </select>
       </div>
       <div>
@@ -4686,12 +4671,7 @@ function _hideTeamSelection() {
       <div>
         <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Nom Staff</label>
         <select id="frais-omp-staff" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;">
-          <option value="">-- Choisir --</option>
-          <option value="Sarah Prost">Sarah Prost</option>
-          <option value="Jérôme Fillella">Jérôme Fillella</option>
-          <option value="Régis BP">Régis BP</option>
-          <option value="Alex MH">Alex MH</option>
-          <option value="Autre">Autre</option>
+          <option value="">-- Chargement... --</option>
         </select>
       </div>
       <div>
@@ -4735,10 +4715,41 @@ function _hideTeamSelection() {
   function ouvrirAccesFrais() { showPage('acces-frais'); }
   
   // Nouvelles fonctions pour les 2 types de frais
+  // Variable pour stocker la liste des membres
+  var _listeMembres = [];
+
+  // Charger la liste des membres depuis Supabase
+  async function chargerListeMembres() {
+    try {
+      var res = await _supabase.from('membres').select('prenom, nom').order('nom', {ascending: true});
+      if (res.error) throw res.error;
+      _listeMembres = (res.data || []).map(function(m) {
+        return (m.prenom || '') + ' ' + (m.nom || '');
+      }).filter(function(n) { return n.trim(); });
+      // Trier par ordre alphabétique
+      _listeMembres.sort(function(a, b) { return a.localeCompare(b, 'fr'); });
+    } catch(e) { console.error('Erreur chargement membres:', e); }
+  }
+
+  // Remplir un select avec la liste des membres
+  function remplirSelectMembres(selectId, avecTous) {
+    var sel = document.getElementById(selectId);
+    if (!sel) return;
+    var html = avecTous ? '<option value="">-- Tous --</option>' : '<option value="">-- Choisir --</option>';
+    _listeMembres.forEach(function(nom) {
+      html += '<option value="' + nom + '">' + nom + '</option>';
+    });
+    sel.innerHTML = html;
+  }
+
   function ouvrirFraisPerso() { 
     showPage('frais-perso'); 
+    // Charger membres puis remplir les selects
+    chargerListeMembres().then(function() {
+      remplirSelectMembres('frais-perso-staff', false);
+      remplirSelectMembres('filtre-perso-staff', true);
+    });
     // Reset les filtres
-    document.getElementById('filtre-perso-staff').value = '';
     document.getElementById('filtre-perso-date-debut').value = '';
     document.getElementById('filtre-perso-date-fin').value = '';
     // Afficher vue admin
@@ -4755,8 +4766,12 @@ function _hideTeamSelection() {
   }
   function ouvrirFraisOMP() { 
     showPage('frais-omp'); 
+    // Charger membres puis remplir les selects
+    chargerListeMembres().then(function() {
+      remplirSelectMembres('frais-omp-staff', false);
+      remplirSelectMembres('filtre-omp-staff', true);
+    });
     // Reset les filtres
-    document.getElementById('filtre-omp-staff').value = '';
     document.getElementById('filtre-omp-date-debut').value = '';
     document.getElementById('filtre-omp-date-fin').value = '';
     // Afficher vue admin
