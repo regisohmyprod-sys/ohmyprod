@@ -9972,8 +9972,9 @@ function _hideTeamSelection() {
     var totalDepenses = window._bilanTotalDepenses || 0;
     var dlTTC = window._bilanDlTTC || 0;
     var dlHT = dlTTC / 1.021;
-    var dealCoprod = window._bilanDealCoprod || 0;
-    var droitsOMP = dlHT * 0.5;
+    var dealBilletterie = window._bilanDealBilletterie || '100%';
+    var dealPctOMP = window._bilanDealPctOMP || 1;
+    var droitsOMP = dlHT * dealPctOMP;
     var droitTirage = montantCNM * 0.60;
     
     document.getElementById('bilan-res-recette-ttc').textContent = fmt(recTTC);
@@ -9982,7 +9983,7 @@ function _hideTeamSelection() {
     document.getElementById('bilan-res-depenses').textContent = fmt(totalDepenses);
     document.getElementById('bilan-res-dl-ttc').textContent = fmt(dlTTC);
     document.getElementById('bilan-res-dl-ht').textContent = fmt(dlHT);
-    document.getElementById('bilan-res-deal-coprod').textContent = fmt(dealCoprod);
+    document.getElementById('bilan-res-deal-coprod').textContent = dealBilletterie;
     document.getElementById('bilan-res-droits-omp').textContent = fmt(droitsOMP);
     document.getElementById('bilan-res-droit-tirage').textContent = fmt(droitTirage);
     
@@ -10025,9 +10026,9 @@ function _hideTeamSelection() {
               var t = parseFloat(row.tarif) || 0;
               gBillets += b;
               recTotal += b * t;
-              // DL TTC depuis fiche billetterie (colonne DL Prod TTC)
+              // DL TTC depuis fiche billetterie (billets × DL Prod unitaire)
               var dlProd = parseFloat(row.dlProd) || 0;
-              dlTTC += dlProd;
+              dlTTC += b * dlProd;
             }
           }
         }
@@ -10056,6 +10057,16 @@ function _hideTeamSelection() {
     window._bilanRecTTC = recTotal;
     window._bilanMontantCNM = montantCNM;
     window._bilanDlTTC = dlTTC;
+    
+    // Récupérer DEAL BILLETTERIE depuis la fiche (ou depuis le champ directement)
+    var dealBilletterie = document.getElementById('fp-deal-billetterie')?.value || '100%';
+    // Convertir en pourcentage OMP : "50/50" → 0.5, "80/20" → 0.8, "100%" → 1
+    var dealPctOMP = 1;
+    if (dealBilletterie === '50/50') dealPctOMP = 0.5;
+    else if (dealBilletterie === '80/20') dealPctOMP = 0.8;
+    else if (dealBilletterie === '100%') dealPctOMP = 1;
+    window._bilanDealBilletterie = dealBilletterie;
+    window._bilanDealPctOMP = dealPctOMP;
 
     setEl('bilan-rec-ttc', recTotal > 0 ? fmt(recTotal) : '');
     setEl('bilan-tva', tva > 0 ? fmt(tva) : '');
