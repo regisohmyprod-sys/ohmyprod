@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.15.12">
+<meta name="version" content="2026.04.15.13">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4223,10 +4223,10 @@ function _hideTeamSelection() {
         </div>
 
         <!-- Accès Frais -->
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-add-frais')">
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="ouvrirFrais()">
           <div class="stat-label">💰 Accès Frais</div>
           <div class="stat-value" style="font-size:24px;color:#c9a84c;">FRAIS</div>
-          <div class="stat-sub">Ajouter une note</div>
+          <div class="stat-sub">Dépôt justificatif</div>
         </div>
 
         <!-- Liens Pratiques -->
@@ -4456,8 +4456,8 @@ function _hideTeamSelection() {
       <div style="margin-bottom:16px;">
         <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px;">Type de carte bancaire *</label>
         <div style="display:flex;gap:10px;">
-          <button type="button" id="btn-cb-perso" onclick="selectTypeCB('PERSO')" style="flex:1;background:#0a0a0a;border:2px solid #333;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;cursor:pointer;transition:all 0.2s;">💳 CB PERSO</button>
-          <button type="button" id="btn-cb-omp" onclick="selectTypeCB('OMP')" style="flex:1;background:#0a0a0a;border:2px solid #333;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;cursor:pointer;transition:all 0.2s;">🏢 CB OMP</button>
+          <button type="button" id="btn-cb-perso" onclick="selectTypeCB('PERSO')" style="flex:1;background:#1e3a5f;border:2px solid #3b82f6;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;cursor:pointer;transition:all 0.2s;">💳 CB PERSO</button>
+          <button type="button" id="btn-cb-omp" onclick="selectTypeCB('OMP')" style="flex:1;background:#2d2510;border:2px solid #c9a84c;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;cursor:pointer;transition:all 0.2s;">🏢 CB OMP</button>
         </div>
         <input type="hidden" id="frais-type-cb" value="">
       </div>
@@ -4535,15 +4535,7 @@ function _hideTeamSelection() {
   </div>
 
   <!-- STATS RAPIDES -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-    <div style="background:#1a1a1a;border-left:3px solid #f59e0b;border-radius:8px;padding:16px;">
-      <div style="font-size:11px;color:#888;text-transform:uppercase;">À valider</div>
-      <div id="stat-frais-avalider" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#f59e0b;">0</div>
-    </div>
-    <div style="background:#1a1a1a;border-left:3px solid #22c55e;border-radius:8px;padding:16px;">
-      <div style="font-size:11px;color:#888;text-transform:uppercase;">Validés</div>
-      <div id="stat-frais-valides" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#22c55e;">0</div>
-    </div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;">
     <div style="background:#1a1a1a;border-left:3px solid #3b82f6;border-radius:8px;padding:16px;">
       <div style="font-size:11px;color:#888;text-transform:uppercase;">Total CB PERSO</div>
       <div id="stat-frais-perso" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#3b82f6;">0 €</div>
@@ -4573,15 +4565,6 @@ function _hideTeamSelection() {
         </select>
       </div>
       <div style="flex:1;min-width:120px;">
-        <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Statut</label>
-        <select id="filtre-recap-statut" onchange="appliquerFiltresRecap()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;">
-          <option value="">-- Tous --</option>
-          <option value="à valider">À valider</option>
-          <option value="validé">Validé</option>
-          <option value="refusé">Refusé</option>
-        </select>
-      </div>
-      <div style="flex:1;min-width:120px;">
         <label style="font-size:10px;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Date début</label>
         <input type="date" id="filtre-recap-date-debut" onchange="appliquerFiltresRecap()" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:12px;box-sizing:border-box;">
       </div>
@@ -4592,6 +4575,7 @@ function _hideTeamSelection() {
       <div style="display:flex;gap:8px;">
         <button onclick="resetFiltresRecap()" style="background:#333;color:#888;border:none;border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer;">✕ Reset</button>
         <button onclick="imprimerRecapFrais()" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 14px;font-size:11px;cursor:pointer;font-weight:600;">🖨️ IMPRIMER</button>
+        <button onclick="ouvrirBucketJustificatifs()" style="background:#2d2510;color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:8px 14px;font-size:11px;cursor:pointer;font-weight:600;">📁 FICHIERS</button>
       </div>
     </div>
   </div>
@@ -4608,12 +4592,10 @@ function _hideTeamSelection() {
           <th style="padding:12px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Description</th>
           <th style="padding:12px 10px;text-align:right;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Montant</th>
           <th style="padding:12px 10px;text-align:center;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Justif</th>
-          <th style="padding:12px 10px;text-align:center;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Statut</th>
-          <th style="padding:12px 10px;text-align:center;font-size:11px;color:#888;text-transform:uppercase;border-bottom:1px solid #2a2a2a;">Actions</th>
         </tr>
       </thead>
       <tbody id="recap-frais-tbody">
-        <tr><td colspan="9" style="padding:30px;text-align:center;color:#666;">Chargement...</td></tr>
+        <tr><td colspan="7" style="padding:30px;text-align:center;color:#666;">Chargement...</td></tr>
       </tbody>
     </table>
   </div>
@@ -4879,13 +4861,9 @@ function _hideTeamSelection() {
 
   // Mettre à jour les stats
   function majStatsRecap() {
-    var aValider = _fraisDataAll.filter(function(f) { return f.statut === 'à valider'; }).length;
-    var valides = _fraisDataAll.filter(function(f) { return f.statut === 'validé'; }).length;
-    var totalPerso = _fraisDataAll.filter(function(f) { return f.mode_paiement === 'PERSO' && f.statut !== 'refusé'; }).reduce(function(s,f) { return s + (parseFloat(f.montant)||0); }, 0);
-    var totalOMP = _fraisDataAll.filter(function(f) { return f.mode_paiement === 'OMP' && f.statut !== 'refusé'; }).reduce(function(s,f) { return s + (parseFloat(f.montant)||0); }, 0);
+    var totalPerso = _fraisDataAll.filter(function(f) { return f.mode_paiement === 'PERSO'; }).reduce(function(s,f) { return s + (parseFloat(f.montant)||0); }, 0);
+    var totalOMP = _fraisDataAll.filter(function(f) { return f.mode_paiement === 'OMP'; }).reduce(function(s,f) { return s + (parseFloat(f.montant)||0); }, 0);
     
-    document.getElementById('stat-frais-avalider').textContent = aValider;
-    document.getElementById('stat-frais-valides').textContent = valides;
     document.getElementById('stat-frais-perso').textContent = totalPerso.toFixed(2) + ' €';
     document.getElementById('stat-frais-omp').textContent = totalOMP.toFixed(2) + ' €';
   }
@@ -4894,14 +4872,12 @@ function _hideTeamSelection() {
   function appliquerFiltresRecap() {
     var membreFilter = document.getElementById('filtre-recap-membre').value;
     var typeCBFilter = document.getElementById('filtre-recap-typecb').value;
-    var statutFilter = document.getElementById('filtre-recap-statut').value;
     var dateDebut = document.getElementById('filtre-recap-date-debut').value;
     var dateFin = document.getElementById('filtre-recap-date-fin').value;
     
     var filtered = _fraisDataAll.filter(function(f) {
       if (membreFilter && f.user_nom !== membreFilter) return false;
       if (typeCBFilter && f.mode_paiement !== typeCBFilter) return false;
-      if (statutFilter && f.statut !== statutFilter) return false;
       if (dateDebut && f.date_depense < dateDebut) return false;
       if (dateFin && f.date_depense > dateFin) return false;
       return true;
@@ -4916,21 +4892,19 @@ function _hideTeamSelection() {
     if (!tbody) return;
     
     if (!data || !data.length) {
-      tbody.innerHTML = '<tr><td colspan="9" style="padding:30px;text-align:center;color:#666;">Aucune note de frais.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="padding:30px;text-align:center;color:#666;">Aucune note de frais.</td></tr>';
       document.getElementById('recap-frais-total').textContent = '0.00 €';
       return;
     }
     
     var typeLabels = {transport:'Transport',hebergement:'Hébergement',repas:'Repas',peage:'Péage/Parking',materiel:'Matériel',autre:'Autre'};
-    var statutColors = {'à valider':'#f59e0b','validé':'#22c55e','refusé':'#e31e24'};
     var total = 0;
     
     var html = '';
     data.forEach(function(f) {
       var dt = f.date_depense ? new Date(f.date_depense).toLocaleDateString('fr-FR') : '';
       var montant = parseFloat(f.montant) || 0;
-      if (f.statut !== 'refusé') total += montant;
-      var statutColor = statutColors[f.statut] || '#888';
+      total += montant;
       var cbColor = f.mode_paiement === 'PERSO' ? '#3b82f6' : '#c9a84c';
       
       html += '<tr style="border-bottom:1px solid #222;">';
@@ -4947,17 +4921,6 @@ function _hideTeamSelection() {
         html += '<span style="color:#555;font-size:10px;">—</span>';
       }
       html += '</td>';
-      html += '<td style="padding:10px;text-align:center;">';
-      html += '<span style="background:' + statutColor + '22;color:' + statutColor + ';padding:3px 8px;border-radius:4px;font-size:10px;text-transform:uppercase;font-weight:600;">' + (f.statut || 'à valider') + '</span>';
-      html += '</td>';
-      html += '<td style="padding:10px;text-align:center;">';
-      if (f.statut === 'à valider') {
-        html += '<button onclick="validerFrais(\'' + f.id + '\')" style="background:#22c55e;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;margin-right:4px;">✓</button>';
-        html += '<button onclick="refuserFrais(\'' + f.id + '\')" style="background:#7f1d1d;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;">✗</button>';
-      } else {
-        html += '<button onclick="supprimerFraisAdmin(\'' + f.id + '\')" style="background:#333;color:#888;border:none;border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;">🗑️</button>';
-      }
-      html += '</td>';
       html += '</tr>';
     });
     
@@ -4965,37 +4928,17 @@ function _hideTeamSelection() {
     document.getElementById('recap-frais-total').textContent = total.toFixed(2) + ' €';
   }
 
-  // Valider une note de frais
-  async function validerFrais(id) {
-    try {
-      await _supabase.from('notes_frais').update({ statut: 'validé', valide_par: _currentUserNom }).eq('id', id);
-      chargerRecapFrais();
-    } catch(e) { alert('Erreur: ' + e.message); }
-  }
-
-  // Refuser une note de frais
-  async function refuserFrais(id) {
-    if (!confirm('Refuser cette note de frais ?')) return;
-    try {
-      await _supabase.from('notes_frais').update({ statut: 'refusé', valide_par: _currentUserNom }).eq('id', id);
-      chargerRecapFrais();
-    } catch(e) { alert('Erreur: ' + e.message); }
-  }
-
-  // Supprimer une note de frais (admin)
-  async function supprimerFraisAdmin(id) {
-    if (!confirm('Supprimer définitivement cette note de frais ?')) return;
-    try {
-      await _supabase.from('notes_frais').delete().eq('id', id);
-      chargerRecapFrais();
-    } catch(e) { alert('Erreur: ' + e.message); }
+  // Ouvrir le bucket Supabase des justificatifs (accès direct aux fichiers)
+  function ouvrirBucketJustificatifs() {
+    // URL du dashboard Supabase Storage pour le bucket justificatifs
+    var bucketUrl = 'https://supabase.com/dashboard/project/nhxqcavianozskxgfcbt/storage/buckets/justificatifs';
+    window.open(bucketUrl, '_blank');
   }
 
   // Reset filtres récap
   function resetFiltresRecap() {
     document.getElementById('filtre-recap-membre').value = '';
     document.getElementById('filtre-recap-typecb').value = '';
-    document.getElementById('filtre-recap-statut').value = '';
     document.getElementById('filtre-recap-date-debut').value = '';
     document.getElementById('filtre-recap-date-fin').value = '';
     appliquerFiltresRecap();
@@ -5005,14 +4948,12 @@ function _hideTeamSelection() {
   function exporterFraisCSV() {
     var membreFilter = document.getElementById('filtre-recap-membre').value;
     var typeCBFilter = document.getElementById('filtre-recap-typecb').value;
-    var statutFilter = document.getElementById('filtre-recap-statut').value;
     var dateDebut = document.getElementById('filtre-recap-date-debut').value;
     var dateFin = document.getElementById('filtre-recap-date-fin').value;
     
     var filtered = _fraisDataAll.filter(function(f) {
       if (membreFilter && f.user_nom !== membreFilter) return false;
       if (typeCBFilter && f.mode_paiement !== typeCBFilter) return false;
-      if (statutFilter && f.statut !== statutFilter) return false;
       if (dateDebut && f.date_depense < dateDebut) return false;
       if (dateFin && f.date_depense > dateFin) return false;
       return true;
