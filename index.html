@@ -1907,7 +1907,7 @@
     @OMPdesign — RÉSERVÉ
     <div style="margin-top:8px;">
       <button onclick="superHardRefresh()" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:rgba(255,255,255,0.4);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;font-family:'Trebuchet MS',sans-serif;" onmouseover="this.style.borderColor='#e31e24';this.style.color='#e31e24';" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.4)';">🔄 HARD REFRESH</button>
-      <button onclick="backupToDrive()" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:rgba(255,255,255,0.4);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;font-family:'Trebuchet MS',sans-serif;margin-left:6px;" onmouseover="this.style.borderColor='#22c55e';this.style.color='#22c55e';" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.4)';">💾 BACKUP DRIVE</button>
+      <button onclick="backupLocal()" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:rgba(255,255,255,0.4);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;font-family:'Trebuchet MS',sans-serif;margin-left:6px;" onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c';" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.4)';">💾 BACKUP LOCAL</button>
     </div>
   </div>
 </div>
@@ -12947,6 +12947,29 @@ function _hideTeamSelection() {
       alert('Erreur pendant le nettoyage. Rechargement forcé...');
       window.location.reload(true);
     }
+  }
+
+  // BACKUP LOCAL - Télécharge le fichier HTML sur le PC
+  function backupLocal() {
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, 'h').slice(0,5);
+    const filename = `OMP_BACKUP_${dateStr}_${timeStr}.html`;
+
+    // Récupérer le HTML complet de la page
+    const htmlContent = document.documentElement.outerHTML;
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    
+    // Créer un lien de téléchargement
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    
+    alert('✅ Backup téléchargé : ' + filename);
   }
 
   // BACKUP TO GOOGLE DRIVE - Upload automatique via OAuth
