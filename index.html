@@ -3529,7 +3529,7 @@ function _hideTeamSelection() {
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
           <tbody>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;width:50%;">SALAIRES</td><td id="bilan-salaires" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Choix sur jauge</td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">TECHNIQUE</td><td id="bilan-technique" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Coulisses + mag scene camion</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">TECHNIQUE</td><td id="bilan-technique" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Coulisses + Camion + Conso</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">COUT PLATEAU TOTAL</td><td id="bilan-cout-plateau" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">ROADS</td><td id="bilan-roads" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">RIGGS</td><td id="bilan-riggs" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
@@ -10154,8 +10154,8 @@ function _hideTeamSelection() {
         }
         setEl('bilan-salaires', fmt(salaires));
         
-        // TECHNIQUE (Coulisses + mag scene camion)
-        var technique = g('fin-omp-tech-coulisses')+g('fin-omp-tech-conso');
+        // TECHNIQUE (Coulisses + Camion supp + Consommables)
+        var technique = g('fin-omp-tech-coulisses')+g('fin-omp-tech-autres')+g('fin-omp-tech-conso');
         setEl('bilan-technique', technique > 0 ? fmt(technique) : '');
         
         // COUT PLATEAU TOTAL
