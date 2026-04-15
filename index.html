@@ -2210,14 +2210,15 @@ function _hideTeamSelection() {
 
     <div class="login-field">
       <label>Email</label>
-      <input type="email" id="login-email" placeholder="votre@email.com" />
+      <input type="email" id="login-email" placeholder="votre@email.com" list="login-emails-list" autocomplete="off" />
+      <datalist id="login-emails-list"></datalist>
     </div>
     <div class="login-field">
       <label>Code d'accès</label>
       <input type="password" id="login-password" placeholder="Code fourni par OMP" />
     </div>
     <div style="display:flex; align-items:center; gap:8px; margin:8px 0 4px; text-align:left;">
-      <input type="checkbox" id="login-remember" style="accent-color:#e31e24; width:15px; height:15px;" />
+      <input type="checkbox" id="login-remember" checked style="accent-color:#e31e24; width:15px; height:15px;" />
       <label for="login-remember" style="font-size:12px; color:#888; cursor:pointer;">Se souvenir de moi</label>
     </div>
     <button class="login-btn" onclick="doLogin()">SE CONNECTER</button>
@@ -3531,16 +3532,16 @@ function _hideTeamSelection() {
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">COUT PLATEAU TOTAL</td><td id="bilan-cout-plateau" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">ROADS</td><td id="bilan-roads" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">RIGGS</td><td id="bilan-riggs" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DIVERS</td><td id="bilan-divers" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DIVERS</td><td style="padding:8px 16px;text-align:right;"><input type="number" id="bilan-divers-input" value="0" step="0.01" oninput="bilanCalcDepenses()" style="width:100px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;color:#fff;padding:4px 8px;font-size:12px;text-align:right;font-family:Inter,sans-serif;"> €</td><td style="padding:8px 12px;color:#555;font-size:11px;">saisie manuelle</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">TOTAL EXTERNE</td><td id="bilan-total-externe" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">PROMO</td><td id="bilan-promo" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">VOYAGES + FRAIS</td><td id="bilan-voyages" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">HOTEL</td><td id="bilan-hotel" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">REPAS / REST</td><td id="bilan-repas" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">AUTRES</td><td id="bilan-autres" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">AUTRES</td><td style="padding:8px 16px;text-align:right;"><input type="number" id="bilan-autres-input" value="0" step="0.01" oninput="bilanCalcDepenses()" style="width:100px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;color:#fff;padding:4px 8px;font-size:12px;text-align:right;font-family:Inter,sans-serif;"> €</td><td style="padding:8px 12px;color:#555;font-size:11px;">saisie manuelle</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">TOTAL VHR</td><td id="bilan-total-vhr" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">SALLE GLOBALE</td><td id="bilan-salle" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">CO-PROD FRAIS</td><td style="padding:8px 16px;text-align:right;"><input type="number" id="bilan-coprod-frais-input" value="0" step="0.01" oninput="bilanCalcDepenses()" style="width:100px;background:#0a0a0a;border:1px solid #22c55e;border-radius:4px;color:#22c55e;padding:4px 8px;font-size:12px;text-align:right;font-family:Inter,sans-serif;font-weight:700;"> €</td><td style="padding:8px 12px;color:#555;font-size:11px;">saisie manuelle</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">CO-PROD FRAIS</td><td id="bilan-coprod-frais" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Salle PL + Autres PL</td></tr>
             <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#22c55e;">TOTAL DEPENSES</td><td id="bilan-total-depenses" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;font-weight:700;"></td><td></td></tr>
           </tbody>
         </table>
@@ -9926,12 +9927,32 @@ function _hideTeamSelection() {
   }
 
   function bilanCalcDepenses() {
-    // Recalcul TOTAL DEPENSES quand on modifie "CO-PROD FRAIS"
-    var coprodFrais = parseFloat(document.getElementById('bilan-coprod-frais-input')?.value) || 0;
+    // Recalcul TOTAL DEPENSES quand on modifie DIVERS ou AUTRES
+    var divers = parseFloat(document.getElementById('bilan-divers-input')?.value) || 0;
+    var autres = parseFloat(document.getElementById('bilan-autres-input')?.value) || 0;
     var baseDepenses = window._bilanBaseDepenses || 0;
     var fmt = function(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
     
-    var totalDepenses = baseDepenses + coprodFrais;
+    // Recalculer TOTAL EXTERNE avec le nouveau DIVERS
+    var roads = window._bilanRoads || 0;
+    var riggs = window._bilanRiggs || 0;
+    var totalExterne = roads + riggs + divers;
+    document.getElementById('bilan-total-externe').textContent = fmt(totalExterne);
+    
+    // Recalculer TOTAL VHR avec le nouveau AUTRES
+    var voyages = window._bilanVoyages || 0;
+    var hotel = window._bilanHotel || 0;
+    var repas = window._bilanRepas || 0;
+    var totalVHR = voyages + hotel + repas + autres;
+    document.getElementById('bilan-total-vhr').textContent = fmt(totalVHR);
+    
+    // Recalculer TOTAL DEPENSES
+    var coutPlateau = window._bilanCoutPlateau || 0;
+    var promo = window._bilanPromo || 0;
+    var salleGlobale = window._bilanSalleGlobale || 0;
+    var coprodFrais = window._bilanCoprodFrais || 0;
+    
+    var totalDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais;
     document.getElementById('bilan-total-depenses').textContent = fmt(totalDepenses);
     
     // Stocker pour calcul RESULTAT OMP
@@ -10087,17 +10108,38 @@ function _hideTeamSelection() {
     } catch(e) { console.log('Bilan AMH deal coprod erreur:', e); }
     window._bilanDealCoprod = dealCoprod;
 
-    // Frais depuis financier_data
+    // Frais depuis financier_data (ou fallback depuis les inputs si on vient de la fiche)
     var totalDepenses = 0;
     try {
       var fr = await _supabase.from('fiches_production').select('financier_data').eq('date_concert_id', _fpDateId).single();
+      var fd = {};
       if (fr.data && fr.data.financier_data) {
-        var fd = JSON.parse(fr.data.financier_data);
-        var g = function(k){ return parseFloat(fd[k])||0; };
+        fd = JSON.parse(fr.data.financier_data);
+      }
+      // Fonction g : récupère depuis financier_data OU depuis l'input directement (fallback)
+      var g = function(k){ 
+        var val = parseFloat(fd[k]);
+        if (!val || val === 0) {
+          var el = document.getElementById(k);
+          if (el) val = parseFloat(el.value) || 0;
+        }
+        return val || 0;
+      };
 
-        // SALAIRES
-        var salaires = g('fin-omp-sal-tournee')+g('fin-omp-sal-road')+g('fin-omp-sal-promo');
-        setEl('bilan-salaires', salaires > 0 ? fmt(salaires) : '');
+        // SALAIRES basés sur la jauge (billets vendus = gBillets)
+        var salaires = 0;
+        if (gBillets < 1500) {
+          salaires = 9300;
+        } else if (gBillets < 2000) {
+          salaires = 9680;
+        } else if (gBillets < 2500) {
+          salaires = 10250;
+        } else if (gBillets < 3000) {
+          salaires = 12000;
+        } else {
+          salaires = 13500;
+        }
+        setEl('bilan-salaires', fmt(salaires));
         
         // TECHNIQUE (Coulisses + mag scene camion)
         var technique = g('fin-omp-tech-coulisses')+g('fin-omp-tech-conso');
@@ -10106,18 +10148,20 @@ function _hideTeamSelection() {
         // COUT PLATEAU TOTAL
         var coutPlateau = salaires + technique;
         setEl('bilan-cout-plateau', coutPlateau > 0 ? fmt(coutPlateau) : '');
+        window._bilanCoutPlateau = coutPlateau;
 
-        // ROADS
-        var roads = g('fin-omp-tech-road');
+        // ROADS = Salaires road + chariste
+        var roads = g('fin-omp-sal-road');
         setEl('bilan-roads', roads > 0 ? fmt(roads) : '');
+        window._bilanRoads = roads;
 
         // RIGGS
         var riggs = g('fin-omp-tech-figer');
         setEl('bilan-riggs', riggs > 0 ? fmt(riggs) : '');
+        window._bilanRiggs = riggs;
 
-        // DIVERS (camion supp + contrôleur + autres tech)
-        var divers = g('fin-omp-tech-autres')+g('fin-omp-tech-controleur');
-        setEl('bilan-divers', divers > 0 ? fmt(divers) : '');
+        // DIVERS (saisie manuelle)
+        var divers = parseFloat(document.getElementById('bilan-divers-input')?.value) || 0;
 
         // TOTAL EXTERNE = ROADS + RIGGS + DIVERS
         var totalExterne = roads + riggs + divers;
@@ -10126,47 +10170,57 @@ function _hideTeamSelection() {
         // PROMO (en vert)
         var promo = g('fin-omp-promo-meta')+g('fin-omp-promo-autres1')+g('fin-omp-promo-autres2');
         setEl('bilan-promo', promo > 0 ? fmt(promo) : '');
+        window._bilanPromo = promo;
 
-        // VOYAGES + FRAIS
-        var voyages = g('fin-omp-voy-prod')+g('fin-omp-voy-artiste')+g('fin-omp-voy-tech')+g('fin-omp-voy-vhr');
+        // VOYAGES + FRAIS = Total voyages tour + Total frais supp VHR
+        var voyages = g('fin-omp-voy-prod')+g('fin-omp-voy-artiste')+g('fin-omp-voy-tech')+g('fin-omp-voy-vhr')+g('fin-omp-vhr-pkart')+g('fin-omp-vhr-pktech')+g('fin-omp-vhr-taxiart')+g('fin-omp-vhr-taxitech')+g('fin-omp-vhr-total2');
         setEl('bilan-voyages', voyages > 0 ? fmt(voyages) : '');
+        window._bilanVoyages = voyages;
 
         // HOTEL
         var hotel = g('fin-omp-hotel-prod')+g('fin-omp-hotel-tech')+g('fin-omp-hotel-art')+g('fin-omp-hotel-estim');
         setEl('bilan-hotel', hotel > 0 ? fmt(hotel) : '');
+        window._bilanHotel = hotel;
 
-        // REPAS / REST
+        // REPAS / REST = Total traiteurs/restauration
         var repas = g('fin-omp-trai-total')+g('fin-omp-trai-resto')+g('fin-omp-trai-loge');
         setEl('bilan-repas', repas > 0 ? fmt(repas) : '');
+        window._bilanRepas = repas;
 
-        // AUTRES (laisser vide pour l'instant)
-        var autres = 0;
-        setEl('bilan-autres', autres > 0 ? fmt(autres) : '');
+        // AUTRES (saisie manuelle)
+        var autres = parseFloat(document.getElementById('bilan-autres-input')?.value) || 0;
 
         // TOTAL VHR = VOYAGES + HOTEL + REPAS + AUTRES
         var totalVHR = voyages + hotel + repas + autres;
         setEl('bilan-total-vhr', totalVHR > 0 ? fmt(totalVHR) : '');
 
-        // SALLE GLOBALE (en vert)
-        var salleLoc = Math.max(g('fin-omp-loc-ht'), g('fin-omp-loc-mg'));
-        var sallePrest = g('fin-omp-prest-energie')+g('fin-omp-prest-chauf')+g('fin-omp-prest-config')+g('fin-omp-prest-fenwick')+g('fin-omp-prest-accroches')+g('fin-omp-prest-elec');
-        var sallePers = g('fin-omp-pers-nettoyage')+g('fin-omp-pers-nett-supp')+g('fin-omp-pers-elec')+g('fin-omp-pers-hriger')+g('fin-omp-pers-regisseur')+g('fin-omp-pers-forfait')+g('fin-omp-pers-caissier')+g('fin-omp-pers-rigg')+g('fin-omp-pers-hotesses')+g('fin-omp-pers-controle')+g('fin-omp-pers-parking')+g('fin-omp-pers-secu')+g('fin-omp-pers-vigi')+g('fin-omp-pers-consigne')+g('fin-omp-pers-gardien');
-        var salleSecu = g('fin-omp-secu-ssiap1')+g('fin-omp-secu-ssiap2')+g('fin-omp-secu-protciv')+g('fin-omp-secu-vigi2')+g('fin-omp-secu-medical')+g('fin-omp-secu-autres');
-        var salleGlobale = salleLoc + sallePrest + sallePers + salleSecu;
+        // SALLE GLOBALE = Total facture salle
+        var salleGlobale = g('fin-omp-total-salle');
+        // Fallback si pas de total : recalculer
+        if (!salleGlobale) {
+          var salleLoc = Math.max(g('fin-omp-loc-ht'), g('fin-omp-loc-mg'));
+          var sallePrest = g('fin-omp-prest-energie')+g('fin-omp-prest-chauf')+g('fin-omp-prest-config')+g('fin-omp-prest-fenwick')+g('fin-omp-prest-accroches')+g('fin-omp-prest-elec');
+          var sallePers = g('fin-omp-pers-nettoyage')+g('fin-omp-pers-nett-supp')+g('fin-omp-pers-elec')+g('fin-omp-pers-hriger')+g('fin-omp-pers-regisseur')+g('fin-omp-pers-forfait')+g('fin-omp-pers-caissier')+g('fin-omp-pers-rigg')+g('fin-omp-pers-hotesses')+g('fin-omp-pers-controle')+g('fin-omp-pers-parking')+g('fin-omp-pers-secu')+g('fin-omp-pers-vigi')+g('fin-omp-pers-consigne')+g('fin-omp-pers-gardien');
+          var salleSecu = g('fin-omp-secu-ssiap1')+g('fin-omp-secu-ssiap2')+g('fin-omp-secu-protciv')+g('fin-omp-secu-vigi2')+g('fin-omp-secu-medical')+g('fin-omp-secu-autres');
+          salleGlobale = salleLoc + sallePrest + sallePers + salleSecu;
+        }
         setEl('bilan-salle', salleGlobale > 0 ? fmt(salleGlobale) : '');
+        window._bilanSalleGlobale = salleGlobale;
 
-        // CO-PROD FRAIS (saisie manuelle)
-        var coprodFrais = parseFloat(document.getElementById('bilan-coprod-frais-input')?.value) || 0;
+        // CO-PROD FRAIS = Total facture salle PL + Total autres postes PL
+        var coprodFrais = g('fin-pl-total-salle') + g('fin-pl-total-autres');
+        setEl('bilan-coprod-frais', coprodFrais > 0 ? fmt(coprodFrais) : '');
+        window._bilanCoprodFrais = coprodFrais;
 
-        // Base dépenses (sans CO-PROD FRAIS) pour recalcul dynamique
-        var baseDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale;
+        // Base dépenses pour recalcul dynamique
+        var baseDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais;
         window._bilanBaseDepenses = baseDepenses;
 
         // TOTAL DEPENSES
-        totalDepenses = baseDepenses + coprodFrais;
+        totalDepenses = baseDepenses;
         setEl('bilan-total-depenses', totalDepenses > 0 ? fmt(totalDepenses) : '');
         window._bilanTotalDepenses = totalDepenses;
-      }
+
     } catch(e) { console.log('Bilan AMH financier erreur:', e); }
 
     // Calcul RESULTAT OMP
@@ -12351,6 +12405,18 @@ function _hideTeamSelection() {
   }
 
   function checkSession() {
+    // Charger la liste des emails historiques
+    var savedEmails = JSON.parse(localStorage.getItem('omp_emails_history') || '[]');
+    var datalist = document.getElementById('login-emails-list');
+    if (datalist && savedEmails.length > 0) {
+      datalist.innerHTML = '';
+      savedEmails.forEach(function(em) {
+        var opt = document.createElement('option');
+        opt.value = em;
+        datalist.appendChild(opt);
+      });
+    }
+    
     var savedEmail = localStorage.getItem('omp_email');
     var savedCode = localStorage.getItem('omp_code');
     if (savedEmail) {
@@ -12473,6 +12539,19 @@ function _hideTeamSelection() {
     } else {
       localStorage.removeItem('omp_email');
       localStorage.removeItem('omp_code');
+    }
+    
+    // Toujours ajouter l'email à l'historique (même sans "Se souvenir")
+    var emailsHistory = JSON.parse(localStorage.getItem('omp_emails_history') || '[]');
+    if (!emailsHistory.includes(email)) {
+      emailsHistory.unshift(email); // Ajouter en premier
+      if (emailsHistory.length > 5) emailsHistory.pop(); // Garder max 5 emails
+      localStorage.setItem('omp_emails_history', JSON.stringify(emailsHistory));
+    } else {
+      // Remonter l'email en tête de liste s'il existe déjà
+      emailsHistory = emailsHistory.filter(function(e) { return e !== email; });
+      emailsHistory.unshift(email);
+      localStorage.setItem('omp_emails_history', JSON.stringify(emailsHistory));
     }
 
     // Connexion réussie
