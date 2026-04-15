@@ -9987,8 +9987,9 @@ function _hideTeamSelection() {
     document.getElementById('bilan-res-droits-omp').textContent = fmt(droitsOMP);
     document.getElementById('bilan-res-droit-tirage').textContent = fmt(droitTirage);
     
-    // RESULTAT OMP = à calculer plus tard
-    // Pour l'instant on laisse vide
+    // RESULTAT OMP = RECETTE TTC - MONTANT CNM - DROITS - DEPENSES + DROITS OMP + DROIT AU TIRAGE
+    var resultatOMP = recTTC - montantCNM - totalDroits - totalDepenses + droitsOMP + droitTirage;
+    document.getElementById('bilan-resultat-omp').textContent = fmt(resultatOMP);
   }
 
   async function fpOuvrirBilanAMH() {
