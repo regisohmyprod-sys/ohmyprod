@@ -2815,8 +2815,9 @@ function _hideTeamSelection() {
         <div style="display:flex;align-items:center;gap:16px;">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#c9a84c;">📊 FICHE DÉPENSES</div>
           <div id="fin-ville-date" style="font-size:13px;color:#888;"></div>
+          <div id="fin-autosave-ind" style="font-size:11px;color:#22c55e;opacity:0;transition:opacity 0.3s;">✅ Auto-sauvegardé</div>
         </div>
-        <button onclick="finSauvegarder()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
+        <button onclick="finSauvegarder(false)" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
       </div>
 
       <!-- SECTION 1 : LOCATION SALLE -->
@@ -10208,7 +10209,26 @@ function _hideTeamSelection() {
         window._bilanSalleGlobale = salleGlobale;
 
         // CO-PROD FRAIS = Total facture salle PL + Total autres postes PL
-        var coprodFrais = g('fin-pl-total-salle') + g('fin-pl-total-autres');
+        // Calculer totalPlSalle
+        var plLocMG = g('fin-pl-loc-mg');
+        var plLocHT = g('fin-pl-loc-ht');
+        var plLoc = Math.max(plLocMG, plLocHT);
+        var plPrest = g('fin-pl-prest-energie')+g('fin-pl-prest-chauf')+g('fin-pl-prest-config')+g('fin-pl-prest-fenwick')+g('fin-pl-prest-accroches')+g('fin-pl-prest-elec');
+        var plPers = g('fin-pl-pers-nettoyage')+g('fin-pl-pers-nett-supp')+g('fin-pl-pers-elec')+g('fin-pl-pers-hriger')+g('fin-pl-pers-regisseur')+g('fin-pl-pers-forfait')+g('fin-pl-pers-caissier')+g('fin-pl-pers-rigg')+g('fin-pl-pers-hotesses')+g('fin-pl-pers-controle')+g('fin-pl-pers-parking')+g('fin-pl-pers-secu')+g('fin-pl-pers-vigi')+g('fin-pl-pers-consigne')+g('fin-pl-pers-gardien');
+        var plSecu = g('fin-pl-secu-ssiap1')+g('fin-pl-secu-ssiap2')+g('fin-pl-secu-protciv')+g('fin-pl-secu-vigi2')+g('fin-pl-secu-medical')+g('fin-pl-secu-autres');
+        var totalPlSalle = plLoc + plPrest + plPers + plSecu;
+        
+        // Calculer totalPlAutres
+        var plSal = g('fin-pl-sal-regisseur')+g('fin-pl-sal-road')+g('fin-pl-sal-caissier');
+        var plTech = g('fin-pl-tech-road')+g('fin-pl-tech-figer')+g('fin-pl-tech-coulisses')+g('fin-pl-tech-autres')+g('fin-pl-tech-conso')+g('fin-pl-tech-controleur');
+        var plPromo = g('fin-pl-promo-meta')+g('fin-pl-promo-autres1')+g('fin-pl-promo-autres2');
+        var plVoy = g('fin-pl-voy-prod')+g('fin-pl-voy-artiste')+g('fin-pl-voy-tech')+g('fin-pl-voy-autres');
+        var plVhr = g('fin-pl-vhr-pkart')+g('fin-pl-vhr-pktech')+g('fin-pl-vhr-taxiart')+g('fin-pl-vhr-taxitech')+g('fin-pl-vhr-total2');
+        var plHotel = g('fin-pl-hotel-prod')+g('fin-pl-hotel-tech')+g('fin-pl-hotel-art')+g('fin-pl-hotel-estim');
+        var plTrai = g('fin-pl-trai-total')+g('fin-pl-trai-resto')+g('fin-pl-trai-loge');
+        var totalPlAutres = plSal + plTech + plPromo + plVoy + plVhr + plHotel + plTrai;
+        
+        var coprodFrais = totalPlSalle + totalPlAutres;
         setEl('bilan-coprod-frais', coprodFrais > 0 ? fmt(coprodFrais) : '');
         window._bilanCoprodFrais = coprodFrais;
 
@@ -10530,8 +10550,8 @@ function _hideTeamSelection() {
 
 
 
-  async function finSauvegarder() {
-    if (!_fpDateId) { alert('Erreur : aucune date sélectionnée.'); return; }
+  async function finSauvegarder(silent) {
+    if (!_fpDateId) { if (!silent) alert('Erreur : aucune date sélectionnée.'); return; }
     const inputs = document.querySelectorAll('#page-fiche-financier .fin-input');
     const data = {};
     inputs.forEach(inp => { data[inp.id] = parseFloat(inp.value) || 0; });
@@ -10543,8 +10563,10 @@ function _hideTeamSelection() {
     } else {
       ({ error } = await _supabase.from('fiches_production').insert({ date_concert_id: _fpDateId, financier_data: payload }));
     }
-    if (error) { alert('Erreur sauvegarde : ' + error.message); return; }
-    alert('✅ Fiche financière enregistrée !');
+    if (error) { if (!silent) alert('Erreur sauvegarde : ' + error.message); return; }
+    // Indicateur discret
+    var ind = document.getElementById('fin-autosave-ind');
+    if (ind) { ind.style.opacity = '1'; setTimeout(function() { ind.style.opacity = '0'; }, 2000); }
   }
 
   async function finCharger() {
@@ -10559,35 +10581,11 @@ function _hideTeamSelection() {
         });
       }
     } catch(e) {}
-    // Attacher les écouteurs pour recalcul en temps réel + auto-save par bloc
-    // Extraire le préfixe de bloc depuis l'ID (ex: fin-omp-vhr-pkart → fin-omp-vhr)
-    function getBlockPrefix(id) {
-      if (!id) return '';
-      const parts = id.split('-');
-      if (parts.length >= 4) return parts.slice(0, 4).join('-');
-      return parts.slice(0, 3).join('-');
-    }
-    let _lastFinBlock = null;
+    // Attacher les écouteurs pour recalcul en temps réel + auto-save
     document.querySelectorAll('#page-fiche-financier .fin-input').forEach(inp => {
-      inp.addEventListener('input', finCalcTotaux);
-      inp.addEventListener('focus', function() {
-        const currentBlock = getBlockPrefix(this.id);
-        // Si on change de bloc, sauvegarder
-        if (_lastFinBlock && _lastFinBlock !== currentBlock) {
-          autoSave('fin');
-        }
-        _lastFinBlock = currentBlock;
-      });
-      // Aussi sauvegarder quand on quitte complètement la zone (clic ailleurs)
-      inp.addEventListener('blur', function() {
-        setTimeout(function() {
-          const active = document.activeElement;
-          if (!active || !active.classList.contains('fin-input')) {
-            // On a quitté la zone des inputs financiers → sauvegarder
-            autoSave('fin');
-            _lastFinBlock = null;
-          }
-        }, 100);
+      inp.addEventListener('input', function() {
+        finCalcTotaux();
+        autoSave('fin'); // Auto-save à chaque modification
       });
     });
     finCalcTotaux();
@@ -12325,7 +12323,7 @@ function _hideTeamSelection() {
           var btn = document.getElementById('fp-save-btn');
           if (btn) { var orig = btn.textContent; btn.textContent = '✅ Sauvegardé'; setTimeout(() => btn.textContent = orig, 1500); }
         } else if (section === 'fin') {
-          await finSauvegarder();
+          await finSauvegarder(true);
         }
       } catch(e) {}
     }, 1200);
