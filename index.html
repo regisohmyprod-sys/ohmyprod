@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.15.17">
+<meta name="version" content="2026.04.15.18">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -5454,7 +5454,17 @@ function _hideTeamSelection() {
     
     var rows = filtered.map(function(f) {
       var dt = f.date_depense ? new Date(f.date_depense).toLocaleDateString('fr-FR') : '';
-      return '<tr><td style="border:1px solid #ddd;padding:7px;">' + (f.user_nom||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + dt + '</td><td style="border:1px solid #ddd;padding:7px;">CB ' + (f.mode_paiement||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + (typeLabels[f.type_frais]||f.type_frais||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + (f.description||'—') + '</td><td style="border:1px solid #ddd;padding:7px;text-align:right;font-weight:bold;">' + (parseFloat(f.montant)||0).toFixed(2) + ' €</td></tr>';
+      // Extraire le nom du fichier depuis l'URL du justificatif
+      var nomFichier = '—';
+      if (f.justificatif_url) {
+        var parts = f.justificatif_url.split('/');
+        nomFichier = decodeURIComponent(parts[parts.length - 1].split('?')[0]);
+        // Tronquer si trop long
+        if (nomFichier.length > 25) {
+          nomFichier = nomFichier.substring(0, 22) + '...';
+        }
+      }
+      return '<tr><td style="border:1px solid #ddd;padding:7px;">' + (f.user_nom||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + dt + '</td><td style="border:1px solid #ddd;padding:7px;">CB ' + (f.mode_paiement||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + (typeLabels[f.type_frais]||f.type_frais||'') + '</td><td style="border:1px solid #ddd;padding:7px;">' + (f.description||'—') + '</td><td style="border:1px solid #ddd;padding:7px;text-align:right;font-weight:bold;">' + (parseFloat(f.montant)||0).toFixed(2) + ' €</td><td style="border:1px solid #ddd;padding:7px;font-size:10px;color:#666;">' + nomFichier + '</td></tr>';
     }).join('');
     
     var existing = document.getElementById('print-overlay');
@@ -5484,11 +5494,13 @@ function _hideTeamSelection() {
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Type Frais</th>' +
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Description</th>' +
         '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:right;font-size:11px;text-transform:uppercase;">Montant</th>' +
+        '<th style="background:#f0f0f0;border:1px solid #ddd;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;">Fichier</th>' +
       '</tr></thead>' +
       '<tbody>' + rows +
         '<tr style="background:#e0e0e0;font-weight:bold;">' +
           '<td colspan="5" style="border:1px solid #ddd;padding:10px;text-align:right;font-size:14px;">TOTAL</td>' +
           '<td style="border:1px solid #ddd;padding:10px;text-align:right;font-size:16px;color:#c9a84c;">' + total.toFixed(2) + ' €</td>' +
+          '<td style="border:1px solid #ddd;"></td>' +
         '</tr>' +
       '</tbody>' +
     '</table>' +
