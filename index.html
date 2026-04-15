@@ -3476,7 +3476,19 @@ function _hideTeamSelection() {
 
       <!-- EN-TÊTE -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#888;text-align:center;">
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;font-weight:700;">THE WORLD OF QUEEN</span> &nbsp;&nbsp;·&nbsp;&nbsp; <span id="bilan-ville" style="color:#22c55e;font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;"></span> &nbsp;&nbsp;·&nbsp;&nbsp; <span id="bilan-date-label" style="color:#c9a84c;font-weight:700;font-size:16px;"></span>
+        <div style="margin-bottom:10px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;font-weight:700;">THE WORLD OF QUEEN</span> &nbsp;&nbsp;·&nbsp;&nbsp; <span id="bilan-ville" style="color:#22c55e;font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;"></span> &nbsp;&nbsp;·&nbsp;&nbsp; <span id="bilan-date-label" style="color:#c9a84c;font-weight:700;font-size:16px;"></span>
+        </div>
+        <div style="display:flex;justify-content:center;gap:40px;margin-top:8px;">
+          <div style="text-align:center;">
+            <span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;">N° PAYANTS</span>
+            <div id="bilan-nb-payants" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#c9a84c;margin-top:2px;">0</div>
+          </div>
+          <div style="text-align:center;">
+            <span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;">N° INVITATIONS</span>
+            <div id="bilan-nb-invitations" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#c9a84c;margin-top:2px;">0</div>
+          </div>
+        </div>
       </div>
 
       <!-- RECETTE TTC -->
@@ -3484,14 +3496,14 @@ function _hideTeamSelection() {
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">RECETTE TTC</div><div id="bilan-rec-ttc" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#c9a84c;"></div><div style="font-size:10px;color:#555;margin-top:4px;" id="bilan-nb-billets"></div></div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">TVA 2,10%</div><div id="bilan-tva" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">RECETTE HT</div><div id="bilan-rec-ht" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">TAXE PARAFISCALE 3,50%</div><div id="bilan-parafiscale" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">MONTANT CNM</div><div id="bilan-parafiscale" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
         <div style="background:#1a1a1a;border:1px solid #22c55e;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">RECETTE HT / HCNM</div><div id="bilan-rec-hcnm" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#22c55e;font-weight:700;"></div></div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">INVITATIONS</div><div id="bilan-invit" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
       </div>
 
       <!-- DROITS -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-        <div style="background:#22c55e;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">TAXES &amp; DROITS</div>
+        <div style="background:#22c55e;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">DROITS</div>
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
           <tbody>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;width:40%;">SACEM 8,36%</td><td id="bilan-sacem" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td><td style="padding:6px 12px;color:#555;font-size:11px;">sur recette HT</td></tr>
@@ -3506,58 +3518,36 @@ function _hideTeamSelection() {
         </table>
       </div>
 
-      <!-- FRAIS -->
+      <!-- DÉPENSES -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-        <div style="background:#22c55e;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">FRAIS</div>
+        <div style="background:#22c55e;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">DÉPENSES</div>
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead><tr style="background:#111;"><th style="padding:6px 12px;text-align:left;color:#888;">Poste</th><th style="padding:6px 12px;text-align:right;color:#888;">Montant</th><th style="padding:6px 12px;text-align:right;color:#888;">% CA HT</th><th style="padding:6px 12px;text-align:right;color:#888;">% Frais</th></tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">COÛT PLATEAU</td><td id="bilan-cout-plateau" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-cout-plateau-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-cout-plateau-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Salaires</td><td id="bilan-salaires" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Technique (COULISSE+CONSO)</td><td id="bilan-technique" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">TECH EXTERNE</td><td id="bilan-tech-ext" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-tech-ext-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-tech-ext-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">VHR</td><td id="bilan-vhr" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-vhr-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-vhr-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Voyages + Frais supp</td><td id="bilan-voyages" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Hôtel</td><td id="bilan-hotel" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Traiteur / Restauration</td><td id="bilan-traiteur" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;padding-left:24px;">Catering Loges</td><td id="bilan-catering" style="padding:6px 12px;text-align:right;color:#fff;"></td><td colspan="2"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">COMMUNICATION</td><td id="bilan-comm" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-comm-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-comm-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#c9a84c;font-weight:700;">SALLE</td><td id="bilan-salle" style="padding:6px 12px;text-align:right;color:#fff;font-weight:700;"></td><td id="bilan-salle-pct-ca" style="padding:6px 12px;text-align:right;color:#888;"></td><td id="bilan-salle-pct-f" style="padding:6px 12px;text-align:right;color:#888;"></td></tr>
-            <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;color:#fff;">TOTAL FRAIS</td><td id="bilan-total-frais" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#22c55e;"></td><td id="bilan-total-frais-pct" colspan="2" style="padding:8px 12px;text-align:right;color:#e31e24;font-weight:700;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;width:50%;">SALAIRES</td><td id="bilan-salaires" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Choix sur jauge</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">TECHNIQUE</td><td id="bilan-technique" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Coulisses + mag scene camion</td></tr>
+            <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#22c55e;">COUT PLATEAU TOTAL</td><td id="bilan-cout-plateau" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;font-weight:700;"></td><td></td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- PRÉ-RÉSULTAT -->
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:12px;">
-        <div style="background:#1e3a5f;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#7eb8d4;text-align:center;">PRÉ-RÉSULTAT</div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 16px;color:#888;">Recette HT / HCNM</td><td id="bilan-pre-hcnm" style="padding:6px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 16px;color:#888;">− Total Droits</td><td id="bilan-pre-droits" style="padding:6px 16px;text-align:right;color:#e31e24;font-weight:600;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 16px;color:#888;">− Total Frais</td><td id="bilan-pre-frais" style="padding:6px 16px;text-align:right;color:#e31e24;font-weight:600;"></td></tr>
-          <tr style="background:#1a1a2e;border-top:2px solid #7eb8d4;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#7eb8d4;">PRÉ-RÉSULTAT</td><td id="bilan-pre-resultat" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:700;"></td></tr>
-        </table>
-      </div>
-
-      <!-- RÉSULTAT FINAL OMP -->
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:12px;">
-        <div style="background:#22c55e;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">RÉSULTAT FINAL OMP</div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 16px;color:#888;">Pré-Résultat</td><td id="bilan-rf-pre" style="padding:6px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 16px;color:#888;">+ DL HT OMP</td><td id="bilan-dlt-omp" style="padding:6px 16px;text-align:right;color:#22c55e;font-weight:600;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 16px;color:#888;">+ CO PROD OMP</td><td id="bilan-coprod-omp" style="padding:6px 16px;text-align:right;color:#22c55e;font-weight:600;">0,00 €</td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 16px;color:#888;">+ Ré-intégration Droit au Tirage</td><td id="bilan-droit-tirage" style="padding:6px 16px;text-align:right;color:#22c55e;font-weight:600;"></td></tr>
-          <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#22c55e;">RÉSULTAT FINAL OMP</td><td id="bilan-resultat-final" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:700;"></td></tr>
-        </table>
-      </div>
-
-      <!-- RÉSULTAT NET AVEC STRUCTURE -->
+      <!-- RÉSULTAT OMP -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-        <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">RÉSULTAT NET AVEC STRUCTURE</div>
+        <div style="background:#d946ef;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;text-align:center;">RÉSULTAT OMP</div>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 16px;color:#888;">Résultat Final OMP</td><td id="bilan-rn-final" style="padding:6px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 16px;color:#888;">− Frais de structure / date</td><td style="padding:4px 8px;text-align:right;"><input type="number" id="bilan-frais-struct" value="4550" oninput="bilanCalcNet()" style="width:120px;background:#1a1a1a;border:1px solid #c9a84c;border-radius:4px;color:#c9a84c;padding:4px 8px;font-size:13px;text-align:right;font-family:Inter,sans-serif;"> €</td></tr>
-          <tr style="background:#1a1a2e;border-top:2px solid #c9a84c;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">RÉSULTAT NET AVEC STRUCTURE</td><td id="bilan-resultat" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:700;"></td></tr>
+          <tbody>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;width:50%;">RECETTE TTC</td><td id="bilan-res-recette-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">MONTANT CNM</td><td id="bilan-res-montant-cnm" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DROITS</td><td id="bilan-res-droits" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DEPENSES</td><td id="bilan-res-depenses" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#1a1a2e;height:8px;"><td colspan="2"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DL TTC</td><td id="bilan-res-dl-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DL HT</td><td id="bilan-res-dl-ht" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DEAL DL CO PROD</td><td id="bilan-res-deal-coprod" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DROITS OMP</td><td id="bilan-res-droits-omp" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#1a1a2e;height:8px;"><td colspan="2"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DROIT AU TIRAGE</td><td id="bilan-res-droit-tirage" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr style="background:#1a1a2e;border-top:2px solid #d946ef;"><td style="padding:12px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#d946ef;">RESULTAT OMP</td><td id="bilan-resultat-omp" style="padding:12px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:24px;font-weight:700;color:#d946ef;"></td></tr>
+          </tbody>
         </table>
       </div>
     </div>
