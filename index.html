@@ -3475,18 +3475,15 @@ function _hideTeamSelection() {
       </div>
 
       <!-- EN-TÊTE -->
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#888;text-align:center;">
-        <div style="margin-bottom:10px;">
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;font-weight:700;">THE WORLD OF QUEEN</span> &nbsp;&nbsp;·&nbsp;&nbsp; <span id="bilan-ville" style="color:#22c55e;font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;"></span> &nbsp;&nbsp;·&nbsp;&nbsp; <span id="bilan-date-label" style="color:#c9a84c;font-weight:700;font-size:16px;"></span>
-        </div>
-        <div style="display:flex;justify-content:center;gap:40px;margin-top:8px;">
-          <div style="text-align:center;">
-            <span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;">N° PAYANTS</span>
-            <div id="bilan-nb-payants" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#c9a84c;margin-top:2px;">0</div>
-          </div>
-          <div style="text-align:center;">
-            <span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;">N° INVITATIONS</span>
-            <div id="bilan-nb-invitations" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#c9a84c;margin-top:2px;">0</div>
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:16px 20px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:20px;">
+          <img src="assets/omp-icon-200.jpg" alt="OMP" style="width:60px;height:60px;border-radius:8px;">
+          <div style="text-align:center;flex:1;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#fff;font-weight:700;">THE WORLD OF QUEEN</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#888;margin:0 12px;">·</span>
+            <span id="bilan-ville" style="color:#22c55e;font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;"></span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#888;margin:0 12px;">·</span>
+            <span id="bilan-date-label" style="color:#c9a84c;font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;"></span>
           </div>
         </div>
       </div>
@@ -3498,7 +3495,11 @@ function _hideTeamSelection() {
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">RECETTE HT</div><div id="bilan-rec-ht" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">MONTANT CNM</div><div id="bilan-parafiscale" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
         <div style="background:#1a1a1a;border:1px solid #22c55e;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">RECETTE HT / HCNM</div><div id="bilan-rec-hcnm" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#22c55e;font-weight:700;"></div></div>
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;"><div style="font-size:11px;color:#888;margin-bottom:4px;">INVITATIONS</div><div id="bilan-invit" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;"></div></div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;display:flex;justify-content:space-around;align-items:center;">
+          <div style="text-align:center;"><div style="font-size:11px;color:#888;margin-bottom:4px;">N° PAYANTS</div><div id="bilan-nb-payants" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;">0</div></div>
+          <div style="width:1px;height:30px;background:#2a2a2a;"></div>
+          <div style="text-align:center;"><div style="font-size:11px;color:#888;margin-bottom:4px;">N° INVITATIONS</div><div id="bilan-nb-invitations" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;">0</div></div>
+        </div>
       </div>
 
       <!-- DROITS -->
@@ -3513,6 +3514,8 @@ function _hideTeamSelection() {
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;">SACD CCSA 1,20%</td><td id="bilan-ccsa" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td><td style="padding:6px 12px;color:#555;font-size:11px;">sur recette HT</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;">SACD AGESSA 1,10%</td><td id="bilan-sacd-agessa" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td><td style="padding:6px 12px;color:#555;font-size:11px;">sur droits</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#22c55e;font-weight:700;">TOTAL SACD</td><td id="bilan-total-sacd" style="padding:6px 12px;color:#22c55e;text-align:right;font-weight:700;"></td><td></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;">Autres droits</td><td style="padding:6px 12px;text-align:right;"><input type="number" id="bilan-autres-droits-input" value="0" step="0.01" oninput="bilanCalcDroits()" style="width:100px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;color:#fff;padding:4px 8px;font-size:12px;text-align:right;font-family:Inter,sans-serif;"> €</td><td style="padding:6px 12px;color:#555;font-size:11px;">saisie manuelle</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#22c55e;font-weight:700;">TOTAL AUTRES DROITS</td><td id="bilan-total-autres-droits" style="padding:6px 12px;color:#22c55e;text-align:right;font-weight:700;">0,00 €</td><td></td></tr>
             <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL DROITS</td><td id="bilan-total-droits" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;"></td><td></td></tr>
           </tbody>
         </table>
@@ -3525,7 +3528,11 @@ function _hideTeamSelection() {
           <tbody>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;width:50%;">SALAIRES</td><td id="bilan-salaires" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Choix sur jauge</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">TECHNIQUE</td><td id="bilan-technique" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Coulisses + mag scene camion</td></tr>
-            <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#22c55e;">COUT PLATEAU TOTAL</td><td id="bilan-cout-plateau" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;font-weight:700;"></td><td></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">COUT PLATEAU TOTAL</td><td id="bilan-cout-plateau" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">VHR</td><td id="bilan-vhr" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Voyages + Hôtel + Restauration</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">COMMUNICATION</td><td id="bilan-comm" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">SALLE</td><td id="bilan-salle" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td><td></td></tr>
+            <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#22c55e;">TOTAL DEPENSES</td><td id="bilan-total-depenses" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;font-weight:700;"></td><td></td></tr>
           </tbody>
         </table>
       </div>
@@ -9889,13 +9896,51 @@ function _hideTeamSelection() {
     window.open(gmailUrl, '_blank');
   }
 
-  function bilanCalcNet() {
-    var final = window._bilanResultatFinal || 0;
-    var fraisStruct = parseFloat(document.getElementById('bilan-frais-struct')?.value) || 4550;
-    var net = final - fraisStruct;
+  function bilanCalcDroits() {
+    // Recalcul TOTAL AUTRES DROITS et TOTAL DROITS quand on modifie "Autres droits"
+    var autresDroits = parseFloat(document.getElementById('bilan-autres-droits-input')?.value) || 0;
+    var totalSacem = window._bilanTotalSacem || 0;
+    var totalSacd = window._bilanTotalSacd || 0;
     var fmt = function(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
-    var elNet = document.getElementById('bilan-resultat');
-    if (elNet) { elNet.textContent = fmt(net); elNet.style.color = net >= 0 ? '#c9a84c' : '#e31e24'; }
+    
+    document.getElementById('bilan-total-autres-droits').textContent = fmt(autresDroits);
+    
+    // TOTAL DROITS = Total SACEM + Total SACD + Total Autres Droits (CORRIGÉ)
+    var totalDroits = totalSacem + totalSacd + autresDroits;
+    document.getElementById('bilan-total-droits').textContent = fmt(totalDroits);
+    
+    // Stocker pour calcul RESULTAT OMP
+    window._bilanTotalDroits = totalDroits;
+    
+    // Mettre à jour le bloc RESULTAT OMP
+    bilanCalcResultatOMP();
+  }
+
+  function bilanCalcResultatOMP() {
+    var fmt = function(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
+    
+    var recTTC = window._bilanRecTTC || 0;
+    var montantCNM = window._bilanMontantCNM || 0;
+    var totalDroits = window._bilanTotalDroits || 0;
+    var totalDepenses = window._bilanTotalDepenses || 0;
+    var dlTTC = window._bilanDlTTC || 0;
+    var dlHT = dlTTC / 1.021;
+    var dealCoprod = window._bilanDealCoprod || 0;
+    var droitsOMP = dlHT * 0.5;
+    var droitTirage = montantCNM * 0.60;
+    
+    document.getElementById('bilan-res-recette-ttc').textContent = fmt(recTTC);
+    document.getElementById('bilan-res-montant-cnm').textContent = fmt(montantCNM);
+    document.getElementById('bilan-res-droits').textContent = fmt(totalDroits);
+    document.getElementById('bilan-res-depenses').textContent = fmt(totalDepenses);
+    document.getElementById('bilan-res-dl-ttc').textContent = fmt(dlTTC);
+    document.getElementById('bilan-res-dl-ht').textContent = fmt(dlHT);
+    document.getElementById('bilan-res-deal-coprod').textContent = fmt(dealCoprod);
+    document.getElementById('bilan-res-droits-omp').textContent = fmt(droitsOMP);
+    document.getElementById('bilan-res-droit-tirage').textContent = fmt(droitTirage);
+    
+    // RESULTAT OMP = à calculer plus tard
+    // Pour l'instant on laisse vide
   }
 
   async function fpOuvrirBilanAMH() {
@@ -9911,13 +9956,10 @@ function _hideTeamSelection() {
     setEl('bilan-date-label', dateStr);
     setEl('bilan-ville-date', ville + (dateStr ? ' · ' + dateStr : ''));
 
-    // Récupérer invitations depuis le champ de la fiche
-    var invitations = parseInt(document.getElementById('fp-invitations')?.value) || 0;
-
     if (!_fpDateId) { showPage('bilan-amh'); return; }
 
     // Charger billetterie_data depuis Supabase
-    var recTotal = 0, gBillets = 0;
+    var recTotal = 0, gBillets = 0, gInvitations = 0, dlTTC = 0;
     try {
       var bdRes = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
       if (bdRes.data && bdRes.data.billetterie_data) {
@@ -9936,6 +9978,20 @@ function _hideTeamSelection() {
               var t = parseFloat(row.tarif) || 0;
               gBillets += b;
               recTotal += b * t;
+              // DL TTC depuis fiche billetterie (colonne DL Prod TTC)
+              var dlProd = parseFloat(row.dlProd) || 0;
+              dlTTC += dlProd;
+            }
+          }
+        }
+        // Invitations depuis l'onglet invit
+        if (parsed.invit) {
+          for (var ci=0; ci<parsed.invit.length; ci++) {
+            var catData = parsed.invit[ci];
+            if (!catData) continue;
+            for (var ri=0; ri<catData.length; ri++) {
+              var row = catData[ri];
+              if (row && row.billets) gInvitations += parseInt(row.billets) || 0;
             }
           }
         }
@@ -9945,34 +10001,45 @@ function _hideTeamSelection() {
     // Calculs recettes (identiques au PILOTE)
     var recHT = recTotal / 1.021;
     var tva = recTotal - recHT;
-    var parafiscale = recHT * 0.035;
-    var recHCNM = recHT - parafiscale;
+    var montantCNM = recHT * 0.035;
+    var recHCNM = recHT - montantCNM;
+
+    // Stocker pour les calculs RESULTAT OMP
+    window._bilanRecTTC = recTotal;
+    window._bilanMontantCNM = montantCNM;
+    window._bilanDlTTC = dlTTC;
 
     setEl('bilan-rec-ttc', recTotal > 0 ? fmt(recTotal) : '');
     setEl('bilan-tva', tva > 0 ? fmt(tva) : '');
     setEl('bilan-rec-ht', recHT > 0 ? fmt(recHT) : '');
-    setEl('bilan-parafiscale', parafiscale > 0 ? fmt(parafiscale) : '');
+    setEl('bilan-parafiscale', montantCNM > 0 ? fmt(montantCNM) : '');
     setEl('bilan-rec-hcnm', recHCNM > 0 ? fmt(recHCNM) : '');
-    setEl('bilan-invit', invitations > 0 ? invitations : '');
-    setEl('bilan-nb-billets', gBillets + ' billets · ' + invitations + ' invit');
+    setEl('bilan-nb-billets', gBillets + ' billets');
+    
+    // N° PAYANTS et N° INVITATIONS (depuis fiche billetterie)
+    setEl('bilan-nb-payants', gBillets);
+    setEl('bilan-nb-invitations', gInvitations);
 
-    // Calcul droits (EXACTEMENT comme PILOTE - piloteCalcDroits)
+    // Calcul droits (EXACTEMENT comme PILOTE)
     var sacem = recHT * 0.0836;
     var agessaSacem = sacem * 0.011;
     var sacd = recHT * 0.06;
     var ccsa = recHT * 0.012;
     var agessaSacd = sacd * 0.011;
-    var assrcTaux = parseFloat(document.getElementById('pilote-assrc-taux')?.value) || 0;
-    var assrc = recHT * assrcTaux / 100;
-    var organicTaux = parseFloat(document.getElementById('pilote-organic-taux')?.value) || 0;
-    var organic = recHT * organicTaux / 100;
 
     var totalSacem = sacem + agessaSacem;
     var totalSacd = sacd + ccsa + agessaSacd;
-    var totalCNM = parafiscale;
-    var totalHorsCNM = totalSacem + totalSacd;
-    var tvaDroits = recHT * 0.021;
-    var totalDroits = tvaDroits + totalSacem + parafiscale + totalSacd + assrc + organic;
+    
+    // Stocker pour bilanCalcDroits
+    window._bilanTotalSacem = totalSacem;
+    window._bilanTotalSacd = totalSacd;
+    
+    // Autres droits (saisie manuelle)
+    var autresDroits = parseFloat(document.getElementById('bilan-autres-droits-input')?.value) || 0;
+    
+    // TOTAL DROITS = Total SACEM + Total SACD + Total Autres Droits (CORRIGÉ)
+    var totalDroits = totalSacem + totalSacd + autresDroits;
+    window._bilanTotalDroits = totalDroits;
 
     setEl('bilan-sacem', sacem > 0 ? fmt(sacem) : '');
     setEl('bilan-sacem-agessa', agessaSacem > 0 ? fmt(agessaSacem) : '');
@@ -9981,44 +10048,38 @@ function _hideTeamSelection() {
     setEl('bilan-ccsa', ccsa > 0 ? fmt(ccsa) : '');
     setEl('bilan-sacd-agessa', agessaSacd > 0 ? fmt(agessaSacd) : '');
     setEl('bilan-total-sacd', totalSacd > 0 ? fmt(totalSacd) : '');
+    setEl('bilan-total-autres-droits', fmt(autresDroits));
     setEl('bilan-total-droits', fmt(totalDroits));
 
-    // Droit au tirage = parafiscale * 0.6
-    var droitTirage = parafiscale * 0.6;
-    setEl('bilan-droit-tirage', droitTirage > 0 ? fmt(droitTirage) : '');
-
-    // DL depuis fiche production
-    var dlHT = 0;
-    var dlOmpPct = parseFloat(document.getElementById('fp-dl-omp')?.value) || 0;
-    var dlPlPct = parseFloat(document.getElementById('fp-dl-prod-locale')?.value) || 0;
-    var dlTTC = gBillets * 2;
-    dlHT = dlTTC / 1.055;
-    var dlOMP = dlHT * (dlOmpPct / 100);
-    setEl('bilan-dlt-omp', dlOMP > 0 ? fmt(dlOMP) : '');
+    // Charger DEAL DL CO PROD depuis identification de la date
+    var dealCoprod = 0;
+    try {
+      var dateRes = await _supabase.from('dates_concert').select('deal_coprod').eq('id', _fpDateId).single();
+      if (dateRes.data && dateRes.data.deal_coprod) {
+        dealCoprod = parseFloat(dateRes.data.deal_coprod) || 0;
+      }
+    } catch(e) { console.log('Bilan AMH deal coprod erreur:', e); }
+    window._bilanDealCoprod = dealCoprod;
 
     // Frais depuis financier_data
+    var totalDepenses = 0;
     try {
       var fr = await _supabase.from('fiches_production').select('financier_data').eq('date_concert_id', _fpDateId).single();
       if (fr.data && fr.data.financier_data) {
         var fd = JSON.parse(fr.data.financier_data);
         var g = function(k){ return parseFloat(fd[k])||0; };
-        var totalFrais = 0;
 
-        // COÛT PLATEAU : Salaires + Technique(COULISSES+CONSO)
+        // SALAIRES
         var salaires = g('fin-omp-sal-tournee')+g('fin-omp-sal-road')+g('fin-omp-sal-promo');
+        
+        // TECHNIQUE (Coulisses + mag scene camion)
         var technique = g('fin-omp-tech-coulisses')+g('fin-omp-tech-conso');
+        
+        // COUT PLATEAU TOTAL
         var coutPlateau = salaires + technique;
         setEl('bilan-salaires', salaires > 0 ? fmt(salaires) : '');
         setEl('bilan-technique', technique > 0 ? fmt(technique) : '');
         setEl('bilan-cout-plateau', coutPlateau > 0 ? fmt(coutPlateau) : '');
-        setEl('bilan-cout-plateau-pct-ca', pct(coutPlateau, recHT));
-        totalFrais += coutPlateau;
-
-        // TECH EXTERNE
-        var techExt = g('fin-omp-tech-figer')+g('fin-omp-tech-road')+g('fin-omp-tech-autres')+g('fin-omp-tech-controleur');
-        setEl('bilan-tech-ext', techExt > 0 ? fmt(techExt) : '');
-        setEl('bilan-tech-ext-pct-ca', pct(techExt, recHT));
-        totalFrais += techExt;
 
         // VHR
         var voyages = g('fin-omp-voy-prod')+g('fin-omp-voy-artiste')+g('fin-omp-voy-tech')+g('fin-omp-voy-vhr');
@@ -10026,19 +10087,11 @@ function _hideTeamSelection() {
         var traiteur= g('fin-omp-trai-total')+g('fin-omp-trai-resto');
         var catering= g('fin-omp-trai-loge');
         var vhr = voyages + hotel + traiteur + catering;
-        setEl('bilan-voyages', voyages > 0 ? fmt(voyages) : '');
-        setEl('bilan-hotel',   hotel   > 0 ? fmt(hotel)   : '');
-        setEl('bilan-traiteur',traiteur > 0 ? fmt(traiteur): '');
-        setEl('bilan-catering',catering > 0 ? fmt(catering): '');
         setEl('bilan-vhr', vhr > 0 ? fmt(vhr) : '');
-        setEl('bilan-vhr-pct-ca', pct(vhr, recHT));
-        totalFrais += vhr;
 
         // COMMUNICATION
         var comm = g('fin-omp-promo-meta')+g('fin-omp-promo-autres1')+g('fin-omp-promo-autres2');
         setEl('bilan-comm', comm > 0 ? fmt(comm) : '');
-        setEl('bilan-comm-pct-ca', pct(comm, recHT));
-        totalFrais += comm;
 
         // SALLE
         var salleLoc = Math.max(g('fin-omp-loc-ht'), g('fin-omp-loc-mg'));
@@ -10047,38 +10100,16 @@ function _hideTeamSelection() {
         var salleSecu = g('fin-omp-secu-ssiap1')+g('fin-omp-secu-ssiap2')+g('fin-omp-secu-protciv')+g('fin-omp-secu-vigi2')+g('fin-omp-secu-medical')+g('fin-omp-secu-autres');
         var salleMT = salleLoc + sallePrest + sallePers + salleSecu;
         setEl('bilan-salle', salleMT > 0 ? fmt(salleMT) : '');
-        setEl('bilan-salle-pct-ca', pct(salleMT, recHT));
-        totalFrais += salleMT;
 
-        // TOTAL FRAIS
-        setEl('bilan-total-frais', totalFrais > 0 ? fmt(totalFrais) : '');
-        setEl('bilan-total-frais-pct', pct(totalFrais, recHT));
-
-        // PRÉ-RÉSULTAT = RecHCNM - Total Droits (hors CNM) - Total Frais
-        var droitsHorsCNM = totalSacem + totalSacd;
-        var preResultat = recHCNM - droitsHorsCNM - totalFrais;
-        setEl('bilan-pre-hcnm',    fmt(recHCNM));
-        setEl('bilan-pre-droits',  fmt(droitsHorsCNM));
-        setEl('bilan-pre-frais',   fmt(totalFrais));
-        setEl('bilan-pre-resultat', fmt(preResultat));
-        var elPre = document.getElementById('bilan-pre-resultat');
-        if (elPre) elPre.style.color = preResultat >= 0 ? '#7eb8d4' : '#e31e24';
-
-        // RÉSULTAT FINAL OMP = Pré-résultat + DL HT OMP + Droit Tirage
-        var resultatFinal = preResultat + dlOMP + droitTirage;
-        setEl('bilan-rf-pre',         fmt(preResultat));
-        setEl('bilan-dlt-omp',        fmt(dlOMP));
-        setEl('bilan-droit-tirage',   fmt(droitTirage));
-        setEl('bilan-resultat-final', fmt(resultatFinal));
-        setEl('bilan-rn-final',       fmt(resultatFinal));
-        var elFinal = document.getElementById('bilan-resultat-final');
-        if (elFinal) elFinal.style.color = resultatFinal >= 0 ? '#22c55e' : '#e31e24';
-
-        // RÉSULTAT NET AVEC STRUCTURE
-        window._bilanResultatFinal = resultatFinal;
-        bilanCalcNet();
+        // TOTAL DEPENSES
+        totalDepenses = coutPlateau + vhr + comm + salleMT;
+        setEl('bilan-total-depenses', totalDepenses > 0 ? fmt(totalDepenses) : '');
+        window._bilanTotalDepenses = totalDepenses;
       }
     } catch(e) { console.log('Bilan AMH financier erreur:', e); }
+
+    // Calcul RESULTAT OMP
+    bilanCalcResultatOMP();
 
     showPage('bilan-amh');
   }
