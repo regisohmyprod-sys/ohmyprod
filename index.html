@@ -12949,27 +12949,102 @@ function _hideTeamSelection() {
     }
   }
 
-  // BACKUP LOCAL - Télécharge le fichier HTML sur le PC
-  function backupLocal() {
+  // BACKUP LOCAL - Télécharge le fichier HTML + TOUTES LES DONNÉES SUPABASE
+  async function backupLocal() {
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
     const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, 'h').slice(0,5);
     const filename = `OMP_BACKUP_${dateStr}_${timeStr}.html`;
 
-    // Récupérer le HTML complet de la page
-    const htmlContent = document.documentElement.outerHTML;
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    
-    // Créer un lien de téléchargement
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    
-    alert('✅ Backup téléchargé : ' + filename);
+    // Afficher indicateur de chargement
+    const loadingMsg = document.createElement('div');
+    loadingMsg.id = 'backup-loading';
+    loadingMsg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1a1a2e;color:#c9a84c;padding:30px 50px;border-radius:15px;z-index:99999;font-size:18px;box-shadow:0 0 30px rgba(201,168,76,0.3);';
+    loadingMsg.innerHTML = '⏳ Export des données en cours...';
+    document.body.appendChild(loadingMsg);
+
+    try {
+      // Récupérer TOUTES les données Supabase
+      const backupData = {};
+      
+      // 1. Table dates_concert
+      const { data: dates } = await _supabase.from('dates_concert').select('*');
+      backupData.dates_concert = dates || [];
+      loadingMsg.innerHTML = '⏳ Dates concert... ✅';
+
+      // 2. Table fiches_production
+      const { data: fiches } = await _supabase.from('fiches_production').select('*');
+      backupData.fiches_production = fiches || [];
+      loadingMsg.innerHTML = '⏳ Fiches production... ✅';
+
+      // 3. Table tournees
+      const { data: tournees } = await _supabase.from('tournees').select('*');
+      backupData.tournees = tournees || [];
+      loadingMsg.innerHTML = '⏳ Tournées... ✅';
+
+      // 4. Table salles
+      const { data: salles } = await _supabase.from('salles').select('*');
+      backupData.salles = salles || [];
+      loadingMsg.innerHTML = '⏳ Salles... ✅';
+
+      // 5. Table vhr_dates
+      const { data: vhr } = await _supabase.from('vhr_dates').select('*');
+      backupData.vhr_dates = vhr || [];
+      loadingMsg.innerHTML = '⏳ VHR... ✅';
+
+      // 6. Table notes_frais
+      const { data: frais } = await _supabase.from('notes_frais').select('*');
+      backupData.notes_frais = frais || [];
+      loadingMsg.innerHTML = '⏳ Notes de frais... ✅';
+
+      // 7. Table membres (si elle existe)
+      try {
+        const { data: membres } = await _supabase.from('membres').select('*');
+        backupData.membres = membres || [];
+      } catch(e) { backupData.membres = []; }
+
+      // 8. Table contacts_promo (si elle existe)
+      try {
+        const { data: contacts } = await _supabase.from('contacts_promo').select('*');
+        backupData.contacts_promo = contacts || [];
+      } catch(e) { backupData.contacts_promo = []; }
+
+      loadingMsg.innerHTML = '⏳ Génération du fichier...';
+
+      // Créer le script de données à injecter dans le HTML
+      const dataScript = 
+'<scr' + 'ipt id="omp-backup-data">\n' +
+'// BACKUP OMP - ' + now.toLocaleString('fr-FR') + '\n' +
+'// Ce fichier contient toutes les données de l\'application\n' +
+'window.OMP_BACKUP_DATA = ' + JSON.stringify(backupData, null, 2) + ';\n' +
+'window.OMP_BACKUP_DATE = "' + now.toISOString() + '";\n' +
+'console.log("📦 Backup OMP chargé - " + Object.keys(window.OMP_BACKUP_DATA).map(k => k + ": " + window.OMP_BACKUP_DATA[k].length).join(", "));\n' +
+'</scr' + 'ipt>';
+
+      // Récupérer le HTML et injecter les données avant </head>
+      let htmlContent = document.documentElement.outerHTML;
+      htmlContent = htmlContent.replace('</head>', dataScript + '\n</head>');
+
+      // Créer le blob et télécharger
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+
+      // Résumé
+      const summary = Object.keys(backupData).map(k => `${k}: ${backupData[k].length}`).join('\n');
+      loadingMsg.remove();
+      alert('✅ Backup complet téléchargé !\n\n' + filename + '\n\n📊 Données exportées :\n' + summary);
+
+    } catch (err) {
+      loadingMsg.remove();
+      console.error('Erreur backup:', err);
+      alert('❌ Erreur lors du backup : ' + err.message);
+    }
   }
 
   // BACKUP TO GOOGLE DRIVE - Upload automatique via OAuth
