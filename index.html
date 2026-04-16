@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.16.07">
+<meta name="version" content="2026.04.16.08">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -10772,12 +10772,12 @@ function _hideTeamSelection() {
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
     const el = document.getElementById('bill-ville-date');
     if (el) el.textContent = label;
-    _billTabActif = 'ldc';
-    // Reset visuels onglets
+    _billTabActif = 'tm';  // TM est le premier onglet affiché
+    // Reset visuels onglets - TM est le premier (index 0)
     document.querySelectorAll('.bill-tab').forEach((t,i) => {
-      t.style.background = i === 0 ? '#3b82f6' : '#1a1a1a';
+      t.style.background = i === 0 ? '#22c55e' : '#1a1a1a';  // Vert pour TM
       t.style.color = i === 0 ? '#fff' : '#888';
-      t.style.borderColor = i === 0 ? '#3b82f6' : '#2a2a2a';
+      t.style.borderColor = i === 0 ? '#22c55e' : '#2a2a2a';
     });
     // Réinitialiser les données avec les bonnes grilles
     billInitData();
