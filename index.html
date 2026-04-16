@@ -8635,7 +8635,7 @@ function _hideTeamSelection() {
   let _prestasData = [];
 
   async function chargerPrestas() {
-    const { data, error } = await supabase
+    const { data, error } = await _supabase
       .from('contacts_presta')
       .select('*')
       .order('societe', { ascending: true });
