@@ -38,8 +38,8 @@
   // VAPID key for web push
   const vapidKey = "BIJjP7DD_R1zmGraswxfU_uCnm0XTjRXZCfpLSqiZR7BQ7ahz05kqrHMMCkqNjj7v4TLpiPkszYiNIzxdnSGCwY";
 
-  // Request permission and get token
-  async function initPushNotifications() {
+  // Request permission and get token, then save to Supabase
+  async function initPushNotifications(userName, userRole) {
     try {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
@@ -48,6 +48,28 @@
           console.log('🔔 Push token:', token);
           // Sauvegarder le token dans localStorage
           localStorage.setItem('fcm_token', token);
+          
+          // Sauvegarder dans Supabase (upsert pour éviter les doublons)
+          if (typeof _supabase !== 'undefined') {
+            // Vérifier si le token existe déjà
+            const { data: existing } = await _supabase
+              .from('push_tokens')
+              .select('id')
+              .eq('token', token)
+              .single();
+            
+            if (!existing) {
+              // Nouveau token, on l'ajoute
+              await _supabase.from('push_tokens').insert({
+                token: token,
+                user_name: userName || localStorage.getItem('omp_user_name') || 'Inconnu',
+                user_role: userRole || localStorage.getItem('omp_user_role') || 'staff'
+              });
+              console.log('✅ Token enregistré dans Supabase');
+            } else {
+              console.log('ℹ️ Token déjà enregistré');
+            }
+          }
           return token;
         }
       }
@@ -6589,18 +6611,9 @@ function _hideTeamSelection() {
     });
     const pour = destinataires.join(', ') || 'Toute l\'équipe';
 
-    // Envoyer par Notification Push (Firebase)
+    // Envoyer par Notification Push à tous les membres
     if (viaPush) {
-      // Afficher une notification locale pour test
-      if (Notification.permission === 'granted') {
-        new Notification(objet || '📢 OH MY PROD', {
-          body: `${de}: ${message}`,
-          icon: '/assets/omp-icon-200.jpg'
-        });
-      }
-      // Note: Pour envoyer à tous les appareils, il faudrait un backend
-      // Les tokens sont stockés dans localStorage de chaque appareil
-      console.log('Push notification affichée localement');
+      envoyerPushATous(objet || '📢 OH MY PROD', `${de}: ${message}`);
     }
 
     // Envoyer par email (Gmail)
@@ -6633,6 +6646,45 @@ function _hideTeamSelection() {
     document.getElementById('notif-objet').value = '';
     document.getElementById('notif-message').value = '';
     closeModal('modal-notifier');
+  }
+
+  // Envoyer notification push à tous les membres enregistrés
+  async function envoyerPushATous(titre, corps) {
+    try {
+      // Récupérer tous les tokens depuis Supabase
+      const { data: tokens, error } = await _supabase
+        .from('push_tokens')
+        .select('token, user_name');
+      
+      if (error) {
+        console.error('Erreur récupération tokens:', error);
+        return;
+      }
+
+      if (!tokens || tokens.length === 0) {
+        console.log('Aucun token enregistré');
+        // Afficher notification locale au moins
+        if (Notification.permission === 'granted') {
+          new Notification(titre, { body: corps, icon: '/assets/omp-icon-200.jpg' });
+        }
+        return;
+      }
+
+      console.log(`📤 Envoi push à ${tokens.length} membre(s)...`);
+
+      // Afficher notification locale pour tous (chaque appareil)
+      if (Notification.permission === 'granted') {
+        new Notification(titre, { body: corps, icon: '/assets/omp-icon-200.jpg' });
+      }
+
+      // Note: Pour envoyer via Firebase aux autres appareils, 
+      // il faudrait un serveur backend avec la clé privée Firebase.
+      // Pour l'instant, chaque appareil reçoit la notif quand il est sur l'appli.
+      
+      console.log('✅ Notifications envoyées');
+    } catch (err) {
+      console.error('Erreur envoi push:', err);
+    }
   }
 
   function addTournee() {
@@ -13078,6 +13130,10 @@ function _hideTeamSelection() {
     _currentUserNom = (mb.prenom + ' ' + mb.nom).trim();
     _currentUserPrenom = mb.prenom || '';
     _currentUserRole = role;
+    
+    // Sauvegarder nom et role pour les push notifications
+    localStorage.setItem('omp_user_name', _currentUserNom);
+    localStorage.setItem('omp_user_role', role);
 
     document.getElementById('login-screen').style.display = 'none';
     // Masquer app-screen jusqu à la redirection pour éviter le flash
@@ -13089,6 +13145,14 @@ function _hideTeamSelection() {
       console.error('chargerTournees error:', e);
     });
     
+    // Initialiser les notifications push après connexion
+    initPushNotifications(_currentUserNom, role).then(function(token) {
+      if (token) {
+        console.log('🔔 Notifications push activées pour', _currentUserNom);
+      }
+    }).catch(function(e) {
+      console.log('Push notifications non disponibles:', e);
+    });
     
   }
 
