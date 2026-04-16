@@ -4543,8 +4543,8 @@ function _hideTeamSelection() {
 
 
 <!-- MODAL CRÉATION/ÉDITION PRESTA -->
-<div id="modal-presta" class="modal" onclick="if(event.target===this)fermerModalPresta()">
-  <div class="modal-content" style="max-width:550px;">
+<div id="modal-presta" class="modal-overlay" onclick="if(event.target===this)fermerModalPresta()" style="background:rgba(0,0,0,0.95);">
+  <div class="modal-box" style="max-width:550px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:#c9a84c;" id="modal-presta-titre">NOUVEAU PRESTATAIRE</div>
       <button onclick="fermerModalPresta()" style="background:none;border:none;color:#888;font-size:24px;cursor:pointer;">&times;</button>
