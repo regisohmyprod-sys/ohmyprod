@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.15.18">
+<meta name="version" content="2026.04.16.01">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3171,27 +3171,28 @@ function _hideTeamSelection() {
         </div>
       </div>
 
-      <!-- RECETTES & TOTAL DÉPENSES -->
+      <!-- RÉSULTAT OMP -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-        <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">RECETTES & RÉSULTAT</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
-          <div style="border-right:1px solid #2a2a2a;">
-            <div style="background:#1e3a5f;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;color:#7eb8d4;text-align:center;">RECETTES</div>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;">Recette Brute TTC</td><td id="pilote-rec-ttc" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#888;">Recette HT</td><td id="pilote-rec-ht" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-              <tr><td style="padding:6px 12px;color:#888;font-weight:700;">Recette HT Hors CNM</td><td id="pilote-rec-hcnm" style="padding:6px 12px;color:#fff;text-align:right;font-weight:700;"></td></tr>
-            </table>
-          </div>
-          <div>
-            <div style="background:#2a1a1a;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;color:#e31e24;text-align:center;">TOTAL DÉPENSES & RÉSULTAT</div>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;font-weight:700;">Total Dépenses</td><td id="pilote-total-dep" style="padding:6px 12px;color:#fff;text-align:right;font-weight:700;"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#888;">Intégration Droit au Tirage</td><td id="pilote-droit-tirage" style="padding:6px 12px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-              <tr style="background:rgba(239,68,68,0.15);"><td style="padding:6px 12px;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;">RÉSULTAT DATE</td><td id="pilote-resultat" style="padding:6px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:900;"></td></tr>
-            </table>
-          </div>
-        </div>
+        <div style="background:#c9a84c;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;color:#000;text-align:center;">RÉSULTAT OMP</div>
+        <!-- Éléments cachés pour compatibilité avec autres modules -->
+        <span id="pilote-rec-ht" style="display:none;"></span>
+        <span id="pilote-rec-hcnm" style="display:none;"></span>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">RECETTE TTC</td><td id="pilote-rec-ttc" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">MONTANT CNM</td><td id="pilote-montant-cnm" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DROITS</td><td id="pilote-total-droits-hcnm" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DÉPENSES</td><td id="pilote-total-dep" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="border-bottom:2px solid #333;background:#0a0a0a;"><td colspan="2" style="height:8px;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DL TTC</td><td id="pilote-dl-total-ttc-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DL HT</td><td id="pilote-dl-ht-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DEAL DL CO PROD</td><td id="pilote-deal-dl-coprod" style="padding:10px 16px;color:#22c55e;text-align:right;font-weight:700;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DROITS OMP</td><td id="pilote-droits-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="border-bottom:2px solid #333;"><td style="padding:10px 16px;color:#ccc;">DROIT AU TIRAGE</td><td id="pilote-droit-tirage" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="background:linear-gradient(90deg, #1a1a2e 0%, #2a1a3a 100%);border-top:2px solid #c9a84c;">
+            <td style="padding:14px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:16px;color:#c9a84c;">RÉSULTAT OMP</td>
+            <td id="pilote-resultat-omp" style="padding:14px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:900;"></td>
+          </tr>
+        </table>
       </div>
 
       <!-- DROITS ET TAXES -->
@@ -3225,10 +3226,6 @@ function _hideTeamSelection() {
           <div style="padding:8px 12px;border-right:1px solid #2a2a2a;"><div style="font-size:11px;color:#888;margin-bottom:3px;">TOTAL SACD</div><div id="pilote-total-sacd" style="font-weight:700;color:#fff;"></div></div>
           <div style="padding:8px 12px;border-right:1px solid #2a2a2a;"><div style="font-size:11px;color:#888;margin-bottom:3px;">TOTAL CNM</div><div id="pilote-total-cnm" style="font-weight:700;color:#fff;"></div></div>
           <div style="padding:8px 12px;"><div style="font-size:11px;color:#888;margin-bottom:3px;">TOTAL DROITS (hors CNM)</div><div id="pilote-total-droits2" style="font-weight:700;color:#c9a84c;"></div></div>
-        </div>
-        <div style="padding:8px 16px;background:#111;display:flex;justify-content:space-between;align-items:center;">
-          <div style="font-weight:700;color:#888;">RECETTE NET DE TAXES ET DROITS</div>
-          <div id="pilote-rec-net" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;font-weight:700;"></div>
         </div>
       </div>
 
@@ -9588,11 +9585,6 @@ function _hideTeamSelection() {
     set('pilote-total-cnm',     totalCNM);
     set('pilote-total-droits2', totalHorsCNM);
     set('pilote-total-droits',  totalDroits);
-    // Recette nette = Recette HT - Total SACEM - Total SACD
-    var recHorsCNM = rHT - parafiscale;
-    set('pilote-rec-hcnm', recHorsCNM);
-    var recNette = recHorsCNM - totalSacem - totalSacd;
-    set('pilote-rec-net', recNette);
   }
 
   async function fpOuvrirPilote() {
@@ -9863,20 +9855,51 @@ function _hideTeamSelection() {
           
           // TOTAL DEPENSES
           var sumFin = totalOmpSalle + totalPlSalle + totalOmpAutres + totalPlAutres;
-          setEl('pilote-total-dep', sumFin>0 ? fmt(sumFin)+' €' : '');
-          // Résultat Date = RecHT - TotalDroitsHorsCNM - TotalDépenses + DroitTirage
-          var resultat = recHT2 - totalDroitsHorsCNM - sumFin + droitTirage + dlHT;
-          var elRes = document.getElementById('pilote-resultat');
-          if (elRes) {
-            elRes.textContent = fmt(resultat) + ' €';
-            elRes.style.color = resultat >= 0 ? '#22c55e' : '#e31e24';
+          setEl('pilote-total-dep', sumFin>0 ? fmt(sumFin) : '');
+          
+          // === NOUVEAU BLOC RÉSULTAT OMP ===
+          // Montant CNM = Recette HT × 3.5%
+          var montantCNM = recHT2 * 0.035;
+          setEl('pilote-montant-cnm', montantCNM > 0 ? fmt(montantCNM) : '');
+          
+          // DROITS = Total droits hors CNM (SACEM + AGESSA + SACD + CCSA + AGESSA2 + ASS.RC + ORGANIC)
+          var assrcTaux = parseFloat(document.getElementById('pilote-assrc-taux')?.value) || 0;
+          var organicTaux = parseFloat(document.getElementById('pilote-organic-taux')?.value) || 0;
+          var assrcMt = recHT2 * assrcTaux / 100;
+          var organicMt = recHT2 * organicTaux / 100;
+          var droitsTotal = totalDroitsHorsCNM + assrcMt + organicMt;
+          setEl('pilote-total-droits-hcnm', droitsTotal > 0 ? fmt(droitsTotal) : '');
+          
+          // DL TTC et DL HT pour OMP
+          setEl('pilote-dl-total-ttc-omp', dlTTC > 0 ? fmt(dlTTC) : '');
+          setEl('pilote-dl-ht-omp', dlHT > 0 ? fmt(dlHT) : '');
+          
+          // DEAL DL CO PROD = % OMP
+          setEl('pilote-deal-dl-coprod', pctOMP + '%');
+          
+          // DROITS OMP = DL HT × % OMP / 100
+          var droitsOMP = dlHT * pctOMP / 100;
+          setEl('pilote-droits-omp', droitsOMP > 0 ? fmt(droitsOMP) : '');
+          
+          // DROIT AU TIRAGE = CNM × 60%
+          setEl('pilote-droit-tirage', droitTirage > 0 ? fmt(droitTirage) : '');
+          
+          // RÉSULTAT OMP = Recette TTC - Montant CNM - Droits - Dépenses + Droits OMP + Droit au Tirage
+          var resultatOMP = recTotal - montantCNM - droitsTotal - sumFin + droitsOMP + droitTirage;
+          var elResOMP = document.getElementById('pilote-resultat-omp');
+          if (elResOMP) {
+            elResOMP.textContent = fmt(resultatOMP);
+            elResOMP.style.color = resultatOMP >= 0 ? '#22c55e' : '#e31e24';
           }
         }
-      } catch(ef) {}
+      } catch(ef) { console.log('Erreur calcul financier:', ef); }
       // Recette TTC et prix moyen
       setEl('pilote-rec-ttc',    recTotal>0?fmt(recTotal):'');
       var recHT = recTotal/1.021;
+      // Éléments cachés pour compatibilité avec Clôture Salle et Décla Droits
       setEl('pilote-rec-ht',     recHT>0?fmt(recHT):'');
+      var recHorsCNM = recHT - (recHT * 0.035);
+      setEl('pilote-rec-hcnm',   recHorsCNM>0?fmt(recHorsCNM):'');
       setEl('pilote-tva',        recTotal>recHT?fmt(recTotal-recHT):'');
       setEl('pilote-prix-moyen', billTotal>0?fmt(recTotal/billTotal):'');
       piloteCalcDroits(recHT);
