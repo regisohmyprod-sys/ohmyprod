@@ -8746,8 +8746,8 @@ function _hideTeamSelection() {
     document.getElementById('presta-id').value = '';
     document.getElementById('presta-autre-bloc').style.display = 'none';
     document.getElementById('btn-suppr-presta').style.display = 'none';
-    await remplirCheckboxVilles([]);
     openModal('modal-presta');
+    try { await remplirCheckboxVilles([]); } catch(e) { console.log('Erreur villes:', e); }
   }
 
   function fermerModalPresta() {
