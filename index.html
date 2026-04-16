@@ -4206,7 +4206,7 @@ function _hideTeamSelection() {
       </div>
 
       <!-- BOUTONS style GESTION TOUR -->
-      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(5, 1fr);">
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(6, 1fr);">
         
         <!-- Gestion VHR -->
         <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="openModal('modal-vhr-tournee')">
@@ -4220,6 +4220,13 @@ function _hideTeamSelection() {
           <div class="stat-label">💰 Accès Frais</div>
           <div class="stat-value" style="font-size:24px;color:#c9a84c;">FRAIS</div>
           <div class="stat-sub">Dépôt justificatifs</div>
+        </div>
+
+        <!-- Contacts Presta -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('contacts-presta')">
+          <div class="stat-label">📇 Contacts Presta</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;">PRESTA</div>
+          <div class="stat-sub">Fichier prestataires</div>
         </div>
 
         <!-- Liens Pratiques -->
@@ -4491,6 +4498,128 @@ function _hideTeamSelection() {
       <button onclick="enregistrerContactPromo()" style="flex:1;background:#c9a84c;color:#000;border:none;border-radius:10px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;font-weight:700;">✓ ENREGISTRER</button>
       <button onclick="closeModal('modal-add-contact-promo')" style="background:#444;color:#fff;border:none;border-radius:10px;padding:14px 24px;font-size:15px;cursor:pointer;font-weight:600;">Annuler</button>
     </div>
+  </div>
+</div>
+
+
+<!-- ========== PAGE CONTACTS PRESTA - FICHIER PRESTATAIRES ========== -->
+<div id="page-contacts-presta" class="page">
+  <button class="back-btn" onclick="showPage('staff-omp')" style="margin-bottom:12px;">← Retour Espace Staff</button>
+  
+  <!-- HEADER -->
+  <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">📇 CONTACTS PRESTATAIRES</div>
+      <div style="font-size:13px;color:#888;margin-top:4px;">Fichier contact de tes prestataires habituels</div>
+    </div>
+    <button onclick="ouvrirModalPresta()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">+ NOUVEAU PRESTA</button>
+  </div>
+
+  <!-- FILTRES -->
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <input id="presta-search" type="text" placeholder="🔍 Rechercher un prestataire..." oninput="filtrerPrestas()"
+           style="flex:1;min-width:200px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;color:#fff;padding:8px 14px;font-size:13px;font-family:'Inter',sans-serif;outline:none;">
+    <select id="presta-filtre-type" onchange="filtrerPrestas()"
+            style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;color:#888;padding:8px 12px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+      <option value="">Tous les types</option>
+      <option value="traiteur">🍽️ Traiteur</option>
+      <option value="hotel">🏨 Hôtel</option>
+      <option value="restaurant">🍴 Restaurant</option>
+      <option value="taxi">🚕 Taxi / VTC</option>
+      <option value="autre">📦 Autre</option>
+    </select>
+    <select id="presta-filtre-ville" onchange="filtrerPrestas()"
+            style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;color:#888;padding:8px 12px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+      <option value="">Toutes les villes</option>
+      <!-- Chargé dynamiquement -->
+    </select>
+  </div>
+
+  <!-- LISTE DES PRESTAS -->
+  <div id="prestas-list" style="display:grid;gap:12px;">
+    <!-- Chargement dynamique -->
+  </div>
+</div>
+
+
+<!-- MODAL CRÉATION/ÉDITION PRESTA -->
+<div id="modal-presta" class="modal" onclick="if(event.target===this)fermerModalPresta()">
+  <div class="modal-content" style="max-width:550px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:#c9a84c;" id="modal-presta-titre">NOUVEAU PRESTATAIRE</div>
+      <button onclick="fermerModalPresta()" style="background:none;border:none;color:#888;font-size:24px;cursor:pointer;">&times;</button>
+    </div>
+    
+    <form id="form-presta" onsubmit="return sauvegarderPresta(event)">
+      <input type="hidden" id="presta-id" value="">
+      
+      <!-- Type de prestataire -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Type de prestataire *</label>
+        <select id="presta-type" required onchange="toggleAutrePresta()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;">
+          <option value="">-- Choisir --</option>
+          <option value="traiteur">🍽️ Traiteur</option>
+          <option value="hotel">🏨 Hôtel</option>
+          <option value="restaurant">🍴 Restaurant</option>
+          <option value="taxi">🚕 Taxi / VTC</option>
+          <option value="autre">📦 Autre (préciser)</option>
+        </select>
+      </div>
+
+      <!-- Si "Autre" sélectionné -->
+      <div id="presta-autre-bloc" style="display:none;margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Précisez le type</label>
+        <input type="text" id="presta-autre-type" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="Ex: Location véhicule, Pressing, etc.">
+      </div>
+
+      <!-- Nom Prestataire (société) -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Nom du prestataire / Société *</label>
+        <input type="text" id="presta-societe" required style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="Ex: Hôtel Mercure, Restaurant Le Zinc...">
+      </div>
+
+      <!-- Nom Contact -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Nom du contact</label>
+        <input type="text" id="presta-nom-contact" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="Prénom Nom">
+      </div>
+
+      <!-- Mobile & Email -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div>
+          <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Mobile</label>
+          <input type="tel" id="presta-telephone" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="06 12 34 56 78">
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Email</label>
+          <input type="email" id="presta-email" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="contact@presta.com">
+        </div>
+      </div>
+
+      <!-- Ville(s) Tour concernée(s) - Multi-select avec checkboxes -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Ville(s) Tour concernée(s)</label>
+        <div style="font-size:11px;color:#666;margin-bottom:8px;">Sélectionne les villes où ce presta intervient</div>
+        <div id="presta-villes-container" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:12px;max-height:180px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <!-- Checkboxes chargées dynamiquement -->
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Notes / Commentaires</label>
+        <textarea id="presta-notes" rows="2" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;resize:vertical;" placeholder="Infos complémentaires, tarifs, avis..."></textarea>
+      </div>
+
+      <!-- BOUTONS -->
+      <div style="display:flex;gap:12px;justify-content:space-between;">
+        <button type="button" id="btn-suppr-presta" onclick="supprimerPresta(document.getElementById('presta-id').value)" style="background:#8b0000;color:#fff;border:none;border-radius:6px;padding:10px 16px;font-size:13px;cursor:pointer;display:none;">🗑️ Supprimer</button>
+        <div style="display:flex;gap:12px;margin-left:auto;">
+          <button type="button" onclick="fermerModalPresta()" style="background:#333;color:#fff;border:none;border-radius:6px;padding:10px 20px;font-size:13px;cursor:pointer;">Annuler</button>
+          <button type="submit" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;">💾 Enregistrer</button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -8502,6 +8631,192 @@ function _hideTeamSelection() {
     `).join('');
   }
 
+  // ========== CONTACTS PRESTATAIRES ==========
+  let _prestasData = [];
+
+  async function chargerPrestas() {
+    const { data, error } = await supabase
+      .from('contacts_presta')
+      .select('*')
+      .order('societe', { ascending: true });
+    if (error) { console.error('Erreur chargement prestas:', error); return; }
+    _prestasData = data || [];
+    afficherPrestas(_prestasData);
+    chargerVillesFiltrePresta();
+  }
+
+  // Charger les villes de la tournée pour le multi-select
+  let _villesTour = [];
+  async function chargerVillesTour() {
+    const { data } = await supabase.from('dates').select('ville').order('ville');
+    const villes = [...new Set((data || []).map(d => d.ville).filter(Boolean))];
+    _villesTour = villes;
+    return villes;
+  }
+
+  async function chargerVillesFiltrePresta() {
+    if (!_villesTour.length) await chargerVillesTour();
+    const select = document.getElementById('presta-filtre-ville');
+    if (!select) return;
+    select.innerHTML = '<option value="">Toutes les villes</option>' + 
+      _villesTour.map(v => `<option value="${v}">${v}</option>`).join('');
+  }
+
+  async function remplirCheckboxVilles(villesSelectionnees = []) {
+    if (!_villesTour.length) await chargerVillesTour();
+    const container = document.getElementById('presta-villes-container');
+    if (!container) return;
+    container.innerHTML = _villesTour.map(v => `
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;cursor:pointer;">
+        <input type="checkbox" name="presta-villes" value="${v}" ${villesSelectionnees.includes(v) ? 'checked' : ''} 
+               style="accent-color:#c9a84c;">
+        ${v}
+      </label>
+    `).join('');
+  }
+
+  function getVillesSelectionnees() {
+    const checkboxes = document.querySelectorAll('input[name="presta-villes"]:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
+  }
+
+  function afficherPrestas(prestas) {
+    const container = document.getElementById('prestas-list');
+    if (!container) return;
+    if (!prestas.length) {
+      container.innerHTML = '<div style="text-align:center;color:#666;padding:40px;">Aucun prestataire enregistré.<br>Clique sur "+ NOUVEAU PRESTA" pour en ajouter.</div>';
+      return;
+    }
+    const typeLabels = {
+      'traiteur': '🍽️ Traiteur',
+      'hotel': '🏨 Hôtel',
+      'restaurant': '🍴 Restaurant',
+      'taxi': '🚕 Taxi / VTC',
+      'autre': '📦 Autre'
+    };
+    container.innerHTML = prestas.map(p => {
+      const typeLabel = p.type_presta === 'autre' && p.autre_type ? `📦 ${p.autre_type}` : (typeLabels[p.type_presta] || p.type_presta || '');
+      const villes = p.villes_tour ? (Array.isArray(p.villes_tour) ? p.villes_tour : JSON.parse(p.villes_tour || '[]')) : [];
+      const villesStr = villes.length ? villes.slice(0, 3).join(', ') + (villes.length > 3 ? '...' : '') : '';
+      return `
+      <div onclick="ouvrirFichePresta('${p.id}')" style="background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div>
+          <div style="font-size:16px;font-weight:600;color:#fff;margin-bottom:4px;">${p.societe || '—'}</div>
+          <div style="font-size:12px;color:#888;">${p.nom_contact ? p.nom_contact + ' • ' : ''}${typeLabel}</div>
+          ${villesStr ? `<div style="font-size:11px;color:#c9a84c;margin-top:4px;">📍 ${villesStr}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          ${p.telephone ? `<a href="tel:${p.telephone}" onclick="event.stopPropagation()" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 10px;color:#c9a84c;text-decoration:none;font-size:12px;">📞</a>` : ''}
+          ${p.email ? `<a href="mailto:${p.email}" onclick="event.stopPropagation()" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 10px;color:#c9a84c;text-decoration:none;font-size:12px;">✉️</a>` : ''}
+        </div>
+      </div>
+    `;}).join('');
+  }
+
+  function filtrerPrestas() {
+    const q = document.getElementById('presta-search')?.value?.toLowerCase() || '';
+    const type = document.getElementById('presta-filtre-type')?.value || '';
+    const ville = document.getElementById('presta-filtre-ville')?.value || '';
+    const filtered = _prestasData.filter(p => {
+      const hay = [p.societe, p.nom_contact, p.autre_type, p.notes]
+        .filter(Boolean).join(' ').toLowerCase();
+      const matchQ = !q || hay.includes(q);
+      const matchType = !type || p.type_presta === type;
+      // Vérifier si le presta couvre cette ville
+      let matchVille = true;
+      if (ville) {
+        const villes = p.villes_tour ? (Array.isArray(p.villes_tour) ? p.villes_tour : JSON.parse(p.villes_tour || '[]')) : [];
+        matchVille = villes.includes(ville);
+      }
+      return matchQ && matchType && matchVille;
+    });
+    afficherPrestas(filtered);
+  }
+
+  function toggleAutrePresta() {
+    const type = document.getElementById('presta-type').value;
+    const bloc = document.getElementById('presta-autre-bloc');
+    if (bloc) bloc.style.display = type === 'autre' ? 'block' : 'none';
+  }
+
+  async function ouvrirModalPresta() {
+    window._prestaEditId = null;
+    document.getElementById('modal-presta-titre').textContent = 'NOUVEAU PRESTATAIRE';
+    document.getElementById('form-presta').reset();
+    document.getElementById('presta-id').value = '';
+    document.getElementById('presta-autre-bloc').style.display = 'none';
+    document.getElementById('btn-suppr-presta').style.display = 'none';
+    await remplirCheckboxVilles([]);
+    openModal('modal-presta');
+  }
+
+  function fermerModalPresta() {
+    closeModal('modal-presta');
+  }
+
+  async function ouvrirFichePresta(id) {
+    const presta = _prestasData.find(p => p.id === id);
+    if (!presta) return;
+    window._prestaEditId = id;
+    document.getElementById('modal-presta-titre').textContent = 'MODIFIER PRESTATAIRE';
+    document.getElementById('presta-id').value = id;
+    document.getElementById('presta-type').value = presta.type_presta || '';
+    toggleAutrePresta();
+    document.getElementById('presta-autre-type').value = presta.autre_type || '';
+    document.getElementById('presta-societe').value = presta.societe || '';
+    document.getElementById('presta-nom-contact').value = presta.nom_contact || '';
+    document.getElementById('presta-telephone').value = presta.telephone || '';
+    document.getElementById('presta-email').value = presta.email || '';
+    document.getElementById('presta-notes').value = presta.notes || '';
+    // Villes
+    const villes = presta.villes_tour ? (Array.isArray(presta.villes_tour) ? presta.villes_tour : JSON.parse(presta.villes_tour || '[]')) : [];
+    await remplirCheckboxVilles(villes);
+    // Bouton supprimer
+    document.getElementById('btn-suppr-presta').style.display = 'block';
+    openModal('modal-presta');
+  }
+
+  async function sauvegarderPresta(e) {
+    e.preventDefault();
+    const id = document.getElementById('presta-id').value;
+    const typePresta = document.getElementById('presta-type').value;
+    const data = {
+      type_presta: typePresta,
+      autre_type: typePresta === 'autre' ? document.getElementById('presta-autre-type').value.trim() : null,
+      societe: document.getElementById('presta-societe').value.trim(),
+      nom_contact: document.getElementById('presta-nom-contact').value.trim(),
+      telephone: document.getElementById('presta-telephone').value.trim(),
+      email: document.getElementById('presta-email').value.trim(),
+      villes_tour: JSON.stringify(getVillesSelectionnees()),
+      notes: document.getElementById('presta-notes').value.trim()
+    };
+
+    let result;
+    if (id) {
+      result = await supabase.from('contacts_presta').update(data).eq('id', id);
+    } else {
+      result = await supabase.from('contacts_presta').insert([data]);
+    }
+
+    if (result.error) {
+      alert('Erreur: ' + result.error.message);
+      return false;
+    }
+
+    fermerModalPresta();
+    await chargerPrestas();
+    return false;
+  }
+
+  async function supprimerPresta(id) {
+    if (!id) return;
+    if (!confirm('Supprimer ce prestataire ?')) return;
+    const { error } = await supabase.from('contacts_presta').delete().eq('id', id);
+    if (error) { alert('Erreur: ' + error.message); return; }
+    fermerModalPresta();
+    await chargerPrestas();
+  }
+
   function filtrerSalles() {
     const q = document.getElementById('salles-search')?.value?.toLowerCase() || '';
     const zone = document.getElementById('salles-filtre-zone')?.value || '';
@@ -8840,6 +9155,7 @@ function _hideTeamSelection() {
     if (id === 'equipe') chargerPageMembres();
     if (id === 'gestion-salles') chargerSalles();
     if (id === 'contacts-promo') chargerContactsPromo();
+    if (id === 'contacts-presta') chargerPrestas();
     if (id === 'acces-frais') {
       // Afficher vue admin ou membre selon le rôle
       var adminView = document.getElementById('frais-admin-view');
