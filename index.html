@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.16.05">
+<meta name="version" content="2026.04.16.07">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3415,9 +3415,9 @@ function _hideTeamSelection() {
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead><tr style="background:#111;"><th style="padding:7px 12px;text-align:left;color:#888;">DROITS</th><th style="padding:7px 12px;text-align:right;color:#888;">MONTANT À DÉCLARER</th><th style="padding:7px 12px;text-align:right;color:#888;">MONTANT À PAYER</th><th style="padding:7px 12px;text-align:center;color:#888;">DÉCLARATION OK</th><th style="padding:7px 12px;text-align:center;color:#888;">RÈGLEMENT OK</th></tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">CNM</td><td id="dd-cnm-montant" style="padding:7px 12px;text-align:right;color:#c9a84c;font-weight:600;"></td><td id="dd-cnm-payer" style="padding:7px 12px;text-align:right;color:#e31e24;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-cnv-decla" onchange="ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-cnv-regl" onchange="ddSauvegarder()"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACD</td><td id="dd-sacd-montant" style="padding:7px 12px;text-align:right;color:#c9a84c;font-weight:600;"></td><td id="dd-sacd-payer" style="padding:7px 12px;text-align:right;color:#e31e24;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-sacd-decla" onchange="ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacd-regl" onchange="ddSauvegarder()"></td></tr>
-            <tr><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACEM</td><td id="dd-sacem-montant" style="padding:7px 12px;text-align:right;color:#c9a84c;font-weight:600;"></td><td id="dd-sacem-payer" style="padding:7px 12px;text-align:right;color:#e31e24;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-sacem-decla" onchange="ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacem-regl" onchange="ddSauvegarder()"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">CNM</td><td id="dd-cnm-montant" style="padding:7px 12px;text-align:right;color:#c9a84c;font-weight:600;"></td><td id="dd-cnm-payer" style="padding:7px 12px;text-align:right;color:#e31e24;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-cnv-decla" onchange="ddUpdatePayerColor('cnm'); ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-cnv-regl" onchange="ddUpdatePayerColor('cnm'); ddSauvegarder()"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACD</td><td id="dd-sacd-montant" style="padding:7px 12px;text-align:right;color:#c9a84c;font-weight:600;"></td><td id="dd-sacd-payer" style="padding:7px 12px;text-align:right;color:#e31e24;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-sacd-decla" onchange="ddUpdatePayerColor('sacd'); ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacd-regl" onchange="ddUpdatePayerColor('sacd'); ddSauvegarder()"></td></tr>
+            <tr><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACEM</td><td id="dd-sacem-montant" style="padding:7px 12px;text-align:right;color:#c9a84c;font-weight:600;"></td><td id="dd-sacem-payer" style="padding:7px 12px;text-align:right;color:#e31e24;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-sacem-decla" onchange="ddUpdatePayerColor('sacem'); ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacem-regl" onchange="ddUpdatePayerColor('sacem'); ddSauvegarder()"></td></tr>
           </tbody>
         </table>
       </div>
@@ -10299,6 +10299,38 @@ function _hideTeamSelection() {
     showPage('bilan-amh');
   }
 
+  // Fonction pour mettre à jour la couleur du montant à payer selon les checkboxes
+  function ddUpdatePayerColor(droit) {
+    // Mapping des IDs (cnm utilise cnv pour les checkboxes)
+    var declaId = droit === 'cnm' ? 'dd-cnv-decla' : 'dd-' + droit + '-decla';
+    var reglId = droit === 'cnm' ? 'dd-cnv-regl' : 'dd-' + droit + '-regl';
+    var payerId = 'dd-' + droit + '-payer';
+    
+    var declaOk = document.getElementById(declaId)?.checked || false;
+    var reglOk = document.getElementById(reglId)?.checked || false;
+    var payerEl = document.getElementById(payerId);
+    
+    if (payerEl) {
+      if (reglOk) {
+        // Règlement OK → Vert
+        payerEl.style.color = '#22c55e';
+      } else if (declaOk) {
+        // Déclaration OK mais pas réglé → Orange
+        payerEl.style.color = '#f59e0b';
+      } else {
+        // Rien coché → Rouge
+        payerEl.style.color = '#e31e24';
+      }
+    }
+  }
+  
+  // Appliquer les couleurs au chargement des données
+  function ddApplyAllPayerColors() {
+    ['cnm', 'sacd', 'sacem'].forEach(function(droit) {
+      ddUpdatePayerColor(droit);
+    });
+  }
+
   var _ddSaveTimer = null;
   function ddSauvegarder() {
     clearTimeout(_ddSaveTimer);
@@ -10395,11 +10427,13 @@ function _hideTeamSelection() {
     // Charger checkboxes sauvegardées
     if (_fpDateId) {
       _supabase.from('fiches_production').select('decla_droits_data').eq('date_concert_id', _fpDateId).single().then(function(r) {
-        if (!r.data || !r.data.decla_droits_data) return;
+        if (!r.data || !r.data.decla_droits_data) { ddApplyAllPayerColors(); return; }
         var d = JSON.parse(r.data.decla_droits_data);
         Object.keys(d).forEach(function(id) {
           var e = document.getElementById(id); if(e) e.checked = d[id];
         });
+        // Appliquer les couleurs selon l'état des checkboxes
+        ddApplyAllPayerColors();
       });
     }
     showPage('decla-droits');
@@ -10472,10 +10506,9 @@ function _hideTeamSelection() {
         });
         var pctSalle = parseFloat(fd['fin-omp-loc-pct']) || 0;
         setEl('cs-pct-salle', pctSalle + ' %');
-        // Location MG = MAX(MG saisi, % × RecHT) - même logique que Fiche Dépenses
+        // Location MG = MAX(MG saisi, loc-ht sauvegardé) - exactement comme Fiche Dépenses
         var locMG = parseFloat(fd['fin-omp-loc-mg']) || 0;
-        var recHTval = parseFloat((document.getElementById('pilote-rec-ht')?.textContent || '0').replace(/[^0-9,]/g,'').replace(',','.')) || 0;
-        var locHT = recHTval * pctSalle / 100;
+        var locHT = parseFloat(fd['fin-omp-loc-ht']) || 0;
         var locCalc = Math.max(locMG, locHT);
         setEl('cs-loc-mg', locCalc > 0 ? fmtCs(locCalc) : '');
         // Prestations/personne salle
