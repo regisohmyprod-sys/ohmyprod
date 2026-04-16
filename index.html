@@ -8648,7 +8648,7 @@ function _hideTeamSelection() {
   // Charger les villes de la tournée pour le multi-select
   let _villesTour = [];
   async function chargerVillesTour() {
-    const { data } = await supabase.from('dates_concert').select('ville').order('ville');
+    const { data } = await _supabase.from('dates_concert').select('ville').order('ville');
     const villes = [...new Set((data || []).map(d => d.ville).filter(Boolean))];
     _villesTour = villes;
     return villes;
@@ -8797,9 +8797,9 @@ function _hideTeamSelection() {
 
       let result;
       if (id) {
-        result = await supabase.from('contacts_presta').update(data).eq('id', id);
+        result = await _supabase.from('contacts_presta').update(data).eq('id', id);
       } else {
-        result = await supabase.from('contacts_presta').insert([data]);
+        result = await _supabase.from('contacts_presta').insert([data]);
       }
 
       if (result.error) {
@@ -8819,7 +8819,7 @@ function _hideTeamSelection() {
   async function supprimerPresta(id) {
     if (!id) return;
     if (!confirm('Supprimer ce prestataire ?')) return;
-    const { error } = await supabase.from('contacts_presta').delete().eq('id', id);
+    const { error } = await _supabase.from('contacts_presta').delete().eq('id', id);
     if (error) { alert('Erreur: ' + error.message); return; }
     fermerModalPresta();
     await chargerPrestas();
