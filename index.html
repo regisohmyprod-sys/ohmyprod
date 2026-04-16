@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.16.01">
+<meta name="version" content="2026.04.16.05">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3413,11 +3413,11 @@ function _hideTeamSelection() {
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <div style="background:#a855f7;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">SUIVI DES DROITS</div>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <thead><tr style="background:#111;"><th style="padding:7px 12px;text-align:left;color:#888;">DROITS</th><th style="padding:7px 12px;text-align:center;color:#888;">DÉCLARATION OK</th><th style="padding:7px 12px;text-align:center;color:#888;">RÈGLEMENT OK</th></tr></thead>
+          <thead><tr style="background:#111;"><th style="padding:7px 12px;text-align:left;color:#888;">DROITS</th><th style="padding:7px 12px;text-align:right;color:#888;">MONTANT À DÉCLARER</th><th style="padding:7px 12px;text-align:right;color:#888;">MONTANT À PAYER</th><th style="padding:7px 12px;text-align:center;color:#888;">DÉCLARATION OK</th><th style="padding:7px 12px;text-align:center;color:#888;">RÈGLEMENT OK</th></tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">CNV</td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-cnv-decla" onchange="ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-cnv-regl" onchange="ddSauvegarder()"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACD</td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-sacd-decla" onchange="ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacd-regl" onchange="ddSauvegarder()"></td></tr>
-            <tr><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACEM</td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-sacem-decla" onchange="ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacem-regl" onchange="ddSauvegarder()"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">CNM</td><td id="dd-cnm-montant" style="padding:7px 12px;text-align:right;color:#c9a84c;font-weight:600;"></td><td id="dd-cnm-payer" style="padding:7px 12px;text-align:right;color:#e31e24;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-cnv-decla" onchange="ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-cnv-regl" onchange="ddSauvegarder()"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACD</td><td id="dd-sacd-montant" style="padding:7px 12px;text-align:right;color:#c9a84c;font-weight:600;"></td><td id="dd-sacd-payer" style="padding:7px 12px;text-align:right;color:#e31e24;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-sacd-decla" onchange="ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacd-regl" onchange="ddSauvegarder()"></td></tr>
+            <tr><td style="padding:7px 12px;color:#ccc;font-weight:600;">SACEM</td><td id="dd-sacem-montant" style="padding:7px 12px;text-align:right;color:#c9a84c;font-weight:600;"></td><td id="dd-sacem-payer" style="padding:7px 12px;text-align:right;color:#e31e24;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#c9a84c;width:16px;height:16px;" id="dd-sacem-decla" onchange="ddSauvegarder()"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sacem-regl" onchange="ddSauvegarder()"></td></tr>
           </tbody>
         </table>
       </div>
@@ -10039,8 +10039,26 @@ function _hideTeamSelection() {
 
     if (!_fpDateId) { showPage('bilan-amh'); return; }
 
+    // Charger le total des invitations validées depuis la table invitations (comme le Pilote)
+    var gInvitations = 0;
+    try {
+      var { data: invitData } = await _supabase
+        .from('invitations')
+        .select('nombre')
+        .eq('date_concert_id', _fpDateId)
+        .eq('valide', 1);
+      if (invitData && invitData.length > 0) {
+        gInvitations = invitData.reduce(function(sum, inv) { return sum + (inv.nombre || 1); }, 0);
+      }
+    } catch(e) { console.log('Bilan AMH invitations erreur:', e); }
+    
+    // Fallback : récupérer depuis le champ fp-invitations si pas trouvé
+    if (gInvitations === 0) {
+      gInvitations = parseInt(document.getElementById('fp-invitations')?.value) || 0;
+    }
+
     // Charger billetterie_data depuis Supabase
-    var recTotal = 0, gBillets = 0, gInvitations = 0, dlTTC = 0;
+    var recTotal = 0, gBillets = 0, dlTTC = 0;
     try {
       var bdRes = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
       if (bdRes.data && bdRes.data.billetterie_data) {
@@ -10065,20 +10083,8 @@ function _hideTeamSelection() {
             }
           }
         }
-        // Invitations : total direct depuis billetterie_data.invit
-        if (parsed.invit) {
-          var invitKeys = ['prod_artistes', 'invit_salle', 'servitudes', 'partenaires', 'presse', 'autres'];
-          for (var ik=0; ik<invitKeys.length; ik++) {
-            gInvitations += parseInt(parsed.invit[invitKeys[ik]]) || 0;
-          }
-        }
       }
     } catch(e) { console.log('Bilan AMH billetterie erreur:', e); }
-    
-    // Fallback : récupérer depuis le champ fp-invitations si pas trouvé
-    if (gInvitations === 0) {
-      gInvitations = parseInt(document.getElementById('fp-invitations')?.value) || 0;
-    }
 
     // Calculs recettes (identiques au PILOTE)
     var recHT = recTotal / 1.021;
@@ -10323,7 +10329,9 @@ function _hideTeamSelection() {
     var promo = document.getElementById('fp-promoteur')?.value || 'PAS DE PL';
     var dateStr = date ? new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : '';
     setEl('dd-date',     dateStr);
-    setEl('dd-lieu',     ville + ' / ' + salle + ' / ' + heure);
+    // Formater l'heure sans les secondes (ex: 20:30 au lieu de 20:30:00)
+    var heureFormatee = heure ? heure.substring(0, 5) : '';
+    setEl('dd-lieu',     ville + ' / ' + salle + ' / ' + heureFormatee);
     setEl('dd-promo',    promo);
     setEl('dd-ville-date', ville + (dateStr ? ' · ' + dateStr : ''));
 
@@ -10332,6 +10340,22 @@ function _hideTeamSelection() {
     setEl('dd-decla-hcnm', getEl('pilote-rec-hcnm'));   // Recette HT Hors CNM
     setEl('dd-payants',    getEl('pilote-ventes'));      // Billets vendus
     setEl('dd-invit',      getEl('pilote-invitations')); // Total invitations
+    
+    // Montants à déclarer pour SUIVI DES DROITS
+    // CNM = MONTANT DÉCLA CNM + SACEM (HT) = Recette HT
+    setEl('dd-cnm-montant', getEl('pilote-rec-ht'));
+    // SACD = MONTANT DÉCLA CNM + SACD (HCNM) = Recette HT Hors CNM
+    setEl('dd-sacd-montant', getEl('pilote-rec-hcnm'));
+    // SACEM = MONTANT DÉCLA CNM + SACD (HCNM) = Recette HT Hors CNM
+    setEl('dd-sacem-montant', getEl('pilote-rec-hcnm'));
+    
+    // Montants à payer depuis Bilan AMH
+    // CNM = MONTANT CNM (bilan-parafiscale)
+    setEl('dd-cnm-payer', getEl('bilan-parafiscale'));
+    // SACD = TOTAL SACD (bilan-total-sacd)
+    setEl('dd-sacd-payer', getEl('bilan-total-sacd'));
+    // SACEM = TOTAL SACEM (bilan-total-sacem)
+    setEl('dd-sacem-payer', getEl('bilan-total-sacem'));
 
     // Facture Salle Total + nom salle
     setEl('dd-f-salle', getEl('cs-fact-total') || getEl('pilote-rec-ht'));
@@ -10448,9 +10472,11 @@ function _hideTeamSelection() {
         });
         var pctSalle = parseFloat(fd['fin-omp-loc-pct']) || 0;
         setEl('cs-pct-salle', pctSalle + ' %');
-        // Location calculée MG = RecHT × % salle
+        // Location MG = MAX(MG saisi, % × RecHT) - même logique que Fiche Dépenses
+        var locMG = parseFloat(fd['fin-omp-loc-mg']) || 0;
         var recHTval = parseFloat((document.getElementById('pilote-rec-ht')?.textContent || '0').replace(/[^0-9,]/g,'').replace(',','.')) || 0;
-        var locCalc = recHTval * pctSalle / 100;
+        var locHT = recHTval * pctSalle / 100;
+        var locCalc = Math.max(locMG, locHT);
         setEl('cs-loc-mg', locCalc > 0 ? fmtCs(locCalc) : '');
         // Prestations/personne salle
         var ompPrest = (parseFloat(fd['fin-omp-prest-energie'])||0)+(parseFloat(fd['fin-omp-prest-chauf'])||0)+(parseFloat(fd['fin-omp-prest-config'])||0)+(parseFloat(fd['fin-omp-prest-fenwick'])||0)+(parseFloat(fd['fin-omp-prest-accroches'])||0)+(parseFloat(fd['fin-omp-prest-elec'])||0);
