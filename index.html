@@ -9924,6 +9924,8 @@ function _hideTeamSelection() {
 
   // Variable globale pour stocker les données du routing tour
   var _routingTourData = [];
+  var _routingTourDataBrut = []; // Données brutes non filtrées
+  var _routingGroupes = []; // Liste des groupes uniques
 
   // Ouvrir le modal DÉCLA ROUTING TOUR avec toutes les dates de la tournée
   async function ouvrirModalRoutingTour() {
@@ -9931,6 +9933,14 @@ function _hideTeamSelection() {
     var titreSpectacle = document.getElementById('fp-spectacle')?.value || 'THE WORLD OF QUEEN';
     var elTitre = document.getElementById('rt-titre-spectacle');
     if (elTitre) elTitre.textContent = titreSpectacle;
+    
+    // Réinitialiser les filtres
+    var filtreGroupe = document.getElementById('rt-filtre-groupe');
+    var filtreDateDebut = document.getElementById('rt-filtre-date-debut');
+    var filtreDateFin = document.getElementById('rt-filtre-date-fin');
+    if (filtreGroupe) filtreGroupe.value = '';
+    if (filtreDateDebut) filtreDateDebut.value = '';
+    if (filtreDateFin) filtreDateFin.value = '';
     
     // Ouvrir le modal
     openModal('modal-routing-tour');
@@ -9975,10 +9985,12 @@ function _hideTeamSelection() {
       if (fiches) fiches.forEach(function(f) { fichesMap[f.date_concert_id] = f; });
       
       _routingTourData = [];
-      var html = '';
+      _routingTourDataBrut = [];
+      _routingGroupes = [];
       
       dates.forEach(function(d, idx) {
         var dateFormatee = '';
+        var dateBrut = d.date_concert || '';
         if (d.date_concert) {
           var dt = new Date(d.date_concert + 'T00:00:00');
           dateFormatee = dt.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'2-digit'});
@@ -9988,12 +10000,18 @@ function _hideTeamSelection() {
         var nomTournee = tourneesMap[d.tournee_id] || '';
         var titreSpectacleDate = nomTournee || 'THE WORLD OF QUEEN';
         
-        // Nom du groupe fixe
+        // Nom du groupe fixe (pour l'instant)
         var nomGroupe = 'TWOQ / THE WORLD OF QUEEN';
         
-        // Stocker les données pour export (les 3 dernières colonnes vides par défaut)
-        _routingTourData.push({
+        // Ajouter le groupe à la liste s'il n'existe pas
+        if (_routingGroupes.indexOf(nomGroupe) === -1) {
+          _routingGroupes.push(nomGroupe);
+        }
+        
+        // Stocker les données brutes (les 3 dernières colonnes vides par défaut)
+        _routingTourDataBrut.push({
           date: dateFormatee,
+          dateBrut: dateBrut,
           nomGroupe: nomGroupe,
           titre: titreSpectacleDate,
           localite: d.ville || '',
@@ -10003,38 +10021,104 @@ function _hideTeamSelection() {
           pctTiers: '',
           nomTiers: ''
         });
-        
-        var bgColor = idx % 2 === 0 ? '#0a0a0a' : '#111';
-        html += '<tr style="background:' + bgColor + ';" data-idx="' + idx + '">'
-          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + dateFormatee + '</td>'
-          + '<td style="padding:7px 10px;color:#c9a84c;border:1px solid #2a2a2a;font-weight:600;">' + nomGroupe + '</td>'
-          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + titreSpectacleDate + '</td>'
-          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.ville || '') + '</td>'
-          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.nom_salle || '') + '</td>'
-          + '<td style="padding:7px 10px;color:#888;border:1px solid #2a2a2a;text-align:center;font-size:10px;">Concert</td>'
-          + '<td style="padding:4px 6px;border:1px solid #2a2a2a;text-align:center;">'
-          + '<input type="text" data-field="pctCharge" style="width:50px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#22c55e;padding:4px 6px;font-size:12px;text-align:center;font-weight:700;" onchange="updateRoutingData(' + idx + ', \'pctCharge\', this.value)">'
-          + '</td>'
-          + '<td style="padding:4px 6px;border:1px solid #2a2a2a;text-align:center;">'
-          + '<input type="text" data-field="pctTiers" style="width:50px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#f59e0b;padding:4px 6px;font-size:12px;text-align:center;font-weight:700;" onchange="updateRoutingData(' + idx + ', \'pctTiers\', this.value)">'
-          + '</td>'
-          + '<td style="padding:4px 6px;border:1px solid #2a2a2a;">'
-          + '<input type="text" list="datalist-tiers-payant" data-field="nomTiers" style="width:100%;min-width:120px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#fff;padding:4px 8px;font-size:12px;" placeholder="Nom tiers..." onchange="updateRoutingData(' + idx + ', \'nomTiers\', this.value)">'
-          + '</td>'
-          + '</tr>';
       });
       
-      tbody.innerHTML = html;
+      // Alimenter le select des groupes
+      var selectGroupe = document.getElementById('rt-filtre-groupe');
+      if (selectGroupe) {
+        selectGroupe.innerHTML = '<option value="">— Tous les groupes —</option>';
+        _routingGroupes.forEach(function(g) {
+          selectGroupe.innerHTML += '<option value="' + g + '">' + g + '</option>';
+        });
+      }
+      
+      // Afficher toutes les données (sans filtre initial)
+      afficherRoutingTour(_routingTourDataBrut);
       
     } catch(e) {
       tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#e31e24;">Erreur de chargement</td></tr>';
     }
   }
 
-  // Mise à jour des données routing quand on modifie un champ
-  function updateRoutingData(idx, field, value) {
+  // Afficher les données routing dans le tableau
+  function afficherRoutingTour(data) {
+    var tbody = document.getElementById('rt-tbody');
+    if (!tbody) return;
+    
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#888;">Aucune date ne correspond aux filtres</td></tr>';
+      _routingTourData = [];
+      return;
+    }
+    
+    _routingTourData = data;
+    var html = '';
+    
+    data.forEach(function(d, idx) {
+      var bgColor = idx % 2 === 0 ? '#0a0a0a' : '#111';
+      html += '<tr style="background:' + bgColor + ';" data-idx="' + idx + '">'
+        + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + d.date + '</td>'
+        + '<td style="padding:7px 10px;color:#c9a84c;border:1px solid #2a2a2a;font-weight:600;">' + d.nomGroupe + '</td>'
+        + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + d.titre + '</td>'
+        + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + d.localite + '</td>'
+        + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + d.salle + '</td>'
+        + '<td style="padding:7px 10px;color:#888;border:1px solid #2a2a2a;text-align:center;font-size:10px;">Concert</td>'
+        + '<td style="padding:4px 6px;border:1px solid #2a2a2a;text-align:center;">'
+        + '<input type="text" data-field="pctCharge" value="' + (d.pctCharge || '') + '" style="width:50px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#22c55e;padding:4px 6px;font-size:12px;text-align:center;font-weight:700;" onchange="updateRoutingDataFiltre(' + idx + ', \'pctCharge\', this.value)">'
+        + '</td>'
+        + '<td style="padding:4px 6px;border:1px solid #2a2a2a;text-align:center;">'
+        + '<input type="text" data-field="pctTiers" value="' + (d.pctTiers || '') + '" style="width:50px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#f59e0b;padding:4px 6px;font-size:12px;text-align:center;font-weight:700;" onchange="updateRoutingDataFiltre(' + idx + ', \'pctTiers\', this.value)">'
+        + '</td>'
+        + '<td style="padding:4px 6px;border:1px solid #2a2a2a;">'
+        + '<input type="text" list="datalist-tiers-payant" data-field="nomTiers" value="' + (d.nomTiers || '') + '" style="width:100%;min-width:120px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#fff;padding:4px 8px;font-size:12px;" placeholder="Nom tiers..." onchange="updateRoutingDataFiltre(' + idx + ', \'nomTiers\', this.value)">'
+        + '</td>'
+        + '</tr>';
+    });
+    
+    tbody.innerHTML = html;
+  }
+
+  // Filtrer les données routing
+  function filtrerRoutingTour() {
+    var filtreGroupe = document.getElementById('rt-filtre-groupe')?.value || '';
+    var filtreDateDebut = document.getElementById('rt-filtre-date-debut')?.value || '';
+    var filtreDateFin = document.getElementById('rt-filtre-date-fin')?.value || '';
+    
+    var dataFiltree = _routingTourDataBrut.filter(function(d) {
+      // Filtre par groupe
+      if (filtreGroupe && d.nomGroupe !== filtreGroupe) return false;
+      
+      // Filtre par date début
+      if (filtreDateDebut && d.dateBrut < filtreDateDebut) return false;
+      
+      // Filtre par date fin
+      if (filtreDateFin && d.dateBrut > filtreDateFin) return false;
+      
+      return true;
+    });
+    
+    afficherRoutingTour(dataFiltree);
+  }
+
+  // Réinitialiser les filtres
+  function reinitialiserFiltresRouting() {
+    var filtreGroupe = document.getElementById('rt-filtre-groupe');
+    var filtreDateDebut = document.getElementById('rt-filtre-date-debut');
+    var filtreDateFin = document.getElementById('rt-filtre-date-fin');
+    if (filtreGroupe) filtreGroupe.value = '';
+    if (filtreDateDebut) filtreDateDebut.value = '';
+    if (filtreDateFin) filtreDateFin.value = '';
+    afficherRoutingTour(_routingTourDataBrut);
+  }
+
+  // Mise à jour des données routing filtrées quand on modifie un champ
+  function updateRoutingDataFiltre(idx, field, value) {
     if (_routingTourData[idx]) {
       _routingTourData[idx][field] = value;
+      // Aussi mettre à jour dans les données brutes
+      var dateBrut = _routingTourData[idx].dateBrut;
+      var found = _routingTourDataBrut.find(function(d) { return d.dateBrut === dateBrut; });
+      if (found) found[field] = value;
     }
   }
   
@@ -15987,6 +16071,30 @@ function _hideTeamSelection() {
 
       <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#7eb8d4;margin-bottom:10px;text-align:center;">CALENDRIER DES REPRÉSENTATIONS</div>
 
+      <!-- FILTRES -->
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:16px;padding:12px;background:#0a0a0a;border-radius:8px;border:1px solid #2a2a2a;">
+        <div style="flex:1;min-width:180px;">
+          <label style="display:block;font-size:11px;color:#7eb8d4;text-transform:uppercase;margin-bottom:4px;">Nom du groupe</label>
+          <select id="rt-filtre-groupe" onchange="filtrerRoutingTour()" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;">
+            <option value="">— Tous les groupes —</option>
+          </select>
+        </div>
+        <div style="min-width:140px;">
+          <label style="display:block;font-size:11px;color:#7eb8d4;text-transform:uppercase;margin-bottom:4px;">Date début</label>
+          <input type="date" id="rt-filtre-date-debut" onchange="filtrerRoutingTour()" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;">
+        </div>
+        <div style="min-width:140px;">
+          <label style="display:block;font-size:11px;color:#7eb8d4;text-transform:uppercase;margin-bottom:4px;">Date fin</label>
+          <input type="date" id="rt-filtre-date-fin" onchange="filtrerRoutingTour()" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;">
+        </div>
+        <div>
+          <button onclick="reinitialiserFiltresRouting()" style="background:#333;color:#fff;border:1px solid #555;border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;">🔄 Réinit.</button>
+        </div>
+        <div>
+          <button onclick="imprimerRoutingTour()" style="background:#3b82f6;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER PDF</button>
+        </div>
+      </div>
+
       <div style="overflow-x:auto;margin-bottom:16px;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:900px;">
           <thead>
@@ -16020,7 +16128,6 @@ function _hideTeamSelection() {
         <option value="AUTRE">
       </datalist>
 
-      <button onclick="imprimerRoutingTour()" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / EXPORT PDF</button>
     </div>
   </div>
 </div>
