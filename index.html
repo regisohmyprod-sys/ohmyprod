@@ -17,6 +17,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- OneSignal Push Notifications -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "0db3cc78-0143-4020-b308-f465e32fa676",
+    });
+  });
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -6526,7 +6536,7 @@ function _hideTeamSelection() {
     const objet = document.getElementById('notif-objet').value.trim();
     const message = document.getElementById('notif-message').value.trim();
     const viaEmail = document.getElementById('notif-via-mail').checked;
-    const viaMsg = document.getElementById('notif-via-msg').checked;
+    const viaPush = document.getElementById('notif-via-push').checked;
 
     if (!message) { alert('Merci de saisir un message.'); return; }
 
@@ -6537,6 +6547,31 @@ function _hideTeamSelection() {
     });
     const pour = destinataires.join(', ') || 'Toute l\'équipe';
 
+    // Envoyer par Notification Push (OneSignal)
+    if (viaPush) {
+      // Envoyer via l'API REST OneSignal
+      fetch('https://onesignal.com/api/v1/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          app_id: '0db3cc78-0143-4020-b308-f465e32fa676',
+          included_segments: ['All'],
+          headings: { en: objet || '📢 OH MY PROD' },
+          contents: { en: `${de}: ${message}` },
+          url: 'https://regisohmyprod-sys.github.io/ohmyprod/'
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Push envoyé:', data);
+      })
+      .catch(err => {
+        console.error('Erreur push:', err);
+      });
+    }
+
     // Envoyer par email (Gmail)
     if (viaEmail) {
       const subject = encodeURIComponent(objet || 'Message OH MY PROD');
@@ -6546,35 +6581,22 @@ function _hideTeamSelection() {
       window.open(`https://mail.google.com/mail/u/0/?view=cm&fs=1&su=${subject}&body=${body}`, '_blank');
     }
 
-    // Ajouter dans Infos Importantes
-    if (viaMsg) {
-      const now = new Date();
-      const dateStr = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')} · ${String(now.getHours()).padStart(2,'0')}h${String(now.getMinutes()).padStart(2,'0')}`;
-
-      const container = document.getElementById('infos-avignon');
-      if (container) {
-        const msg = document.createElement('div');
-        msg.className = 'info-message';
-        msg.innerHTML = `
-          <div class="info-message-header">
-            <div class="info-from">✍️ <strong>${de}</strong> <span class="info-arrow">→</span> <span class="info-to">${pour}</span></div>
-            <div class="info-date-msg">${dateStr}</div>
-          </div>
-          <div class="info-message-body">${message}</div>`;
-        container.querySelector('.info-new-msg').insertAdjacentElement('beforebegin', msg);
-      }
-    }
-
     // Envoyer par WhatsApp Groupe (ouvre l'appli WhatsApp Desktop)
     if (document.getElementById('notif-via-wa').checked) {
-      const waText = encodeURIComponent(`*${objet || 'Message OH MY PROD'}*\n\nDe : ${de} → ${pour}\n\n${message}\n\n— OH MY PROD`);
-      // Ouvre WhatsApp Desktop/Web avec le message pré-rempli
-      // Tu devras sélectionner le groupe OH MY PROD dans la liste
-      window.open(`https://web.whatsapp.com/send?text=${waText}`, '_blank');
+      const waText = `*${objet || 'Message OH MY PROD'}*\n\nDe : ${de} → ${pour}\n\n${message}\n\n— OH MY PROD`;
+      // Copier le message dans le presse-papier
+      navigator.clipboard.writeText(waText).catch(() => {});
+      // Ouvrir directement le groupe WhatsApp OH MY PROD
+      window.open('https://chat.whatsapp.com/JEbCMZRyf9IH4YkthdweZ6', '_blank');
+      alert('📋 Message copié ! Colle-le dans le groupe WhatsApp (Ctrl+V) et envoie.');
     }
 
     // Confirmation
-    alert(`✅ Message envoyé à ${pour} !`);
+    const moyens = [];
+    if (viaPush) moyens.push('🔔 Push');
+    if (viaEmail) moyens.push('📧 Email');
+    if (document.getElementById('notif-via-wa').checked) moyens.push('🟢 WhatsApp');
+    alert(`✅ Message envoyé${moyens.length ? ' via ' + moyens.join(', ') : ''} !`);
 
     // Reset et fermer
     document.getElementById('notif-objet').value = '';
@@ -14882,8 +14904,8 @@ function _hideTeamSelection() {
         <div class="modal-field">
           <label>Envoyer via</label>
           <div style="display:flex; gap:12px; margin-top:4px; flex-wrap:wrap;">
+            <label class="notif-check"><input type="checkbox" id="notif-via-push"> 🔔 Notification Push</label>
             <label class="notif-check"><input type="checkbox" id="notif-via-mail"> 📧 Email</label>
-            <label class="notif-check"><input type="checkbox" id="notif-via-msg"> 💬 Infos Importantes</label>
             <label class="notif-check"><input type="checkbox" id="notif-via-wa"> 🟢 WhatsApp Groupe</label>
           </div>
         </div>
