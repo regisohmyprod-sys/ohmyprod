@@ -9941,10 +9941,10 @@ function _hideTeamSelection() {
     tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#888;">Chargement...</td></tr>';
     
     try {
-      // Récupérer toutes les dates avec leurs fiches production + info tournée
+      // Récupérer toutes les dates
       var { data: dates, error } = await _supabase
         .from('dates_concert')
-        .select('id, date_concert, ville, nom_salle, tournee_id, tournees(nom)')
+        .select('id, date_concert, ville, nom_salle, tournee_id')
         .order('date_concert', { ascending: true });
       
       if (error) {
@@ -9957,6 +9957,13 @@ function _hideTeamSelection() {
         tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#888;">Aucune date trouvée dans la base</td></tr>';
         return;
       }
+      
+      // Récupérer les tournées séparément
+      var { data: tournees } = await _supabase
+        .from('tournees')
+        .select('id, nom');
+      var tourneesMap = {};
+      if (tournees) tournees.forEach(function(t) { tourneesMap[t.id] = t.nom; });
       
       console.log('Routing tour - dates chargées:', dates.length);
       
@@ -9978,7 +9985,7 @@ function _hideTeamSelection() {
         }
         
         // Récupérer le nom de la tournée pour le titre du spectacle
-        var nomTournee = d.tournees?.nom || '';
+        var nomTournee = tourneesMap[d.tournee_id] || '';
         var titreSpectacleDate = nomTournee || 'THE WORLD OF QUEEN';
         
         // Nom du groupe fixe
