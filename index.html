@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.16.08">
+<meta name="version" content="2026.04.16.14">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3324,11 +3324,11 @@ function _hideTeamSelection() {
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <div style="background:#1e3a5f;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#7eb8d4;text-align:center;">JAUGE + INFOS DATE</div>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Etat des ventes à ce jour</td><td id="cs-ventes" style="padding:7px 16px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:900;text-align:right;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Total invitations</td><td id="cs-invitations" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Jauge totale à ce jour</td><td id="cs-jauge-total" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% de remplissage sur jauge choisie</td><td id="cs-remplissage" style="padding:7px 16px;color:#22c55e;font-weight:700;text-align:right;"></td></tr>
-          <tr><td style="padding:7px 16px;color:#888;">Prix moyen billet</td><td id="cs-prix-moyen" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Etat des ventes à ce jour</td><td id="cs-ventes" style="padding:7px 16px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:900;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Total invitations</td><td id="cs-invitations" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Jauge totale à ce jour</td><td id="cs-jauge-total" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% de remplissage sur jauge choisie</td><td id="cs-remplissage" style="padding:7px 16px;color:#22c55e;font-weight:700;text-align:center;"></td></tr>
+          <tr><td style="padding:7px 16px;color:#888;">Prix moyen billet</td><td id="cs-prix-moyen" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
         </table>
       </div>
 
@@ -3383,7 +3383,7 @@ function _hideTeamSelection() {
 
         <a href="https://sso.cnm.fr/login?service=https%3A%2F%2Fmonespace.cnm.fr%2F&gateway=false" target="_blank" style="background:#2a2a2a;color:#c9a84c;border:1px solid #a855f7;border-radius:4px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">🌐 CNM</a>
 
-        <button onclick="openModal('modal-sacem-mail')" style="background:#2a2a2a;color:#c9a84c;border:1px solid #a855f7;border-radius:4px;padding:9px 16px;font-size:13px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.3px;display:inline-flex;align-items:center;gap:6px;">📧 SACEM</button>
+        <button onclick="ouvrirModalSacem()" style="background:#2a2a2a;color:#c9a84c;border:1px solid #a855f7;border-radius:4px;padding:9px 16px;font-size:13px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.3px;display:inline-flex;align-items:center;gap:6px;">📧 SACEM</button>
 
         <a href="https://www.sacd.fr/fr/membre/login" target="_blank" style="background:#2a2a2a;color:#c9a84c;border:1px solid #a855f7;border-radius:4px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">🌐 SACD</a>
 
@@ -3428,39 +3428,16 @@ function _hideTeamSelection() {
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead><tr style="background:#111;"><th style="padding:7px 12px;text-align:left;color:#888;">RÉSEAU</th><th style="padding:7px 12px;text-align:right;color:#888;">MONTANT TTC</th><th style="padding:7px 12px;text-align:center;color:#888;">RÈGLEMENT OK</th></tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;">TICKETMASTER</td><td id="dd-tm-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-tm-ok"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;">FNAC</td><td id="dd-fnac-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-fnac-ok"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;">SALLE / FIMALAC</td><td id="dd-salle-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;">PROMOTEUR LOCAL</td><td id="dd-promo-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;">WEEZEVENT</td><td id="dd-weez-mt" style="padding:7px 12px;text-align:right;color:#fff;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;">TICKETMASTER</td><td id="dd-tm-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-tm-ok" onchange="ddUpdateReglColor('tm'); ddSauvegarder()"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;">FNAC</td><td id="dd-fnac-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-fnac-ok" onchange="ddUpdateReglColor('fnac'); ddSauvegarder()"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;">SALLE / FIMALAC</td><td id="dd-salle-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-sallefim-ok" onchange="ddUpdateReglColor('sallefim'); ddSauvegarder()"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 12px;color:#ccc;">PROMOTEUR LOCAL</td><td id="dd-promo-mt" style="padding:7px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-promoloc-ok" onchange="ddUpdateReglColor('promoloc'); ddSauvegarder()"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 12px;color:#ccc;">WEEZEVENT</td><td id="dd-weez-mt" style="padding:7px 12px;text-align:right;color:#fff;"></td><td style="padding:7px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px;" id="dd-weez-ok" onchange="ddUpdateReglColor('weez'); ddSauvegarder()"></td></tr>
             <tr style="background:#1a1a2e;border-top:2px solid #a855f7;"><td style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL</td><td id="dd-total-regl" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#c9a84c;font-weight:700;"></td><td></td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- SUIVI DES RÈGLEMENTS OMP -->
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-        <div style="background:#a855f7;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">SUIVI DES RÈGLEMENTS OMP</div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <thead><tr style="background:#111;"><th style="padding:7px 12px;text-align:left;color:#888;">FOURNISSEUR</th><th style="padding:7px 12px;text-align:right;color:#888;">MONTANT TTC</th><th style="padding:7px 12px;text-align:center;color:#888;">RÈGLEMENT OK</th><th style="padding:7px 12px;text-align:left;color:#888;">PRESTATAIRE</th></tr></thead>
-          <tbody id="dd-omp-tbody">
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">FACTURE SALLE TOTAL</td><td id="dd-f-salle" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" id="dd-salle-ok" onchange="ddSauvegarder()"></td><td id="dd-nom-salle" style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">TECHNIQUE OMP</td><td id="dd-tech-omp-mt" style="padding:6px 12px;text-align:right;color:#fff;font-weight:600;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" id="dd-tech-omp-ok" onchange="ddSauvegarder()"></td><td style="padding:6px 12px;color:#888;">COULISSES</td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">PERSONNEL EXT (hotesses, cont...)</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-pers-ext" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">RIGGERS</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-riggers" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">PROMOTEUR LOCAL</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-promo-local" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">CONTRÔLES</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-controles" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">ROADS SALAIRES</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-roads" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">SALAIRES OMP</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-salaires-omp" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">CONSOMMABLES FORFAIT</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-conso" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" checked></td><td style="padding:6px 12px;color:#888;">VINCENT</td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">PROMO</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-promo-mt" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" checked></td><td style="padding:6px 12px;color:#888;">META</td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">VOYAGES</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-voyages" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" checked></td><td style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">TRAITEURS</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-traiteurs" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;"></td><td style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:6px 12px;color:#ccc;font-weight:600;">HOTEL TOTAL</td><td style="padding:6px 12px;text-align:right;"><input type="number" class="fin-input" id="dd-hotel" placeholder="0" style="width:110px;"></td><td style="padding:6px 12px;text-align:center;"><input type="checkbox" style="accent-color:#22c55e;width:15px;height:15px;" checked></td><td style="padding:6px 12px;color:#888;"></td></tr>
-            <tr style="background:#1a1a2e;border-top:2px solid #a855f7;"><td style="padding:8px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:#fff;font-size:13px;">TOTAL</td><td id="dd-total-omp" style="padding:8px 12px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#c9a84c;font-weight:700;"></td><td colspan="2"></td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
     <!-- PAGE BILAN AMH -->
@@ -9906,6 +9883,42 @@ function _hideTeamSelection() {
     } catch(ex) { console.log('piloteChargerBill erreur:', ex); }
   }
 
+  // Ouvrir le modal SACEM avec pré-remplissage automatique des champs
+  function ouvrirModalSacem() {
+    // Récupérer les infos de la fiche production
+    var titre = document.getElementById('fp-spectacle')?.value || 'The World of Queen';
+    var salle = document.getElementById('fp-salle')?.value || '';
+    var dateRaw = document.getElementById('fp-date-concert')?.value || '';
+    var heureRaw = document.getElementById('fp-heure')?.value || '';
+    
+    // Formater la date en DD/MM/YYYY
+    var dateFormatee = '';
+    if (dateRaw) {
+      var d = new Date(dateRaw + 'T00:00:00');
+      dateFormatee = d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'});
+    }
+    
+    // Formater l'heure en HH:MM ou HHMM
+    var heureFormatee = heureRaw ? heureRaw.substring(0, 5).replace(':', 'H') : '';
+    
+    // Récupérer les données depuis la page décla droits (déjà chargées)
+    var payants = (document.getElementById('dd-payants')?.textContent || '').replace(/\s/g, '');
+    var invit = (document.getElementById('dd-invit')?.textContent || '').replace(/\s/g, '');
+    var recetteHT = document.getElementById('dd-decla-ht')?.textContent || '';
+    
+    // Pré-remplir les champs du modal
+    var elTitre = document.getElementById('sacem-titre'); if (elTitre) elTitre.value = titre;
+    var elSalle = document.getElementById('sacem-salle'); if (elSalle) elSalle.value = salle;
+    var elDate = document.getElementById('sacem-date'); if (elDate) elDate.value = dateFormatee;
+    var elHeure = document.getElementById('sacem-heure'); if (elHeure) elHeure.value = heureFormatee;
+    var elPayants = document.getElementById('sacem-payants'); if (elPayants) elPayants.value = payants;
+    var elInvit = document.getElementById('sacem-invit'); if (elInvit) elInvit.value = invit;
+    var elRecette = document.getElementById('sacem-recette'); if (elRecette) elRecette.value = recetteHT;
+    
+    // Ouvrir le modal
+    openModal('modal-sacem-mail');
+  }
+
   function envoyerMailSacem() {
     var titre   = document.getElementById('sacem-titre')?.value || '';
     var salle   = document.getElementById('sacem-salle')?.value || '';
@@ -10331,6 +10344,27 @@ function _hideTeamSelection() {
     });
   }
 
+  // Fonction pour mettre à jour la couleur du montant SUIVI DES RÈGLEMENTS (réseaux)
+  function ddUpdateReglColor(reseau) {
+    var checkId = 'dd-' + reseau + '-ok';
+    var montantId = 'dd-' + reseau + '-mt';
+    // Cas spéciaux pour les IDs différents
+    if (reseau === 'sallefim') montantId = 'dd-salle-mt';
+    if (reseau === 'promoloc') montantId = 'dd-promo-mt';
+    
+    var checked = document.getElementById(checkId)?.checked || false;
+    var montantEl = document.getElementById(montantId);
+    
+    if (montantEl) {
+      montantEl.style.color = checked ? '#22c55e' : '#fff';
+    }
+  }
+  
+  // Appliquer toutes les couleurs au chargement
+  function ddApplyAllReglColors() {
+    ['tm', 'fnac', 'sallefim', 'promoloc', 'weez'].forEach(function(r) { ddUpdateReglColor(r); });
+  }
+
   var _ddSaveTimer = null;
   function ddSauvegarder() {
     clearTimeout(_ddSaveTimer);
@@ -10338,7 +10372,12 @@ function _hideTeamSelection() {
       if (!_fpDateId) return;
       try {
         var data = {};
+        // Checkboxes SUIVI DES DROITS
         ['dd-cnv-decla','dd-cnv-regl','dd-sacd-decla','dd-sacd-regl','dd-sacem-decla','dd-sacem-regl'].forEach(function(id) {
+          var e = document.getElementById(id); if(e) data[id] = e.checked;
+        });
+        // Checkboxes SUIVI DES RÈGLEMENTS (réseaux)
+        ['dd-tm-ok','dd-fnac-ok','dd-sallefim-ok','dd-promoloc-ok','dd-weez-ok'].forEach(function(id) {
           var e = document.getElementById(id); if(e) data[id] = e.checked;
         });
         var payload = { decla_droits_data: JSON.stringify(data) };
@@ -10367,41 +10406,79 @@ function _hideTeamSelection() {
     setEl('dd-promo',    promo);
     setEl('dd-ville-date', ville + (dateStr ? ' · ' + dateStr : ''));
 
-    // Montants depuis Pilote Date
-    setEl('dd-decla-ht',   getEl('pilote-rec-ht'));     // Recette HT
-    setEl('dd-decla-hcnm', getEl('pilote-rec-hcnm'));   // Recette HT Hors CNM
-    setEl('dd-payants',    getEl('pilote-ventes'));      // Billets vendus
-    setEl('dd-invit',      getEl('pilote-invitations')); // Total invitations
-    
-    // Montants à déclarer pour SUIVI DES DROITS
-    // CNM = MONTANT DÉCLA CNM + SACEM (HT) = Recette HT
-    setEl('dd-cnm-montant', getEl('pilote-rec-ht'));
-    // SACD = MONTANT DÉCLA CNM + SACD (HCNM) = Recette HT Hors CNM
-    setEl('dd-sacd-montant', getEl('pilote-rec-hcnm'));
-    // SACEM = MONTANT DÉCLA CNM + SACD (HCNM) = Recette HT Hors CNM
-    setEl('dd-sacem-montant', getEl('pilote-rec-hcnm'));
-    
-    // Montants à payer depuis Bilan AMH
-    // CNM = MONTANT CNM (bilan-parafiscale)
-    setEl('dd-cnm-payer', getEl('bilan-parafiscale'));
-    // SACD = TOTAL SACD (bilan-total-sacd)
-    setEl('dd-sacd-payer', getEl('bilan-total-sacd'));
-    // SACEM = TOTAL SACEM (bilan-total-sacem)
-    setEl('dd-sacem-payer', getEl('bilan-total-sacem'));
-
     // Facture Salle Total + nom salle
     setEl('dd-f-salle', getEl('cs-fact-total') || getEl('pilote-rec-ht'));
     var nomSalle = document.getElementById('fp-salle')?.value || '';
     var elNomSalle = document.getElementById('dd-nom-salle'); if(elNomSalle) elNomSalle.textContent = nomSalle.toUpperCase();
 
-    // Technique OMP depuis financier_data (Supabase)
+    // Charger billetterie depuis Supabase pour calculer les montants
     if (_fpDateId) {
-      _supabase.from('fiches_production').select('financier_data').eq('date_concert_id', _fpDateId).single().then(function(r) {
-        if (!r.data || !r.data.financier_data) return;
-        var fd = JSON.parse(r.data.financier_data);
-        var techOMP = (parseFloat(fd['fin-omp-tech-road'])||0)+(parseFloat(fd['fin-omp-tech-figer'])||0)+(parseFloat(fd['fin-omp-tech-coulisses'])||0)+(parseFloat(fd['fin-omp-tech-autres'])||0)+(parseFloat(fd['fin-omp-tech-conso'])||0)+(parseFloat(fd['fin-omp-tech-controleur'])||0);
-        var fmtT = function(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
-        var eTech = document.getElementById('dd-tech-omp-mt'); if(eTech) eTech.textContent = fmtT(techOMP);
+      _supabase.from('fiches_production').select('billetterie_data, financier_data').eq('date_concert_id', _fpDateId).single().then(function(r) {
+        if (!r.data) return;
+        
+        var fmtMontant = function(n){ return n > 0 ? n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €' : ''; };
+        
+        // Calculer recette TTC et HT depuis billetterie_data
+        var recTTC = 0, totalBillets = 0;
+        if (r.data.billetterie_data) {
+          var bd = JSON.parse(r.data.billetterie_data);
+          ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'].forEach(function(op) {
+            if (!bd[op]) return;
+            bd[op].forEach(function(cat) {
+              (cat||[]).forEach(function(d) {
+                var billets = parseFloat(d.billets) || 0;
+                var tarif = parseFloat(d.tarif) || 0;
+                recTTC += billets * tarif;
+                totalBillets += billets;
+              });
+            });
+          });
+        }
+        var recHT = recTTC / 1.021;
+        var recHCNM = recHT - (recHT * 0.035);
+        
+        // Montants à déclarer
+        setEl('dd-cnm-montant', fmtMontant(recHT));
+        setEl('dd-sacd-montant', fmtMontant(recHCNM));
+        setEl('dd-sacem-montant', fmtMontant(recHCNM));
+        
+        // Montants à payer (même logique que Bilan AMH)
+        // CNM = Recette HT × 3.5%
+        var montantCNM = recHT * 0.035;
+        setEl('dd-cnm-payer', fmtMontant(montantCNM));
+        // SACEM = SACEM (8.36%) + AGESSA SACEM (1.10% de SACEM)
+        var sacem = recHT * 0.0836;
+        var agessaSacem = sacem * 0.011;
+        var totalSacem = sacem + agessaSacem;
+        setEl('dd-sacem-payer', fmtMontant(totalSacem));
+        // SACD = SACD (6%) + CCSA (1.2%) + AGESSA SACD (1.10% de SACD)
+        var sacd = recHT * 0.06;
+        var ccsa = recHT * 0.012;
+        var agessaSacd = sacd * 0.011;
+        var totalSacd = sacd + ccsa + agessaSacd;
+        setEl('dd-sacd-payer', fmtMontant(totalSacd));
+        
+        // Autres montants
+        setEl('dd-decla-ht', fmtMontant(recHT));
+        setEl('dd-decla-hcnm', fmtMontant(recHCNM));
+        setEl('dd-payants', totalBillets.toLocaleString('fr-FR'));
+        
+        // Appliquer les couleurs selon checkboxes
+        ddApplyAllPayerColors();
+        
+        // Technique OMP depuis financier_data
+        if (r.data.financier_data) {
+          var fd = JSON.parse(r.data.financier_data);
+          var techOMP = (parseFloat(fd['fin-omp-tech-road'])||0)+(parseFloat(fd['fin-omp-tech-figer'])||0)+(parseFloat(fd['fin-omp-tech-coulisses'])||0)+(parseFloat(fd['fin-omp-tech-autres'])||0)+(parseFloat(fd['fin-omp-tech-conso'])||0)+(parseFloat(fd['fin-omp-tech-controleur'])||0);
+          setEl('dd-tech-omp-mt', fmtMontant(techOMP));
+        }
+      });
+      
+      // Charger invitations
+      _supabase.from('invitations').select('nombre').eq('date_concert_id', _fpDateId).eq('valide', 1).then(function(ri) {
+        var totalInvit = 0;
+        if (ri.data) ri.data.forEach(function(inv) { totalInvit += inv.nombre || 1; });
+        setEl('dd-invit', totalInvit.toLocaleString('fr-FR'));
       });
     }
 
@@ -10427,13 +10504,18 @@ function _hideTeamSelection() {
     // Charger checkboxes sauvegardées
     if (_fpDateId) {
       _supabase.from('fiches_production').select('decla_droits_data').eq('date_concert_id', _fpDateId).single().then(function(r) {
-        if (!r.data || !r.data.decla_droits_data) { ddApplyAllPayerColors(); return; }
+        if (!r.data || !r.data.decla_droits_data) { 
+          ddApplyAllPayerColors(); 
+          ddApplyAllReglColors();
+          return; 
+        }
         var d = JSON.parse(r.data.decla_droits_data);
         Object.keys(d).forEach(function(id) {
           var e = document.getElementById(id); if(e) e.checked = d[id];
         });
         // Appliquer les couleurs selon l'état des checkboxes
         ddApplyAllPayerColors();
+        ddApplyAllReglColors();
       });
     }
     showPage('decla-droits');
