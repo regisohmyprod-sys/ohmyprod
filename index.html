@@ -17,30 +17,56 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- OneSignal Push Notifications -->
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<!-- Firebase Cloud Messaging -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "0db3cc78-0143-4020-b308-f465e32fa676",
-      serviceWorkerParam: { scope: "/" },
-      serviceWorkerPath: "/OneSignalSDKWorker.js",
-      promptOptions: {
-        slidedown: {
-          prompts: [{
-            type: "push",
-            autoPrompt: true,
-            text: {
-              actionMessage: "Recevoir les alertes OH MY PROD ?",
-              acceptButton: "Oui !",
-              cancelButton: "Plus tard"
-            },
-            delay: { pageViews: 1, timeDelay: 3 }
-          }]
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDykNi68rFEo2raplohOmif2Gx6L_EluoQ",
+    authDomain: "oh-my-prod.firebaseapp.com",
+    projectId: "oh-my-prod",
+    storageBucket: "oh-my-prod.firebasestorage.app",
+    messagingSenderId: "651166585451",
+    appId: "1:651166585451:web:a7fc7d0c6034d15509972e"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const messaging = firebase.messaging();
+
+  // VAPID key for web push
+  const vapidKey = "BIJjP7DD_R1zmGraswxfU_uCnm0XTjRXZCfpLSqiZR7BQ7ahz05kqrHMMCkqNjj7v4TLpiPkszYiNIzxdnSGCwY";
+
+  // Request permission and get token
+  async function initPushNotifications() {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        const token = await messaging.getToken({ vapidKey: vapidKey });
+        if (token) {
+          console.log('🔔 Push token:', token);
+          // Sauvegarder le token dans localStorage
+          localStorage.setItem('fcm_token', token);
+          return token;
         }
       }
-    });
+    } catch (err) {
+      console.error('Erreur push:', err);
+    }
+    return null;
+  }
+
+  // Handle foreground messages
+  messaging.onMessage((payload) => {
+    console.log('Message reçu:', payload);
+    // Afficher une notification même en foreground
+    if (Notification.permission === 'granted') {
+      new Notification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: '/assets/omp-icon-200.jpg'
+      });
+    }
   });
 </script>
 <style>
@@ -6563,29 +6589,18 @@ function _hideTeamSelection() {
     });
     const pour = destinataires.join(', ') || 'Toute l\'équipe';
 
-    // Envoyer par Notification Push (OneSignal)
+    // Envoyer par Notification Push (Firebase)
     if (viaPush) {
-      // Envoyer via l'API REST OneSignal
-      fetch('https://onesignal.com/api/v1/notifications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-        },
-        body: JSON.stringify({
-          app_id: '0db3cc78-0143-4020-b308-f465e32fa676',
-          included_segments: ['All'],
-          headings: { en: objet || '📢 OH MY PROD' },
-          contents: { en: `${de}: ${message}` },
-          url: 'https://regisohmyprod-sys.github.io/ohmyprod/'
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Push envoyé:', data);
-      })
-      .catch(err => {
-        console.error('Erreur push:', err);
-      });
+      // Afficher une notification locale pour test
+      if (Notification.permission === 'granted') {
+        new Notification(objet || '📢 OH MY PROD', {
+          body: `${de}: ${message}`,
+          icon: '/assets/omp-icon-200.jpg'
+        });
+      }
+      // Note: Pour envoyer à tous les appareils, il faudrait un backend
+      // Les tokens sont stockés dans localStorage de chaque appareil
+      console.log('Push notification affichée localement');
     }
 
     // Envoyer par email (Gmail)
