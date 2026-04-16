@@ -8648,7 +8648,7 @@ function _hideTeamSelection() {
   // Charger les villes de la tournée pour le multi-select
   let _villesTour = [];
   async function chargerVillesTour() {
-    const { data } = await supabase.from('dates').select('ville').order('ville');
+    const { data } = await supabase.from('dates_concert').select('ville').order('ville');
     const villes = [...new Set((data || []).map(d => d.ville).filter(Boolean))];
     _villesTour = villes;
     return villes;
@@ -8778,33 +8778,41 @@ function _hideTeamSelection() {
 
   async function sauvegarderPresta(e) {
     e.preventDefault();
-    const id = document.getElementById('presta-id').value;
-    const typePresta = document.getElementById('presta-type').value;
-    const data = {
-      type_presta: typePresta,
-      autre_type: typePresta === 'autre' ? document.getElementById('presta-autre-type').value.trim() : null,
-      societe: document.getElementById('presta-societe').value.trim(),
-      nom_contact: document.getElementById('presta-nom-contact').value.trim(),
-      telephone: document.getElementById('presta-telephone').value.trim(),
-      email: document.getElementById('presta-email').value.trim(),
-      villes_tour: JSON.stringify(getVillesSelectionnees()),
-      notes: document.getElementById('presta-notes').value.trim()
-    };
+    try {
+      const id = document.getElementById('presta-id').value;
+      const typePresta = document.getElementById('presta-type').value;
+      const autreTypeEl = document.getElementById('presta-autre-type');
+      const villesSelected = getVillesSelectionnees();
+      
+      const data = {
+        type_presta: typePresta,
+        autre_type: (typePresta === 'autre' && autreTypeEl) ? autreTypeEl.value.trim() : null,
+        societe: document.getElementById('presta-societe').value.trim(),
+        nom_contact: document.getElementById('presta-nom-contact').value.trim(),
+        telephone: document.getElementById('presta-telephone').value.trim(),
+        email: document.getElementById('presta-email').value.trim(),
+        villes_tour: villesSelected,
+        notes: document.getElementById('presta-notes').value.trim()
+      };
 
-    let result;
-    if (id) {
-      result = await supabase.from('contacts_presta').update(data).eq('id', id);
-    } else {
-      result = await supabase.from('contacts_presta').insert([data]);
+      let result;
+      if (id) {
+        result = await supabase.from('contacts_presta').update(data).eq('id', id);
+      } else {
+        result = await supabase.from('contacts_presta').insert([data]);
+      }
+
+      if (result.error) {
+        alert('Erreur: ' + result.error.message);
+        return false;
+      }
+
+      fermerModalPresta();
+      await chargerPrestas();
+    } catch(err) {
+      console.error('Erreur sauvegarde presta:', err);
+      alert('Erreur: ' + err.message);
     }
-
-    if (result.error) {
-      alert('Erreur: ' + result.error.message);
-      return false;
-    }
-
-    fermerModalPresta();
-    await chargerPrestas();
     return false;
   }
 
