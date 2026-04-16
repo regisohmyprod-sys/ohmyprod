@@ -4222,11 +4222,15 @@ function _hideTeamSelection() {
           <div class="stat-sub">Dépôt justificatifs</div>
         </div>
 
-        <!-- Contacts Presta -->
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('contacts-presta')">
+        <!-- Contacts Presta - Menu déroulant -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-presta')">
           <div class="stat-label">📇 Contacts Presta</div>
           <div class="stat-value" style="font-size:24px;color:#c9a84c;">PRESTA</div>
           <div class="stat-sub">Fichier prestataires</div>
+          <div id="dropdown-presta" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <div onclick="event.stopPropagation(); showPage('contacts-presta')" style="padding:12px 14px; cursor:pointer; font-size:13px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 VHR (Hôtels, Restos, Taxis...)</div>
+            <div onclick="event.stopPropagation(); showPage('contacts-presta-tech')" style="padding:12px 14px; cursor:pointer; font-size:13px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🔧 TECHNIQUE (Riggers, Roads...)</div>
+          </div>
         </div>
 
         <!-- Liens Pratiques -->
@@ -4509,7 +4513,7 @@ function _hideTeamSelection() {
   <!-- HEADER -->
   <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
     <div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">📇 CONTACTS PRESTATAIRES</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">📇 CONTACTS PRESTATAIRES VHR</div>
       <div style="font-size:13px;color:#888;margin-top:4px;">Fichier contact de tes prestataires habituels</div>
     </div>
     <button onclick="ouvrirModalPresta()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">+ NOUVEAU PRESTA</button>
@@ -4538,6 +4542,126 @@ function _hideTeamSelection() {
   <!-- LISTE DES PRESTAS -->
   <div id="prestas-list" style="display:grid;gap:12px;">
     <!-- Chargement dynamique -->
+  </div>
+</div>
+
+
+<!-- ========== PAGE CONTACTS PRESTA TECHNIQUE ========== -->
+<div id="page-contacts-presta-tech" class="page">
+  <button class="back-btn" onclick="showPage('staff-omp')" style="margin-bottom:12px;">← Retour Espace Staff</button>
+  
+  <!-- HEADER -->
+  <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">🔧 CONTACTS PRESTATAIRES TECHNIQUE</div>
+      <div style="font-size:13px;color:#888;margin-top:4px;">Fichier contact de tes prestataires techniques</div>
+    </div>
+    <button onclick="ouvrirModalPrestaTech()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">+ NOUVEAU PRESTA TECH</button>
+  </div>
+
+  <!-- FILTRES -->
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <input id="presta-tech-search" type="text" placeholder="🔍 Rechercher un prestataire..." oninput="filtrerPrestasTech()"
+           style="flex:1;min-width:200px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;color:#fff;padding:8px 14px;font-size:13px;font-family:'Inter',sans-serif;outline:none;">
+    <select id="presta-tech-filtre-type" onchange="filtrerPrestasTech()"
+            style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;color:#888;padding:8px 12px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+      <option value="">Tous les types</option>
+      <option value="fournisseur_tech">🎛️ Fournisseurs Tech</option>
+      <option value="rigger">🧗 Riggers</option>
+      <option value="road">🚛 Roads</option>
+      <option value="autre">📦 Autre</option>
+    </select>
+    <select id="presta-tech-filtre-ville" onchange="filtrerPrestasTech()"
+            style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;color:#888;padding:8px 12px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+      <option value="">Toutes les villes</option>
+      <!-- Chargé dynamiquement -->
+    </select>
+  </div>
+
+  <!-- LISTE DES PRESTAS TECH -->
+  <div id="prestas-tech-list" style="display:grid;gap:12px;">
+    <!-- Chargement dynamique -->
+  </div>
+</div>
+
+
+<!-- MODAL CRÉATION/ÉDITION PRESTA TECH -->
+<div id="modal-presta-tech" class="modal-overlay" onclick="if(event.target===this)fermerModalPrestaTech()" style="background:rgba(0,0,0,0.95);">
+  <div class="modal-box" style="max-width:550px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:#c9a84c;" id="modal-presta-tech-titre">NOUVEAU PRESTATAIRE TECHNIQUE</div>
+      <button onclick="fermerModalPrestaTech()" style="background:none;border:none;color:#888;font-size:24px;cursor:pointer;">&times;</button>
+    </div>
+    
+    <form id="form-presta-tech" onsubmit="return sauvegarderPrestaTech(event)">
+      <input type="hidden" id="presta-tech-id" value="">
+      
+      <!-- Type de prestataire -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Type de prestataire *</label>
+        <select id="presta-tech-type" required onchange="toggleAutrePrestaTech()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;">
+          <option value="">-- Choisir --</option>
+          <option value="fournisseur_tech">🎛️ Fournisseurs Tech</option>
+          <option value="rigger">🧗 Riggers</option>
+          <option value="road">🚛 Roads</option>
+          <option value="autre">📦 Autre (préciser)</option>
+        </select>
+      </div>
+
+      <!-- Si "Autre" sélectionné -->
+      <div id="presta-tech-autre-bloc" style="display:none;margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Précisez le type</label>
+        <input type="text" id="presta-tech-autre-type" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="Ex: Backliner, SFX, etc.">
+      </div>
+
+      <!-- Nom Prestataire (société) -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Nom du prestataire / Société *</label>
+        <input type="text" id="presta-tech-societe" required style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="Ex: SLU, Dushow, etc.">
+      </div>
+
+      <!-- Nom Contact -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Nom du contact</label>
+        <input type="text" id="presta-tech-nom-contact" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="Prénom Nom">
+      </div>
+
+      <!-- Mobile & Email -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div>
+          <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Mobile</label>
+          <input type="tel" id="presta-tech-telephone" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="06 12 34 56 78">
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Email</label>
+          <input type="email" id="presta-tech-email" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;" placeholder="contact@presta.com">
+        </div>
+      </div>
+
+      <!-- Ville(s) Tour concernée(s) -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Ville(s) Tour concernée(s)</label>
+        <div style="font-size:11px;color:#666;margin-bottom:8px;">Sélectionne les villes où ce presta intervient</div>
+        <div id="presta-tech-villes-container" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:12px;max-height:180px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <!-- Checkboxes chargées dynamiquement -->
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;">Notes / Commentaires</label>
+        <textarea id="presta-tech-notes" rows="2" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px;font-size:13px;outline:none;resize:vertical;" placeholder="Infos complémentaires, tarifs, avis..."></textarea>
+      </div>
+
+      <!-- BOUTONS -->
+      <div style="display:flex;gap:12px;justify-content:space-between;">
+        <button type="button" id="btn-suppr-presta-tech" onclick="supprimerPrestaTech(document.getElementById('presta-tech-id').value)" style="background:#8b0000;color:#fff;border:none;border-radius:6px;padding:10px 16px;font-size:13px;cursor:pointer;display:none;">🗑️ Supprimer</button>
+        <div style="display:flex;gap:12px;margin-left:auto;">
+          <button type="button" onclick="fermerModalPrestaTech()" style="background:#333;color:#fff;border:none;border-radius:6px;padding:10px 20px;font-size:13px;cursor:pointer;">Annuler</button>
+          <button type="submit" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;">💾 Enregistrer</button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -8699,15 +8823,17 @@ function _hideTeamSelection() {
       const villes = p.villes_tour ? (Array.isArray(p.villes_tour) ? p.villes_tour : JSON.parse(p.villes_tour || '[]')) : [];
       const villesStr = villes.length ? villes.slice(0, 3).join(', ') + (villes.length > 3 ? '...' : '') : '';
       return `
-      <div onclick="ouvrirFichePresta('${p.id}')" style="background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:16px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+      <div style="background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:16px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
         <div>
           <div style="font-size:16px;font-weight:600;color:#fff;margin-bottom:4px;">${p.societe || '—'}</div>
           <div style="font-size:12px;color:#888;">${p.nom_contact ? p.nom_contact + ' • ' : ''}${typeLabel}</div>
           ${villesStr ? `<div style="font-size:11px;color:#c9a84c;margin-top:4px;">📍 ${villesStr}</div>` : ''}
         </div>
-        <div style="display:flex;gap:8px;align-items:center;">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${p.telephone ? `<a href="tel:${p.telephone}" onclick="event.stopPropagation()" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 10px;color:#c9a84c;text-decoration:none;font-size:12px;">📞</a>` : ''}
           ${p.email ? `<a href="mailto:${p.email}" onclick="event.stopPropagation()" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 10px;color:#c9a84c;text-decoration:none;font-size:12px;">✉️</a>` : ''}
+          <button onclick="ouvrirFichePresta('${p.id}')" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:6px;padding:8px 10px;color:#c9a84c;font-size:12px;cursor:pointer;">✏️</button>
+          <button onclick="supprimerPresta('${p.id}')" style="background:#1a1a1a;border:1px solid #8b0000;border-radius:6px;padding:8px 10px;color:#e74c3c;font-size:12px;cursor:pointer;">🗑️</button>
         </div>
       </div>
     `;}).join('');
@@ -8823,6 +8949,189 @@ function _hideTeamSelection() {
     if (error) { alert('Erreur: ' + error.message); return; }
     fermerModalPresta();
     await chargerPrestas();
+  }
+
+  // ========== CONTACTS PRESTATAIRES TECHNIQUE ==========
+  let _prestasTechData = [];
+
+  async function chargerPrestasTech() {
+    const { data, error } = await _supabase
+      .from('contacts_presta_tech')
+      .select('*')
+      .order('societe', { ascending: true });
+    if (error) { console.error('Erreur chargement prestas tech:', error); return; }
+    _prestasTechData = data || [];
+    afficherPrestasTech(_prestasTechData);
+    chargerVillesFiltrePrestasTech();
+  }
+
+  async function chargerVillesFiltrePrestasTech() {
+    if (!_villesTour.length) await chargerVillesTour();
+    const select = document.getElementById('presta-tech-filtre-ville');
+    if (!select) return;
+    select.innerHTML = '<option value="">Toutes les villes</option>' + 
+      _villesTour.map(v => `<option value="${v}">${v}</option>`).join('');
+  }
+
+  async function remplirCheckboxVillesTech(villesSelectionnees = []) {
+    if (!_villesTour.length) await chargerVillesTour();
+    const container = document.getElementById('presta-tech-villes-container');
+    if (!container) return;
+    container.innerHTML = _villesTour.map(v => `
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;cursor:pointer;">
+        <input type="checkbox" name="presta-tech-villes" value="${v}" ${villesSelectionnees.includes(v) ? 'checked' : ''} 
+               style="accent-color:#c9a84c;">
+        ${v}
+      </label>
+    `).join('');
+  }
+
+  function getVillesSelectionneesTech() {
+    const checkboxes = document.querySelectorAll('input[name="presta-tech-villes"]:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
+  }
+
+  function afficherPrestasTech(prestas) {
+    const container = document.getElementById('prestas-tech-list');
+    if (!container) return;
+    if (!prestas.length) {
+      container.innerHTML = '<div style="text-align:center;color:#666;padding:40px;">Aucun prestataire technique enregistré.<br>Clique sur "+ NOUVEAU PRESTA TECH" pour en ajouter.</div>';
+      return;
+    }
+    const typeLabels = {
+      'fournisseur_tech': '🎛️ Fournisseurs Tech',
+      'rigger': '🧗 Riggers',
+      'road': '🚛 Roads',
+      'autre': '📦 Autre'
+    };
+    container.innerHTML = prestas.map(p => {
+      const typeLabel = p.type_presta === 'autre' && p.autre_type ? `📦 ${p.autre_type}` : (typeLabels[p.type_presta] || p.type_presta || '');
+      const villes = p.villes_tour ? (Array.isArray(p.villes_tour) ? p.villes_tour : JSON.parse(p.villes_tour || '[]')) : [];
+      const villesStr = villes.length ? villes.slice(0, 3).join(', ') + (villes.length > 3 ? '...' : '') : '';
+      return `
+      <div style="background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:16px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div>
+          <div style="font-size:16px;font-weight:600;color:#fff;margin-bottom:4px;">${p.societe || '—'}</div>
+          <div style="font-size:12px;color:#888;">${p.nom_contact ? p.nom_contact + ' • ' : ''}${typeLabel}</div>
+          ${villesStr ? `<div style="font-size:11px;color:#c9a84c;margin-top:4px;">📍 ${villesStr}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          ${p.telephone ? `<a href="tel:${p.telephone}" onclick="event.stopPropagation()" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 10px;color:#c9a84c;text-decoration:none;font-size:12px;">📞</a>` : ''}
+          ${p.email ? `<a href="mailto:${p.email}" onclick="event.stopPropagation()" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:8px 10px;color:#c9a84c;text-decoration:none;font-size:12px;">✉️</a>` : ''}
+          <button onclick="ouvrirFichePrestaTech('${p.id}')" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:6px;padding:8px 10px;color:#c9a84c;font-size:12px;cursor:pointer;">✏️</button>
+          <button onclick="supprimerPrestaTech('${p.id}')" style="background:#1a1a1a;border:1px solid #8b0000;border-radius:6px;padding:8px 10px;color:#e74c3c;font-size:12px;cursor:pointer;">🗑️</button>
+        </div>
+      </div>
+    `;}).join('');
+  }
+
+  function filtrerPrestasTech() {
+    const q = document.getElementById('presta-tech-search')?.value?.toLowerCase() || '';
+    const type = document.getElementById('presta-tech-filtre-type')?.value || '';
+    const ville = document.getElementById('presta-tech-filtre-ville')?.value || '';
+    const filtered = _prestasTechData.filter(p => {
+      const hay = [p.societe, p.nom_contact, p.autre_type, p.notes]
+        .filter(Boolean).join(' ').toLowerCase();
+      const matchQ = !q || hay.includes(q);
+      const matchType = !type || p.type_presta === type;
+      let matchVille = true;
+      if (ville) {
+        const villes = p.villes_tour ? (Array.isArray(p.villes_tour) ? p.villes_tour : JSON.parse(p.villes_tour || '[]')) : [];
+        matchVille = villes.includes(ville);
+      }
+      return matchQ && matchType && matchVille;
+    });
+    afficherPrestasTech(filtered);
+  }
+
+  function toggleAutrePrestaTech() {
+    const type = document.getElementById('presta-tech-type').value;
+    const bloc = document.getElementById('presta-tech-autre-bloc');
+    if (bloc) bloc.style.display = type === 'autre' ? 'block' : 'none';
+  }
+
+  async function ouvrirModalPrestaTech() {
+    window._prestaTechEditId = null;
+    document.getElementById('modal-presta-tech-titre').textContent = 'NOUVEAU PRESTATAIRE TECHNIQUE';
+    document.getElementById('form-presta-tech').reset();
+    document.getElementById('presta-tech-id').value = '';
+    document.getElementById('presta-tech-autre-bloc').style.display = 'none';
+    document.getElementById('btn-suppr-presta-tech').style.display = 'none';
+    openModal('modal-presta-tech');
+    try { await remplirCheckboxVillesTech([]); } catch(e) { console.log('Erreur villes:', e); }
+  }
+
+  function fermerModalPrestaTech() {
+    closeModal('modal-presta-tech');
+  }
+
+  async function ouvrirFichePrestaTech(id) {
+    const presta = _prestasTechData.find(p => p.id === id);
+    if (!presta) return;
+    window._prestaTechEditId = id;
+    document.getElementById('modal-presta-tech-titre').textContent = 'MODIFIER PRESTATAIRE TECHNIQUE';
+    document.getElementById('presta-tech-id').value = id;
+    document.getElementById('presta-tech-type').value = presta.type_presta || '';
+    toggleAutrePrestaTech();
+    document.getElementById('presta-tech-autre-type').value = presta.autre_type || '';
+    document.getElementById('presta-tech-societe').value = presta.societe || '';
+    document.getElementById('presta-tech-nom-contact').value = presta.nom_contact || '';
+    document.getElementById('presta-tech-telephone').value = presta.telephone || '';
+    document.getElementById('presta-tech-email').value = presta.email || '';
+    document.getElementById('presta-tech-notes').value = presta.notes || '';
+    const villes = presta.villes_tour ? (Array.isArray(presta.villes_tour) ? presta.villes_tour : JSON.parse(presta.villes_tour || '[]')) : [];
+    await remplirCheckboxVillesTech(villes);
+    document.getElementById('btn-suppr-presta-tech').style.display = 'block';
+    openModal('modal-presta-tech');
+  }
+
+  async function sauvegarderPrestaTech(e) {
+    e.preventDefault();
+    try {
+      const id = document.getElementById('presta-tech-id').value;
+      const typePresta = document.getElementById('presta-tech-type').value;
+      const autreTypeEl = document.getElementById('presta-tech-autre-type');
+      const villesSelected = getVillesSelectionneesTech();
+      
+      const data = {
+        type_presta: typePresta,
+        autre_type: (typePresta === 'autre' && autreTypeEl) ? autreTypeEl.value.trim() : null,
+        societe: document.getElementById('presta-tech-societe').value.trim(),
+        nom_contact: document.getElementById('presta-tech-nom-contact').value.trim(),
+        telephone: document.getElementById('presta-tech-telephone').value.trim(),
+        email: document.getElementById('presta-tech-email').value.trim(),
+        villes_tour: villesSelected,
+        notes: document.getElementById('presta-tech-notes').value.trim()
+      };
+
+      let result;
+      if (id) {
+        result = await _supabase.from('contacts_presta_tech').update(data).eq('id', id);
+      } else {
+        result = await _supabase.from('contacts_presta_tech').insert([data]);
+      }
+
+      if (result.error) {
+        alert('Erreur: ' + result.error.message);
+        return false;
+      }
+
+      fermerModalPrestaTech();
+      await chargerPrestasTech();
+    } catch(err) {
+      console.error('Erreur sauvegarde presta tech:', err);
+      alert('Erreur: ' + err.message);
+    }
+    return false;
+  }
+
+  async function supprimerPrestaTech(id) {
+    if (!id) return;
+    if (!confirm('Supprimer ce prestataire technique ?')) return;
+    const { error } = await _supabase.from('contacts_presta_tech').delete().eq('id', id);
+    if (error) { alert('Erreur: ' + error.message); return; }
+    fermerModalPrestaTech();
+    await chargerPrestasTech();
   }
 
   function filtrerSalles() {
@@ -9164,6 +9473,7 @@ function _hideTeamSelection() {
     if (id === 'gestion-salles') chargerSalles();
     if (id === 'contacts-promo') chargerContactsPromo();
     if (id === 'contacts-presta') chargerPrestas();
+    if (id === 'contacts-presta-tech') chargerPrestasTech();
     if (id === 'acces-frais') {
       // Afficher vue admin ou membre selon le rôle
       var adminView = document.getElementById('frais-admin-view');
