@@ -6537,13 +6537,13 @@ function _hideTeamSelection() {
     });
     const pour = destinataires.join(', ') || 'Toute l\'équipe';
 
-    // Envoyer par email
+    // Envoyer par email (Gmail)
     if (viaEmail) {
       const subject = encodeURIComponent(objet || 'Message OH MY PROD');
       const body = encodeURIComponent(
         `De : ${de}\nPour : ${pour}\n\n${message}\n\n— OH MY PROD`
       );
-      window.open(`mailto:?subject=${subject}&body=${body}`);
+      window.open(`https://mail.google.com/mail/u/0/?view=cm&fs=1&su=${subject}&body=${body}`, '_blank');
     }
 
     // Ajouter dans Infos Importantes
@@ -6565,14 +6565,12 @@ function _hideTeamSelection() {
       }
     }
 
-    // Envoyer par WhatsApp Groupe
+    // Envoyer par WhatsApp Groupe (ouvre l'appli WhatsApp Desktop)
     if (document.getElementById('notif-via-wa').checked) {
       const waText = encodeURIComponent(`*${objet || 'Message OH MY PROD'}*\n\nDe : ${de} → ${pour}\n\n${message}\n\n— OH MY PROD`);
-      window.open(`https://chat.whatsapp.com/JEbCMZRyf9IH4YkthdweZ6`);
-      // Note : le texte sera copié, colle-le dans le groupe
-      setTimeout(() => {
-        navigator.clipboard.writeText(decodeURIComponent(waText)).catch(() => {});
-      }, 500);
+      // Ouvre WhatsApp Desktop/Web avec le message pré-rempli
+      // Tu devras sélectionner le groupe OH MY PROD dans la liste
+      window.open(`https://web.whatsapp.com/send?text=${waText}`, '_blank');
     }
 
     // Confirmation
@@ -14884,8 +14882,8 @@ function _hideTeamSelection() {
         <div class="modal-field">
           <label>Envoyer via</label>
           <div style="display:flex; gap:12px; margin-top:4px; flex-wrap:wrap;">
-            <label class="notif-check"><input type="checkbox" id="notif-via-mail" checked> 📧 Email</label>
-            <label class="notif-check"><input type="checkbox" id="notif-via-msg" checked> 💬 Infos Importantes</label>
+            <label class="notif-check"><input type="checkbox" id="notif-via-mail"> 📧 Email</label>
+            <label class="notif-check"><input type="checkbox" id="notif-via-msg"> 💬 Infos Importantes</label>
             <label class="notif-check"><input type="checkbox" id="notif-via-wa"> 🟢 WhatsApp Groupe</label>
           </div>
         </div>
