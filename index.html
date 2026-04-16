@@ -9938,23 +9938,23 @@ function _hideTeamSelection() {
     // Charger toutes les dates de la tournée depuis Supabase
     var tbody = document.getElementById('rt-tbody');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#888;">Chargement...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#888;">Chargement...</td></tr>';
     
     try {
-      // Récupérer toutes les dates avec leurs fiches production
+      // Récupérer toutes les dates avec leurs fiches production + info tournée
       var { data: dates, error } = await _supabase
         .from('dates_concert')
-        .select('id, date_concert, ville, nom_salle, tournee_id')
+        .select('id, date_concert, ville, nom_salle, tournee_id, tournees(nom)')
         .order('date_concert', { ascending: true });
       
       if (error) {
         console.error('Erreur Supabase routing tour:', error);
-        tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#e31e24;">Erreur: ' + (error.message || 'Connexion') + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#e31e24;">Erreur: ' + (error.message || 'Connexion') + '</td></tr>';
         return;
       }
       
       if (!dates || dates.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#888;">Aucune date trouvée dans la base</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#888;">Aucune date trouvée dans la base</td></tr>';
         return;
       }
       
@@ -9977,45 +9977,57 @@ function _hideTeamSelection() {
           dateFormatee = dt.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'2-digit'});
         }
         
-        // Récupérer le promoteur depuis la fiche production
-        var fiche = fichesMap[d.id] || {};
-        var promoteur = fiche.promoteur || '';
+        // Récupérer le nom de la tournée pour le titre du spectacle
+        var nomTournee = d.tournees?.nom || '';
+        var titreSpectacleDate = nomTournee || 'THE WORLD OF QUEEN';
         
-        // Déterminer si c'est OMP ou tiers payeur (basé sur promoteur)
-        var hasPromo = promoteur && promoteur.trim() !== '' && promoteur.toUpperCase() !== 'PAS DE PL';
-        var pctCharge = hasPromo ? '' : 'X';
-        var pctTiers = hasPromo ? 'X' : '';
-        var nomTiers = hasPromo ? promoteur : '';
+        // Nom du groupe fixe
+        var nomGroupe = 'TWOQ / THE WORLD OF QUEEN';
         
-        // Stocker les données pour export
+        // Stocker les données pour export (les 3 dernières colonnes vides par défaut)
         _routingTourData.push({
           date: dateFormatee,
-          titre: 'THE WORLD OF QUEEN',
+          nomGroupe: nomGroupe,
+          titre: titreSpectacleDate,
           localite: d.ville || '',
           salle: d.nom_salle || '',
           genre: 'Concert, Musique de scène',
-          pctCharge: pctCharge,
-          pctTiers: pctTiers,
-          nomTiers: nomTiers
+          pctCharge: '',
+          pctTiers: '',
+          nomTiers: ''
         });
         
         var bgColor = idx % 2 === 0 ? '#0a0a0a' : '#111';
-        html += '<tr style="background:' + bgColor + ';">'
+        html += '<tr style="background:' + bgColor + ';" data-idx="' + idx + '">'
           + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + dateFormatee + '</td>'
-          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">THE WORLD OF QUEEN</td>'
+          + '<td style="padding:7px 10px;color:#c9a84c;border:1px solid #2a2a2a;font-weight:600;">' + nomGroupe + '</td>'
+          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + titreSpectacleDate + '</td>'
           + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.ville || '') + '</td>'
           + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.nom_salle || '') + '</td>'
           + '<td style="padding:7px 10px;color:#888;border:1px solid #2a2a2a;text-align:center;font-size:10px;">Concert</td>'
-          + '<td style="padding:7px 10px;color:#22c55e;border:1px solid #2a2a2a;text-align:center;font-weight:700;">' + pctCharge + '</td>'
-          + '<td style="padding:7px 10px;color:#f59e0b;border:1px solid #2a2a2a;text-align:center;font-weight:700;">' + pctTiers + '</td>'
-          + '<td style="padding:7px 10px;color:#888;border:1px solid #2a2a2a;">' + nomTiers + '</td>'
+          + '<td style="padding:4px 6px;border:1px solid #2a2a2a;text-align:center;">'
+          + '<input type="text" data-field="pctCharge" style="width:50px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#22c55e;padding:4px 6px;font-size:12px;text-align:center;font-weight:700;" onchange="updateRoutingData(' + idx + ', \'pctCharge\', this.value)">'
+          + '</td>'
+          + '<td style="padding:4px 6px;border:1px solid #2a2a2a;text-align:center;">'
+          + '<input type="text" data-field="pctTiers" style="width:50px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#f59e0b;padding:4px 6px;font-size:12px;text-align:center;font-weight:700;" onchange="updateRoutingData(' + idx + ', \'pctTiers\', this.value)">'
+          + '</td>'
+          + '<td style="padding:4px 6px;border:1px solid #2a2a2a;">'
+          + '<input type="text" list="datalist-tiers-payant" data-field="nomTiers" style="width:100%;min-width:120px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#fff;padding:4px 8px;font-size:12px;" placeholder="Nom tiers..." onchange="updateRoutingData(' + idx + ', \'nomTiers\', this.value)">'
+          + '</td>'
           + '</tr>';
       });
       
       tbody.innerHTML = html;
       
     } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#e31e24;">Erreur de chargement</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;text-align:center;color:#e31e24;">Erreur de chargement</td></tr>';
+    }
+  }
+
+  // Mise à jour des données routing quand on modifie un champ
+  function updateRoutingData(idx, field, value) {
+    if (_routingTourData[idx]) {
+      _routingTourData[idx][field] = value;
     }
   }
   
@@ -10033,13 +10045,14 @@ function _hideTeamSelection() {
       var bg = idx % 2 === 0 ? '#fff' : '#f5f5f5';
       return '<tr style="background:' + bg + ';">'
         + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.date + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;font-weight:600;">' + d.nomGroupe + '</td>'
         + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.titre + '</td>'
         + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.localite + '</td>'
         + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.salle + '</td>'
         + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:10px;text-align:center;">Concert</td>'
-        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;text-align:center;font-weight:700;">' + d.pctCharge + '</td>'
-        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;text-align:center;font-weight:700;">' + d.pctTiers + '</td>'
-        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.nomTiers + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;text-align:center;font-weight:700;">' + (d.pctCharge || '') + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;text-align:center;font-weight:700;">' + (d.pctTiers || '') + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + (d.nomTiers || '') + '</td>'
         + '</tr>';
     }).join('');
     
@@ -10058,7 +10071,7 @@ function _hideTeamSelection() {
       + '<div class="header">'
       + '<div class="header-left">'
       + '<div style="font-size:11px;color:#666;">GROUPE</div>'
-      + '<div style="font-size:16px;font-weight:700;">THE WORLD OF QUEEN</div>'
+      + '<div style="font-size:16px;font-weight:700;">TWOQ / THE WORLD OF QUEEN</div>'
       + '<div style="font-size:13px;color:#c00;margin-top:2px;">' + titreSpectacle + '</div>'
       + '</div>'
       + '<div class="header-right">'
@@ -10070,6 +10083,7 @@ function _hideTeamSelection() {
       + '<table>'
       + '<thead><tr>'
       + '<th>Date</th>'
+      + '<th>Nom du groupe</th>'
       + '<th>Titre du spectacle</th>'
       + '<th>Localité</th>'
       + '<th>Nom de la salle</th>'
@@ -15971,6 +15985,7 @@ function _hideTeamSelection() {
           <thead>
             <tr style="background:#1e3a5f;">
               <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Date</th>
+              <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Nom du groupe</th>
               <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Titre du spectacle</th>
               <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Localité</th>
               <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Nom de la salle</th>
@@ -15981,10 +15996,22 @@ function _hideTeamSelection() {
             </tr>
           </thead>
           <tbody id="rt-tbody">
-            <tr><td colspan="8" style="padding:20px;text-align:center;color:#888;">Chargement...</td></tr>
+            <tr><td colspan="9" style="padding:20px;text-align:center;color:#888;">Chargement...</td></tr>
           </tbody>
         </table>
       </div>
+
+      <!-- Datalist pour les tiers payants -->
+      <datalist id="datalist-tiers-payant">
+        <option value="OH MY PROD">
+        <option value="LES DERNIERS COUCHES">
+        <option value="NUIT D'ARTISTES">
+        <option value="BLEU CITRON">
+        <option value="PEEL PROD">
+        <option value="SALLE">
+        <option value="CLIENT">
+        <option value="AUTRE">
+      </datalist>
 
       <button onclick="imprimerRoutingTour()" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / EXPORT PDF</button>
     </div>
