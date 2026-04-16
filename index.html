@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.16.19">
+<meta name="version" content="2026.04.16.21">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -9944,7 +9944,7 @@ function _hideTeamSelection() {
       // Récupérer toutes les dates avec leurs fiches production
       var { data: dates, error } = await _supabase
         .from('dates_concert')
-        .select('id, date_concert, ville, salle, spectacle, promoteur')
+        .select('id, date_concert, ville, nom_salle, tournee_id')
         .order('date_concert', { ascending: true });
       
       if (error) {
@@ -9960,6 +9960,13 @@ function _hideTeamSelection() {
       
       console.log('Routing tour - dates chargées:', dates.length);
       
+      // Récupérer les infos promoteur depuis fiches_production
+      var { data: fiches } = await _supabase
+        .from('fiches_production')
+        .select('date_concert_id, promoteur');
+      var fichesMap = {};
+      if (fiches) fiches.forEach(function(f) { fichesMap[f.date_concert_id] = f; });
+      
       _routingTourData = [];
       var html = '';
       
@@ -9970,18 +9977,22 @@ function _hideTeamSelection() {
           dateFormatee = dt.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'2-digit'});
         }
         
+        // Récupérer le promoteur depuis la fiche production
+        var fiche = fichesMap[d.id] || {};
+        var promoteur = fiche.promoteur || '';
+        
         // Déterminer si c'est OMP ou tiers payeur (basé sur promoteur)
-        var hasPromo = d.promoteur && d.promoteur.trim() !== '' && d.promoteur.toUpperCase() !== 'PAS DE PL';
+        var hasPromo = promoteur && promoteur.trim() !== '' && promoteur.toUpperCase() !== 'PAS DE PL';
         var pctCharge = hasPromo ? '' : 'X';
         var pctTiers = hasPromo ? 'X' : '';
-        var nomTiers = hasPromo ? d.promoteur : '';
+        var nomTiers = hasPromo ? promoteur : '';
         
         // Stocker les données pour export
         _routingTourData.push({
           date: dateFormatee,
-          titre: d.spectacle || 'THE WORLD OF QUEEN',
+          titre: 'THE WORLD OF QUEEN',
           localite: d.ville || '',
-          salle: d.salle || '',
+          salle: d.nom_salle || '',
           genre: 'Concert, Musique de scène',
           pctCharge: pctCharge,
           pctTiers: pctTiers,
@@ -9991,9 +10002,9 @@ function _hideTeamSelection() {
         var bgColor = idx % 2 === 0 ? '#0a0a0a' : '#111';
         html += '<tr style="background:' + bgColor + ';">'
           + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + dateFormatee + '</td>'
-          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.spectacle || 'THE WORLD OF QUEEN') + '</td>'
+          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">THE WORLD OF QUEEN</td>'
           + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.ville || '') + '</td>'
-          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.salle || '') + '</td>'
+          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.nom_salle || '') + '</td>'
           + '<td style="padding:7px 10px;color:#888;border:1px solid #2a2a2a;text-align:center;font-size:10px;">Concert</td>'
           + '<td style="padding:7px 10px;color:#22c55e;border:1px solid #2a2a2a;text-align:center;font-weight:700;">' + pctCharge + '</td>'
           + '<td style="padding:7px 10px;color:#f59e0b;border:1px solid #2a2a2a;text-align:center;font-weight:700;">' + pctTiers + '</td>'
@@ -10008,53 +10019,73 @@ function _hideTeamSelection() {
     }
   }
   
-  // Copier le tableau pour coller dans Excel (format TSV)
-  function copierRoutingTourTableau() {
+  // Imprimer / Exporter PDF le tableau Routing Tour
+  function imprimerRoutingTour() {
     if (!_routingTourData || _routingTourData.length === 0) {
-      alert('Aucune donnée à copier');
+      alert('Aucune donnée à imprimer');
       return;
     }
     
-    // En-têtes
-    var lignes = ['Date\tTitre du spectacle\tLocalité\tNom de la salle\tGenre\t% à ma charge\t% tiers\tNom tiers payeur'];
+    var titreSpectacle = document.getElementById('rt-titre-spectacle')?.textContent || 'THE WORLD OF QUEEN';
     
-    // Données
-    _routingTourData.forEach(function(d) {
-      lignes.push(d.date + '\t' + d.titre + '\t' + d.localite + '\t' + d.salle + '\t' + d.genre + '\t' + d.pctCharge + '\t' + d.pctTiers + '\t' + d.nomTiers);
-    });
+    // Construire le HTML pour impression
+    var lignesHTML = _routingTourData.map(function(d, idx) {
+      var bg = idx % 2 === 0 ? '#fff' : '#f5f5f5';
+      return '<tr style="background:' + bg + ';">'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.date + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.titre + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.localite + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.salle + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:10px;text-align:center;">Concert</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;text-align:center;font-weight:700;">' + d.pctCharge + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;text-align:center;font-weight:700;">' + d.pctTiers + '</td>'
+        + '<td style="padding:6px 8px;border:1px solid #ccc;font-size:11px;">' + d.nomTiers + '</td>'
+        + '</tr>';
+    }).join('');
     
-    var texte = lignes.join('\n');
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Décla Routing Tour - OH MY PROD</title>'
+      + '<style>'
+      + 'body { font-family: Arial, sans-serif; padding: 20px; color: #000; }'
+      + 'h1 { font-size: 18px; margin-bottom: 5px; }'
+      + 'h2 { font-size: 14px; color: #666; margin-bottom: 20px; }'
+      + '.header { display: flex; justify-content: space-between; margin-bottom: 20px; }'
+      + '.header-left { }'
+      + '.header-right { text-align: right; border: 2px solid #000; padding: 10px 20px; }'
+      + 'table { width: 100%; border-collapse: collapse; margin-top: 10px; }'
+      + 'th { background: #333; color: #fff; padding: 8px; font-size: 10px; text-align: left; border: 1px solid #333; }'
+      + '@media print { body { padding: 10px; } }'
+      + '</style></head><body>'
+      + '<div class="header">'
+      + '<div class="header-left">'
+      + '<div style="font-size:11px;color:#666;">GROUPE</div>'
+      + '<div style="font-size:16px;font-weight:700;">THE WORLD OF QUEEN</div>'
+      + '<div style="font-size:13px;color:#c00;margin-top:2px;">' + titreSpectacle + '</div>'
+      + '</div>'
+      + '<div class="header-right">'
+      + '<div style="font-size:11px;color:#666;">PRODUCTEUR TOURNÉE</div>'
+      + '<div style="font-size:16px;font-weight:700;">OH MY PROD</div>'
+      + '</div>'
+      + '</div>'
+      + '<div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:10px;">CALENDRIER DES REPRÉSENTATIONS</div>'
+      + '<table>'
+      + '<thead><tr>'
+      + '<th>Date</th>'
+      + '<th>Titre du spectacle</th>'
+      + '<th>Localité</th>'
+      + '<th>Nom de la salle</th>'
+      + '<th>Genre</th>'
+      + '<th style="text-align:center;">% à ma charge</th>'
+      + '<th style="text-align:center;">% tiers</th>'
+      + '<th>Nom tiers payeur</th>'
+      + '</tr></thead>'
+      + '<tbody>' + lignesHTML + '</tbody>'
+      + '</table>'
+      + '<script>window.onload=function(){window.print();}<\/script>'
+      + '</body></html>';
     
-    navigator.clipboard.writeText(texte).then(function() {
-      alert('✅ Tableau copié ! Colle-le dans Excel avec Ctrl+V');
-    }).catch(function() {
-      alert('❌ Erreur lors de la copie');
-    });
-  }
-  
-  // Exporter en CSV
-  function exporterRoutingTourCSV() {
-    if (!_routingTourData || _routingTourData.length === 0) {
-      alert('Aucune donnée à exporter');
-      return;
-    }
-    
-    // En-têtes
-    var lignes = ['Date;Titre du spectacle;Localité;Nom de la salle;Genre;% à ma charge;% tiers;Nom tiers payeur'];
-    
-    // Données
-    _routingTourData.forEach(function(d) {
-      lignes.push(d.date + ';' + d.titre + ';' + d.localite + ';' + d.salle + ';' + d.genre + ';' + d.pctCharge + ';' + d.pctTiers + ';' + d.nomTiers);
-    });
-    
-    var csv = lignes.join('\n');
-    var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'routing_tour_omp.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+    var win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
   }
 
   function envoyerMailSacem() {
@@ -15955,10 +15986,7 @@ function _hideTeamSelection() {
         </table>
       </div>
 
-      <div style="display:flex;gap:10px;">
-        <button onclick="copierRoutingTourTableau()" style="flex:1;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📋 COPIER POUR EXCEL</button>
-        <button onclick="exporterRoutingTourCSV()" style="flex:1;background:#22c55e;color:#000;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📥 TÉLÉCHARGER CSV</button>
-      </div>
+      <button onclick="imprimerRoutingTour()" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / EXPORT PDF</button>
     </div>
   </div>
 </div>
