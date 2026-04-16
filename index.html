@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.16.14">
+<meta name="version" content="2026.04.16.18">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3386,6 +3386,8 @@ function _hideTeamSelection() {
         <button onclick="ouvrirModalSacem()" style="background:#2a2a2a;color:#c9a84c;border:1px solid #a855f7;border-radius:4px;padding:9px 16px;font-size:13px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.3px;display:inline-flex;align-items:center;gap:6px;">📧 SACEM</button>
 
         <a href="https://www.sacd.fr/fr/membre/login" target="_blank" style="background:#2a2a2a;color:#c9a84c;border:1px solid #a855f7;border-radius:4px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">🌐 SACD</a>
+
+        <button onclick="ouvrirModalRoutingTour()" style="background:#1e3a5f;color:#7eb8d4;border:1px solid #3b82f6;border-radius:4px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;display:inline-flex;align-items:center;gap:6px;">📋 DÉCLA ROUTING TOUR</button>
 
       </div>
 
@@ -9904,7 +9906,8 @@ function _hideTeamSelection() {
     // Récupérer les données depuis la page décla droits (déjà chargées)
     var payants = (document.getElementById('dd-payants')?.textContent || '').replace(/\s/g, '');
     var invit = (document.getElementById('dd-invit')?.textContent || '').replace(/\s/g, '');
-    var recetteHT = document.getElementById('dd-decla-ht')?.textContent || '';
+    // Recette HT = MONTANT À DÉCLARER de la ligne SACEM (dd-sacem-montant)
+    var recetteHT = document.getElementById('dd-sacem-montant')?.textContent || '';
     
     // Pré-remplir les champs du modal
     var elTitre = document.getElementById('sacem-titre'); if (elTitre) elTitre.value = titre;
@@ -9919,6 +9922,133 @@ function _hideTeamSelection() {
     openModal('modal-sacem-mail');
   }
 
+  // Variable globale pour stocker les données du routing tour
+  var _routingTourData = [];
+
+  // Ouvrir le modal DÉCLA ROUTING TOUR avec toutes les dates de la tournée
+  async function ouvrirModalRoutingTour() {
+    // Récupérer le titre du spectacle de la fiche courante
+    var titreSpectacle = document.getElementById('fp-spectacle')?.value || 'THE WORLD OF QUEEN';
+    var elTitre = document.getElementById('rt-titre-spectacle');
+    if (elTitre) elTitre.textContent = titreSpectacle;
+    
+    // Ouvrir le modal
+    openModal('modal-routing-tour');
+    
+    // Charger toutes les dates de la tournée depuis Supabase
+    var tbody = document.getElementById('rt-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#888;">Chargement...</td></tr>';
+    
+    try {
+      // Récupérer toutes les dates avec leurs fiches production
+      var { data: dates, error } = await _supabase
+        .from('dates_concert')
+        .select('id, date_concert, ville, salle, spectacle, promoteur')
+        .order('date_concert', { ascending: true });
+      
+      if (error || !dates || dates.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#888;">Aucune date trouvée</td></tr>';
+        return;
+      }
+      
+      _routingTourData = [];
+      var html = '';
+      
+      dates.forEach(function(d, idx) {
+        var dateFormatee = '';
+        if (d.date_concert) {
+          var dt = new Date(d.date_concert + 'T00:00:00');
+          dateFormatee = dt.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'2-digit'});
+        }
+        
+        // Déterminer si c'est OMP ou tiers payeur (basé sur promoteur)
+        var hasPromo = d.promoteur && d.promoteur.trim() !== '' && d.promoteur.toUpperCase() !== 'PAS DE PL';
+        var pctCharge = hasPromo ? '' : 'X';
+        var pctTiers = hasPromo ? 'X' : '';
+        var nomTiers = hasPromo ? d.promoteur : '';
+        
+        // Stocker les données pour export
+        _routingTourData.push({
+          date: dateFormatee,
+          titre: d.spectacle || 'THE WORLD OF QUEEN',
+          localite: d.ville || '',
+          salle: d.salle || '',
+          genre: 'Concert, Musique de scène',
+          pctCharge: pctCharge,
+          pctTiers: pctTiers,
+          nomTiers: nomTiers
+        });
+        
+        var bgColor = idx % 2 === 0 ? '#0a0a0a' : '#111';
+        html += '<tr style="background:' + bgColor + ';">'
+          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + dateFormatee + '</td>'
+          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.spectacle || 'THE WORLD OF QUEEN') + '</td>'
+          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.ville || '') + '</td>'
+          + '<td style="padding:7px 10px;color:#fff;border:1px solid #2a2a2a;">' + (d.salle || '') + '</td>'
+          + '<td style="padding:7px 10px;color:#888;border:1px solid #2a2a2a;text-align:center;font-size:10px;">Concert</td>'
+          + '<td style="padding:7px 10px;color:#22c55e;border:1px solid #2a2a2a;text-align:center;font-weight:700;">' + pctCharge + '</td>'
+          + '<td style="padding:7px 10px;color:#f59e0b;border:1px solid #2a2a2a;text-align:center;font-weight:700;">' + pctTiers + '</td>'
+          + '<td style="padding:7px 10px;color:#888;border:1px solid #2a2a2a;">' + nomTiers + '</td>'
+          + '</tr>';
+      });
+      
+      tbody.innerHTML = html;
+      
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#e31e24;">Erreur de chargement</td></tr>';
+    }
+  }
+  
+  // Copier le tableau pour coller dans Excel (format TSV)
+  function copierRoutingTourTableau() {
+    if (!_routingTourData || _routingTourData.length === 0) {
+      alert('Aucune donnée à copier');
+      return;
+    }
+    
+    // En-têtes
+    var lignes = ['Date\tTitre du spectacle\tLocalité\tNom de la salle\tGenre\t% à ma charge\t% tiers\tNom tiers payeur'];
+    
+    // Données
+    _routingTourData.forEach(function(d) {
+      lignes.push(d.date + '\t' + d.titre + '\t' + d.localite + '\t' + d.salle + '\t' + d.genre + '\t' + d.pctCharge + '\t' + d.pctTiers + '\t' + d.nomTiers);
+    });
+    
+    var texte = lignes.join('\n');
+    
+    navigator.clipboard.writeText(texte).then(function() {
+      alert('✅ Tableau copié ! Colle-le dans Excel avec Ctrl+V');
+    }).catch(function() {
+      alert('❌ Erreur lors de la copie');
+    });
+  }
+  
+  // Exporter en CSV
+  function exporterRoutingTourCSV() {
+    if (!_routingTourData || _routingTourData.length === 0) {
+      alert('Aucune donnée à exporter');
+      return;
+    }
+    
+    // En-têtes
+    var lignes = ['Date;Titre du spectacle;Localité;Nom de la salle;Genre;% à ma charge;% tiers;Nom tiers payeur'];
+    
+    // Données
+    _routingTourData.forEach(function(d) {
+      lignes.push(d.date + ';' + d.titre + ';' + d.localite + ';' + d.salle + ';' + d.genre + ';' + d.pctCharge + ';' + d.pctTiers + ';' + d.nomTiers);
+    });
+    
+    var csv = lignes.join('\n');
+    var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'routing_tour_omp.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function envoyerMailSacem() {
     var titre   = document.getElementById('sacem-titre')?.value || '';
     var salle   = document.getElementById('sacem-salle')?.value || '';
@@ -9928,20 +10058,31 @@ function _hideTeamSelection() {
     var invit   = document.getElementById('sacem-invit')?.value || '';
     var recette = document.getElementById('sacem-recette')?.value || '';
 
+    // Corps du mail avec tableau formaté
     var corps = 'Bonjour Patricia,'
       + '\n\nVoici les déclarations de la semaine pour Oh my prod !'
       + '\n\nBonne réception.'
       + '\nBien à toi'
       + '\n\nRÉGIS.'
-      + '\n\n— Informations du spectacle —'
-      + '\n\nTitre du spectacle : ' + titre
-      + '\nNom de la salle : ' + salle
-      + '\nDate du spectacle : ' + date
-      + '\nHeure du spectacle : ' + heure
-      + '\nN° entrées payantes : ' + payants
-      + '\nN° invitations et servitudes : ' + invit
-      + '\nRecette HT : ' + recette
-      + '\nTaux de TVA : 2,10 %';
+      + '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+      + '\n'
+      + '\n  TITRE DU SPECTACLE          │  ' + titre
+      + '\n  ─────────────────────────────┼──────────────────────────'
+      + '\n  NOM DE LA SALLE             │  ' + salle
+      + '\n  ─────────────────────────────┼──────────────────────────'
+      + '\n  DATE DU SPECTACLE           │  ' + date
+      + '\n  ─────────────────────────────┼──────────────────────────'
+      + '\n  HEURE DU SPECTACLE          │  ' + heure
+      + '\n  ─────────────────────────────┼──────────────────────────'
+      + '\n  N° ENTRÉES PAYANTES         │  ' + payants
+      + '\n  ─────────────────────────────┼──────────────────────────'
+      + '\n  N° INVITATIONS ET SERVITUDES│  ' + invit
+      + '\n  ─────────────────────────────┼──────────────────────────'
+      + '\n  RECETTE HT                  │  ' + recette
+      + '\n  ─────────────────────────────┼──────────────────────────'
+      + '\n  TAUX DE TVA                 │  2,10 %'
+      + '\n'
+      + '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
 
     var sujet = 'Déclarations SACEM — Oh My Prod — ' + (date || '');
     // Ouvrir directement Gmail avec le mail pré-rempli
@@ -15710,7 +15851,7 @@ function _hideTeamSelection() {
 <div id="modal-sacem-mail" class="modal-overlay" onclick="closeModalOutside(event)">
   <div class="modal-box" style="max-width:600px;">
     <div class="modal-header">
-      <div class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:18px;">📧 DÉCLARATION SACEM — Patricia Coumes</div>
+      <div class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:18px;">📧 DÉCLARATION SACEM — OH MY PROD</div>
       <button class="modal-close" onclick="closeModal('modal-sacem-mail')">✕</button>
     </div>
     <div class="modal-body" style="padding:20px;">
@@ -15760,6 +15901,56 @@ function _hideTeamSelection() {
       </div>
 
       <button onclick="envoyerMailSacem()" style="width:100%;background:#a855f7;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📧 OUVRIR DANS MA MESSAGERIE</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DÉCLA ROUTING TOUR -->
+<div id="modal-routing-tour" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box" style="max-width:95%;width:1200px;">
+    <div class="modal-header" style="background:#1e3a5f;">
+      <div class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:18px;color:#7eb8d4;">📋 DÉCLA ROUTING TOUR — OH MY PROD</div>
+      <button class="modal-close" onclick="closeModal('modal-routing-tour')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <div style="font-size:11px;color:#888;">GROUPE</div>
+          <div style="font-size:16px;color:#fff;font-weight:700;">THE WORLD OF QUEEN</div>
+          <div style="font-size:13px;color:#c9a84c;margin-top:2px;" id="rt-titre-spectacle">L'ÉTERNELLE LÉGENDE</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#888;">PRODUCTEUR TOURNÉE</div>
+          <div style="font-size:16px;color:#fff;font-weight:700;">OH MY PROD</div>
+        </div>
+      </div>
+
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#7eb8d4;margin-bottom:10px;text-align:center;">CALENDRIER DES REPRÉSENTATIONS</div>
+
+      <div style="overflow-x:auto;margin-bottom:16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:900px;">
+          <thead>
+            <tr style="background:#1e3a5f;">
+              <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Date</th>
+              <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Titre du spectacle</th>
+              <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Localité</th>
+              <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Nom de la salle</th>
+              <th style="padding:8px 10px;text-align:center;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Genre</th>
+              <th style="padding:8px 10px;text-align:center;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">% à ma charge</th>
+              <th style="padding:8px 10px;text-align:center;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">% tiers</th>
+              <th style="padding:8px 10px;text-align:left;color:#7eb8d4;font-weight:600;border:1px solid #2a2a2a;">Nom tiers payeur</th>
+            </tr>
+          </thead>
+          <tbody id="rt-tbody">
+            <tr><td colspan="8" style="padding:20px;text-align:center;color:#888;">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button onclick="copierRoutingTourTableau()" style="flex:1;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📋 COPIER POUR EXCEL</button>
+        <button onclick="exporterRoutingTourCSV()" style="flex:1;background:#22c55e;color:#000;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📥 TÉLÉCHARGER CSV</button>
+      </div>
     </div>
   </div>
 </div>
