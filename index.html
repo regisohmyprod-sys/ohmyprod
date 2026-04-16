@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.16.18">
+<meta name="version" content="2026.04.16.19">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -9947,10 +9947,18 @@ function _hideTeamSelection() {
         .select('id, date_concert, ville, salle, spectacle, promoteur')
         .order('date_concert', { ascending: true });
       
-      if (error || !dates || dates.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#888;">Aucune date trouvée</td></tr>';
+      if (error) {
+        console.error('Erreur Supabase routing tour:', error);
+        tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#e31e24;">Erreur: ' + (error.message || 'Connexion') + '</td></tr>';
         return;
       }
+      
+      if (!dates || dates.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#888;">Aucune date trouvée dans la base</td></tr>';
+        return;
+      }
+      
+      console.log('Routing tour - dates chargées:', dates.length);
       
       _routingTourData = [];
       var html = '';
