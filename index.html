@@ -3233,6 +3233,8 @@ function _hideTeamSelection() {
           <div style="background:#1e3a5f;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;text-align:center;">MEV / CHIFFRES VENTES</div>
           <table style="width:100%;border-collapse:collapse;font-size:13px;">
             <tbody>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Ventes à ce jour</td><td id="pilote-proj-ventes-actuelles" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% de remplissage</td><td id="pilote-remplissage" style="padding:7px 16px;color:#22c55e;font-weight:700;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">N° Jours depuis ouverture</td><td id="pilote-nb-jours" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Moyenne depuis open</td><td id="pilote-moy-open" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Moyenne vente 3 mois</td><td id="pilote-moy-3m" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
@@ -3240,9 +3242,9 @@ function _hideTeamSelection() {
               <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Moyenne 7 derniers jours</td><td id="pilote-moy-7j" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:700;">TENDANCE</td><td id="pilote-tendance" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">N° Jours restants</td><td id="pilote-jours-restants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% de remplissage</td><td id="pilote-remplissage" style="padding:7px 16px;color:#22c55e;font-weight:700;text-align:right;"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Projection payants</td><td id="pilote-proj-payants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Projection payants</td><td id="pilote-proj-payants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);"><td style="padding:7px 16px;color:#c9a84c;font-weight:600;">🎯 BOOST BONUS (manuel)</td><td style="padding:4px 16px;text-align:right;"><input id="pilote-boost-bonus" type="number" placeholder="0" oninput="projChangeBoost()" onchange="projChangeBoost()" style="width:80px;background:#0a0a0a;border:1px solid #c9a84c;border-radius:6px;color:#c9a84c;padding:4px 8px;font-size:13px;font-weight:600;text-align:right;font-family:'Inter',sans-serif;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:7px 16px;color:#c9a84c;">% de remplissage (projection)</td><td id="pilote-remplissage-projection" style="padding:7px 16px;color:#c9a84c;font-weight:700;text-align:right;"></td></tr>
               <tr style="background:rgba(239,68,68,0.15);"><td style="padding:7px 16px;color:#fff;font-weight:700;">Projection total</td><td id="pilote-proj-total" style="padding:7px 16px;color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:900;text-align:right;"></td></tr>
             </tbody>
           </table>
@@ -14910,6 +14912,14 @@ function _hideTeamSelection() {
         if (el) el.textContent = (v !== null && v !== undefined && !isNaN(v) && v !== '') ? (v + (suf || '')) : '—';
       };
 
+      // Helper spécifique pour afficher des nombres formatés en français
+      var setNum = function(id, n) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        if (n === null || n === undefined || isNaN(n) || n === 0) { el.textContent = '—'; return; }
+        el.textContent = Math.round(n).toLocaleString('fr-FR');
+      };
+
       if (snapshots.length === 0) {
         // Pas d'historique : on laisse les cases existantes (moy depuis open déjà calculée)
         // mais on vide les cases qui nécessitent l'historique
@@ -14963,20 +14973,32 @@ function _hideTeamSelection() {
 
       // 8. Affichage
       var r2 = function(n) { return Math.round(n * 100) / 100; };
+
+      // Ventes à ce jour (nouvelle ligne en haut du bloc)
+      setNum('pilote-proj-ventes-actuelles', totalActuel);
+
       setVal('pilote-moy-3m', moy3m > 0 ? r2(moy3m) : '—', moy3m > 0 ? ' bil/j' : '');
       setVal('pilote-moy-30j', moy30j > 0 ? r2(moy30j) : '—', moy30j > 0 ? ' bil/j' : '');
       setVal('pilote-moy-7j', moy7j > 0 ? r2(moy7j) : '—', moy7j > 0 ? ' bil/j' : '');
       setVal('pilote-tendance', tendance > 0 ? r2(tendance) : '—', tendance > 0 ? ' bil/j' : '');
-      setVal('pilote-proj-payants', projectionPayants > 0 ? projectionPayants.toLocaleString('fr-FR') : '');
-      setVal('pilote-proj-total', projectionTotal > 0 ? projectionTotal.toLocaleString('fr-FR') : '');
+      setNum('pilote-proj-payants', projectionPayants);
+      setNum('pilote-proj-total', projectionTotal);
 
-      // Couleur du % remplissage recalculé avec projection totale
+      // % de remplissage ACTUEL = ventes à ce jour / jauge (sans bonus, sans projection)
       if (jauge > 0) {
-        var pct = (projectionTotal / jauge) * 100;
+        var pctActuel = (totalActuel / jauge) * 100;
         var elR = document.getElementById('pilote-remplissage');
         if (elR) {
-          elR.textContent = pct.toFixed(2) + '%';
-          elR.style.color = pct >= 90 ? '#22c55e' : pct >= 70 ? '#c9a84c' : pct >= 50 ? '#f59e0b' : '#ef4444';
+          elR.textContent = pctActuel.toFixed(2) + '%';
+          elR.style.color = pctActuel >= 90 ? '#22c55e' : pctActuel >= 70 ? '#c9a84c' : pctActuel >= 50 ? '#f59e0b' : '#ef4444';
+        }
+
+        // % de remplissage PROJECTION = projection total (avec bonus) / jauge
+        var pctProj = (projectionTotal / jauge) * 100;
+        var elRP = document.getElementById('pilote-remplissage-projection');
+        if (elRP) {
+          elRP.textContent = pctProj.toFixed(2) + '%';
+          elRP.style.color = pctProj >= 90 ? '#22c55e' : pctProj >= 70 ? '#c9a84c' : pctProj >= 50 ? '#f59e0b' : '#ef4444';
         }
       }
 
