@@ -3359,10 +3359,20 @@ function _hideTeamSelection() {
         </div>
       </div>
 
-      <!-- GRAPHIQUE SUIVI DES VENTES (placeholder) -->
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:20px;margin-bottom:16px;text-align:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#888;margin-bottom:8px;">📈 SUIVI DES VENTES</div>
-        <div style="color:#555;font-size:13px;">Graphique disponible après connexion aux données de vente</div>
+      <!-- GRAPHIQUE SUIVI DES VENTES -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:20px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:12px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#c9a84c;">📈 SUIVI DES VENTES</div>
+          <div style="display:flex;gap:12px;font-size:11px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;color:#ccc;"><span style="width:14px;height:3px;background:#3b82f6;display:inline-block;"></span>Ventes réelles (cumul)</div>
+            <div style="display:flex;align-items:center;gap:6px;color:#ccc;"><span style="width:14px;height:3px;background:#c9a84c;display:inline-block;border-top:1px dashed #c9a84c;"></span>Projection</div>
+            <div style="display:flex;align-items:center;gap:6px;color:#ccc;"><span style="width:10px;height:10px;background:#ef4444;border-radius:50%;display:inline-block;"></span>Concert</div>
+          </div>
+        </div>
+        <div id="pilote-graph-container" style="width:100%;min-height:260px;">
+          <div id="pilote-graph-empty" style="color:#555;font-size:13px;text-align:center;padding:40px 0;">Aucune donnée de vente à afficher</div>
+          <svg id="pilote-graph-svg" style="display:none;width:100%;height:300px;" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
       </div>
 
     </div>
@@ -15015,6 +15025,8 @@ function _hideTeamSelection() {
 
       // 💰 Déclencher la projection financière une fois les ventes calculées
       setTimeout(function(){ projAfficherBlocFinancier(); }, 100);
+      // 📈 Déclencher le graphique une fois la projection calculée
+      setTimeout(function(){ projAfficherGraphique(dateId); }, 200);
     } catch (err) {
       console.error('❌ Erreur affichage projection :', err);
     }
@@ -15299,18 +15311,42 @@ function _hideTeamSelection() {
       var elEq = document.getElementById('pilote-fin-equilibre');
       var elEqInfo = document.getElementById('pilote-fin-equilibre-info');
 
+      // Petits mots humoristiques tirés au hasard selon la situation
+      var CULOTTE_SAUVE = [
+        '🩲 Culotte sauvée !',
+        '🩲 La culotte est sèche !',
+        '🩲 On garde la culotte au chaud !',
+        '🎉 Rien à craindre pour la culotte !',
+        '🩲 Même pas besoin d\'y penser !'
+      ];
+      var CULOTTE_CHAUD = [
+        'pour ne pas perdre sa culotte 🩲',
+        'pour sauver la culotte 🩲',
+        'avant que la culotte tombe 🩲',
+        'et garder la culotte au sec 🩲',
+        'sinon bye bye la culotte 🩲'
+      ];
+      var CULOTTE_DANGER = [
+        '😱 La culotte est en danger !',
+        '🚨 Alerte culotte à terre !',
+        '⚠️ La culotte va sauter !',
+        '😬 Ça sent le slip...',
+        '🆘 SOS culotte !'
+      ];
+      var pick = function(arr) { return arr[Math.floor(Math.random() * arr.length)]; };
+
       if (prixMoyen <= 0 || ventesAujourdhui <= 0) {
         if (elEq) { elEq.textContent = '—'; elEq.style.color = '#888'; }
         if (elEqInfo) elEqInfo.textContent = '';
       } else if (equilibreAtteint) {
         if (elEq) { elEq.textContent = '✅ Équilibre atteint'; elEq.style.color = '#22c55e'; }
-        if (elEqInfo) elEqInfo.textContent = 'Résultat déjà positif · marge : ' + _projFormatMontant(resultatOMPActuel);
+        if (elEqInfo) elEqInfo.textContent = pick(CULOTTE_SAUVE) + ' · Marge actuelle : ' + _projFormatMontant(resultatOMPActuel);
       } else if (equilibreAtteignable) {
         if (elEq) { elEq.textContent = '🟡 ' + pointEquilibreTotal.toLocaleString('fr-FR') + ' billets'; elEq.style.color = '#f59e0b'; }
-        if (elEqInfo) elEqInfo.textContent = 'Encore ' + billetsManquants + ' billets à vendre (projection : +' + diffBillets + ')';
+        if (elEqInfo) elEqInfo.textContent = 'Encore ' + billetsManquants + ' billets à vendre ' + pick(CULOTTE_CHAUD);
       } else {
         if (elEq) { elEq.textContent = '🔴 ' + pointEquilibreTotal.toLocaleString('fr-FR') + ' billets'; elEq.style.color = '#ef4444'; }
-        if (elEqInfo) elEqInfo.textContent = 'Manque ' + billetsManquants + ' billets — projection insuffisante (+' + diffBillets + ')';
+        if (elEqInfo) elEqInfo.textContent = 'Manque ' + billetsManquants + ' billets · ' + pick(CULOTTE_DANGER);
       }
 
       console.log('💰 Projection Financière :', {
@@ -15330,6 +15366,179 @@ function _hideTeamSelection() {
       });
     } catch (err) {
       console.error('❌ Erreur projection financière :', err);
+    }
+  }
+
+  // ============================================================
+  // 📈 GRAPHIQUE SUIVI DES VENTES
+  // Affiche la courbe des ventes par mois + projection jusqu'au concert
+  // ============================================================
+
+  /**
+   * Agrège les snapshots en points mensuels (dernier cumul de chaque mois).
+   */
+  function _projAgregerParMois(snapshots) {
+    if (!snapshots || snapshots.length === 0) return [];
+    var parMois = {};
+    snapshots.forEach(function(s) {
+      var d = new Date(s.snapshot_date);
+      var key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      if (!parMois[key] || new Date(parMois[key].snapshot_date) < d) {
+        parMois[key] = {
+          snapshot_date: s.snapshot_date,
+          total_cumul: s.total_cumul,
+          year: d.getFullYear(),
+          month: d.getMonth(),
+          labelCourt: ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'][d.getMonth()] + ' ' + String(d.getFullYear()).slice(-2)
+        };
+      }
+    });
+    return Object.keys(parMois).sort().map(function(k) { return parMois[k]; });
+  }
+
+  /**
+   * Génère le graphique SVG de suivi des ventes.
+   */
+  async function projAfficherGraphique(dateId) {
+    if (!dateId) return;
+    try {
+      var r = await _supabase.from('ventes_snapshots')
+        .select('snapshot_date, total_cumul')
+        .eq('date_id', dateId)
+        .order('snapshot_date', { ascending: true });
+
+      var snapshots = r.data || [];
+      var emptyEl = document.getElementById('pilote-graph-empty');
+      var svgEl = document.getElementById('pilote-graph-svg');
+      if (!svgEl || !emptyEl) return;
+
+      if (snapshots.length === 0) {
+        emptyEl.style.display = 'block';
+        svgEl.style.display = 'none';
+        return;
+      }
+
+      var points = _projAgregerParMois(snapshots);
+      if (points.length === 0) {
+        emptyEl.style.display = 'block';
+        svgEl.style.display = 'none';
+        return;
+      }
+
+      var projectionTotal = _projParseNombre(document.getElementById('pilote-proj-total')?.textContent || '');
+      var dateConcertStr = document.getElementById('fp-date')?.value || '';
+      var dConcert = dateConcertStr ? new Date(dateConcertStr + 'T00:00:00') : null;
+      var jauge = parseInt(document.getElementById('fp-jauge-finale')?.value) || 0;
+
+      var allPoints = points.slice();
+      if (projectionTotal > 0 && dConcert) {
+        allPoints.push({
+          snapshot_date: dConcert.toISOString().split('T')[0],
+          total_cumul: projectionTotal,
+          year: dConcert.getFullYear(),
+          month: dConcert.getMonth(),
+          labelCourt: ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'][dConcert.getMonth()] + ' ' + String(dConcert.getFullYear()).slice(-2),
+          projection: true
+        });
+      }
+
+      var maxVal = Math.max.apply(null, allPoints.map(function(p) { return p.total_cumul; }));
+      if (jauge > 0 && jauge > maxVal) maxVal = jauge;
+      var maxY = Math.ceil(maxVal / 100) * 100 + 100;
+
+      var W = 800, H = 300;
+      var padding = { top: 20, right: 30, bottom: 50, left: 55 };
+      var innerW = W - padding.left - padding.right;
+      var innerH = H - padding.top - padding.bottom;
+
+      var nb = allPoints.length;
+      var xStep = nb > 1 ? innerW / (nb - 1) : 0;
+
+      var coords = allPoints.map(function(p, i) {
+        return {
+          x: padding.left + i * xStep,
+          y: padding.top + innerH - (p.total_cumul / maxY) * innerH,
+          point: p
+        };
+      });
+
+      var indexFirstProjection = coords.findIndex(function(c) { return c.point.projection; });
+      var coordsReel = indexFirstProjection >= 0 ? coords.slice(0, indexFirstProjection) : coords;
+      var coordsProj = indexFirstProjection >= 0 ? coords.slice(indexFirstProjection - 1) : [];
+
+      var pathReel = coordsReel.length > 0
+        ? 'M ' + coordsReel.map(function(c) { return c.x.toFixed(1) + ',' + c.y.toFixed(1); }).join(' L ')
+        : '';
+      var pathProj = coordsProj.length > 1
+        ? 'M ' + coordsProj.map(function(c) { return c.x.toFixed(1) + ',' + c.y.toFixed(1); }).join(' L ')
+        : '';
+
+      var areaReel = '';
+      if (coordsReel.length > 0) {
+        var first = coordsReel[0];
+        var last = coordsReel[coordsReel.length - 1];
+        areaReel = 'M ' + first.x.toFixed(1) + ',' + (padding.top + innerH).toFixed(1)
+                 + ' L ' + coordsReel.map(function(c) { return c.x.toFixed(1) + ',' + c.y.toFixed(1); }).join(' L ')
+                 + ' L ' + last.x.toFixed(1) + ',' + (padding.top + innerH).toFixed(1) + ' Z';
+      }
+
+      var gridLines = '';
+      var gridLabels = '';
+      for (var i = 0; i <= 5; i++) {
+        var y = padding.top + (innerH / 5) * i;
+        var val = Math.round(maxY - (maxY / 5) * i);
+        gridLines += '<line x1="' + padding.left + '" y1="' + y.toFixed(1) + '" x2="' + (W - padding.right) + '" y2="' + y.toFixed(1) + '" stroke="#2a2a2a" stroke-width="1"/>';
+        gridLabels += '<text x="' + (padding.left - 8) + '" y="' + (y + 4).toFixed(1) + '" fill="#666" font-size="10" text-anchor="end" font-family="Inter,sans-serif">' + val.toLocaleString('fr-FR') + '</text>';
+      }
+
+      var ligneJauge = '';
+      if (jauge > 0 && jauge <= maxY) {
+        var yJauge = padding.top + innerH - (jauge / maxY) * innerH;
+        ligneJauge = '<line x1="' + padding.left + '" y1="' + yJauge.toFixed(1) + '" x2="' + (W - padding.right) + '" y2="' + yJauge.toFixed(1) + '" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>'
+                   + '<text x="' + (W - padding.right - 6) + '" y="' + (yJauge - 4).toFixed(1) + '" fill="#ef4444" font-size="9" text-anchor="end" font-family="Inter,sans-serif" font-weight="600">JAUGE ' + jauge.toLocaleString('fr-FR') + '</text>';
+      }
+
+      var xLabels = '';
+      var pas = nb > 10 ? 2 : 1;
+      coords.forEach(function(c, i) {
+        if (i % pas !== 0 && i !== coords.length - 1) return;
+        xLabels += '<text x="' + c.x.toFixed(1) + '" y="' + (H - padding.bottom + 18) + '" fill="#888" font-size="10" text-anchor="middle" font-family="Inter,sans-serif"' + (c.point.projection ? ' font-weight="700"' : '') + '>' + c.point.labelCourt + '</text>';
+      });
+
+      var pointsSvg = '';
+      coords.forEach(function(c, i) {
+        var isConcert = c.point.projection && i === coords.length - 1;
+        var isProj = c.point.projection;
+        var color = isConcert ? '#ef4444' : (isProj ? '#c9a84c' : '#3b82f6');
+        var radius = isConcert ? 6 : 4;
+        pointsSvg += '<circle cx="' + c.x.toFixed(1) + '" cy="' + c.y.toFixed(1) + '" r="' + radius + '" fill="' + color + '" stroke="#1a1a1a" stroke-width="2">'
+                   + '<title>' + c.point.labelCourt + ' — ' + c.point.total_cumul.toLocaleString('fr-FR') + ' billets' + (isProj ? ' (projeté)' : '') + '</title></circle>';
+      });
+
+      var svgContent = [
+        '<defs>',
+        '  <linearGradient id="grad-reel" x1="0%" y1="0%" x2="0%" y2="100%">',
+        '    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4"/>',
+        '    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>',
+        '  </linearGradient>',
+        '</defs>',
+        gridLines,
+        areaReel ? '<path d="' + areaReel + '" fill="url(#grad-reel)"/>' : '',
+        ligneJauge,
+        pathReel ? '<path d="' + pathReel + '" stroke="#3b82f6" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>' : '',
+        pathProj ? '<path d="' + pathProj + '" stroke="#c9a84c" stroke-width="2.5" fill="none" stroke-dasharray="6,4" stroke-linejoin="round" stroke-linecap="round"/>' : '',
+        pointsSvg,
+        xLabels,
+        gridLabels
+      ].join('');
+
+      svgEl.innerHTML = svgContent;
+      emptyEl.style.display = 'none';
+      svgEl.style.display = 'block';
+
+      console.log('📈 Graphique généré :', { points: points.length, projection: projectionTotal, maxY: maxY });
+    } catch (err) {
+      console.error('❌ Erreur graphique ventes :', err);
     }
   }
 
