@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.29">
+<meta name="version" content="2026.04.17.30">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1701,6 +1701,14 @@
       overflow-y: visible !important;
       padding-right: 0 !important;
     }
+    
+    /* ✨ MOBILE : Masquer les boutons VHR/FRAIS/LIENS dans Espace Artistes/Tech/Staff */
+    /* (car ils sont déjà dans la bottom nav mobile) */
+    #page-artistique .artistique-boutons,
+    #page-dossier-technique .stats-grid,
+    #page-staff-omp .stats-grid {
+      display: none !important;
+    }
     .modal-row {
       flex-direction: column !important;
       gap: 10px !important;
@@ -2102,21 +2110,27 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 2px;
   cursor: pointer;
   color: #888;
-  padding: 8px 4px;
+  padding: 6px 2px;
   transition: all 0.2s ease;
   position: relative;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   min-height: 48px;
+  flex: 1;
+  min-width: 0;
 }
 .bn-item:active { transform: scale(0.92); }
-.bn-item .bn-icon { font-size: 22px; line-height: 1; transition: transform 0.2s ease; }
+.bn-item .bn-icon { font-size: 20px; line-height: 1; transition: transform 0.2s ease; }
 .bn-item .bn-label {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.3px;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.2px;
   font-family: 'Inter', sans-serif; text-transform: uppercase; line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .bn-item.active { color: #c9a84c; }
 .bn-item.active .bn-icon {
@@ -19915,18 +19929,21 @@ function _hideTeamSelection() {
       <span class="bn-badge" id="bn-notif-badge">0</span>
     </div>
 
-    <!-- STAFF / ARTISTE / TECH : 4 items -->
+    <!-- STAFF / ARTISTE / TECH : 5 items + PLUS commun -->
     <div class="bn-item bn-staff active" onclick="bnNavigateStaff(this)">
       <span class="bn-icon">🏠</span><span class="bn-label">Accueil</span>
     </div>
-    <div class="bn-item bn-staff" onclick="bnNavigate('tournees', this)">
-      <span class="bn-icon">📅</span><span class="bn-label">Mes Dates</span>
+    <div class="bn-item bn-staff" onclick="bnMesDatesVHR(this)">
+      <span class="bn-icon">📅</span><span class="bn-label">Dates-VHR</span>
     </div>
-    <div class="bn-item bn-staff" onclick="bnNavigateVHR(this)">
-      <span class="bn-icon">🚗</span><span class="bn-label">VHR</span>
+    <div class="bn-item bn-staff" onclick="bnNavigateFrais(this)">
+      <span class="bn-icon">💰</span><span class="bn-label">Frais</span>
     </div>
-    <div class="bn-item bn-staff" onclick="bnNavigateContacts(this)">
-      <span class="bn-icon">📞</span><span class="bn-label">Contacts</span>
+    <div class="bn-item bn-staff" onclick="bnNotifier(this)">
+      <span class="bn-icon">📨</span><span class="bn-label">Notifier</span>
+    </div>
+    <div class="bn-item bn-staff" onclick="bnLiens(this)">
+      <span class="bn-icon">🔗</span><span class="bn-label">Liens</span>
     </div>
 
     <!-- PLUS (commun aux deux) -->
@@ -20087,6 +20104,56 @@ function bnNavigateVHR(el) {
   ompHaptic();
   bnSetActive(el);
   if (typeof showPage === 'function') showPage('tournees');
+}
+
+// NOUVEAU : Mes Dates + VHR = modal de choix de tournée
+function bnMesDatesVHR(el) {
+  ompHaptic();
+  bnSetActive(el);
+  // Afficher une modal demandant quelle tournée
+  var html = ''
+    + '<div style="display:grid;grid-template-columns:1fr;gap:12px;padding:4px;">'
+    + '  <div onclick="ompCloseSheet();showTournee(\'twoq\');" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:12px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all 0.2s;" onmouseover="this.style.boxShadow=\'0 0 15px rgba(201,168,76,0.3)\'" onmouseout="this.style.boxShadow=\'\'">'
+    + '    <img src="assets/twoq1.jpg" onerror="this.style.display=\'none\'" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #c9a84c;flex-shrink:0;">'
+    + '    <div style="flex:1;">'
+    + '      <div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1.5px;color:#fff;">🎸 THE WORLD OF QUEEN</div>'
+    + '      <div style="font-size:12px;color:#c9a84c;margin-top:2px;">L\'Hommage à la Légende</div>'
+    + '    </div>'
+    + '    <div style="color:#c9a84c;font-size:20px;">›</div>'
+    + '  </div>'
+    + '  <div onclick="ompCloseSheet();showTournee(\'twoq2\');" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:12px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all 0.2s;" onmouseover="this.style.boxShadow=\'0 0 15px rgba(201,168,76,0.3)\'" onmouseout="this.style.boxShadow=\'\'">'
+    + '    <img src="assets/twoq2.jpg" onerror="this.style.display=\'none\'" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #c9a84c;flex-shrink:0;">'
+    + '    <div style="flex:1;">'
+    + '      <div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1.5px;color:#fff;">👑 THE WORLD OF QUEEN</div>'
+    + '      <div style="font-size:12px;color:#c9a84c;margin-top:2px;">L\'Éternelle Légende</div>'
+    + '    </div>'
+    + '    <div style="color:#c9a84c;font-size:20px;">›</div>'
+    + '  </div>'
+    + '</div>';
+  if (typeof ompSheet === 'function') ompSheet('🎸 Choisir une tournée', html);
+}
+
+// NOUVEAU : Accès direct FRAIS
+function bnNavigateFrais(el) {
+  ompHaptic();
+  bnSetActive(el);
+  if (typeof ouvrirFrais === 'function') ouvrirFrais();
+}
+
+// NOUVEAU : Menu LIENS
+function bnLiens(el) {
+  ompHaptic();
+  bnSetActive(el);
+  var html = ''
+    + '<div style="display:flex;flex-direction:column;gap:8px;padding:4px;">'
+    + '  <a href="https://mail.google.com/mail/u/0/" target="_blank" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:12px;font-size:14px;" onclick="ompCloseSheet()">📧 <span>Ma boîte mail</span></a>'
+    + '  <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:12px;font-size:14px;" onclick="ompCloseSheet()">📅 <span>Mon agenda</span></a>'
+    + '  <a href="https://drive.google.com/drive/my-drive" target="_blank" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:12px;font-size:14px;" onclick="ompCloseSheet()">📁 <span>Drive Tour</span></a>'
+    + '  <a href="https://all.accor.com/a/fr.html" target="_blank" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:12px;font-size:14px;" onclick="ompCloseSheet()">🏨 <span>Accor Hotels</span></a>'
+    + '  <a href="https://fr.mappy.com/itineraire" target="_blank" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:12px;font-size:14px;" onclick="ompCloseSheet()">🗺️ <span>Mappy</span></a>'
+    + '  <a href="https://www.sncf-connect.com/" target="_blank" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:12px;font-size:14px;" onclick="ompCloseSheet()">🚄 <span>SNCF Connect</span></a>'
+    + '</div>';
+  if (typeof ompSheet === 'function') ompSheet('🔗 Liens Pratiques', html);
 }
 
 function bnNavigateContacts(el) {
