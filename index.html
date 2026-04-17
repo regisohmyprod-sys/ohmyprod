@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.25">
+<meta name="version" content="2026.04.17.26">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1693,6 +1693,13 @@
     .modal-box {
       max-height: calc(100vh - 90px - env(safe-area-inset-top, 0) - env(safe-area-inset-bottom, 0)) !important;
       border-radius: 12px !important;
+    }
+    
+    /* ✨ DATES-SCROLL : retirer la hauteur fixe sur mobile pour fluidité naturelle */
+    .dates-scroll {
+      max-height: none !important;
+      overflow-y: visible !important;
+      padding-right: 0 !important;
     }
     .modal-row {
       flex-direction: column !important;
@@ -13888,8 +13895,10 @@ function _hideTeamSelection() {
           group.style.display = visibles.length === 0 ? 'none' : '';
         });
         
+        // Remettre le conteneur de dates tout en haut (scroll interne)
+        scroll.scrollTop = 0;
         // Remettre la page tout en haut (pas de scroll auto qui descend)
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        window.scrollTo(0, 0);
       }
     }, 50);
 
