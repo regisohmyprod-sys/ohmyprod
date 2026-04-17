@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.28">
+<meta name="version" content="2026.04.17.29">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -14783,16 +14783,11 @@ function _hideTeamSelection() {
       return;
     }
 
-    // Vérifier team sélectionnée vs role
-    var team = window._selectedTeam || 'prod';
-    var autorise = false;
-    if (role === 'admin') autorise = true;
-    else if (team === 'staff_omp' && role === 'staff_omp') autorise = true;
-    else if (team === 'artiste' && role === 'artiste') autorise = true;
-    else if (team === 'technique' && (role === 'technique' || role === 'staff_omp')) autorise = true;
-
-    if (!autorise) {
-      if (errDiv) { errDiv.textContent = 'Acces non autorise pour cet espace.'; errDiv.style.display = 'block'; }
+    // Vérification simple : le rôle doit être reconnu
+    // (la redirection vers le bon espace se fait automatiquement dans applyRoleUI selon le rôle)
+    var rolesValides = ['admin', 'staff_omp', 'artiste', 'technique'];
+    if (!rolesValides.includes(role)) {
+      if (errDiv) { errDiv.textContent = 'Rôle non reconnu. Contactez OMP.'; errDiv.style.display = 'block'; }
       return;
     }
 
