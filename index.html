@@ -3226,7 +3226,10 @@ function _hideTeamSelection() {
 
         <!-- PROJECTIONS VENTES -->
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
-          <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">PROJECTIONS VENTES</div>
+          <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;position:relative;">
+            PROJECTIONS VENTES
+            <button onclick="projOuvrirModalImport()" title="Importer l'historique des ventes depuis Excel" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#000;color:#c9a84c;border:1px solid #c9a84c;padding:3px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;font-weight:600;">📥 IMPORT</button>
+          </div>
           <div style="background:#1e3a5f;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;text-align:center;">MEV / CHIFFRES VENTES</div>
           <table style="width:100%;border-collapse:collapse;font-size:13px;">
             <tbody>
@@ -10474,6 +10477,8 @@ function _hideTeamSelection() {
     showPage('pilote-date');
     // Charger données billetterie pour DL
     if (_fpDateId) { setTimeout(function(){ piloteChargerBill(_fpDateId); }, 100); }
+    // 🎯 PROJECTIONS : remplir le bloc PROJECTIONS VENTES à partir de l'historique
+    if (_fpDateId) { setTimeout(function(){ projAfficherBlocVentes(_fpDateId); }, 400); }
   }
 
   async function piloteChargerBill(dateId) {
@@ -12185,6 +12190,14 @@ function _hideTeamSelection() {
     }
     _billModifie = false;
     billUpdateIndicateur(false);
+
+    // 🎯 PROJECTIONS : snapshot auto du total ventes du jour
+    try {
+      if (typeof projEnregistrerSnapshot === 'function') {
+        await projEnregistrerSnapshot(_fpDateId, _billData);
+      }
+    } catch(e) { console.warn('Snapshot ventes non enregistré :', e); }
+
     if (!silent) {
       const btn = document.querySelector('#page-fiche-billetterie button[onclick="billSauvegarder()"]');
       if (btn) { btn.textContent = '✅ Enregistré !'; btn.style.background = '#22c55e'; setTimeout(() => { btn.textContent = '💾 Enregistrer'; btn.style.background = '#3b82f6'; }, 2000); }
@@ -14765,6 +14778,360 @@ function _hideTeamSelection() {
       document.head.appendChild(script);
     });
   }
+
+  // ============================================================
+  // 🎯 MODULE PROJECTIONS VENTES — APPLI OMP
+  // Alimente le bloc PROJECTIONS VENTES de la page Pilote Date
+  // en se basant sur l'historique des ventes (table ventes_snapshots)
+  // ============================================================
+
+  /**
+   * Calcule le total cumul de billets vendus depuis billetterie_data.
+   * Structure billetterie_data OMP : { ldc:[[{billets,tarif,dlProd}]], fimalac:[...], ... }
+   * Opérateurs : ldc, fimalac, nda, dome, salle, bleucitron, tm, fnac
+   */
+  function _projCalculerTotalBilletterie(bd) {
+    if (!bd) return { total: 0, detail: {} };
+    var total = 0;
+    var detail = {};
+    var operateurs = ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'];
+    operateurs.forEach(function(op) {
+      var subTotal = 0;
+      if (bd[op] && Array.isArray(bd[op])) {
+        bd[op].forEach(function(cat) {
+          (cat || []).forEach(function(d) {
+            subTotal += parseFloat(d.billets) || 0;
+          });
+        });
+      }
+      detail[op] = subTotal;
+      total += subTotal;
+    });
+    return { total: Math.round(total), detail: detail };
+  }
+
+  /**
+   * Enregistre un snapshot automatique du jour après sauvegarde billetterie.
+   * Un seul snapshot par jour par date — upsert si existe déjà.
+   */
+  async function projEnregistrerSnapshot(dateId, billetterieData) {
+    if (!dateId) return null;
+    try {
+      var calc = _projCalculerTotalBilletterie(billetterieData);
+      var today = new Date().toISOString().split('T')[0];
+
+      // Récupérer le dernier snapshot antérieur pour calculer la progression
+      var r1 = await _supabase
+        .from('ventes_snapshots')
+        .select('total_cumul, snapshot_date')
+        .eq('date_id', dateId)
+        .lt('snapshot_date', today)
+        .order('snapshot_date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      var etatPrecedent = (r1.data && r1.data.total_cumul) || 0;
+      var progression = calc.total - etatPrecedent;
+
+      var r2 = await _supabase
+        .from('ventes_snapshots')
+        .upsert({
+          date_id: dateId,
+          snapshot_date: today,
+          total_cumul: calc.total,
+          etat_precedent: etatPrecedent,
+          progression: progression,
+          detail_reseaux: calc.detail
+        }, { onConflict: 'date_id,snapshot_date' })
+        .select()
+        .single();
+
+      if (r2.error) throw r2.error;
+      console.log('✅ Snapshot OMP :', { date: today, cumul: calc.total, progression: progression });
+      return r2.data;
+    } catch (err) {
+      console.error('❌ Erreur snapshot ventes :', err);
+      return null;
+    }
+  }
+
+  /**
+   * Calcule la moyenne journalière sur une période glissante (7j, 30j, 90j).
+   * Logique : (cumul_actuel - cumul_snapshot_proche_dateLimite) / nbJours
+   */
+  function _projMoyennePeriode(snapshots, today, nbJours) {
+    if (!snapshots || snapshots.length === 0) return 0;
+    var dateLimite = new Date(today);
+    dateLimite.setDate(dateLimite.getDate() - nbJours);
+    var dernier = snapshots[snapshots.length - 1];
+    var cumulActuel = dernier.total_cumul;
+    var snapRef = null;
+    for (var i = snapshots.length - 1; i >= 0; i--) {
+      if (new Date(snapshots[i].snapshot_date) <= dateLimite) {
+        snapRef = snapshots[i];
+        break;
+      }
+    }
+    if (!snapRef) {
+      // Pas d'historique assez ancien → on calcule sur la période réellement disponible
+      var premier = snapshots[0];
+      var joursReels = Math.max(1, Math.floor((today - new Date(premier.snapshot_date)) / 86400000));
+      if (joursReels < nbJours / 3) return 0; // Trop peu d'historique → pas de moyenne fiable
+      return (cumulActuel - premier.total_cumul) / joursReels;
+    }
+    return (cumulActuel - snapRef.total_cumul) / nbJours;
+  }
+
+  /**
+   * Remplit le bloc PROJECTIONS VENTES de la page Pilote Date.
+   * Utilise les IDs existants : pilote-moy-open, pilote-moy-3m, pilote-moy-30j,
+   * pilote-moy-7j, pilote-tendance, pilote-proj-payants, pilote-proj-total.
+   */
+  async function projAfficherBlocVentes(dateId) {
+    if (!dateId) return;
+    try {
+      // 1. Récupérer tous les snapshots de cette date
+      var r = await _supabase
+        .from('ventes_snapshots')
+        .select('*')
+        .eq('date_id', dateId)
+        .order('snapshot_date', { ascending: true });
+
+      var snapshots = r.data || [];
+
+      var setVal = function(id, v, suf) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = (v !== null && v !== undefined && !isNaN(v) && v !== '') ? (v + (suf || '')) : '—';
+      };
+
+      if (snapshots.length === 0) {
+        // Pas d'historique : on laisse les cases existantes (moy depuis open déjà calculée)
+        // mais on vide les cases qui nécessitent l'historique
+        setVal('pilote-moy-3m', '');
+        setVal('pilote-moy-30j', '');
+        setVal('pilote-moy-7j', '');
+        setVal('pilote-tendance', '');
+        setVal('pilote-proj-payants', '');
+        setVal('pilote-proj-total', '');
+        console.log('ℹ️ Aucun snapshot pour cette date — projection indisponible');
+        return;
+      }
+
+      // 2. Calculs
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+      var dernier = snapshots[snapshots.length - 1];
+      var totalActuel = dernier.total_cumul;
+
+      var moy7j = _projMoyennePeriode(snapshots, today, 7);
+      var moy30j = _projMoyennePeriode(snapshots, today, 30);
+      var moy3m = _projMoyennePeriode(snapshots, today, 90);
+      var tendance = moy7j * 0.7 + moy30j * 0.3;
+
+      // 3. Jours restants jusqu'au concert
+      var dateConcertStr = document.getElementById('fp-date')?.value || document.getElementById('pilote-date')?.getAttribute('data-date');
+      var joursRestants = 0;
+      if (dateConcertStr) {
+        var dConcert = new Date(dateConcertStr + (dateConcertStr.includes('T') ? '' : 'T00:00:00'));
+        joursRestants = Math.max(0, Math.ceil((dConcert - today) / 86400000));
+      } else {
+        // Fallback : lire depuis le champ pilote-jours-restants déjà rempli
+        var txt = document.getElementById('pilote-jours-restants')?.textContent;
+        joursRestants = parseInt(txt) || 0;
+      }
+
+      // 4. Boost bonus (champ optionnel à ajouter plus tard, pour l'instant 0)
+      var boostBonus = 0;
+      var boostEl = document.getElementById('fp-boost-bonus');
+      if (boostEl) boostBonus = parseInt(boostEl.value) || 0;
+
+      // 5. Projection payants = total actuel + (tendance × jours restants) + boost
+      var projectionPayants = Math.round(totalActuel + tendance * joursRestants + boostBonus);
+
+      // 6. Invitations (pour calculer projection total)
+      var invits = parseInt(document.getElementById('fp-invitations')?.value) || 0;
+      var projectionTotal = projectionPayants + invits;
+
+      // 7. Jauge pour le % remplissage
+      var jauge = parseInt(document.getElementById('fp-jauge-finale')?.value) ||
+                  parseInt(document.getElementById('pilote-jauge')?.textContent) || 0;
+
+      // 8. Affichage
+      var r2 = function(n) { return Math.round(n * 100) / 100; };
+      setVal('pilote-moy-3m', moy3m > 0 ? r2(moy3m) : '—', moy3m > 0 ? ' bil/j' : '');
+      setVal('pilote-moy-30j', moy30j > 0 ? r2(moy30j) : '—', moy30j > 0 ? ' bil/j' : '');
+      setVal('pilote-moy-7j', moy7j > 0 ? r2(moy7j) : '—', moy7j > 0 ? ' bil/j' : '');
+      setVal('pilote-tendance', tendance > 0 ? r2(tendance) : '—', tendance > 0 ? ' bil/j' : '');
+      setVal('pilote-proj-payants', projectionPayants > 0 ? projectionPayants.toLocaleString('fr-FR') : '');
+      setVal('pilote-proj-total', projectionTotal > 0 ? projectionTotal.toLocaleString('fr-FR') : '');
+
+      // Couleur du % remplissage recalculé avec projection totale
+      if (jauge > 0) {
+        var pct = (projectionTotal / jauge) * 100;
+        var elR = document.getElementById('pilote-remplissage');
+        if (elR) {
+          elR.textContent = pct.toFixed(2) + '%';
+          elR.style.color = pct >= 90 ? '#22c55e' : pct >= 70 ? '#c9a84c' : pct >= 50 ? '#f59e0b' : '#ef4444';
+        }
+      }
+
+      console.log('📊 Projection OMP :', {
+        totalActuel: totalActuel,
+        moy7j: r2(moy7j), moy30j: r2(moy30j), moy3m: r2(moy3m),
+        tendance: r2(tendance),
+        joursRestants: joursRestants,
+        projectionPayants: projectionPayants,
+        projectionTotal: projectionTotal
+      });
+    } catch (err) {
+      console.error('❌ Erreur affichage projection :', err);
+    }
+  }
+
+  // ============================================================
+  // 📥 IMPORT HISTORIQUE EXCEL
+  // Modal pour importer l'historique depuis un tableau Excel copié-collé
+  // ============================================================
+
+  function projOuvrirModalImport() {
+    if (!_fpDateId) {
+      alert('❌ Aucune date sélectionnée');
+      return;
+    }
+    var modal = document.getElementById('modal-import-historique');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'modal-import-historique';
+      modal.className = 'modal-overlay';
+      modal.style.display = 'none';
+      modal.innerHTML = [
+        '<div class="modal-box" style="max-width:720px;">',
+        '  <div class="modal-header">',
+        '    <div class="modal-title">📥 IMPORTER HISTORIQUE VENTES</div>',
+        '    <button class="modal-close" onclick="document.getElementById(\'modal-import-historique\').style.display=\'none\'">✕</button>',
+        '  </div>',
+        '  <div style="padding:16px;">',
+        '    <p style="margin:0 0 12px;color:#aaa;font-size:13px;">',
+        '      Copie-colle ton tableau Excel ci-dessous (Ctrl+C depuis Excel puis Ctrl+V ici).<br>',
+        '      <strong style="color:#c9a84c;">Colonnes attendues :</strong> Date du pointage · État précédent · Ventes à ce jour · Progression',
+        '    </p>',
+        '    <textarea id="import-histo-data" placeholder="01/04/2025\t0\t88\t88\n01/07/2025\t0\t134\t134\n..." ',
+        '      style="width:100%;min-height:220px;font-family:Courier New,monospace;font-size:12px;padding:10px;background:#0a0a0a;color:#fff;border:1px solid #333;border-radius:6px;box-sizing:border-box;"></textarea>',
+        '    <div id="import-histo-preview" style="margin-top:14px;"></div>',
+        '    <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">',
+        '      <button onclick="document.getElementById(\'modal-import-historique\').style.display=\'none\'" style="background:#333;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;">Annuler</button>',
+        '      <button onclick="projPreviewImport()" style="background:#3b82f6;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;">👁 Prévisualiser</button>',
+        '      <button onclick="projConfirmerImport()" style="background:#22c55e;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;">✅ Importer</button>',
+        '    </div>',
+        '  </div>',
+        '</div>'
+      ].join('');
+      document.body.appendChild(modal);
+    }
+    modal.style.display = 'flex';
+    document.getElementById('import-histo-data').value = '';
+    document.getElementById('import-histo-preview').innerHTML = '';
+  }
+
+  function _projParserDateFR(dateStr) {
+    if (!dateStr) return null;
+    var m = dateStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+    if (!m) return null;
+    var jour = m[1].padStart(2, '0');
+    var mois = m[2].padStart(2, '0');
+    var annee = m[3].length === 2 ? '20' + m[3] : m[3];
+    return annee + '-' + mois + '-' + jour;
+  }
+
+  function _projParserHisto(texte) {
+    if (!texte || !texte.trim()) return { lignes: [], erreurs: ['Aucune donnée'] };
+    var lignes = [];
+    var erreurs = [];
+    var lignesTexte = texte.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+    lignesTexte.forEach(function(ligne, idx) {
+      if (/date.*pointage|état.*précédent|ventes.*ce.*jour|progression/i.test(ligne)) return;
+      var cols = ligne.split(/\t|;/).map(function(c) { return c.trim(); });
+      if (cols.length < 3) { erreurs.push('Ligne ' + (idx+1) + ' ignorée : pas assez de colonnes'); return; }
+      var dateParsed = _projParserDateFR(cols[0]);
+      if (!dateParsed) { erreurs.push('Ligne ' + (idx+1) + ' : date invalide "' + cols[0] + '"'); return; }
+      var etatPrec = parseInt((cols[1] || '0').replace(/\s/g, '')) || 0;
+      var totalCumul = parseInt((cols[2] || '0').replace(/\s/g, '')) || 0;
+      var progression = cols[3] ? parseInt((cols[3] || '0').replace(/[\s+]/g, '')) : (totalCumul - etatPrec);
+      if (isNaN(totalCumul)) { erreurs.push('Ligne ' + (idx+1) + ' : total cumul invalide'); return; }
+      lignes.push({
+        snapshot_date: dateParsed,
+        etat_precedent: etatPrec,
+        total_cumul: totalCumul,
+        progression: progression
+      });
+    });
+    return { lignes: lignes, erreurs: erreurs };
+  }
+
+  function projPreviewImport() {
+    var texte = document.getElementById('import-histo-data').value;
+    var parsed = _projParserHisto(texte);
+    var preview = document.getElementById('import-histo-preview');
+    var html = '';
+    if (parsed.erreurs.length > 0) {
+      html += '<div style="background:#3a1a1a;border:1px solid #ef4444;padding:10px;border-radius:6px;margin-bottom:10px;font-size:12px;">';
+      html += '<strong style="color:#f87171;">⚠️ ' + parsed.erreurs.length + ' avertissement(s) :</strong>';
+      html += '<ul style="margin:6px 0 0 20px;color:#ddd;">' + parsed.erreurs.map(function(e){return '<li>'+e+'</li>';}).join('') + '</ul></div>';
+    }
+    if (parsed.lignes.length === 0) {
+      html += '<div style="color:#f87171;">❌ Aucune ligne valide à importer.</div>';
+    } else {
+      html += '<div style="background:#1a3a1a;border:1px solid #22c55e;padding:10px;border-radius:6px;margin-bottom:10px;">';
+      html += '<strong style="color:#4ade80;">✅ ' + parsed.lignes.length + ' ligne(s) prête(s) à importer</strong></div>';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:11px;background:#111;border-radius:6px;overflow:hidden;">';
+      html += '<thead><tr style="background:#222;"><th style="padding:7px;text-align:left;color:#c9a84c;">Date</th><th style="padding:7px;text-align:right;color:#c9a84c;">État préc.</th><th style="padding:7px;text-align:right;color:#c9a84c;">Cumul</th><th style="padding:7px;text-align:right;color:#c9a84c;">Progression</th></tr></thead><tbody>';
+      parsed.lignes.forEach(function(l) {
+        html += '<tr style="border-bottom:1px solid #222;">';
+        html += '<td style="padding:6px;color:#ddd;">' + l.snapshot_date + '</td>';
+        html += '<td style="padding:6px;text-align:right;color:#999;">' + l.etat_precedent + '</td>';
+        html += '<td style="padding:6px;text-align:right;color:#fff;font-weight:600;">' + l.total_cumul + '</td>';
+        html += '<td style="padding:6px;text-align:right;color:' + (l.progression > 0 ? '#4ade80' : '#666') + ';">' + (l.progression > 0 ? '+' : '') + l.progression + '</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+    }
+    preview.innerHTML = html;
+  }
+
+  async function projConfirmerImport() {
+    if (!_fpDateId) { alert('❌ Aucune date sélectionnée'); return; }
+    var texte = document.getElementById('import-histo-data').value;
+    var parsed = _projParserHisto(texte);
+    if (parsed.lignes.length === 0) { alert('❌ Aucune ligne valide. Vérifie le format.'); return; }
+    if (!confirm('Importer ' + parsed.lignes.length + ' snapshot(s) pour cette date ?\n\nLes snapshots existants sur les mêmes dates seront écrasés.')) return;
+
+    var rows = parsed.lignes.map(function(l) {
+      return {
+        date_id: _fpDateId,
+        snapshot_date: l.snapshot_date,
+        total_cumul: l.total_cumul,
+        etat_precedent: l.etat_precedent,
+        progression: l.progression,
+        detail_reseaux: {}
+      };
+    });
+
+    try {
+      var r = await _supabase.from('ventes_snapshots').upsert(rows, { onConflict: 'date_id,snapshot_date' }).select();
+      if (r.error) throw r.error;
+      alert('✅ ' + r.data.length + ' snapshot(s) importé(s) avec succès !');
+      document.getElementById('modal-import-historique').style.display = 'none';
+      // Rafraîchir le bloc projection
+      await projAfficherBlocVentes(_fpDateId);
+    } catch (err) {
+      console.error('Erreur import :', err);
+      alert('❌ Erreur à l\'import : ' + (err.message || err));
+    }
+  }
+
+  // ============================================================
+  // FIN MODULE PROJECTIONS VENTES
+  // ============================================================
 </script>
 
 <!-- MODALE CRÉER UNE LISTE D'INVITATIONS -->
