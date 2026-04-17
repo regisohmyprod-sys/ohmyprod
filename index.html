@@ -2588,7 +2588,10 @@ function _hideTeamSelection() {
     <!-- GESTION OMP -->
     <!-- PAGE SUIVI DATES RÉSUMÉ (Accès Financier) -->
     <div id="page-suivi-resume" class="page">
-      <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+        <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:0;">← Retour au Tableau de bord</button>
+        <button onclick="suiviImprimerPDF()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;">🖨️ IMPRIMER / PDF</button>
+      </div>
       <div class="page-title">📊 SUIVI DATES RÉSUMÉ</div>
       <div style="font-size:13px;color:#888;margin-bottom:16px;margin-top:-12px;font-style:italic;">Vue globale de toutes les dates — résultats actuels & projections</div>
 
@@ -16055,6 +16058,170 @@ function _hideTeamSelection() {
     } catch(err) {
       console.warn('Impossible d\'ouvrir la date :', err);
     }
+  }
+
+  /**
+   * Génère un PDF imprimable qui respecte le filtre actif.
+   * Ouvre une fenêtre d'impression propre avec les bonnes données.
+   */
+  function suiviImprimerPDF() {
+    if (!_suiviDonnees || _suiviDonnees.length === 0) {
+      alert('❌ Aucune donnée à imprimer. Attends le chargement complet.');
+      return;
+    }
+
+    // 1. Filtrer les données selon le filtre actif
+    var dates = _suiviFiltre === 'all' ? _suiviDonnees.slice() : _suiviDonnees.filter(function(d) { return d.categorie === _suiviFiltre; });
+    if (dates.length === 0) {
+      alert('❌ Aucune date correspondant au filtre sélectionné.');
+      return;
+    }
+
+    // 2. Libellé du filtre
+    var libelleFiltre = {
+      'all': 'TOUTES LES DATES',
+      'passees': 'DATES PASSÉES',
+      'encours': 'DATES EN COURS (≤ 7 jours)',
+      'avenir': 'DATES À VENIR'
+    }[_suiviFiltre] || 'TOUTES LES DATES';
+
+    // 3. Helpers de formatage
+    var fmtEur = function(n) {
+      if (!n || isNaN(n)) return '—';
+      return Math.round(n).toLocaleString('fr-FR') + ' €';
+    };
+    var fmtNb = function(n) {
+      if (!n || isNaN(n) || n === 0) return '—';
+      return n.toLocaleString('fr-FR');
+    };
+    var fmtPct = function(n) {
+      if (!n || isNaN(n)) return '—';
+      return n.toFixed(1) + '%';
+    };
+    var colorEuros = function(n) { return n >= 0 ? '#16a34a' : '#dc2626'; };
+
+    // 4. Calcul des totaux
+    var tot = {
+      billets: 0, jauge: 0, recetteTTC: 0, recetteHT: 0, resultatOMP: 0,
+      projBillets: 0, projCA: 0, projCAHT: 0, projResultatOMP: 0
+    };
+    dates.forEach(function(d) {
+      tot.billets += d.billets;
+      tot.jauge += d.jauge;
+      tot.recetteTTC += d.recetteTTC;
+      tot.recetteHT += d.recetteHT;
+      tot.resultatOMP += d.resultatOMP;
+      tot.projBillets += d.aSnapshots ? d.projBillets : d.billets;
+      tot.projCA += d.aSnapshots ? d.projCA : d.recetteTTC;
+      tot.projCAHT += d.aSnapshots ? d.projCAHT : d.recetteHT;
+      tot.projResultatOMP += d.aSnapshots ? d.projResultatOMP : d.resultatOMP;
+    });
+    var totPctRempl = tot.jauge > 0 ? (tot.billets / tot.jauge) * 100 : 0;
+    var totProjPctRempl = tot.jauge > 0 ? (tot.projBillets / tot.jauge) * 100 : 0;
+
+    // 5. Construction des lignes du tableau
+    var trs = dates.map(function(d, idx) {
+      var altBg = idx % 2 === 1 ? 'background:#f9f9f9;' : '';
+      var dateStr = '';
+      try { dateStr = new Date(d.date + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' }); } catch(e) { dateStr = d.date; }
+
+      return '<tr style="' + altBg + '">'
+        + '<td style="padding:6px 8px;border-bottom:1px solid #ddd;border-right:2px solid #c9a84c;font-weight:600;white-space:nowrap;">' + dateStr + '</td>'
+        + '<td style="padding:6px 8px;border-bottom:1px solid #ddd;border-right:2px solid #c9a84c;"><strong>' + (d.ville || '—') + '</strong>' + (d.salle ? '<br><span style="color:#666;font-size:9px;">' + d.salle + '</span>' : '') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;">' + fmtNb(d.billets) + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:#666;">' + fmtNb(d.jauge) + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;font-weight:600;">' + fmtPct(d.pctRempl) + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;">' + fmtEur(d.recetteTTC) + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;">' + fmtEur(d.recetteHT) + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;border-right:2px solid #c9a84c;font-weight:600;color:' + colorEuros(d.resultatOMP) + ';">' + fmtEur(d.resultatOMP) + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:' + (d.aSnapshots ? '#8b6f1a' : '#aaa') + ';">' + (d.aSnapshots ? fmtNb(d.projBillets) : '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:#666;">' + fmtNb(d.jauge) + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;font-weight:600;color:' + (d.aSnapshots ? '#8b6f1a' : '#aaa') + ';">' + (d.aSnapshots ? fmtPct(d.projPctRempl) : '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:' + (d.aSnapshots ? '#8b6f1a' : '#aaa') + ';">' + (d.aSnapshots ? fmtEur(d.projCA) : '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:' + (d.aSnapshots ? '#8b6f1a' : '#aaa') + ';">' + (d.aSnapshots ? fmtEur(d.projCAHT) : '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;font-weight:600;color:' + (d.aSnapshots ? colorEuros(d.projResultatOMP) : '#aaa') + ';">' + (d.aSnapshots ? fmtEur(d.projResultatOMP) : '—') + '</td>'
+        + '</tr>';
+    }).join('');
+
+    // 6. Ligne de totaux
+    var trTotaux = '<tr style="background:#1e3a5f;color:#fff;">'
+      + '<td colspan="2" style="padding:10px 8px;font-family:\'Bebas Neue\',sans-serif;font-size:12px;letter-spacing:1.5px;border-right:2px solid #c9a84c;">TOTAUX (' + dates.length + ' dates)</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;">' + fmtNb(tot.billets) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;">' + fmtNb(tot.jauge) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;">' + fmtPct(totPctRempl) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;">' + fmtEur(tot.recetteTTC) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;">' + fmtEur(tot.recetteHT) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;border-right:2px solid #c9a84c;color:' + (tot.resultatOMP >= 0 ? '#4ade80' : '#fca5a5') + ';">' + fmtEur(tot.resultatOMP) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;color:#c9a84c;">' + fmtNb(tot.projBillets) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;">' + fmtNb(tot.jauge) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;color:#c9a84c;">' + fmtPct(totProjPctRempl) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;color:#c9a84c;">' + fmtEur(tot.projCA) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;color:#c9a84c;">' + fmtEur(tot.projCAHT) + '</td>'
+      + '<td style="padding:10px 6px;text-align:right;font-weight:700;color:' + (tot.projResultatOMP >= 0 ? '#4ade80' : '#fca5a5') + ';">' + fmtEur(tot.projResultatOMP) + '</td>'
+      + '</tr>';
+
+    // 7. Date d'impression
+    var dateImpression = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+    var heureImpression = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+
+    // 8. HTML complet du PDF
+    var htmlPdf = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>OMP — Suivi Dates Résumé — ' + libelleFiltre + '</title>'
+      + '<style>'
+      + '@page { size: A4 landscape; margin: 10mm; }'
+      + 'body { font-family: Arial, Helvetica, sans-serif; color: #222; margin: 0; padding: 0; }'
+      + 'h1 { font-family: "Bebas Neue", Arial, sans-serif; font-size: 22px; color: #c9a84c; margin: 0 0 4px; letter-spacing: 2px; }'
+      + 'h2 { font-family: "Bebas Neue", Arial, sans-serif; font-size: 16px; color: #1e3a5f; margin: 0 0 16px; letter-spacing: 1.5px; font-weight: 600; }'
+      + '.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; border-bottom: 2px solid #c9a84c; padding-bottom: 10px; }'
+      + '.meta { font-size: 11px; color: #666; text-align: right; }'
+      + 'table { width: 100%; border-collapse: collapse; font-size: 10px; }'
+      + 'thead tr.top th { background: #1e3a5f; color: #fff; padding: 6px; font-family: "Bebas Neue", Arial, sans-serif; letter-spacing: 1px; font-size: 11px; }'
+      + 'thead tr.top th.sep-left { background: #16a34a; }'
+      + 'thead tr.top th.sep-right { background: #c9a84c; color: #000; }'
+      + 'thead tr.sub th { background: #f1f1f1; padding: 5px 6px; font-size: 9px; color: #444; font-weight: 600; }'
+      + '.legend { font-size: 10px; color: #666; margin-top: 10px; font-style: italic; }'
+      + '.footer { margin-top: 16px; font-size: 9px; color: #888; text-align: center; border-top: 1px solid #ddd; padding-top: 8px; }'
+      + '@media print { .no-print { display: none !important; } body { padding: 0; } }'
+      + '</style>'
+      + '</head><body>'
+      + '<div class="header">'
+      + '  <div>'
+      + '    <h1>📊 SUIVI DATES RÉSUMÉ</h1>'
+      + '    <h2>' + libelleFiltre + ' · ' + dates.length + ' date' + (dates.length > 1 ? 's' : '') + '</h2>'
+      + '  </div>'
+      + '  <div class="meta">'
+      + '    <div><strong>OH MY PROD</strong></div>'
+      + '    <div>Édité le ' + dateImpression + ' à ' + heureImpression + '</div>'
+      + '  </div>'
+      + '</div>'
+      + '<table>'
+      + '  <thead>'
+      + '    <tr class="top">'
+      + '      <th rowspan="2" style="text-align:left;padding-left:8px;">DATE</th>'
+      + '      <th rowspan="2" style="text-align:left;padding-left:8px;">VILLE / SALLE</th>'
+      + '      <th colspan="6" class="sep-left">✅ RÉSULTATS À CE JOUR</th>'
+      + '      <th colspan="6" class="sep-right">🎯 PROJECTION</th>'
+      + '    </tr>'
+      + '    <tr class="sub">'
+      + '      <th>Billets</th><th>Jauge</th><th>% Rempl.</th><th>CA TTC</th><th>CA HT</th><th style="border-right:2px solid #c9a84c;">Résultat OMP</th>'
+      + '      <th>Billets</th><th>Jauge</th><th>% Rempl.</th><th>CA TTC</th><th>CA HT</th><th>Résultat OMP</th>'
+      + '    </tr>'
+      + '  </thead>'
+      + '  <tbody>' + trs + '</tbody>'
+      + '  <tfoot>' + trTotaux + '</tfoot>'
+      + '</table>'
+      + '<div class="legend">💡 Les projections en doré sont calculées d\'après l\'historique des ventes et l\'algorithme de tendance OMP. Les dates sans historique suffisant sont marquées « — ».</div>'
+      + '<div class="footer">Oh My Prod · Suivi Dates Résumé · Document généré automatiquement depuis l\'APPLI OMP</div>'
+      + '<' + 'script>window.onload = function() { setTimeout(function() { window.print(); }, 300); };<' + '/script>'
+      + '</body></html>';
+
+    // 9. Ouvrir la fenêtre d'impression
+    var win = window.open('', '_blank', 'width=1400,height=900');
+    if (!win) {
+      alert('❌ La fenêtre d\'impression a été bloquée. Autorise les popups sur ce site puis réessaie.');
+      return;
+    }
+    win.document.write(htmlPdf);
+    win.document.close();
   }
 
   // ============================================================
