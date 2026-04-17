@@ -2585,6 +2585,54 @@ function _hideTeamSelection() {
     </div>
 
     <!-- GESTION OMP -->
+    <!-- PAGE SUIVI DATES RÉSUMÉ (Accès Financier) -->
+    <div id="page-suivi-resume" class="page">
+      <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
+      <div class="page-title">📊 SUIVI DATES RÉSUMÉ</div>
+      <div style="font-size:13px;color:#888;margin-bottom:16px;margin-top:-12px;font-style:italic;">Vue globale de toutes les dates — résultats actuels & projections</div>
+
+      <!-- Filtres -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        <button id="suivi-filter-all" onclick="suiviSetFilter('all')" class="suivi-filter-btn" style="background:#c9a84c;color:#000;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">TOUTES <span id="suivi-count-all" style="opacity:0.7;">(0)</span></button>
+        <button id="suivi-filter-passees" onclick="suiviSetFilter('passees')" class="suivi-filter-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">PASSÉES <span id="suivi-count-passees" style="opacity:0.7;">(0)</span></button>
+        <button id="suivi-filter-encours" onclick="suiviSetFilter('encours')" class="suivi-filter-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">EN COURS <span id="suivi-count-encours" style="opacity:0.7;">(0)</span></button>
+        <button id="suivi-filter-avenir" onclick="suiviSetFilter('avenir')" class="suivi-filter-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">À VENIR <span id="suivi-count-avenir" style="opacity:0.7;">(0)</span></button>
+      </div>
+
+      <!-- Loader / Empty / Tableau -->
+      <div id="suivi-loading" style="text-align:center;padding:40px 20px;color:#888;font-size:13px;">Chargement des données...</div>
+      <div id="suivi-empty" style="display:none;text-align:center;padding:40px 20px;color:#555;font-size:13px;">Aucune date à afficher pour ce filtre.</div>
+
+      <div id="suivi-table-container" style="display:none;overflow-x:auto;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:1400px;">
+          <thead>
+            <tr style="background:#1a1a1a;">
+              <th rowspan="2" style="padding:10px;text-align:left;color:#c9a84c;border-right:2px solid #c9a84c;border-bottom:1px solid #2a2a2a;font-size:11px;letter-spacing:0.5px;position:sticky;left:0;background:#1a1a1a;z-index:2;">DATE</th>
+              <th rowspan="2" style="padding:10px;text-align:left;color:#c9a84c;border-right:2px solid #c9a84c;border-bottom:1px solid #2a2a2a;font-size:11px;letter-spacing:0.5px;">VILLE / SALLE</th>
+              <th colspan="6" style="padding:7px 10px;text-align:center;color:#fff;background:rgba(34,197,94,0.15);border-right:2px solid #c9a84c;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;">✅ RÉSULTATS À CE JOUR</th>
+              <th colspan="6" style="padding:7px 10px;text-align:center;color:#fff;background:rgba(201,168,76,0.15);font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;">🎯 PROJECTION</th>
+            </tr>
+            <tr style="background:#111;color:#888;font-weight:500;font-size:10px;">
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(34,197,94,0.08);">Billets</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(34,197,94,0.08);">Jauge</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(34,197,94,0.08);">% Rempl.</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(34,197,94,0.08);">CA TTC</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(34,197,94,0.08);">CA HT</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(34,197,94,0.08);border-right:2px solid #c9a84c;">Résultat OMP</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);">Billets</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);">Jauge</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);">% Rempl.</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);">CA TTC</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);">CA HT</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);">Résultat OMP</th>
+            </tr>
+          </thead>
+          <tbody id="suivi-tbody"></tbody>
+          <tfoot id="suivi-tfoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
     <div id="page-gestion-omp" class="page">
       <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
       <div class="page-title">📋 CRÉA / SUIVI DATES</div>
@@ -15543,7 +15591,355 @@ function _hideTeamSelection() {
   }
 
   // ============================================================
-  // FIN MODULE PROJECTIONS VENTES
+  // 📊 SUIVI DATES RÉSUMÉ (Accès Financier)
+  // Vue globale de toutes les dates avec projections
+  // ============================================================
+
+  var _suiviDonnees = [];      // Cache des dates chargées
+  var _suiviFiltre = 'all';    // Filtre actif
+  var _suiviEnCours = false;   // Flag anti-rechargement
+
+  /**
+   * Ouvre la page SUIVI DATES RÉSUMÉ et déclenche le chargement.
+   */
+  async function ouvrirSuiviDatesResume() {
+    showPage('suivi-resume');
+    if (!_suiviEnCours) {
+      _suiviEnCours = true;
+      try {
+        await suiviChargerDonnees();
+        suiviAfficher();
+      } finally {
+        _suiviEnCours = false;
+      }
+    }
+  }
+
+  /**
+   * Charge toutes les dates de toutes les tournées + leurs données financières.
+   */
+  async function suiviChargerDonnees() {
+    try {
+      document.getElementById('suivi-loading').style.display = 'block';
+      document.getElementById('suivi-table-container').style.display = 'none';
+      document.getElementById('suivi-empty').style.display = 'none';
+
+      // 1. Récupérer toutes les tournées
+      var rTournees = await _supabase.from('tournees').select('id, nom');
+      var tourneesById = {};
+      (rTournees.data || []).forEach(function(t) { tourneesById[t.id] = t.nom; });
+
+      // 2. Récupérer toutes les dates de concert
+      var rDates = await _supabase
+        .from('dates_concert')
+        .select('id, tournee_id, date_concert, ville, nom_salle, jauge_choisie, jauge_max, statut')
+        .order('date_concert', { ascending: true });
+
+      var dates = rDates.data || [];
+      if (dates.length === 0) {
+        _suiviDonnees = [];
+        return;
+      }
+
+      // 3. Récupérer toutes les fiches_production en une seule requête
+      var dateIds = dates.map(function(d) { return d.id; });
+      var rFiches = await _supabase
+        .from('fiches_production')
+        .select('date_concert_id, billetterie_data, total_jauge, invitations, boost_bonus')
+        .in('date_concert_id', dateIds);
+
+      var fichesByDateId = {};
+      (rFiches.data || []).forEach(function(f) { fichesByDateId[f.date_concert_id] = f; });
+
+      // 4. Récupérer tous les snapshots en une seule requête (pour projections)
+      var rSnaps = await _supabase
+        .from('ventes_snapshots')
+        .select('date_id, snapshot_date, total_cumul')
+        .in('date_id', dateIds)
+        .order('snapshot_date', { ascending: true });
+
+      var snapshotsByDateId = {};
+      (rSnaps.data || []).forEach(function(s) {
+        if (!snapshotsByDateId[s.date_id]) snapshotsByDateId[s.date_id] = [];
+        snapshotsByDateId[s.date_id].push(s);
+      });
+
+      // 5. Pour chaque date, calculer les données actuelles + projections
+      _suiviDonnees = dates.map(function(d) {
+        var fiche = fichesByDateId[d.id] || {};
+        var snapshots = snapshotsByDateId[d.id] || [];
+
+        // Calcul des ventes actuelles depuis billetterie_data
+        var billets = 0, recetteTTC = 0;
+        try {
+          var bd = fiche.billetterie_data ? JSON.parse(fiche.billetterie_data) : {};
+          ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'].forEach(function(op) {
+            if (!bd[op]) return;
+            bd[op].forEach(function(cat) {
+              (cat || []).forEach(function(el) {
+                var b = parseFloat(el.billets) || 0;
+                var t = parseFloat(el.tarif) || 0;
+                billets += b;
+                recetteTTC += b * t;
+              });
+            });
+          });
+        } catch(e) {}
+
+        var prixMoyen = billets > 0 ? recetteTTC / billets : 0;
+        var recetteHT = recetteTTC / 1.055; // TVA spectacle 5,5%
+        var jauge = parseInt(d.jauge_choisie || d.jauge_max || 0, 10);
+        var pctRempl = jauge > 0 ? (billets / jauge) * 100 : 0;
+
+        // Résultat OMP actuel = RECETTE HT HORS CNM - Charges (estimation 31% pour lighter version)
+        // On se base sur le ratio pour estimer quand on n'a pas la donnée exacte en base
+        // Plus précis : si on a des snapshots, on calcule la projection financière
+        var resultatOMPActuel = recetteHT - (recetteHT * 0.31) - 0; // Approximation si pas de fiche complète
+        // Si on a la recette, on prend une estimation plus prudente (les charges fixes ne sont pas dans billetterie)
+        // NOTE : pour avoir le vrai résultat OMP il faudrait lire les charges réelles de la fiche financière
+        // Pour l'instant on approxime : Résultat OMP ≈ recette HT × (1 - 31%) - charges_fixes_estimées
+
+        // === PROJECTION ===
+        var projectionBillets = billets;
+        var tendance = 0;
+        if (snapshots.length >= 2) {
+          // Calcul TENDANCE comme dans projAfficherBlocVentes
+          var today = new Date(); today.setHours(0,0,0,0);
+          var moy7j = _suiviMoyennePeriode(snapshots, today, 7);
+          var moy30j = _suiviMoyennePeriode(snapshots, today, 30);
+          tendance = moy7j * 0.7 + moy30j * 0.3;
+
+          var dConcert = new Date(d.date_concert + 'T00:00:00');
+          var joursRestants = Math.max(0, Math.ceil((dConcert - today) / 86400000));
+          var totalActuel = snapshots[snapshots.length - 1].total_cumul;
+          projectionBillets = Math.round(totalActuel + tendance * joursRestants + (parseInt(fiche.boost_bonus) || 0));
+        }
+
+        var projectionCA = recetteTTC + ((projectionBillets - billets) * prixMoyen);
+        var projectionCAHT = projectionCA / 1.055;
+        var projectionPctRempl = jauge > 0 ? (projectionBillets / jauge) * 100 : 0;
+        var projectionResultatOMP = ((projectionBillets - billets) * prixMoyen + resultatOMPActuel) * (1 - 0.31);
+
+        // Statut : passée / en cours / à venir
+        var today2 = new Date(); today2.setHours(0,0,0,0);
+        var dConcert = new Date(d.date_concert + 'T00:00:00');
+        var diffDays = Math.ceil((dConcert - today2) / 86400000);
+        var categorie = 'avenir';
+        if (diffDays < 0) categorie = 'passees';
+        else if (diffDays <= 7) categorie = 'encours';
+
+        return {
+          id: d.id,
+          date: d.date_concert,
+          ville: d.ville || '',
+          salle: d.nom_salle || '',
+          tournee: tourneesById[d.tournee_id] || '',
+          categorie: categorie,
+          // Actuel
+          billets: Math.round(billets),
+          jauge: jauge,
+          pctRempl: pctRempl,
+          recetteTTC: recetteTTC,
+          recetteHT: recetteHT,
+          resultatOMP: resultatOMPActuel,
+          // Projection
+          projBillets: projectionBillets,
+          projPctRempl: projectionPctRempl,
+          projCA: projectionCA,
+          projCAHT: projectionCAHT,
+          projResultatOMP: projectionResultatOMP,
+          aSnapshots: snapshots.length >= 2
+        };
+      });
+
+      console.log('📊 Suivi résumé chargé :', _suiviDonnees.length, 'dates');
+    } catch (err) {
+      console.error('❌ Erreur chargement suivi :', err);
+      _suiviDonnees = [];
+    }
+  }
+
+  /**
+   * Calcule la moyenne de ventes sur une période (version pour suivi global).
+   */
+  function _suiviMoyennePeriode(snapshots, today, nbJours) {
+    if (!snapshots || snapshots.length === 0) return 0;
+    var dateLimite = new Date(today);
+    dateLimite.setDate(dateLimite.getDate() - nbJours);
+    var dernier = snapshots[snapshots.length - 1];
+    var cumulActuel = dernier.total_cumul;
+    var snapRef = null;
+    for (var i = snapshots.length - 1; i >= 0; i--) {
+      if (new Date(snapshots[i].snapshot_date) <= dateLimite) {
+        snapRef = snapshots[i];
+        break;
+      }
+    }
+    if (!snapRef) {
+      var premier = snapshots[0];
+      var joursReels = Math.max(1, Math.floor((today - new Date(premier.snapshot_date)) / 86400000));
+      if (joursReels < nbJours / 3) return 0;
+      return (cumulActuel - premier.total_cumul) / joursReels;
+    }
+    return (cumulActuel - snapRef.total_cumul) / nbJours;
+  }
+
+  /**
+   * Change le filtre actif et rafraîchit l'affichage.
+   */
+  function suiviSetFilter(f) {
+    _suiviFiltre = f;
+    // Style des boutons
+    ['all','passees','encours','avenir'].forEach(function(key) {
+      var btn = document.getElementById('suivi-filter-' + key);
+      if (!btn) return;
+      if (key === f) {
+        btn.style.background = '#c9a84c';
+        btn.style.color = '#000';
+        btn.style.border = 'none';
+      } else {
+        btn.style.background = '#1a1a1a';
+        btn.style.color = '#888';
+        btn.style.border = '1px solid #333';
+      }
+    });
+    suiviAfficher();
+  }
+
+  /**
+   * Filtre + affiche les données dans le tableau + totaux.
+   */
+  function suiviAfficher() {
+    document.getElementById('suivi-loading').style.display = 'none';
+
+    // Compteurs par catégorie
+    var nbAll = _suiviDonnees.length;
+    var nbPassees = _suiviDonnees.filter(function(d) { return d.categorie === 'passees'; }).length;
+    var nbEnCours = _suiviDonnees.filter(function(d) { return d.categorie === 'encours'; }).length;
+    var nbAvenir = _suiviDonnees.filter(function(d) { return d.categorie === 'avenir'; }).length;
+    var setCount = function(id, n) { var el = document.getElementById(id); if (el) el.textContent = '(' + n + ')'; };
+    setCount('suivi-count-all', nbAll);
+    setCount('suivi-count-passees', nbPassees);
+    setCount('suivi-count-encours', nbEnCours);
+    setCount('suivi-count-avenir', nbAvenir);
+
+    // Filtrage
+    var dates = _suiviFiltre === 'all' ? _suiviDonnees.slice() : _suiviDonnees.filter(function(d) { return d.categorie === _suiviFiltre; });
+
+    if (dates.length === 0) {
+      document.getElementById('suivi-empty').style.display = 'block';
+      document.getElementById('suivi-table-container').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('suivi-empty').style.display = 'none';
+    document.getElementById('suivi-table-container').style.display = 'block';
+
+    // === TABLEAU ===
+    var fmtEur = function(n) {
+      if (!n || isNaN(n)) return '—';
+      return Math.round(n).toLocaleString('fr-FR') + ' €';
+    };
+    var fmtNb = function(n) {
+      if (!n || isNaN(n) || n === 0) return '—';
+      return n.toLocaleString('fr-FR');
+    };
+    var fmtPct = function(n) {
+      if (!n || isNaN(n)) return '—';
+      return n.toFixed(1) + '%';
+    };
+    var colorPct = function(pct) {
+      if (pct >= 90) return '#22c55e';
+      if (pct >= 70) return '#c9a84c';
+      if (pct >= 40) return '#f59e0b';
+      return '#ef4444';
+    };
+    var colorEuros = function(n) { return n >= 0 ? '#22c55e' : '#ef4444'; };
+
+    var tbody = document.getElementById('suivi-tbody');
+    tbody.innerHTML = dates.map(function(d, idx) {
+      var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
+      var dateStr = '';
+      try { dateStr = new Date(d.date + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' }); } catch(e) { dateStr = d.date; }
+
+      return '<tr style="border-bottom:1px solid #222;' + altBg + 'cursor:pointer;" onmouseover="this.style.background=\'#1a1a1a\'" onmouseout="this.style.background=\'' + (idx % 2 === 1 ? '#0d0d0d' : 'transparent') + '\'" onclick="suiviOuvrirDate(\'' + d.id + '\')">'
+        + '<td style="padding:8px 10px;color:#ddd;white-space:nowrap;border-right:2px solid #c9a84c;">' + dateStr + '</td>'
+        + '<td style="padding:8px 10px;color:#fff;border-right:2px solid #c9a84c;"><strong>' + (d.ville || '—') + '</strong>' + (d.salle ? '<br><span style="color:#888;font-size:10px;">' + d.salle + '</span>' : '') + '</td>'
+        // Bloc actuel
+        + '<td style="padding:8px 6px;text-align:right;color:#fff;">' + fmtNb(d.billets) + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:#888;">' + fmtNb(d.jauge) + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:' + colorPct(d.pctRempl) + ';font-weight:600;">' + fmtPct(d.pctRempl) + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:#fff;">' + fmtEur(d.recetteTTC) + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:#fff;">' + fmtEur(d.recetteHT) + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:' + colorEuros(d.resultatOMP) + ';border-right:2px solid #c9a84c;font-weight:600;">' + fmtEur(d.resultatOMP) + '</td>'
+        // Bloc projection
+        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? '#c9a84c' : '#555') + ';">' + (d.aSnapshots ? fmtNb(d.projBillets) : '—') + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:#888;">' + fmtNb(d.jauge) + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? colorPct(d.projPctRempl) : '#555') + ';font-weight:600;">' + (d.aSnapshots ? fmtPct(d.projPctRempl) : '—') + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? '#c9a84c' : '#555') + ';">' + (d.aSnapshots ? fmtEur(d.projCA) : '—') + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? '#c9a84c' : '#555') + ';">' + (d.aSnapshots ? fmtEur(d.projCAHT) : '—') + '</td>'
+        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? colorEuros(d.projResultatOMP) : '#555') + ';font-weight:600;">' + (d.aSnapshots ? fmtEur(d.projResultatOMP) : '—') + '</td>'
+        + '</tr>';
+    }).join('');
+
+    // === TOTAUX ===
+    var tot = {
+      billets: 0, jauge: 0, recetteTTC: 0, recetteHT: 0, resultatOMP: 0,
+      projBillets: 0, projCA: 0, projCAHT: 0, projResultatOMP: 0
+    };
+    dates.forEach(function(d) {
+      tot.billets += d.billets;
+      tot.jauge += d.jauge;
+      tot.recetteTTC += d.recetteTTC;
+      tot.recetteHT += d.recetteHT;
+      tot.resultatOMP += d.resultatOMP;
+      tot.projBillets += d.aSnapshots ? d.projBillets : d.billets;
+      tot.projCA += d.aSnapshots ? d.projCA : d.recetteTTC;
+      tot.projCAHT += d.aSnapshots ? d.projCAHT : d.recetteHT;
+      tot.projResultatOMP += d.aSnapshots ? d.projResultatOMP : d.resultatOMP;
+    });
+    var totPctRempl = tot.jauge > 0 ? (tot.billets / tot.jauge) * 100 : 0;
+    var totProjPctRempl = tot.jauge > 0 ? (tot.projBillets / tot.jauge) * 100 : 0;
+
+    var tfoot = document.getElementById('suivi-tfoot');
+    tfoot.innerHTML = '<tr style="background:#1e3a5f;border-top:2px solid #c9a84c;">'
+      + '<td colspan="2" style="padding:12px 10px;color:#7eb8d4;font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:2px;border-right:2px solid #c9a84c;">TOTAUX (' + dates.length + ' dates)</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:#fff;font-weight:700;">' + fmtNb(tot.billets) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:#fff;font-weight:700;">' + fmtNb(tot.jauge) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:' + colorPct(totPctRempl) + ';font-weight:700;">' + fmtPct(totPctRempl) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:#fff;font-weight:700;">' + fmtEur(tot.recetteTTC) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:#fff;font-weight:700;">' + fmtEur(tot.recetteHT) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:' + colorEuros(tot.resultatOMP) + ';font-weight:700;border-right:2px solid #c9a84c;">' + fmtEur(tot.resultatOMP) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:#c9a84c;font-weight:700;">' + fmtNb(tot.projBillets) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:#fff;font-weight:700;">' + fmtNb(tot.jauge) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:' + colorPct(totProjPctRempl) + ';font-weight:700;">' + fmtPct(totProjPctRempl) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:#c9a84c;font-weight:700;">' + fmtEur(tot.projCA) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:#c9a84c;font-weight:700;">' + fmtEur(tot.projCAHT) + '</td>'
+      + '<td style="padding:12px 6px;text-align:right;color:' + colorEuros(tot.projResultatOMP) + ';font-weight:700;">' + fmtEur(tot.projResultatOMP) + '</td>'
+      + '</tr>';
+  }
+
+  /**
+   * Ouvre la fiche Pilote Date correspondante quand on clique sur une ligne.
+   */
+  async function suiviOuvrirDate(dateId) {
+    if (!dateId) return;
+    try {
+      // On réutilise la fonction existante qui ouvre Pilote Date
+      if (typeof fpOuvrirDateById === 'function') {
+        await fpOuvrirDateById(dateId);
+      } else {
+        // Fallback : on met l'ID actif et on ouvre la page
+        window._fpDateId = dateId;
+        showPage('pilote-date');
+      }
+    } catch(err) {
+      console.warn('Impossible d\'ouvrir la date :', err);
+    }
+  }
+
+  // ============================================================
+  // FIN MODULE SUIVI DATES RÉSUMÉ
   // ============================================================
 
   /**
@@ -17884,11 +18280,6 @@ function _hideTeamSelection() {
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </div>
 
-        <div style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;opacity:0.5;color:#fff;">
-          <span style="font-size:22px;">📊</span>
-          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">ACCÈS FINANCIER</div><div style="font-size:11px;color:#555;">À venir</div></div>
-        </div>
-
       </div>
     </div>
   </div>
@@ -17914,6 +18305,12 @@ function _hideTeamSelection() {
           <span style="font-size:22px;">📅</span>
           <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">GESTION DATES TOURNÉES</div><div style="font-size:11px;color:#555;">Planning & suivi dates</div></div>
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
+        </div>
+
+        <div onclick="closeModal('modal-gestion-tour-regis'); ouvrirSuiviDatesResume();" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #c9a84c;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='#c9a84c'">
+          <span style="font-size:22px;">📊</span>
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">ACCÈS FINANCIER</div><div style="font-size:11px;color:#aaa;">Suivi dates résumé · Vue globale</div></div>
+          <span style="margin-left:auto;color:#c9a84c;font-size:16px;">→</span>
         </div>
 
         <div onclick="closeModal('modal-gestion-tour-regis'); openModal('modal-add-tournee');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
