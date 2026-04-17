@@ -15616,20 +15616,157 @@ function _hideTeamSelection() {
   }
 
   /**
-   * Charge toutes les dates de toutes les tournées + leurs données financières.
+   * V2 — Calcule le VRAI Résultat OMP pour une date donnée.
+   * Utilise la même formule que piloteChargerBill dans Pilote Date :
+   * RÉSULTAT OMP = Recette TTC - Montant CNM - Droits - Dépenses + Droits OMP + Droit au Tirage
+   */
+  function _suiviCalculerResultatOMP(ficheData) {
+    if (!ficheData) return { recTTC: 0, recHT: 0, billets: 0, resultatOMP: 0, complet: false };
+
+    var pctOMP = parseFloat(ficheData.dl_omp_pct) || 100;
+    // var pctPL = parseFloat(ficheData.dl_prod_locale_pct) || 0;
+
+    // Taux personnalisés (ASSRC / ORGANIC)
+    var assrcTaux = 0, organicTaux = 0;
+    try {
+      if (ficheData.pilote_taux) {
+        var pt = JSON.parse(ficheData.pilote_taux);
+        assrcTaux = parseFloat(pt.assrc) || 0;
+        organicTaux = parseFloat(pt.organic) || 0;
+      }
+    } catch(e) {}
+
+    // === 1. Calculs depuis billetterie_data ===
+    var bd = {};
+    try { bd = ficheData.billetterie_data ? JSON.parse(ficheData.billetterie_data) : {}; } catch(e) {}
+
+    var dlTotal = 0, recTotal = 0, billTotal = 0;
+    ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'].forEach(function(op) {
+      if (!bd[op]) return;
+      bd[op].forEach(function(cat) {
+        (cat||[]).forEach(function(el) {
+          var b = parseFloat(el.billets) || 0;
+          var t = parseFloat(el.tarif) || 0;
+          var dlp = parseFloat(el.dlProd) || 0;
+          recTotal += b * t;
+          dlTotal += b * dlp;
+          billTotal += b;
+        });
+      });
+    });
+
+    // DL
+    var dlOMP = dlTotal * pctOMP / 100;
+    var dlPL = dlTotal * (100 - pctOMP) / 100;
+    var dlTTC = dlOMP + dlPL;
+    var dlHT = dlTTC / 1.021;
+
+    // Droit au Tirage = PARAFISCALE × 60%
+    var parafiscale = recTotal > 0 ? (recTotal / 1.021) * 0.035 : 0;
+    var droitTirage = parafiscale * 0.6;
+
+    // Droits Hors CNM (SACEM + AGESSA + SACD + CCSA + AGESSA(SACD))
+    var recHT2 = recTotal / 1.021;
+    var sacem = recHT2 * 0.0836;
+    var agessaSacem = sacem * 0.011;
+    var sacd = recHT2 * 0.06;
+    var ccsa = recHT2 * 0.012;
+    var agessaSacd = sacd * 0.011;
+    var totalDroitsHorsCNM = sacem + agessaSacem + sacd + ccsa + agessaSacd;
+
+    // Montant CNM = Recette HT × 3,5%
+    var montantCNM = recHT2 * 0.035;
+
+    // ASS.RC + ORGANIC
+    var assrcMt = recHT2 * assrcTaux / 100;
+    var organicMt = recHT2 * organicTaux / 100;
+    var droitsTotal = totalDroitsHorsCNM + assrcMt + organicMt;
+
+    // Droits OMP = DL HT × % OMP
+    var droitsOMP = dlHT * pctOMP / 100;
+
+    // === 2. Calculs depuis financier_data (DÉPENSES) ===
+    var sumFin = 0;
+    var complet = false;
+    try {
+      if (ficheData.financier_data) {
+        var fd = JSON.parse(ficheData.financier_data);
+        var getVal = function(key) { return parseFloat(fd[key]) || 0; };
+
+        // OMP SALLE
+        var ompLoc = Math.max(getVal('fin-omp-loc-mg'), getVal('fin-omp-loc-ht'));
+        var ompPrest = getVal('fin-omp-prest-energie') + getVal('fin-omp-prest-chauf') + getVal('fin-omp-prest-config') + getVal('fin-omp-prest-fenwick') + getVal('fin-omp-prest-accroches') + getVal('fin-omp-prest-elec');
+        var ompPers = getVal('fin-omp-pers-nettoyage') + getVal('fin-omp-pers-nett-supp') + getVal('fin-omp-pers-elec') + getVal('fin-omp-pers-hriger') + getVal('fin-omp-pers-regisseur') + getVal('fin-omp-pers-forfait') + getVal('fin-omp-pers-caissier') + getVal('fin-omp-pers-rigg') + getVal('fin-omp-pers-hotesses') + getVal('fin-omp-pers-controle') + getVal('fin-omp-pers-parking') + getVal('fin-omp-pers-secu') + getVal('fin-omp-pers-vigi') + getVal('fin-omp-pers-consigne') + getVal('fin-omp-pers-gardien');
+        var ompSecu = getVal('fin-omp-secu-ssiap1') + getVal('fin-omp-secu-ssiap2') + getVal('fin-omp-secu-protciv') + getVal('fin-omp-secu-vigi2') + getVal('fin-omp-secu-medical') + getVal('fin-omp-secu-autres');
+        var totalOmpSalle = ompLoc + ompPrest + ompPers + ompSecu;
+
+        // PL SALLE
+        var plLoc = Math.max(getVal('fin-pl-loc-mg'), getVal('fin-pl-loc-ht'));
+        var plPrest = getVal('fin-pl-prest-energie') + getVal('fin-pl-prest-chauf') + getVal('fin-pl-prest-config') + getVal('fin-pl-prest-fenwick') + getVal('fin-pl-prest-accroches') + getVal('fin-pl-prest-elec');
+        var plPers = getVal('fin-pl-pers-nettoyage') + getVal('fin-pl-pers-nett-supp') + getVal('fin-pl-pers-elec') + getVal('fin-pl-pers-hriger') + getVal('fin-pl-pers-regisseur') + getVal('fin-pl-pers-forfait') + getVal('fin-pl-pers-caissier') + getVal('fin-pl-pers-rigg') + getVal('fin-pl-pers-hotesses') + getVal('fin-pl-pers-controle') + getVal('fin-pl-pers-parking') + getVal('fin-pl-pers-secu') + getVal('fin-pl-pers-vigi') + getVal('fin-pl-pers-consigne') + getVal('fin-pl-pers-gardien');
+        var plSecu = getVal('fin-pl-secu-ssiap1') + getVal('fin-pl-secu-ssiap2') + getVal('fin-pl-secu-protciv') + getVal('fin-pl-secu-vigi2') + getVal('fin-pl-secu-medical') + getVal('fin-pl-secu-autres');
+        var totalPlSalle = plLoc + plPrest + plPers + plSecu;
+
+        // OMP AUTRES
+        var ompSal = getVal('fin-omp-sal-tournee') + getVal('fin-omp-sal-road') + getVal('fin-omp-sal-promo');
+        var ompTech = getVal('fin-omp-tech-road') + getVal('fin-omp-tech-figer') + getVal('fin-omp-tech-coulisses') + getVal('fin-omp-tech-autres') + getVal('fin-omp-tech-conso') + getVal('fin-omp-tech-controleur');
+        var ompPromo = getVal('fin-omp-promo-meta') + getVal('fin-omp-promo-autres1') + getVal('fin-omp-promo-autres2');
+        var ompVoy = getVal('fin-omp-voy-prod') + getVal('fin-omp-voy-artiste') + getVal('fin-omp-voy-tech') + getVal('fin-omp-voy-vhr');
+        var ompVhr = getVal('fin-omp-vhr-pkart') + getVal('fin-omp-vhr-pktech') + getVal('fin-omp-vhr-taxiart') + getVal('fin-omp-vhr-taxitech') + getVal('fin-omp-vhr-total2');
+        var ompHotel = getVal('fin-omp-hotel-prod') + getVal('fin-omp-hotel-tech') + getVal('fin-omp-hotel-art') + getVal('fin-omp-hotel-estim');
+        var ompTrai = getVal('fin-omp-trai-total') + getVal('fin-omp-trai-resto') + getVal('fin-omp-trai-loge');
+        var totalOmpAutres = ompSal + ompTech + ompPromo + ompVoy + ompVhr + ompHotel + ompTrai;
+
+        // PL AUTRES
+        var plSal = getVal('fin-pl-sal-regisseur') + getVal('fin-pl-sal-road') + getVal('fin-pl-sal-caissier');
+        var plTech = getVal('fin-pl-tech-road') + getVal('fin-pl-tech-figer') + getVal('fin-pl-tech-coulisses') + getVal('fin-pl-tech-autres') + getVal('fin-pl-tech-conso') + getVal('fin-pl-tech-controleur');
+        var plPromo = getVal('fin-pl-promo-meta') + getVal('fin-pl-promo-autres1') + getVal('fin-pl-promo-autres2');
+        var plVoy = getVal('fin-pl-voy-prod') + getVal('fin-pl-voy-artiste') + getVal('fin-pl-voy-tech') + getVal('fin-pl-voy-autres');
+        var plVhr = getVal('fin-pl-vhr-pkart') + getVal('fin-pl-vhr-pktech') + getVal('fin-pl-vhr-taxiart') + getVal('fin-pl-vhr-taxitech') + getVal('fin-pl-vhr-total2');
+        var plHotel = getVal('fin-pl-hotel-prod') + getVal('fin-pl-hotel-tech') + getVal('fin-pl-hotel-art') + getVal('fin-pl-hotel-estim');
+        var plTrai = getVal('fin-pl-trai-total') + getVal('fin-pl-trai-resto') + getVal('fin-pl-trai-loge');
+        var totalPlAutres = plSal + plTech + plPromo + plVoy + plVhr + plHotel + plTrai;
+
+        sumFin = totalOmpSalle + totalPlSalle + totalOmpAutres + totalPlAutres;
+        complet = sumFin > 0;
+      }
+    } catch(e) {
+      console.warn('Erreur parse financier_data :', e);
+    }
+
+    // === 3. RÉSULTAT OMP final (formule exacte Pilote Date) ===
+    var resultatOMP = recTotal - montantCNM - droitsTotal - sumFin + droitsOMP + droitTirage;
+
+    return {
+      recTTC: recTotal,
+      recHT: recHT2,
+      billets: Math.round(billTotal),
+      montantCNM: montantCNM,
+      droits: droitsTotal,
+      depenses: sumFin,
+      droitsOMP: droitsOMP,
+      droitTirage: droitTirage,
+      resultatOMP: resultatOMP,
+      complet: complet
+    };
+  }
+
+  /**
+   * Charge toutes les dates + calcule le vrai Résultat OMP pour chacune.
    */
   async function suiviChargerDonnees() {
     try {
       document.getElementById('suivi-loading').style.display = 'block';
+      document.getElementById('suivi-loading').textContent = 'Chargement des données... (peut prendre quelques secondes)';
       document.getElementById('suivi-table-container').style.display = 'none';
       document.getElementById('suivi-empty').style.display = 'none';
 
-      // 1. Récupérer toutes les tournées
+      // 1. Tournées
       var rTournees = await _supabase.from('tournees').select('id, nom');
       var tourneesById = {};
       (rTournees.data || []).forEach(function(t) { tourneesById[t.id] = t.nom; });
 
-      // 2. Récupérer toutes les dates de concert
+      // 2. Toutes les dates
       var rDates = await _supabase
         .from('dates_concert')
         .select('id, tournee_id, date_concert, ville, nom_salle, jauge_choisie, jauge_max, statut')
@@ -15641,17 +15778,18 @@ function _hideTeamSelection() {
         return;
       }
 
-      // 3. Récupérer toutes les fiches_production en une seule requête
       var dateIds = dates.map(function(d) { return d.id; });
+
+      // 3. Toutes les fiches_production avec billetterie_data + financier_data (en une seule requête)
       var rFiches = await _supabase
         .from('fiches_production')
-        .select('date_concert_id, billetterie_data, total_jauge, invitations, boost_bonus')
+        .select('date_concert_id, billetterie_data, financier_data, dl_omp_pct, dl_prod_locale_pct, pilote_taux, total_jauge, invitations, boost_bonus')
         .in('date_concert_id', dateIds);
 
       var fichesByDateId = {};
       (rFiches.data || []).forEach(function(f) { fichesByDateId[f.date_concert_id] = f; });
 
-      // 4. Récupérer tous les snapshots en une seule requête (pour projections)
+      // 4. Tous les snapshots
       var rSnaps = await _supabase
         .from('ventes_snapshots')
         .select('date_id, snapshot_date, total_cumul')
@@ -15664,50 +15802,25 @@ function _hideTeamSelection() {
         snapshotsByDateId[s.date_id].push(s);
       });
 
-      // 5. Pour chaque date, calculer les données actuelles + projections
+      // 5. Pour chaque date : calcul exact du Résultat OMP via la formule Pilote
       _suiviDonnees = dates.map(function(d) {
         var fiche = fichesByDateId[d.id] || {};
         var snapshots = snapshotsByDateId[d.id] || [];
 
-        // Calcul des ventes actuelles depuis billetterie_data
-        var billets = 0, recetteTTC = 0;
-        try {
-          var bd = fiche.billetterie_data ? JSON.parse(fiche.billetterie_data) : {};
-          ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'].forEach(function(op) {
-            if (!bd[op]) return;
-            bd[op].forEach(function(cat) {
-              (cat || []).forEach(function(el) {
-                var b = parseFloat(el.billets) || 0;
-                var t = parseFloat(el.tarif) || 0;
-                billets += b;
-                recetteTTC += b * t;
-              });
-            });
-          });
-        } catch(e) {}
+        // Calcul financier VRAI avec la formule exacte
+        var calc = _suiviCalculerResultatOMP(fiche);
 
-        var prixMoyen = billets > 0 ? recetteTTC / billets : 0;
-        var recetteHT = recetteTTC / 1.055; // TVA spectacle 5,5%
         var jauge = parseInt(d.jauge_choisie || d.jauge_max || 0, 10);
-        var pctRempl = jauge > 0 ? (billets / jauge) * 100 : 0;
-
-        // Résultat OMP actuel = RECETTE HT HORS CNM - Charges (estimation 31% pour lighter version)
-        // On se base sur le ratio pour estimer quand on n'a pas la donnée exacte en base
-        // Plus précis : si on a des snapshots, on calcule la projection financière
-        var resultatOMPActuel = recetteHT - (recetteHT * 0.31) - 0; // Approximation si pas de fiche complète
-        // Si on a la recette, on prend une estimation plus prudente (les charges fixes ne sont pas dans billetterie)
-        // NOTE : pour avoir le vrai résultat OMP il faudrait lire les charges réelles de la fiche financière
-        // Pour l'instant on approxime : Résultat OMP ≈ recette HT × (1 - 31%) - charges_fixes_estimées
+        var pctRempl = jauge > 0 ? (calc.billets / jauge) * 100 : 0;
+        var prixMoyen = calc.billets > 0 ? calc.recTTC / calc.billets : 0;
 
         // === PROJECTION ===
-        var projectionBillets = billets;
-        var tendance = 0;
+        var projectionBillets = calc.billets;
         if (snapshots.length >= 2) {
-          // Calcul TENDANCE comme dans projAfficherBlocVentes
           var today = new Date(); today.setHours(0,0,0,0);
           var moy7j = _suiviMoyennePeriode(snapshots, today, 7);
           var moy30j = _suiviMoyennePeriode(snapshots, today, 30);
-          tendance = moy7j * 0.7 + moy30j * 0.3;
+          var tendance = moy7j * 0.7 + moy30j * 0.3;
 
           var dConcert = new Date(d.date_concert + 'T00:00:00');
           var joursRestants = Math.max(0, Math.ceil((dConcert - today) / 86400000));
@@ -15715,15 +15828,19 @@ function _hideTeamSelection() {
           projectionBillets = Math.round(totalActuel + tendance * joursRestants + (parseInt(fiche.boost_bonus) || 0));
         }
 
-        var projectionCA = recetteTTC + ((projectionBillets - billets) * prixMoyen);
-        var projectionCAHT = projectionCA / 1.055;
+        // Projection CA = Recette TTC + (Diff billets × Prix moyen)
+        var diffBillets = projectionBillets - calc.billets;
+        var projectionCA = calc.recTTC + (diffBillets * prixMoyen);
+        var projectionCAHT = projectionCA / 1.021;
         var projectionPctRempl = jauge > 0 ? (projectionBillets / jauge) * 100 : 0;
-        var projectionResultatOMP = ((projectionBillets - billets) * prixMoyen + resultatOMPActuel) * (1 - 0.31);
 
-        // Statut : passée / en cours / à venir
+        // Projection Résultat OMP = (Diff × Prix moyen + Résultat OMP) × (1 - 31%)
+        var projectionResultatOMP = (diffBillets * prixMoyen + calc.resultatOMP) * (1 - 0.31);
+
+        // Catégorie
         var today2 = new Date(); today2.setHours(0,0,0,0);
-        var dConcert = new Date(d.date_concert + 'T00:00:00');
-        var diffDays = Math.ceil((dConcert - today2) / 86400000);
+        var dConcert2 = new Date(d.date_concert + 'T00:00:00');
+        var diffDays = Math.ceil((dConcert2 - today2) / 86400000);
         var categorie = 'avenir';
         if (diffDays < 0) categorie = 'passees';
         else if (diffDays <= 7) categorie = 'encours';
@@ -15736,12 +15853,13 @@ function _hideTeamSelection() {
           tournee: tourneesById[d.tournee_id] || '',
           categorie: categorie,
           // Actuel
-          billets: Math.round(billets),
+          billets: calc.billets,
           jauge: jauge,
           pctRempl: pctRempl,
-          recetteTTC: recetteTTC,
-          recetteHT: recetteHT,
-          resultatOMP: resultatOMPActuel,
+          recetteTTC: calc.recTTC,
+          recetteHT: calc.recHT,
+          resultatOMP: calc.resultatOMP,
+          ficheComplete: calc.complet,
           // Projection
           projBillets: projectionBillets,
           projPctRempl: projectionPctRempl,
@@ -15752,7 +15870,7 @@ function _hideTeamSelection() {
         };
       });
 
-      console.log('📊 Suivi résumé chargé :', _suiviDonnees.length, 'dates');
+      console.log('📊 Suivi résumé V2 chargé :', _suiviDonnees.length, 'dates (calcul exact)');
     } catch (err) {
       console.error('❌ Erreur chargement suivi :', err);
       _suiviDonnees = [];
@@ -15864,7 +15982,7 @@ function _hideTeamSelection() {
 
       return '<tr style="border-bottom:1px solid #222;' + altBg + 'cursor:pointer;" onmouseover="this.style.background=\'#1a1a1a\'" onmouseout="this.style.background=\'' + (idx % 2 === 1 ? '#0d0d0d' : 'transparent') + '\'" onclick="suiviOuvrirDate(\'' + d.id + '\')">'
         + '<td style="padding:8px 10px;color:#ddd;white-space:nowrap;border-right:2px solid #c9a84c;">' + dateStr + '</td>'
-        + '<td style="padding:8px 10px;color:#fff;border-right:2px solid #c9a84c;"><strong>' + (d.ville || '—') + '</strong>' + (d.salle ? '<br><span style="color:#888;font-size:10px;">' + d.salle + '</span>' : '') + '</td>'
+        + '<td style="padding:8px 10px;color:#fff;border-right:2px solid #c9a84c;"><strong>' + (d.ville || '—') + '</strong>' + (d.salle ? '<br><span style="color:#888;font-size:10px;">' + d.salle + '</span>' : '') + (!d.ficheComplete && d.billets > 0 ? '<br><span style="color:#f59e0b;font-size:9px;">⚠ Dépenses non saisies</span>' : '') + '</td>'
         // Bloc actuel
         + '<td style="padding:8px 6px;text-align:right;color:#fff;">' + fmtNb(d.billets) + '</td>'
         + '<td style="padding:8px 6px;text-align:right;color:#888;">' + fmtNb(d.jauge) + '</td>'
