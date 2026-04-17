@@ -3241,9 +3241,8 @@ function _hideTeamSelection() {
               <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:700;">TENDANCE</td><td id="pilote-tendance" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">N° Jours restants</td><td id="pilote-jours-restants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% de remplissage</td><td id="pilote-remplissage" style="padding:7px 16px;color:#22c55e;font-weight:700;text-align:right;"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);"><td style="padding:7px 16px;color:#c9a84c;font-weight:600;">🎯 BOOST BONUS (manuel)</td><td style="padding:4px 16px;text-align:right;"><input id="pilote-boost-bonus" type="number" placeholder="0" oninput="projChangeBoost()" onchange="projChangeBoost()" style="width:80px;background:#0a0a0a;border:1px solid #c9a84c;border-radius:6px;color:#c9a84c;padding:4px 8px;font-size:13px;font-weight:600;text-align:right;font-family:'Inter',sans-serif;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Projection payants</td><td id="pilote-proj-payants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:7px 16px;color:#c9a84c;">Projection payants + Bonus</td><td id="pilote-proj-payants-bonus" style="padding:7px 16px;color:#c9a84c;font-weight:700;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);"><td style="padding:7px 16px;color:#c9a84c;font-weight:600;">🎯 BOOST BONUS (manuel)</td><td style="padding:4px 16px;text-align:right;"><input id="pilote-boost-bonus" type="number" placeholder="0" oninput="projChangeBoost()" onchange="projChangeBoost()" style="width:80px;background:#0a0a0a;border:1px solid #c9a84c;border-radius:6px;color:#c9a84c;padding:4px 8px;font-size:13px;font-weight:600;text-align:right;font-family:'Inter',sans-serif;"></td></tr>
               <tr style="background:rgba(239,68,68,0.15);"><td style="padding:7px 16px;color:#fff;font-weight:700;">Projection total</td><td id="pilote-proj-total" style="padding:7px 16px;color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:900;text-align:right;"></td></tr>
             </tbody>
           </table>
@@ -14953,13 +14952,10 @@ function _hideTeamSelection() {
       if (boostEl && boostEl.value !== '') boostBonus = parseInt(boostEl.value) || 0;
 
       // 5. Projection payants = total actuel + (tendance × jours restants)
-      // (sans le bonus ici — il sera ajouté dans la ligne "+ Bonus" juste en dessous)
       var projectionPayants = Math.round(totalActuel + tendance * joursRestants);
-      var projectionPayantsBonus = projectionPayants + boostBonus;
 
-      // 6. Invitations (pour calculer projection total)
-      var invits = parseInt(document.getElementById('fp-invitations')?.value) || 0;
-      var projectionTotal = projectionPayantsBonus + invits;
+      // 6. Projection total = Projection payants + Boost Bonus
+      var projectionTotal = projectionPayants + boostBonus;
 
       // 7. Jauge pour le % remplissage
       var jauge = parseInt(document.getElementById('fp-jauge-finale')?.value) ||
@@ -14972,7 +14968,6 @@ function _hideTeamSelection() {
       setVal('pilote-moy-7j', moy7j > 0 ? r2(moy7j) : '—', moy7j > 0 ? ' bil/j' : '');
       setVal('pilote-tendance', tendance > 0 ? r2(tendance) : '—', tendance > 0 ? ' bil/j' : '');
       setVal('pilote-proj-payants', projectionPayants > 0 ? projectionPayants.toLocaleString('fr-FR') : '');
-      setVal('pilote-proj-payants-bonus', projectionPayantsBonus > 0 ? projectionPayantsBonus.toLocaleString('fr-FR') + (boostBonus > 0 ? ' (+' + boostBonus + ')' : '') : '');
       setVal('pilote-proj-total', projectionTotal > 0 ? projectionTotal.toLocaleString('fr-FR') : '');
 
       // Couleur du % remplissage recalculé avec projection totale
