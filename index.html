@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.11">
+<meta name="version" content="2026.04.17.18">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1301,29 +1301,41 @@
       grid-template-columns: 1fr !important;
     }
     
-    /* DATES - Titre ville et date réduits */
+    /* DATES - Titre ville et date — style FICHE CONCERT plus impactant sur mobile */
     .city-title {
-      font-size: 22px !important;
-      letter-spacing: 1px !important;
+      font-size: 46px !important;
+      letter-spacing: 2px !important;
+      line-height: 0.95 !important;
+      text-shadow: 0 2px 12px rgba(201,168,76,0.15) !important;
     }
     .city-date {
-      font-size: 11px !important;
+      font-size: 13px !important;
+      margin-top: 8px !important;
+      letter-spacing: 1px !important;
     }
     .city-meta {
-      gap: 6px !important;
+      gap: 8px !important;
       flex-wrap: wrap !important;
+      margin-top: 12px !important;
     }
     .venue-name {
       font-size: 10px !important;
+      letter-spacing: 1px !important;
     }
     .date-detail-header {
-      padding: 12px 0 !important;
+      padding: 8px 40px !important;
+      margin-bottom: 8px !important;
     }
     .nav-arrow {
-      width: 24px !important;
-      height: 24px !important;
-      font-size: 12px !important;
+      width: 32px !important;
+      height: 32px !important;
+      font-size: 14px !important;
+      background: rgba(201,168,76,0.08) !important;
+      border: 1px solid rgba(201,168,76,0.3) !important;
+      color: #c9a84c !important;
     }
+    .date-nav.left { left: 0 !important; }
+    .date-nav.right { right: 0 !important; }
     
     /* BOUTON NOTIFIER L'ÉQUIPE - Très réduit */
     button[onclick="openModal('modal-notifier')"] {
@@ -1363,33 +1375,126 @@
       gap: 24px !important;
     }
     
-    /* INVITATIONS - Tableau lisible sur mobile */
-    .inv-table {
-      font-size: 9px !important;
-    }
-    .inv-table th,
+    /* ✨ INVITATIONS — Tableau transformé en cartes sur mobile */
+    .inv-table,
+    .inv-table thead,
+    .inv-table tbody,
+    .inv-table tr,
     .inv-table td {
-      padding: 4px 3px !important;
-      font-size: 8px !important;
+      display: block !important;
+      width: 100% !important;
     }
-    /* Masquer colonnes inutiles sur mobile : Mail, N°Place, Options, Notes */
-    .inv-table th:nth-child(4),
+    /* Masquer le header du tableau (on lira les données via data-label) */
+    .inv-table thead {
+      display: none !important;
+    }
+    /* Chaque ligne = une carte */
+    .inv-table tr {
+      background: #0f0f0f !important;
+      border: 1px solid #2a2a2a !important;
+      border-radius: 10px !important;
+      padding: 12px !important;
+      margin-bottom: 10px !important;
+      position: relative !important;
+    }
+    .inv-table tr:last-child { margin-bottom: 0 !important; }
+    /* Masquer les colonnes peu utiles sur mobile (mail, n°place, notes) */
     .inv-table td:nth-child(4),
-    .inv-table th:nth-child(6),
     .inv-table td:nth-child(6),
-    .inv-table th:nth-child(8),
-    .inv-table td:nth-child(8),
-    .inv-table th:nth-child(9),
     .inv-table td:nth-child(9) {
       display: none !important;
     }
-    .inv-total {
+    /* Chaque cellule visible : affichée en ligne avec son label */
+    .inv-table td {
+      padding: 4px 0 !important;
+      font-size: 13px !important;
+      border: none !important;
+      text-align: left !important;
+      color: #ddd !important;
+    }
+    /* Date — en haut à gauche, dorée */
+    .inv-table td:nth-child(1) {
       font-size: 11px !important;
+      color: #c9a84c !important;
+      letter-spacing: 1px !important;
+      text-transform: uppercase !important;
+      font-weight: 600 !important;
+      margin-bottom: 4px !important;
+    }
+    /* Demandeur — petit, gris */
+    .inv-table td:nth-child(2) {
+      font-size: 11px !important;
+      color: #888 !important;
+    }
+    .inv-table td:nth-child(2)::before {
+      content: "👤 ";
+    }
+    /* Invité — nom gros et blanc */
+    .inv-table td:nth-child(3) {
+      font-size: 15px !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      margin-top: 2px !important;
+    }
+    /* Nombre de places */
+    .inv-table td:nth-child(5) {
+      font-size: 12px !important;
+      color: #aaa !important;
+      display: inline-block !important;
+      width: auto !important;
+      margin-right: 10px !important;
+    }
+    .inv-table td:nth-child(5)::before {
+      content: "🎟️ ";
+    }
+    .inv-table td:nth-child(5)::after {
+      content: " places";
+      color: #666;
+    }
+    /* Statut — inline avec places */
+    .inv-table td:nth-child(7) {
+      display: inline-block !important;
+      width: auto !important;
+      margin-top: 2px !important;
+    }
+    /* Options — boutons bien visibles en bas */
+    .inv-table td:nth-child(8) {
+      margin-top: 8px !important;
+      padding-top: 8px !important;
+      border-top: 1px solid #222 !important;
+      display: flex !important;
+      gap: 6px !important;
+      flex-wrap: wrap !important;
+    }
+    .inv-table td:nth-child(8) button {
+      flex: 1 !important;
+      min-width: 80px !important;
+      padding: 8px !important;
+      font-size: 12px !important;
+    }
+    .inv-total {
+      font-size: 12px !important;
+      padding: 12px !important;
+      border-top: 1px solid #333 !important;
+      margin-top: 10px !important;
+      display: flex !important;
+      justify-content: space-around !important;
+      background: #0a0a0a !important;
+      border-radius: 8px !important;
+      font-weight: 600 !important;
     }
     .invit-liste-header {
       flex-direction: column !important;
       align-items: flex-start !important;
       gap: 8px !important;
+    }
+    
+    /* Bouton imprimer PDF : juste l'icône sur mobile */
+    .btn-imprimer-invit-label {
+      display: none !important;
+    }
+    .btn-imprimer-invit {
+      padding: 6px 8px !important;
     }
     
     /* GESTION SALLES - Mobile */
@@ -3009,9 +3114,9 @@ function _hideTeamSelection() {
           <div class="stat-value" style="font-size:32px;color:#c9a84c;">GESTION TOUR</div>
           <div class="stat-sub">Créa & Suivi dates + Accès Financier + VHR</div>
           <div id="dropdown-tour" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
-            <div onclick="event.stopPropagation(); showPage('gestion-omp')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
-            <div onclick="event.stopPropagation(); ouvrirSuiviDatesResume()" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#c9a84c; font-weight:600; border-bottom:1px solid #333; background:rgba(201,168,76,0.08);" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='rgba(201,168,76,0.08)'">📊 Accès Financier</div>
-            <div onclick="event.stopPropagation(); openModal('modal-vhr-tournee')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('gestion-omp'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
+            <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviDatesResume(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#c9a84c; font-weight:600; border-bottom:1px solid #333; background:rgba(201,168,76,0.08);" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='rgba(201,168,76,0.08)'">📊 Accès Financier</div>
+            <div onclick="selectDropdownItem(event, function(){ openModal('modal-vhr-tournee'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
           </div>
         </div>
 
@@ -3021,7 +3126,7 @@ function _hideTeamSelection() {
           <div class="stat-value" style="font-size:32px;color:#c9a84c;">BOOKING TOUR</div>
           <div class="stat-sub">Booking dates & Gestion salles</div>
           <div id="dropdown-booking" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
-            <div onclick="event.stopPropagation(); showPage('gestion-salles')" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Booking / Gestion Salles</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('gestion-salles'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Booking / Gestion Salles</div>
           </div>
         </div>
 
@@ -3031,7 +3136,7 @@ function _hideTeamSelection() {
           <div class="stat-value" style="font-size:32px;color:#c9a84c;">PROMO</div>
           <div class="stat-sub">Marketing & Réseaux</div>
           <div id="dropdown-promo" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
-            <div onclick="event.stopPropagation(); toggleDropdown('dropdown-promo'); showPage('contacts-promo');" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333; cursor:pointer;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📋 Contact Promo</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('contacts-promo'); })" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333; cursor:pointer;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📋 Contact Promo</div>
             <a href="https://business.facebook.com/latest/home?business_id=644890879422593" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📢 Meta Pubs</a>
             <a href="https://www.theworldofqueen.com/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🌐 Site TWOQ Off</a>
             <a href="https://www.ohmyprod.com/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎬 Site OMP Off</a>
@@ -4565,17 +4670,18 @@ function _hideTeamSelection() {
 
 
       <!-- BLOC INVITATIONS OR -->
-      <div style="background:#1a1a1a;border:2px solid #c9a84c;border-radius:12px;padding:0;overflow:hidden;margin-bottom:16px;">
-        <div style="background:linear-gradient(135deg,#2a1f00,#c9a84c);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#000;">🎟️ INVITATIONS</div>
+      <div style="background:#1a1a1a;border:2px solid #c9a84c;border-radius:12px;padding:0;overflow:hidden;margin-bottom:16px;box-shadow:0 0 20px rgba(201,168,76,0.15);">
+        <div style="background:linear-gradient(135deg,#2a1f00,#c9a84c);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#000;display:flex;align-items:center;gap:8px;">🎟️ INVITATIONS</div>
+          <button class="btn-imprimer-invit" onclick="imprimerListeInvit(this)" title="Imprimer PDF" style="background:rgba(0,0,0,0.25);border:1px solid rgba(0,0,0,0.3);color:#000;border-radius:6px;padding:5px 10px;font-size:13px;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:4px;">🖨️ <span class="btn-imprimer-invit-label">PDF</span></button>
         </div>
-        <div style="padding:16px;">
-          <button class="btn btn-primary" style="margin-bottom:16px;" onclick="openModal('modal-add-invit')">+ Ajouter une invitation</button>
+        <div style="padding:14px;">
+          <button class="btn btn-primary" style="margin-bottom:14px;width:100%;padding:11px;font-size:14px;" onclick="openModal('modal-add-invit')">+ Ajouter une invitation</button>
           <div class="invit-liste-bloc">
-            <div class="invit-liste-header">
+            <div class="invit-liste-header" style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
               <div>
-                <div style="font-weight:700; font-size:15px;" id="dyn-invit-titre">LISTE INVITATIONS</div>
-                <div style="font-size:11px; color:var(--grey); margin-top:2px;">🟢 Ouvert aux demandes</div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-weight:700; font-size:16px;letter-spacing:1px;" id="dyn-invit-titre">LISTE INVITATIONS</div>
+                <div style="font-size:11px; color:var(--grey); margin-top:3px;">🟢 Ouvert aux demandes</div>
               </div>
             </div>
             <table class="inv-table">
@@ -4583,10 +4689,6 @@ function _hideTeamSelection() {
               <tbody id="dyn-invit-tbody"></tbody>
             </table>
             <div class="inv-total" id="dyn-invit-total"><span>Total : 0</span><span>Validé : 0</span></div>
-            <!-- Bouton imprimer en bas -->
-            <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid #333;">
-              <button class="btn btn-ghost" style="font-size:11px;padding:6px 12px;" onclick="imprimerListeInvit(this)">🖨️ Imprimer PDF</button>
-            </div>
           </div>
         </div>
       </div>
@@ -4752,8 +4854,6 @@ function _hideTeamSelection() {
       <!-- PHOTO ÉQUIPE -->
       <div style="width:100%;border-radius:14px;overflow:hidden;margin-bottom:28px;position:relative;max-height:340px;border:3px solid #c9a84c;box-shadow:0 0 20px rgba(201,168,76,0.4);">
         <img src="assets/omp-img-banner-1.jpg" style="width:100%;height:340px;object-fit:cover;object-position:center 30%;" alt="Team Technique OH MY PROD">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.6));"></div>
-        <div style="position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;opacity:0.8;">TEAM ARTISTIQUE · THE WORLD OF QUEEN</div>
       </div>
 
       <!-- BOUTONS style GESTION TOUR -->
@@ -4838,8 +4938,8 @@ function _hideTeamSelection() {
           <div class="stat-value" style="font-size:24px;color:#c9a84c;">PRESTA</div>
           <div class="stat-sub">Fichier prestataires</div>
           <div id="dropdown-presta" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
-            <div onclick="event.stopPropagation(); showPage('contacts-presta')" style="padding:12px 14px; cursor:pointer; font-size:13px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 VHR (Hôtels, Restos, Taxis...)</div>
-            <div onclick="event.stopPropagation(); showPage('contacts-presta-tech')" style="padding:12px 14px; cursor:pointer; font-size:13px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🔧 TECHNIQUE (Riggers, Roads...)</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('contacts-presta'); })" style="padding:12px 14px; cursor:pointer; font-size:13px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 VHR</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('contacts-presta-tech'); })" style="padding:12px 14px; cursor:pointer; font-size:13px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🔧 TECHNIQUE</div>
           </div>
         </div>
 
@@ -4889,15 +4989,13 @@ function _hideTeamSelection() {
 
       <!-- HEADER -->
       <div style="margin-bottom:24px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">👑 ESPACE ARTISTIQUE</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">👑 ESPACE ARTISTES</div>
         <div style="font-size:14px;color:#888;margin-top:4px;">Bienvenue à la team artistique OH MY PROD !</div>
       </div>
 
       <!-- PHOTO ÉQUIPE -->
       <div class="artistique-photo-container" style="width:100%;border-radius:14px;overflow:hidden;margin-bottom:28px;position:relative;max-height:340px;border:3px solid #c9a84c;box-shadow:0 0 20px rgba(201,168,76,0.4);">
         <img class="artistique-photo" src="assets/omp-img-banner-3.jpg" style="width:100%;height:340px;object-fit:cover;object-position:center 40%;" alt="Team Artistique OH MY PROD">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.6));"></div>
-        <div style="position:absolute;bottom:16px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;opacity:0.8;">TEAM ARTISTIQUE · THE WORLD OF QUEEN</div>
       </div>
 
       <!-- BOUTONS style GESTION TOUR -->
@@ -5384,12 +5482,13 @@ function _hideTeamSelection() {
       
       <!-- Type CB -->
       <div style="margin-bottom:16px;">
-        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px;">Type de carte bancaire *</label>
+        <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px;">Type de carte bancaire <span style="color:#e31e24;font-weight:700;">*</span></label>
         <div style="display:flex;gap:10px;">
-          <button type="button" id="btn-cb-perso" onclick="selectTypeCB('PERSO')" style="flex:1;background:#1e3a5f;border:2px solid #3b82f6;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;cursor:pointer;transition:all 0.2s;">💳 CB PERSO</button>
-          <button type="button" id="btn-cb-omp" onclick="selectTypeCB('OMP')" style="flex:1;background:#2d2510;border:2px solid #c9a84c;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;cursor:pointer;transition:all 0.2s;">🏢 CB OMP</button>
+          <button type="button" id="btn-cb-perso" onclick="selectTypeCB('PERSO')" style="flex:1;background:#0a0a0a;border:2px solid #333;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#888;cursor:pointer;transition:all 0.2s;opacity:0.7;">💳 CB PERSO</button>
+          <button type="button" id="btn-cb-omp" onclick="selectTypeCB('OMP')" style="flex:1;background:#0a0a0a;border:2px solid #333;border-radius:8px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#888;cursor:pointer;transition:all 0.2s;opacity:0.7;">🏢 CB OMP</button>
         </div>
         <input type="hidden" id="frais-type-cb" value="">
+        <div id="frais-cb-error" style="display:none;font-size:11px;color:#e31e24;margin-top:6px;font-weight:600;">⚠️ Merci de choisir CB PERSO ou CB OMP</div>
       </div>
 
       <!-- Type de frais -->
@@ -5669,16 +5768,42 @@ function _hideTeamSelection() {
   // Sélectionner le type de CB
   function selectTypeCB(type) {
     document.getElementById('frais-type-cb').value = type;
+    var btnPerso = document.getElementById('btn-cb-perso');
+    var btnOmp = document.getElementById('btn-cb-omp');
+    var errDiv = document.getElementById('frais-cb-error');
+    
+    // Masquer le message d'erreur dès qu'un choix est fait
+    if (errDiv) errDiv.style.display = 'none';
+    
+    // Haptic feedback léger
+    if (typeof ompHaptic === 'function') ompHaptic(15);
+    
     if (type === 'PERSO') {
-      document.getElementById('btn-cb-perso').style.borderColor = '#3b82f6';
-      document.getElementById('btn-cb-perso').style.background = '#1e3a5f';
-      document.getElementById('btn-cb-omp').style.borderColor = '#333';
-      document.getElementById('btn-cb-omp').style.background = '#0a0a0a';
+      // Sélectionné : bleu vif, pleine opacité, ombre
+      btnPerso.style.borderColor = '#3b82f6';
+      btnPerso.style.background = '#1e3a5f';
+      btnPerso.style.color = '#fff';
+      btnPerso.style.opacity = '1';
+      btnPerso.style.boxShadow = '0 0 12px rgba(59,130,246,0.4)';
+      // Non sélectionné : terne
+      btnOmp.style.borderColor = '#333';
+      btnOmp.style.background = '#0a0a0a';
+      btnOmp.style.color = '#888';
+      btnOmp.style.opacity = '0.6';
+      btnOmp.style.boxShadow = 'none';
     } else {
-      document.getElementById('btn-cb-omp').style.borderColor = '#c9a84c';
-      document.getElementById('btn-cb-omp').style.background = '#2d2510';
-      document.getElementById('btn-cb-perso').style.borderColor = '#333';
-      document.getElementById('btn-cb-perso').style.background = '#0a0a0a';
+      // Sélectionné : doré vif, pleine opacité, ombre
+      btnOmp.style.borderColor = '#c9a84c';
+      btnOmp.style.background = '#2d2510';
+      btnOmp.style.color = '#fff';
+      btnOmp.style.opacity = '1';
+      btnOmp.style.boxShadow = '0 0 12px rgba(201,168,76,0.4)';
+      // Non sélectionné : terne
+      btnPerso.style.borderColor = '#333';
+      btnPerso.style.background = '#0a0a0a';
+      btnPerso.style.color = '#888';
+      btnPerso.style.opacity = '0.6';
+      btnPerso.style.boxShadow = 'none';
     }
   }
 
@@ -5713,7 +5838,17 @@ function _hideTeamSelection() {
     var prog = document.getElementById('frais-upload-progress');
     
     // Validations
-    if (!typeCB) { alert('Merci de sélectionner le type de carte (PERSO ou OMP).'); return; }
+    if (!typeCB) {
+      var errDiv = document.getElementById('frais-cb-error');
+      if (errDiv) {
+        errDiv.style.display = 'block';
+        errDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (typeof ompHaptic === 'function') ompHaptic(30);
+      if (typeof ompToast === 'function') ompToast('Choisis CB PERSO ou CB OMP', 'error');
+      else alert('Merci de sélectionner le type de carte (PERSO ou OMP).');
+      return;
+    }
     if (!typeDepense) { alert('Merci de sélectionner le type de frais.'); return; }
     if (!dateDepense) { alert('Merci d\'indiquer la date de la dépense.'); return; }
     if (!montant || parseFloat(montant) <= 0) { alert('Merci d\'indiquer un montant valide.'); return; }
@@ -7732,7 +7867,14 @@ function _hideTeamSelection() {
   }
 
   // Toggle dropdown menus dans le dashboard
+  // Flag anti-ghost-click pour éviter qu'un tap sur un item de dropdown
+  // ne déclenche accidentellement un bouton en dessous sur mobile
+  var _ompDropdownLockUntil = 0;
+  
   function toggleDropdown(dropdownId) {
+    // Si on est dans un délai anti-ghost-click, on ignore
+    if (Date.now() < _ompDropdownLockUntil) return;
+    
     var dropdown = document.getElementById(dropdownId);
     var allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
     
@@ -7740,15 +7882,95 @@ function _hideTeamSelection() {
     allDropdowns.forEach(function(dd) {
       if (dd.id !== dropdownId) {
         dd.style.display = 'none';
+        dd.style.top = '';
+        dd.style.bottom = '';
       }
     });
     
     // Toggle celui cliqué
     if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+      // Afficher d'abord pour pouvoir mesurer
       dropdown.style.display = 'block';
+      dropdown.style.visibility = 'hidden';
+      
+      // ✨ Détecter si le dropdown va être caché par la bottom nav
+      // Sur mobile, la bottom nav fait ~70px + safe area
+      var bottomNavSpace = window.innerWidth <= 768 ? 80 : 20;
+      var card = dropdown.parentElement;
+      var cardRect = card.getBoundingClientRect();
+      var dropdownHeight = dropdown.offsetHeight;
+      var viewportHeight = window.innerHeight;
+      
+      // Espace disponible sous la carte
+      var spaceBelow = viewportHeight - cardRect.bottom - bottomNavSpace;
+      // Espace disponible au-dessus de la carte
+      var spaceAbove = cardRect.top - 20;
+      
+      if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
+        // Pas assez de place en bas → ouvrir vers le haut
+        dropdown.style.top = 'auto';
+        dropdown.style.bottom = '100%';
+        dropdown.style.marginTop = '0';
+        dropdown.style.marginBottom = '6px';
+      } else {
+        // Ouvrir vers le bas (défaut)
+        dropdown.style.top = '100%';
+        dropdown.style.bottom = 'auto';
+        dropdown.style.marginTop = '6px';
+        dropdown.style.marginBottom = '0';
+        
+        // Si ça dépasse quand même en bas, scroller pour le montrer
+        if (spaceBelow < dropdownHeight) {
+          setTimeout(function() {
+            var newRect = dropdown.getBoundingClientRect();
+            if (newRect.bottom > viewportHeight - bottomNavSpace) {
+              var scrollAmount = newRect.bottom - (viewportHeight - bottomNavSpace) + 10;
+              window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+            }
+          }, 50);
+        }
+      }
+      
+      dropdown.style.visibility = 'visible';
     } else {
       dropdown.style.display = 'none';
+      dropdown.style.top = '';
+      dropdown.style.bottom = '';
     }
+  }
+
+  // Helper pour les items de dropdown :
+  // - empêche la propagation du clic
+  // - ferme TOUS les dropdowns
+  // - active le lock anti-ghost-click (500ms)
+  // - exécute l'action avec un petit délai pour laisser le DOM se stabiliser
+  function selectDropdownItem(event, action) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    
+    // Fermer tous les dropdowns immédiatement
+    var allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
+    allDropdowns.forEach(function(dd) {
+      dd.style.display = 'none';
+    });
+    
+    // Activer le lock pour éviter qu'un ghost click mobile ne déclenche
+    // un bouton en dessous du dropdown qui vient de se fermer
+    _ompDropdownLockUntil = Date.now() + 500;
+    
+    // Haptic feedback léger
+    if (typeof ompHaptic === 'function') ompHaptic(10);
+    
+    // Exécuter l'action après un petit délai
+    setTimeout(function() {
+      try {
+        if (typeof action === 'function') action();
+      } catch(e) { console.error('Erreur dropdown item:', e); }
+    }, 60);
+    
+    return false;
   }
 
   // Fermer dropdowns si on clique ailleurs
@@ -7760,6 +7982,9 @@ function _hideTeamSelection() {
       });
     }
   });
+
+  // Exposer globalement
+  window.selectDropdownItem = selectDropdownItem;
 
   async function addDate() {
     const ville = document.getElementById('new-ville').value.trim();
