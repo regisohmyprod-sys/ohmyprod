@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.02">
+<meta name="version" content="2026.04.17.03">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -2378,7 +2378,7 @@ html, body { overscroll-behavior-y: none; }
       line-height:1;
       margin-bottom:8px;
       text-shadow:0 0 40px rgba(201,168,76,0.4);
-    ">OH MY APPLI</div>
+    ">OH MY APPLI !</div>
 
     <div style="margin-bottom:16px;"></div>
 
@@ -2737,7 +2737,7 @@ function _hideTeamSelection() {
 <div id="login-screen" style="display:none;">
   <div class="login-box">
     <img src="assets/LOGO OMP OHS.png" alt="OH MY PROD" class="login-logo" />
-    <div class="login-title">OH MY APPLI</div>
+    <div class="login-title">OH MY APPLI !</div>
     <div class="login-sub">Entrez votre email et le code fourni par OMP</div>
 
     <div class="login-field">
@@ -2863,7 +2863,7 @@ function _hideTeamSelection() {
         <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;color:#fff;line-height:1;margin-bottom:8px;">TABLEAU DE BORD</div>
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="width:40px;height:2px;background:#c9a84c;"></div>
-          <div style="font-size:11px;letter-spacing:3px;color:#c9a84c;font-family:'Inter',sans-serif;text-transform:uppercase;">Oh My Prod — Oh My Appli</div>
+          <div style="font-size:11px;letter-spacing:3px;color:#c9a84c;font-family:'Inter',sans-serif;text-transform:uppercase;">Oh My Prod — Oh My Appli !</div>
         </div>
       </div>
 
@@ -7260,7 +7260,7 @@ function _hideTeamSelection() {
     const msgInvit = `Bonjour ${prenom || ''},\n\nVous êtes invité(e) à rejoindre l'espace de gestion de tournées OH MY PROD.\n\n👉 Accédez à l'application ici :\nhttps://regisohmyprod-sys.github.io/ohmyprod\n\nVotre fonction : ${fonction || '–'}\nVotre team : ${team || '–'}\nTournée(s) : ${tournees}\n\nÀ bientôt !\nL'équipe OH MY PROD`;
 
     // Ouvrir Gmail directement
-    const subject = encodeURIComponent('Invitation – Oh My Appli OH MY PROD');
+    const subject = encodeURIComponent('Invitation – Oh My Appli ! OH MY PROD');
     const body = encodeURIComponent(msgInvit);
     window.open('https://mail.google.com/mail/?view=cm&to=' + email + '&su=' + subject + '&body=' + body, '_blank');
 
