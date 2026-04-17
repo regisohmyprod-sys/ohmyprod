@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.27">
+<meta name="version" content="2026.04.17.28">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -2944,7 +2944,12 @@ function _hideTeamSelection() {
     </div>
     <div class="login-field">
       <label>Code d'accès</label>
-      <input type="password" id="login-password" placeholder="Code fourni par OMP" />
+      <div style="position:relative;">
+        <input type="password" id="login-password" placeholder="Code fourni par OMP" style="padding-right:44px;" />
+        <button type="button" onclick="togglePasswordVisibility()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#888;cursor:pointer;padding:4px 8px;font-size:18px;line-height:1;" aria-label="Afficher/masquer le code">
+          <span id="toggle-pwd-icon">👁️</span>
+        </button>
+      </div>
     </div>
     <div style="display:flex; align-items:center; gap:8px; margin:8px 0 4px; text-align:left;">
       <input type="checkbox" id="login-remember" checked style="accent-color:#e31e24; width:15px; height:15px;" />
@@ -19973,6 +19978,20 @@ function _hideTeamSelection() {
 </aside>
 
 <script>
+  // Toggle visibilité du code d'accès au login
+  function togglePasswordVisibility() {
+    var input = document.getElementById('login-password');
+    var icon = document.getElementById('toggle-pwd-icon');
+    if (!input) return;
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (icon) icon.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      if (icon) icon.textContent = '👁️';
+    }
+  }
+
   // Mettre à jour le numéro de version depuis le meta tag
   (function() {
     try {
