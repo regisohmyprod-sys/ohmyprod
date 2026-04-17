@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.21">
+<meta name="version" content="2026.04.17.22">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4892,10 +4892,16 @@ function _hideTeamSelection() {
 
       </div>
 
-      <!-- 2 CARTES TOURNÉES (style dashboard) -->
-      <div class="db-tournees-cols" style="grid-template-columns:repeat(2,1fr);margin-top:24px;">
+      <!-- INVITATION À CHOISIR UNE TOURNÉE -->
+      <div style="margin-top:28px;margin-bottom:14px;text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;">🎸 MERCI DE CHOISIR VOTRE TOURNÉE</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">Cliquez sur une tournée pour voir les dates</div>
+      </div>
+
+      <!-- 2 CARTES TOURNÉES CLIQUABLES -->
+      <div class="db-tournees-cols" style="grid-template-columns:repeat(2,1fr);">
         <!-- TWOQ L'HOMMAGE -->
-        <div class="db-col-card">
+        <div class="db-col-card" onclick="showTournee('twoq')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">🎸 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'hommage à la légende</span></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq-effectuees-tech">–</div></div>
@@ -4905,9 +4911,10 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq-fin-tech" style="font-size:14px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq-specs-total-tech" style="color:var(--green)">–</div></div>
           </div>
+          <div style="padding:10px;text-align:center;background:rgba(201,168,76,0.08);border-top:1px solid #2a2a2a;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1.5px;color:#c9a84c;">👉 VOIR LES DATES</div>
         </div>
         <!-- TWOQ ETERNELLE LEGENDE -->
-        <div class="db-col-card">
+        <div class="db-col-card" onclick="showTournee('twoq2')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">👑 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'Éternelle Légende</span></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq2-effectuees-tech">–</div></div>
@@ -4917,6 +4924,7 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq2-fin-tech" style="font-size:14px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq2-specs-total-tech" style="color:var(--green)">–</div></div>
           </div>
+          <div style="padding:10px;text-align:center;background:rgba(201,168,76,0.08);border-top:1px solid #2a2a2a;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1.5px;color:#c9a84c;">👉 VOIR LES DATES</div>
         </div>
       </div>
     </div>
@@ -5003,10 +5011,16 @@ function _hideTeamSelection() {
 
       </div>
 
-      <!-- 2 CARTES TOURNÉES (style dashboard) -->
-      <div class="db-tournees-cols" style="grid-template-columns:repeat(2,1fr);margin-top:24px;">
+      <!-- INVITATION À CHOISIR UNE TOURNÉE -->
+      <div style="margin-top:28px;margin-bottom:14px;text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;">🎸 MERCI DE CHOISIR VOTRE TOURNÉE</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">Cliquez sur une tournée pour voir les dates</div>
+      </div>
+
+      <!-- 2 CARTES TOURNÉES CLIQUABLES -->
+      <div class="db-tournees-cols" style="grid-template-columns:repeat(2,1fr);">
         <!-- TWOQ L'HOMMAGE -->
-        <div class="db-col-card">
+        <div class="db-col-card" onclick="showTournee('twoq')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">🎸 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'hommage à la légende</span></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq-effectuees-staff">–</div></div>
@@ -5016,9 +5030,10 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq-fin-staff" style="font-size:14px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq-specs-total-staff" style="color:var(--green)">–</div></div>
           </div>
+          <div style="padding:10px;text-align:center;background:rgba(201,168,76,0.08);border-top:1px solid #2a2a2a;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1.5px;color:#c9a84c;">👉 VOIR LES DATES</div>
         </div>
         <!-- TWOQ ETERNELLE LEGENDE -->
-        <div class="db-col-card">
+        <div class="db-col-card" onclick="showTournee('twoq2')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">👑 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'Éternelle Légende</span></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq2-effectuees-staff">–</div></div>
@@ -5028,6 +5043,7 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq2-fin-staff" style="font-size:14px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq2-specs-total-staff" style="color:var(--green)">–</div></div>
           </div>
+          <div style="padding:10px;text-align:center;background:rgba(201,168,76,0.08);border-top:1px solid #2a2a2a;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1.5px;color:#c9a84c;">👉 VOIR LES DATES</div>
         </div>
       </div>
 
@@ -5087,10 +5103,16 @@ function _hideTeamSelection() {
 
       </div>
 
-      <!-- 2 CARTES TOURNÉES (style dashboard) -->
-      <div class="db-tournees-cols" style="grid-template-columns:repeat(2,1fr);margin-top:24px;">
+      <!-- INVITATION À CHOISIR UNE TOURNÉE -->
+      <div style="margin-top:28px;margin-bottom:14px;text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#c9a84c;">🎸 MERCI DE CHOISIR VOTRE TOURNÉE</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">Cliquez sur une tournée pour voir les dates</div>
+      </div>
+
+      <!-- 2 CARTES TOURNÉES CLIQUABLES -->
+      <div class="db-tournees-cols" style="grid-template-columns:repeat(2,1fr);">
         <!-- TWOQ L'HOMMAGE -->
-        <div class="db-col-card">
+        <div class="db-col-card" onclick="showTournee('twoq')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">🎸 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'hommage à la légende</span></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq-effectuees-art">–</div></div>
@@ -5100,9 +5122,10 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq-fin-art" style="font-size:14px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq-specs-total-art" style="color:var(--green)">–</div></div>
           </div>
+          <div style="padding:10px;text-align:center;background:rgba(201,168,76,0.08);border-top:1px solid #2a2a2a;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1.5px;color:#c9a84c;">👉 VOIR LES DATES</div>
         </div>
         <!-- TWOQ ETERNELLE LEGENDE -->
-        <div class="db-col-card">
+        <div class="db-col-card" onclick="showTournee('twoq2')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);">👑 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'Éternelle Légende</span></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq2-effectuees-art">–</div></div>
@@ -5112,6 +5135,7 @@ function _hideTeamSelection() {
             <div class="db-col-stat"><div class="db-tournee-label">Fin tournée</div><div class="db-tournee-value" id="db-twoq2-fin-art" style="font-size:14px;">–</div></div>
             <div class="db-col-stat"><div class="db-tournee-label">Spectateurs à ce jour</div><div class="db-tournee-value" id="db-twoq2-specs-total-art" style="color:var(--green)">–</div></div>
           </div>
+          <div style="padding:10px;text-align:center;background:rgba(201,168,76,0.08);border-top:1px solid #2a2a2a;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1.5px;color:#c9a84c;">👉 VOIR LES DATES</div>
         </div>
       </div>
 
