@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.31">
+<meta name="version" content="2026.04.17.32">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1709,6 +1709,29 @@
     #page-staff-omp .stats-grid {
       display: none !important;
     }
+    
+    /* ✨ MOBILE : Mini dashboard tournée en 2 colonnes + header en colonne */
+    #page-tournee-dynamic .tournee-dashboard {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 8px !important;
+    }
+    #page-tournee-dynamic .tournee-stat-card {
+      padding: 10px !important;
+    }
+    #page-tournee-dynamic .tournee-stat-label {
+      font-size: 10px !important;
+    }
+    #page-tournee-dynamic .tournee-stat-value {
+      font-size: 20px !important;
+    }
+    #page-tournee-dynamic .dates-header {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+    }
+    #page-tournee-dynamic .dates-header > div {
+      flex-wrap: wrap !important;
+    }
     .modal-row {
       flex-direction: column !important;
       gap: 10px !important;
@@ -2169,8 +2192,15 @@
 .bn-item .bn-badge.show { display: flex; }
 
 @media (max-width: 768px) {
-  .bottom-nav { display: block; }
-  .main { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0)) !important; }
+  .bottom-nav { 
+    display: block !important; 
+    z-index: 9999 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+  .main { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0)) !important; }
   .bottom-nav[data-role="admin"] .bn-staff { display: none; }
   .bottom-nav[data-role="staff"] .bn-admin { display: none; }
 }
