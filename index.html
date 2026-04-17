@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.26">
+<meta name="version" content="2026.04.17.27">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -19968,9 +19968,21 @@ function _hideTeamSelection() {
     </button>
   </div>
   <div class="drawer-footer">
-    APPLI OMP — v<span id="drawer-version">2026.04.17</span>
+    APPLI OMP — v<span id="drawer-version">—</span>
   </div>
 </aside>
+
+<script>
+  // Mettre à jour le numéro de version depuis le meta tag
+  (function() {
+    try {
+      var metaVersion = document.querySelector('meta[name="version"]');
+      var versionText = metaVersion ? metaVersion.getAttribute('content') : '—';
+      var span = document.getElementById('drawer-version');
+      if (span) span.textContent = versionText;
+    } catch(e) { console.error('version update:', e); }
+  })();
+</script>
 
 <!-- TOAST CONTAINER -->
 <div class="omp-toast-container" id="omp-toast-container"></div>
