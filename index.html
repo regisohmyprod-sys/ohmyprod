@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.20">
+<meta name="version" content="2026.04.17.21">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -15555,9 +15555,14 @@ function _hideTeamSelection() {
       const avenir = dates.filter(d => parseDate(d.date_concert) >= today);
       const prochaine = [...avenir].sort((a,b) => new Date(a.date_concert) - new Date(b.date_concert))[0];
 
-      // Helper : remplir l'élément principal + tous les clones (Artistique / Staff OMP)
+      // Helper : remplir l'élément principal + tous les clones (Artistique / Tech / Staff OMP)
       const fillAll = function(suffix, value) {
-        var ids = [`db-${prefix}-${suffix}`, `db-${prefix}-${suffix}-art`, `db-${prefix}-${suffix}-staff`];
+        var ids = [
+          `db-${prefix}-${suffix}`,
+          `db-${prefix}-${suffix}-art`,
+          `db-${prefix}-${suffix}-tech`,
+          `db-${prefix}-${suffix}-staff`
+        ];
         ids.forEach(function(id) {
           var el = document.getElementById(id);
           if (el) el.textContent = value;
