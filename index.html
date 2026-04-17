@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.32">
+<meta name="version" content="2026.04.17.37">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -98,6 +98,11 @@
 </script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  /* ✨ DROITS ADMIN : Masquer les boutons Modifier/Supprimer/Ajouter pour les non-admin */
+  body.role-not-admin .vhr-admin-action {
+    display: none !important;
+  }
 
   /* LOGIN */
   #login-screen {
@@ -1731,6 +1736,43 @@
     }
     #page-tournee-dynamic .dates-header > div {
       flex-wrap: wrap !important;
+    }
+    
+    /* ✨ MOBILE : Empêcher les date-row de déborder à droite */
+    body {
+      overflow-x: hidden !important;
+    }.date-row {
+      gap: 8px !important;
+      padding: 10px 12px !important;
+      overflow: hidden !important;
+    }
+    .date-row .date-info {
+      min-width: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: hidden !important;
+    }
+    .date-row .date-city {
+      font-size: 14px !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+    .date-row .date-venue {
+      font-size: 11px !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+    .checklist-bar {
+      min-width: 70px !important;
+      max-width: 90px !important;
+      flex-shrink: 0 !important;
+    }
+    .checklist-bar .bar-text {
+      font-size: 9px !important;
+    }
+    .date-row .badge {
+      display: none !important; /* badge caché sur mobile pour gagner place */
     }
     .modal-row {
       flex-direction: column !important;
@@ -4604,22 +4646,22 @@ function _hideTeamSelection() {
       <div id="dyn-photo-salle-container" style="display:none;position:relative;width:100%;height:220px;border-radius:12px;overflow:hidden;margin-bottom:12px;">
         <img id="dyn-photo-salle" src="" style="width:100%;height:100%;object-fit:cover;object-position:center;" alt="Photo salle">
         <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.7));"></div>
-        <div style="position:absolute;bottom:12px;right:12px;">
+        <div class="vhr-admin-action" style="position:absolute;bottom:12px;right:12px;">
           <label style="background:rgba(0,0,0,0.6);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">
             📷 CHANGER
             <input type="file" id="dyn-photo-salle-input" accept="image/*" style="display:none;" onchange="uploaderPhotoSalle(this)">
           </label>
         </div>
       </div>
-      <div id="dyn-photo-salle-upload" style="margin-bottom:12px;">
+      <div id="dyn-photo-salle-upload" class="vhr-admin-action" style="margin-bottom:12px;">
         <label style="display:inline-flex;align-items:center;gap:8px;background:#1a1a1a;color:#7eb8d4;border:1px dashed #3b82f6;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">
           📷 AJOUTER UNE PHOTO DE SALLE
           <input type="file" id="dyn-photo-salle-input2" accept="image/*" style="display:none;" onchange="uploaderPhotoSalle(this)">
         </label>
       </div>
 
-      <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px;">
-        <button class="btn" style="background:var(--card); color:var(--white); font-size:12px; border:1px solid var(--border);" onclick="ouvrirModifierDate()">✏️ Modifier la fiche</button>
+      <div id="dyn-date-admin-actions" style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px;">
+        <button class="btn" id="dyn-modifier-btn" style="background:var(--card); color:var(--white); font-size:12px; border:1px solid var(--border);" onclick="ouvrirModifierDate()">✏️ Modifier la fiche</button>
         <button class="btn" id="dyn-delete-btn" style="background:#7f1d1d; color:#fff; font-size:12px; border:1px solid #ef4444;" onclick="supprimerDate()">🗑️ Supprimer cette date</button>
       </div>
 
@@ -4699,7 +4741,7 @@ function _hideTeamSelection() {
             <div id="vhr-voyages-liste" style="display:flex;flex-direction:column;gap:8px;">
               <div style="color:#555;font-size:12px;font-style:italic;text-align:center;padding:8px;">Aucun voyage renseigné</div>
             </div>
-            <button onclick="ouvrirAjoutVHREntry('voyage',_dateActiveId,_tourneeActiveId)" style="margin-top:10px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:6px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UN VOYAGE</button>
+            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('voyage',_dateActiveId,_tourneeActiveId)" style="margin-top:10px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:6px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UN VOYAGE</button>
           </div>
 
           <!-- SECTION 2 : HÉBERGEMENT -->
@@ -4708,7 +4750,7 @@ function _hideTeamSelection() {
             <div id="vhr-hotels-liste" style="display:flex;flex-direction:column;gap:8px;">
               <div style="color:#555;font-size:12px;font-style:italic;text-align:center;padding:8px;">Aucun hébergement renseigné</div>
             </div>
-            <button onclick="ouvrirAjoutVHREntry('hebergement',_dateActiveId,_tourneeActiveId)" style="margin-top:10px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:6px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UN HÉBERGEMENT</button>
+            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('hebergement',_dateActiveId,_tourneeActiveId)" style="margin-top:10px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:6px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UN HÉBERGEMENT</button>
           </div>
 
           <!-- SECTION 3 : CONTACTS -->
@@ -4717,7 +4759,7 @@ function _hideTeamSelection() {
             <div id="vhr-contacts-liste" style="display:flex;flex-direction:column;gap:8px;">
               <div style="color:#555;font-size:12px;font-style:italic;text-align:center;padding:8px;">Aucun contact renseigné</div>
             </div>
-            <button onclick="ouvrirAjoutVHREntry('contact',_dateActiveId,_tourneeActiveId)" style="margin-top:10px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:6px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UN CONTACT</button>
+            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('contact',_dateActiveId,_tourneeActiveId)" style="margin-top:10px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:6px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UN CONTACT</button>
           </div>
 
           <!-- SECTION 4 : DOCUMENTS -->
@@ -4726,7 +4768,7 @@ function _hideTeamSelection() {
             <div id="vhr-docs-liste" style="display:flex;flex-direction:column;gap:8px;">
               <div style="color:#555;font-size:12px;font-style:italic;text-align:center;padding:8px;">Aucun document déposé</div>
             </div>
-            <button onclick="ouvrirAjoutVHREntry('document',_dateActiveId,_tourneeActiveId)" style="margin-top:10px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:6px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UN DOCUMENT</button>
+            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('document',_dateActiveId,_tourneeActiveId)" style="margin-top:10px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:6px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER UN DOCUMENT</button>
           </div>
 
         </div>
@@ -9012,13 +9054,13 @@ function _hideTeamSelection() {
                     ${v.voy_lieu?`<div style="font-size:11px;color:#aaa;">📍 ${v.voy_lieu}</div>`:''}
                     ${v.voy_notes&&!v.voy_notes.startsWith('dosier')?`<div style="font-size:11px;color:#777;font-style:italic;">💬 ${v.voy_notes}</div>`:''}
                   </div>
-                  <div style="display:flex;gap:4px;flex-shrink:0;">
+                  <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
                     <button onclick="modifierVHREntry('voyage','${v.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${v.id}','vhr-voy-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
                 </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun voyage</div>'}
             </div>
-            <button onclick="ouvrirAjoutVHREntry('voyage','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
+            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('voyage','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
           </div>
 
           <!-- HÉBERGEMENT -->
@@ -9037,13 +9079,13 @@ function _hideTeamSelection() {
                     ${h.hotel_dist_gare?`<div style="font-size:11px;color:#888;">🚉 ${h.hotel_dist_gare}</div>`:''}
                     ${h.hotel_commentaire?`<div style="font-size:11px;color:#777;font-style:italic;">💬 ${h.hotel_commentaire}</div>`:''}
                   </div>
-                  <div style="display:flex;gap:4px;flex-shrink:0;">
+                  <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
                     <button onclick="modifierVHREntry('hebergement','${h.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${h.id}','vhr-hot-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
                 </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun hébergement</div>'}
             </div>
-            <button onclick="ouvrirAjoutVHREntry('hebergement','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
+            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('hebergement','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
           </div>
 
           <!-- CONTACTS -->
@@ -9057,13 +9099,13 @@ function _hideTeamSelection() {
                     ${c.contact_tel?`<div style="font-size:11px;color:#aaa;">📱 ${c.contact_tel}</div>`:''}
                     ${c.contact_email?`<div style="font-size:11px;color:#aaa;">✉️ ${c.contact_email}</div>`:''}
                   </div>
-                  <div style="display:flex;gap:4px;flex-shrink:0;">
+                  <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
                     <button onclick="modifierVHREntry('contact','${c.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${c.id}','vhr-con-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
                 </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun contact</div>'}
             </div>
-            <button onclick="ouvrirAjoutVHREntry('contact','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
+            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('contact','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
           </div>
 
           <!-- DOCUMENTS -->
@@ -9077,13 +9119,13 @@ function _hideTeamSelection() {
                     ${doc.doc_deposant?`<div style="font-size:11px;color:#888;">👤 ${doc.doc_deposant} · ${doc.doc_date||''}</div>`:''}
                     ${doc.doc_lien?`<a href="${doc.doc_lien}" target="_blank" style="font-size:11px;color:#3b82f6;">🔗 Ouvrir</a>`:''}
                   </div>
-                  <div style="display:flex;gap:4px;flex-shrink:0;">
+                  <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
                     <button onclick="modifierVHREntry('document','${doc.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${doc.id}','vhr-doc-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
                 </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun document</div>'}
             </div>
-            <button onclick="ouvrirAjoutVHREntry('document','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
+            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('document','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
           </div>
 
         </div>
@@ -9375,7 +9417,7 @@ function _hideTeamSelection() {
               ${v.voy_lieu ? `<div style="font-size:11px;color:#aaa;">📍 ${v.voy_lieu}</div>` : ''}
               ${v.voy_notes ? `<div style="font-size:11px;color:#777;font-style:italic;">💬 ${v.voy_notes}</div>` : ''}
             </div>
-            <div style="display:flex;gap:4px;flex-shrink:0;">
+            <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
               <button onclick="modifierVHREntry('voyage','${v.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️ MODIFIER</button>
               <button onclick="supprimerVHRBloc('${v.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;padding:2px 4px;font-weight:700;">✕</button>
             </div>
@@ -9401,7 +9443,7 @@ function _hideTeamSelection() {
               ${h.hotel_dist_gare ? `<div style="font-size:11px;color:#888;">🚉 Gare: ${h.hotel_dist_gare}</div>` : ''}
               ${h.hotel_commentaire ? `<div style="font-size:11px;color:#777;font-style:italic;">💬 ${h.hotel_commentaire}</div>` : ''}
             </div>
-            <div style="display:flex;gap:4px;flex-shrink:0;">
+            <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
               <button onclick="modifierVHREntry('hebergement','${h.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️ MODIFIER</button>
               <button onclick="supprimerVHRBloc('${h.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;padding:2px 4px;font-weight:700;">✕</button>
             </div>
@@ -9423,7 +9465,7 @@ function _hideTeamSelection() {
               ${c.contact_email ? `<div style="font-size:11px;color:#aaa;">✉️ ${c.contact_email}</div>` : ''}
               ${c.contact_notes ? `<div style="font-size:11px;color:#777;font-style:italic;">💬 ${c.contact_notes}</div>` : ''}
             </div>
-            <div style="display:flex;gap:4px;flex-shrink:0;">
+            <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
               <button onclick="modifierVHREntry('contact','${c.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️ MODIFIER</button>
               <button onclick="supprimerVHRBloc('${c.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;padding:2px 4px;font-weight:700;">✕</button>
             </div>
@@ -9444,7 +9486,7 @@ function _hideTeamSelection() {
               ${d.doc_deposant ? `<div style="font-size:11px;color:#888;">👤 ${d.doc_deposant}${d.doc_date?' · '+d.doc_date:''}</div>` : ''}
               ${d.doc_lien ? `<a href="${d.doc_lien}" target="_blank" style="font-size:11px;color:#3b82f6;">🔗 Ouvrir le lien</a>` : ''}
             </div>
-            <div style="display:flex;gap:4px;flex-shrink:0;">
+            <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
               <button onclick="modifierVHREntry('document','${d.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️ MODIFIER</button>
               <button onclick="supprimerVHRBloc('${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;padding:2px 4px;font-weight:700;">✕</button>
             </div>
@@ -14586,10 +14628,16 @@ function _hideTeamSelection() {
         ? '<span class="badge badge-green">Validé</span>'
         : '<span class="badge badge-orange">En attente</span>';
       const dateStr = inv.date_demande ? new Date(inv.date_demande).toLocaleDateString('fr-FR') : '-';
+      // Seul admin (toi et Alexandrine) peut valider/supprimer les invitations
+      const isAdmin = (_currentUserRole === 'admin');
       const btnValider = !inv.valide
-        ? '<button data-invid="' + inv.id + '" data-dateid="' + dateId + '" onclick="validerInvitation(this.dataset.invid, this.dataset.dateid)" style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;">Valider</button>'
+        ? (isAdmin
+            ? '<button data-invid="' + inv.id + '" data-dateid="' + dateId + '" onclick="validerInvitation(this.dataset.invid, this.dataset.dateid)" style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;">Valider</button>'
+            : '<span style="color:#f59e0b;font-size:11px;">⏳</span>')
         : '<span style="color:#22c55e;font-size:11px;">&#10003;</span>';
-      const btnSupprimer = '<button data-invid="' + inv.id + '" data-dateid="' + dateId + '" onclick="supprimerInvitation(this.dataset.invid, this.dataset.dateid)" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px;">&#x1F5D1;</button>';
+      const btnSupprimer = isAdmin
+        ? '<button data-invid="' + inv.id + '" data-dateid="' + dateId + '" onclick="supprimerInvitation(this.dataset.invid, this.dataset.dateid)" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px;">&#x1F5D1;</button>'
+        : '';
       const row = '<tr style="border-bottom:1px solid var(--border); font-size:13px;">'
         + '<td style="padding:10px 12px; color:var(--grey);">' + dateStr + '</td>'
         + '<td style="padding:10px 12px; color:var(--grey);">' + (inv.demandeur || '-') + '</td>'
@@ -14927,13 +14975,30 @@ function _hideTeamSelection() {
     }
     window._selectedTeam = team;
 
-    // Masquer le bouton "+ Ajouter une date" pour tous sauf admin et staff_omp
+    // ✨ Toggle classe CSS sur body pour masquer les boutons admin
+    if (role === 'admin') {
+      document.body.classList.remove('role-not-admin');
+    } else {
+      document.body.classList.add('role-not-admin');
+    }
+
+    // Masquer le bouton "+ Ajouter une date" pour tous sauf admin (toi et Alexandrine)
     var btnAddDate = document.getElementById('btn-ajouter-date');
     if (btnAddDate) {
-      if (role === 'admin' || role === 'staff_omp') {
+      if (role === 'admin') {
         btnAddDate.style.display = '';
       } else {
         btnAddDate.style.display = 'none';
+      }
+    }
+
+    // Masquer les boutons "Modifier / Supprimer cette date" pour tous sauf admin
+    var dateAdminActions = document.getElementById('dyn-date-admin-actions');
+    if (dateAdminActions) {
+      if (role === 'admin') {
+        dateAdminActions.style.display = '';
+      } else {
+        dateAdminActions.style.display = 'none';
       }
     }
 
