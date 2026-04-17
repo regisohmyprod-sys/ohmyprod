@@ -3215,11 +3215,12 @@ function _hideTeamSelection() {
             <tbody>
               <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;font-weight:600;">Date jour</td><td id="pilote-date-jour" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:600;">Prix moyen</td><td id="pilote-prix-moyen" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;font-weight:600;">Etat date à ce jour</td><td id="pilote-etat-ventes2" style="padding:7px 16px;color:#e31e24;font-weight:700;text-align:right;background:rgba(239,68,68,0.1);"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:600;">Etat date projection</td><td id="pilote-projection" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;font-weight:600;">Point équilibre projeté</td><td id="pilote-equilibre" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
-              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:600;">Etat financier à ce jour</td><td id="pilote-fin-actuel" style="padding:7px 16px;font-weight:700;text-align:right;"></td></tr>
-              <tr><td style="padding:7px 16px;color:#888;font-weight:600;">Projection Etat financier</td><td id="pilote-fin-projection" style="padding:7px 16px;font-weight:700;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;font-weight:600;">Ventes à ce jour</td><td id="pilote-etat-ventes2" style="padding:7px 16px;color:#e31e24;font-weight:700;text-align:right;background:rgba(239,68,68,0.1);"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:600;">Projection ventes</td><td id="pilote-fin-proj-ventes" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;font-weight:600;">Diff jour vs projection</td><td id="pilote-fin-diff" style="padding:7px 16px;color:#c9a84c;font-weight:700;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:600;">Projection CA</td><td id="pilote-fin-ca" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
+              <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;font-weight:600;">Projection financière</td><td id="pilote-fin-projection" style="padding:7px 16px;font-weight:700;text-align:right;"></td></tr>
+              <tr style="background:rgba(201,168,76,0.08);"><td style="padding:7px 16px;color:#c9a84c;font-weight:700;">🎯 POINT ÉQUILIBRE PROJETÉ</td><td style="padding:7px 16px;text-align:right;"><div id="pilote-fin-equilibre" style="font-weight:700;"></div><div id="pilote-fin-equilibre-info" style="font-size:11px;color:#888;font-weight:400;margin-top:2px;"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -15010,6 +15011,9 @@ function _hideTeamSelection() {
         projectionPayants: projectionPayants,
         projectionTotal: projectionTotal
       });
+
+      // 💰 Déclencher la projection financière une fois les ventes calculées
+      setTimeout(function(){ projAfficherBlocFinancier(); }, 100);
     } catch (err) {
       console.error('❌ Erreur affichage projection :', err);
     }
@@ -15153,6 +15157,178 @@ function _hideTeamSelection() {
     } catch (err) {
       console.error('Erreur import :', err);
       alert('❌ Erreur à l\'import : ' + (err.message || err));
+    }
+  }
+
+  // ============================================================
+  // 💰 PROJECTIONS FINANCIÈRES
+  // Alimente le bloc PROJECTIONS FINANCIÈRES de Pilote Date
+  // Formules définies avec Régis le 17/04/2026
+  // ============================================================
+
+  // Constante : charges variables moyennes qui suivent les ventes
+  // (GUSO + SACEM + taxes billetterie + frais opérateurs...)
+  var PROJ_FIN_TAUX_CHARGES_VARIABLES = 0.31;
+
+  /**
+   * Parse un montant formaté en français (ex: "41,58 €" ou "-1 224,27 €") en nombre.
+   */
+  function _projParseMontant(txt) {
+    if (!txt || typeof txt !== 'string') return 0;
+    var negatif = txt.indexOf('-') >= 0 || txt.indexOf('−') >= 0;
+    var clean = txt.replace(/[^\d,.]/g, '').replace(/\s/g, '').replace(',', '.');
+    var n = parseFloat(clean);
+    if (isNaN(n)) return 0;
+    return negatif ? -Math.abs(n) : n;
+  }
+
+  /**
+   * Parse un nombre formaté en français (ex: "1 947" ou "2 081") en nombre entier.
+   */
+  function _projParseNombre(txt) {
+    if (!txt || typeof txt !== 'string') return 0;
+    var negatif = txt.indexOf('-') >= 0 || txt.indexOf('−') >= 0;
+    var clean = txt.replace(/[^\d]/g, '');
+    var n = parseInt(clean, 10);
+    if (isNaN(n)) return 0;
+    return negatif ? -n : n;
+  }
+
+  /**
+   * Formate un nombre en montant €.
+   */
+  function _projFormatMontant(n) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+
+  /**
+   * Remplit le bloc PROJECTIONS FINANCIÈRES.
+   * À appeler APRÈS projAfficherBlocVentes (qui a rempli Projection total)
+   * ET APRÈS piloteChargerBill (qui a rempli RÉSULTAT OMP et Prix moyen).
+   */
+  function projAfficherBlocFinancier() {
+    try {
+      // === LECTURE DES DONNÉES SOURCES ===
+
+      // 1. Ventes à ce jour (= total actuel)
+      var ventesAujourdhui = _projParseNombre(document.getElementById('pilote-etat-ventes2')?.textContent || '');
+
+      // 2. Projection ventes (total projeté avec bonus) depuis bloc PROJECTIONS VENTES
+      var projectionVentes = _projParseNombre(document.getElementById('pilote-proj-total')?.textContent || '');
+
+      // 3. Prix moyen (déjà calculé par piloteChargerBill)
+      var prixMoyen = _projParseMontant(document.getElementById('pilote-prix-moyen')?.textContent || '');
+
+      // 4. Recette TTC actuelle (pour calcul Projection CA)
+      var recetteTTCActuelle = _projParseMontant(document.getElementById('pilote-rec-ttc')?.textContent || '');
+
+      // 5. Résultat OMP actuel (pour calcul Projection financière)
+      var resultatOMPActuel = _projParseMontant(document.getElementById('pilote-resultat-omp')?.textContent || '');
+
+      // === CALCULS SELON LA LOGIQUE RÉGIS ===
+
+      // A. Diff jour vs projection = Projection - Ventes à ce jour
+      var diffBillets = projectionVentes - ventesAujourdhui;
+
+      // B. Projection CA = Recette TTC actuelle + (Diff × Prix moyen)
+      // Exemple Niort : 38 670,65 + (113 × 41,58) = 43 369,19 €
+      var projectionCA = recetteTTCActuelle + (diffBillets * prixMoyen);
+
+      // C. Projection financière
+      //    Étape 1 : Diff × Prix moyen = bonus recette (ex : 113 × 41,58 = 4 698,54)
+      //    Étape 2 : + Résultat OMP actuel (ex : 4 698,54 + (-1 224,27) = 3 474,27)
+      //    Étape 3 : × (1 - 31%) pour déduire les charges variables (ex : 3 474,27 × 0,69 = 2 397,25)
+      var bonusRecette = diffBillets * prixMoyen;
+      var sousTotal = bonusRecette + resultatOMPActuel;
+      var projectionFinanciere = sousTotal * (1 - PROJ_FIN_TAUX_CHARGES_VARIABLES);
+
+      // D. POINT ÉQUILIBRE PROJETÉ
+      //    Combien de billets au total pour atteindre le résultat = 0 ?
+      //    Chaque billet supplémentaire rapporte : Prix moyen × (1 - 31%)
+      //    Si Résultat OMP < 0 : il faut combler le déficit avec ces billets "nets"
+      var margeParBillet = prixMoyen * (1 - PROJ_FIN_TAUX_CHARGES_VARIABLES);
+      var pointEquilibreTotal = 0;
+      var billetsManquants = 0;
+      var equilibreAtteint = false;
+      var equilibreAtteignable = true;
+
+      if (resultatOMPActuel >= 0) {
+        // Déjà à l'équilibre ou positif
+        pointEquilibreTotal = ventesAujourdhui;
+        billetsManquants = 0;
+        equilibreAtteint = true;
+      } else if (margeParBillet > 0) {
+        // Calcul du nb billets à vendre pour combler le déficit
+        billetsManquants = Math.ceil(Math.abs(resultatOMPActuel) / margeParBillet);
+        pointEquilibreTotal = ventesAujourdhui + billetsManquants;
+        equilibreAtteignable = billetsManquants <= diffBillets;
+      }
+
+      // === AFFICHAGE ===
+
+      var setTxt = function(id, txt, color) {
+        var el = document.getElementById(id);
+        if (el) {
+          el.textContent = txt;
+          if (color) el.style.color = color;
+        }
+      };
+
+      // Projection ventes (en billets)
+      setTxt('pilote-fin-proj-ventes', projectionVentes > 0 ? projectionVentes.toLocaleString('fr-FR') : '—');
+
+      // Diff jour vs projection (avec signe + et couleur)
+      if (diffBillets > 0) {
+        setTxt('pilote-fin-diff', '+' + diffBillets.toLocaleString('fr-FR') + ' billets', '#22c55e');
+      } else if (diffBillets < 0) {
+        setTxt('pilote-fin-diff', diffBillets.toLocaleString('fr-FR') + ' billets', '#ef4444');
+      } else {
+        setTxt('pilote-fin-diff', '—', '#888');
+      }
+
+      // Projection CA (recette brute projetée)
+      setTxt('pilote-fin-ca', recetteTTCActuelle > 0 ? _projFormatMontant(projectionCA) : '—', '#fff');
+
+      // Projection financière (résultat net projeté)
+      var colorProj = projectionFinanciere >= 0 ? '#22c55e' : '#ef4444';
+      setTxt('pilote-fin-projection', prixMoyen > 0 ? _projFormatMontant(projectionFinanciere) : '—', colorProj);
+
+      // POINT ÉQUILIBRE PROJETÉ
+      var elEq = document.getElementById('pilote-fin-equilibre');
+      var elEqInfo = document.getElementById('pilote-fin-equilibre-info');
+
+      if (prixMoyen <= 0 || ventesAujourdhui <= 0) {
+        if (elEq) { elEq.textContent = '—'; elEq.style.color = '#888'; }
+        if (elEqInfo) elEqInfo.textContent = '';
+      } else if (equilibreAtteint) {
+        if (elEq) { elEq.textContent = '✅ Équilibre atteint'; elEq.style.color = '#22c55e'; }
+        if (elEqInfo) elEqInfo.textContent = 'Résultat déjà positif · marge : ' + _projFormatMontant(resultatOMPActuel);
+      } else if (equilibreAtteignable) {
+        if (elEq) { elEq.textContent = '🟡 ' + pointEquilibreTotal.toLocaleString('fr-FR') + ' billets'; elEq.style.color = '#f59e0b'; }
+        if (elEqInfo) elEqInfo.textContent = 'Encore ' + billetsManquants + ' billets à vendre (projection : +' + diffBillets + ')';
+      } else {
+        if (elEq) { elEq.textContent = '🔴 ' + pointEquilibreTotal.toLocaleString('fr-FR') + ' billets'; elEq.style.color = '#ef4444'; }
+        if (elEqInfo) elEqInfo.textContent = 'Manque ' + billetsManquants + ' billets — projection insuffisante (+' + diffBillets + ')';
+      }
+
+      console.log('💰 Projection Financière :', {
+        ventesAujourdhui: ventesAujourdhui,
+        projectionVentes: projectionVentes,
+        diffBillets: diffBillets,
+        prixMoyen: prixMoyen,
+        recetteTTCActuelle: recetteTTCActuelle,
+        resultatOMPActuel: resultatOMPActuel,
+        projectionCA: projectionCA,
+        bonusRecette: bonusRecette,
+        projectionFinanciere: projectionFinanciere,
+        pointEquilibreTotal: pointEquilibreTotal,
+        billetsManquants: billetsManquants,
+        equilibreAtteint: equilibreAtteint,
+        equilibreAtteignable: equilibreAtteignable
+      });
+    } catch (err) {
+      console.error('❌ Erreur projection financière :', err);
     }
   }
 
