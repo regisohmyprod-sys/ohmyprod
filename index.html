@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.08">
+<meta name="version" content="2026.04.17.09">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -8694,24 +8694,37 @@ function _hideTeamSelection() {
   }
 
   async function sauverVoyageVHR() {
-    const type = document.getElementById('voy-type').value;
+    // Helper null-safe
+    var getVal = function(elId, def) {
+      var el = document.getElementById(elId);
+      return el ? el.value : (def !== undefined ? def : '');
+    };
+    var getText = function(elId, def) {
+      var el = document.getElementById(elId);
+      return el ? el.textContent : (def !== undefined ? def : '');
+    };
+    var getChecked = function(elId) {
+      var el = document.getElementById(elId);
+      return el ? !!el.checked : false;
+    };
+    const type = getVal('voy-type');
     if (!type) { alert('Choisissez un type de voyage.'); return; }
     const voyData = {
       voy_type: type,
-      voy_team: document.getElementById('voy-team').value,
-      voy_jour: document.getElementById('voy-jour').value,
-      voy_heure_debut: document.getElementById('voy-heure-debut').value,
-      voy_heure_fin: document.getElementById('voy-heure-fin').value,
-      voy_lieu: document.getElementById('voy-lieu').value,
-      voy_lieu_arrivee: document.getElementById('voy-lieu-arrivee').value,
-      voy_pickup: document.getElementById('voy-pickup-oui')?.checked ? 'oui' : 'non',
-      voy_chauffeur_nom: document.getElementById('voy-chauffeur-nom').value,
-      voy_chauffeur_tel: document.getElementById('voy-chauffeur-tel').value,
-      voy_transfert_depart: document.getElementById('voy-transfert-depart').value,
-      voy_transfert_arrivee: document.getElementById('voy-transfert-arrivee').value,
-      voy_transfert_distance: document.getElementById('voy-transfert-distance').textContent,
-      voy_dossier: document.getElementById('voy-dossier').value,
-      voy_notes: document.getElementById('voy-notes').value,
+      voy_team: getVal('voy-team'),
+      voy_jour: getVal('voy-jour'),
+      voy_heure_debut: getVal('voy-heure-debut'),
+      voy_heure_fin: getVal('voy-heure-fin'),
+      voy_lieu: getVal('voy-lieu'),
+      voy_lieu_arrivee: getVal('voy-lieu-arrivee'),
+      voy_pickup: getChecked('voy-pickup-oui') ? 'oui' : 'non',
+      voy_chauffeur_nom: getVal('voy-chauffeur-nom'),
+      voy_chauffeur_tel: getVal('voy-chauffeur-tel'),
+      voy_transfert_depart: getVal('voy-transfert-depart'),
+      voy_transfert_arrivee: getVal('voy-transfert-arrivee'),
+      voy_transfert_distance: getText('voy-transfert-distance'),
+      voy_dossier: getVal('voy-dossier'),
+      voy_notes: getVal('voy-notes'),
     };
     let error;
     if (_vhrEntryEditId) {
@@ -9066,51 +9079,68 @@ function _hideTeamSelection() {
     _vhrEntryTourneeId = data.tournee_id;
     _vhrEntryEditId = id;
 
+    // Helper null-safe : met la valeur uniquement si l'élément existe
+    var setVal = function(elId, val) {
+      var el = document.getElementById(elId);
+      if (el) el.value = val || '';
+    };
+    var setText = function(elId, val) {
+      var el = document.getElementById(elId);
+      if (el) el.textContent = val || '—';
+    };
+    var setChecked = function(elId, checked) {
+      var el = document.getElementById(elId);
+      if (el) el.checked = !!checked;
+    };
+    var setDisplay = function(elId, display) {
+      var el = document.getElementById(elId);
+      if (el) el.style.display = display;
+    };
+
     if (type === 'voyage') {
-      document.getElementById('voy-type').value = data.voy_type || '';
-      document.getElementById('voy-team').value = data.voy_team || 'tous';
-      document.getElementById('voy-jour').value = data.voy_jour || '';
-      document.getElementById('voy-heure-debut').value = data.voy_heure_debut || '';
-      document.getElementById('voy-heure-fin').value = data.voy_heure_fin || '';
-      document.getElementById('voy-lieu').value = data.voy_lieu || '';
-      document.getElementById('voy-lieu-arrivee').value = data.voy_lieu_arrivee || '';
-      document.getElementById('voy-chauffeur-nom').value = data.voy_chauffeur_nom || '';
-      document.getElementById('voy-chauffeur-tel').value = data.voy_chauffeur_tel || '';
-      document.getElementById('voy-transfert-depart').value = data.voy_transfert_depart || '';
-      document.getElementById('voy-transfert-arrivee').value = data.voy_transfert_arrivee || '';
-      const distEl = document.getElementById('voy-transfert-distance');
-      if (distEl) distEl.textContent = data.voy_transfert_distance || '—';
-      document.getElementById('voy-dossier').value = data.voy_dossier || '';
-      document.getElementById('voy-notes').value = data.voy_notes || '';
+      setVal('voy-type', data.voy_type);
+      setVal('voy-team', data.voy_team || 'tous');
+      setVal('voy-jour', data.voy_jour);
+      setVal('voy-heure-debut', data.voy_heure_debut);
+      setVal('voy-heure-fin', data.voy_heure_fin);
+      setVal('voy-lieu', data.voy_lieu);
+      setVal('voy-lieu-arrivee', data.voy_lieu_arrivee);
+      setVal('voy-chauffeur-nom', data.voy_chauffeur_nom);
+      setVal('voy-chauffeur-tel', data.voy_chauffeur_tel);
+      setVal('voy-transfert-depart', data.voy_transfert_depart);
+      setVal('voy-transfert-arrivee', data.voy_transfert_arrivee);
+      setText('voy-transfert-distance', data.voy_transfert_distance);
+      setVal('voy-dossier', data.voy_dossier);
+      setVal('voy-notes', data.voy_notes);
       if (data.voy_pickup === 'oui') {
-        document.getElementById('voy-pickup-oui').checked = true;
-        document.getElementById('voy-pickup-details').style.display = 'flex';
+        setChecked('voy-pickup-oui', true);
+        setDisplay('voy-pickup-details', 'flex');
       } else {
-        document.getElementById('voy-pickup-non').checked = true;
-        document.getElementById('voy-pickup-details').style.display = 'none';
+        setChecked('voy-pickup-non', true);
+        setDisplay('voy-pickup-details', 'none');
       }
       openModal('modal-vhr-voyage');
     } else if (type === 'hebergement') {
-      document.getElementById('vhr-hotel-nom').value = data.hotel_nom || '';
-      document.getElementById('vhr-hotel-adresse').value = data.hotel_adresse || '';
-      document.getElementById('vhr-hotel-adresse-salle').value = data.hotel_adresse_salle || '';
-      document.getElementById('vhr-hotel-dist-salle').value = data.hotel_dist_salle || '';
-      document.getElementById('vhr-hotel-commentaire').value = data.hotel_commentaire || '';
+      setVal('vhr-hotel-nom', data.hotel_nom);
+      setVal('vhr-hotel-adresse', data.hotel_adresse);
+      setVal('vhr-hotel-adresse-salle', data.hotel_adresse_salle);
+      setVal('vhr-hotel-dist-salle', data.hotel_dist_salle);
+      setVal('vhr-hotel-commentaire', data.hotel_commentaire);
       openModal('modal-vhr-hotel');
     } else if (type === 'contact') {
-      document.getElementById('vhr-contact-prenom').value = data.contact_prenom || '';
-      document.getElementById('vhr-contact-nom').value = data.contact_nom || '';
-      document.getElementById('vhr-contact-fonction').value = data.contact_fonction || '';
-      document.getElementById('vhr-contact-tel').value = data.contact_tel || '';
-      document.getElementById('vhr-contact-email').value = data.contact_email || '';
-      document.getElementById('vhr-contact-notes').value = data.contact_notes || '';
+      setVal('vhr-contact-prenom', data.contact_prenom);
+      setVal('vhr-contact-nom', data.contact_nom);
+      setVal('vhr-contact-fonction', data.contact_fonction);
+      setVal('vhr-contact-tel', data.contact_tel);
+      setVal('vhr-contact-email', data.contact_email);
+      setVal('vhr-contact-notes', data.contact_notes);
       openModal('modal-vhr-contact');
     } else if (type === 'document') {
-      document.getElementById('vhr-doc-categorie').value = data.doc_categorie || '';
-      document.getElementById('vhr-doc-type').value = data.doc_type || '';
-      document.getElementById('vhr-doc-deposant').value = data.doc_deposant || '';
-      document.getElementById('vhr-doc-date').value = data.doc_date || '';
-      document.getElementById('vhr-doc-lien').value = data.doc_lien || '';
+      setVal('vhr-doc-categorie', data.doc_categorie);
+      setVal('vhr-doc-type', data.doc_type);
+      setVal('vhr-doc-deposant', data.doc_deposant);
+      setVal('vhr-doc-date', data.doc_date);
+      setVal('vhr-doc-lien', data.doc_lien);
       openModal('modal-vhr-doc');
     }
   }
