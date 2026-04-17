@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.06">
+<meta name="version" content="2026.04.17.08">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1559,8 +1559,8 @@
     #page-dashboard > div:nth-of-type(2) > div:first-child,
     div[style*="font-size:42px"][style*="Bebas Neue"],
     div[style*="font-size: 42px"][style*="Bebas Neue"] {
-      font-size: 30px !important;
-      letter-spacing: 2px !important;
+      font-size: 26px !important;
+      letter-spacing: 1.5px !important;
       white-space: nowrap !important;
       overflow: hidden !important;
       text-overflow: ellipsis !important;
@@ -9040,9 +9040,28 @@ function _hideTeamSelection() {
   }
 
   async function modifierVHREntry(type, id) {
+    console.log('🔧 modifierVHREntry appelé:', type, id);
     // Charger les données depuis Supabase
     const { data, error } = await _supabase.from('vhr_dates').select('*').eq('id', id).single();
-    if (error || !data) { alert('Erreur chargement'); return; }
+    console.log('🔧 Résultat Supabase:', { data, error });
+    if (error) {
+      console.error('❌ Erreur Supabase:', error);
+      if (typeof ompToast === 'function') {
+        ompToast('Erreur : ' + (error.message || 'impossible de charger'), 'error');
+      } else {
+        alert('Erreur chargement : ' + (error.message || 'inconnue'));
+      }
+      return;
+    }
+    if (!data) {
+      console.error('❌ Aucune donnée retournée pour id:', id);
+      if (typeof ompToast === 'function') {
+        ompToast('Donnée introuvable (permissions ?)', 'error');
+      } else {
+        alert('Erreur chargement : donnée introuvable');
+      }
+      return;
+    }
     _vhrEntryDateId = data.date_concert_id;
     _vhrEntryTourneeId = data.tournee_id;
     _vhrEntryEditId = id;
