@@ -2,10 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Viewport optimisé pour app native (safe-area + anti-zoom) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.16.21">
+<meta name="version" content="2026.04.17.01">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -13,9 +14,13 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/jpeg" href="assets/omp-icon-200.jpg">
 <link rel="apple-touch-icon" href="assets/omp-icon-200.jpg">
-<meta name="theme-color" content="#c9a84c">
+<!-- Mode fullscreen iOS + Android -->
+<meta name="theme-color" content="#0a0a0a">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OMP">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Firebase Cloud Messaging -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1856,6 +1861,459 @@
     outline: none;
   }
   .fin-input:focus { border-color: #c9a84c; }
+
+/* ==========================================================
+   ============ 📱 OMP MOBILE KIT — START =================
+   ========================================================== */
+
+/* ==========================================================
+   BLOC A — BOTTOM NAVIGATION BAR (mobile uniquement)
+   ========================================================== */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+  border-top: 1px solid #2a2a2a;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.bottom-nav-inner {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 62px;
+  align-items: center;
+}
+.bn-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  color: #888;
+  padding: 8px 4px;
+  transition: all 0.2s ease;
+  position: relative;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 48px;
+}
+.bn-item:active { transform: scale(0.92); }
+.bn-item .bn-icon { font-size: 22px; line-height: 1; transition: transform 0.2s ease; }
+.bn-item .bn-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.3px;
+  font-family: 'Inter', sans-serif; text-transform: uppercase; line-height: 1;
+}
+.bn-item.active { color: #c9a84c; }
+.bn-item.active .bn-icon {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 2px 4px rgba(201,168,76,0.4));
+}
+.bn-item.active::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 28px; height: 3px;
+  background: #c9a84c;
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 0 8px rgba(201,168,76,0.6);
+}
+.bn-item .bn-badge {
+  position: absolute;
+  top: 6px; right: 22%;
+  min-width: 16px; height: 16px;
+  background: #e31e24;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 9px; font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 0 0 2px #0a0a0a;
+}
+.bn-item .bn-badge.show { display: flex; }
+
+@media (max-width: 768px) {
+  .bottom-nav { display: block; }
+  .main { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0)) !important; }
+  .bottom-nav[data-role="admin"] .bn-staff { display: none; }
+  .bottom-nav[data-role="staff"] .bn-admin { display: none; }
+}
+
+/* ==========================================================
+   BLOC B — DRAWER "MENU PLUS"
+   ========================================================== */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+.drawer-panel {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 82%;
+  max-width: 340px;
+  background: #0f0f0f;
+  border-left: 1px solid #2a2a2a;
+  z-index: 1200;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.7);
+}
+.drawer-panel.open { transform: translateX(0); }
+.drawer-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.drawer-user { display: flex; flex-direction: column; gap: 2px; }
+.drawer-user-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 1.5px; color: #fff;
+}
+.drawer-user-role {
+  font-size: 11px; color: #c9a84c;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.drawer-close {
+  background: #2a2a2a; border: none; color: #fff;
+  width: 36px; height: 36px; border-radius: 50%;
+  font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-content { flex: 1; overflow-y: auto; padding: 12px 0; }
+.drawer-section-title {
+  font-size: 10px; color: #888;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  padding: 14px 20px 6px; font-weight: 700;
+}
+.drawer-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+  color: #ddd; font-size: 14px; font-weight: 500;
+  cursor: pointer; border: none;
+  background: transparent; width: 100%; text-align: left;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 48px;
+}
+.drawer-item:active { background: rgba(201,168,76,0.1); }
+.drawer-item .drawer-icon { font-size: 18px; width: 24px; text-align: center; }
+.drawer-item.danger { color: #e31e24; }
+.drawer-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #2a2a2a;
+  text-align: center;
+  font-size: 10px; color: #666; letter-spacing: 1px;
+}
+
+/* ==========================================================
+   BLOC C — SAFE AREAS iOS + FEELING NATIF
+   ========================================================== */
+@media (max-width: 768px) {
+  .topbar {
+    padding-top: calc(4px + env(safe-area-inset-top, 0)) !important;
+  }
+  .modal-content {
+    padding-top: calc(16px + env(safe-area-inset-top, 0)) !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0)) !important;
+  }
+  button, .btn, [onclick] { min-height: 44px; }
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
+  body, .main, .content, .dates-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  * { -webkit-tap-highlight-color: transparent; }
+  .bottom-nav, .drawer-panel, .topbar,
+  .nav-item, .tournee-item, .btn,
+  .db-col-header, .page-title {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+html, body { overscroll-behavior-y: none; }
+
+/* ==========================================================
+   BLOC D — TOASTS (remplace alert)
+   ========================================================== */
+.omp-toast-container {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  width: calc(100% - 32px);
+  max-width: 420px;
+}
+.omp-toast {
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  border-left: 3px solid #c9a84c;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.omp-toast.show { opacity: 1; transform: translateY(0); }
+.omp-toast.success { border-left-color: #22c55e; }
+.omp-toast.error { border-left-color: #e31e24; }
+.omp-toast.warning { border-left-color: #f59e0b; }
+.omp-toast-icon { font-size: 18px; }
+.omp-toast-msg { flex: 1; line-height: 1.35; }
+
+/* ==========================================================
+   BLOC E — CONFIRM NATIF
+   ========================================================== */
+.omp-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 9998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.omp-confirm-overlay.open { display: flex; opacity: 1; }
+.omp-confirm-box {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  max-width: 360px;
+  width: 100%;
+  padding: 24px 20px;
+  text-align: center;
+  transform: scale(0.9);
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
+.omp-confirm-overlay.open .omp-confirm-box { transform: scale(1); }
+.omp-confirm-icon { font-size: 40px; margin-bottom: 12px; }
+.omp-confirm-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px; letter-spacing: 1px;
+  color: #fff; margin-bottom: 8px;
+}
+.omp-confirm-msg {
+  font-size: 14px; color: #bbb;
+  line-height: 1.5; margin-bottom: 20px;
+}
+.omp-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.omp-confirm-btn {
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s ease;
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
+}
+.omp-confirm-btn:active { transform: scale(0.95); }
+.omp-confirm-btn-cancel { background: #2a2a2a; color: #ddd; }
+.omp-confirm-btn-ok { background: #c9a84c; color: #0a0a0a; }
+.omp-confirm-btn-danger { background: #e31e24; color: #fff; }
+
+/* ==========================================================
+   BLOC F — BOTTOM SHEET
+   ========================================================== */
+.omp-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.omp-sheet-overlay.open { opacity: 1; pointer-events: auto; }
+.omp-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: #1a1a1a;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  z-index: 9600;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 85vh;
+  overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+}
+.omp-sheet.open { transform: translateY(0); }
+.omp-sheet-handle {
+  width: 40px; height: 5px;
+  background: #444;
+  border-radius: 3px;
+  margin: 10px auto 6px;
+}
+.omp-sheet-header {
+  padding: 6px 20px 12px;
+  border-bottom: 1px solid #2a2a2a;
+  text-align: center;
+}
+.omp-sheet-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 1.5px; color: #fff;
+}
+.omp-sheet-content { padding: 16px 20px; }
+
+/* ==========================================================
+   BLOC G — TRANSITIONS DE PAGES
+   ========================================================== */
+@media (max-width: 768px) {
+  .page {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+    pointer-events: none;
+  }
+  .page.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+    animation: pageEnter 0.3s ease;
+  }
+  @keyframes pageEnter {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .topbar {
+    transition: transform 0.3s ease;
+    will-change: transform;
+  }
+  .topbar.hidden-on-scroll { transform: translateY(-100%); }
+}
+
+/* ==========================================================
+   BLOC H — SKELETON LOADERS + PRESS ANIMATIONS
+   ========================================================== */
+.omp-skeleton {
+  background: linear-gradient(90deg, #1a1a1a 0%, #252525 50%, #1a1a1a 100%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+@keyframes skeletonShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.omp-skeleton-line { height: 14px; margin-bottom: 8px; }
+.omp-skeleton-card { height: 80px; margin-bottom: 12px; }
+
+@media (max-width: 768px) {
+  button:active,
+  .btn:active,
+  .nav-item:active,
+  .tournee-item:active,
+  [onclick]:active:not(input):not(textarea):not(select) {
+    transform: scale(0.96);
+    transition: transform 0.08s ease;
+  }
+}
+
+/* ==========================================================
+   BLOC I — PULL-TO-REFRESH INDICATOR
+   ========================================================== */
+.omp-ptr-indicator {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0) + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-50px);
+  background: #1a1a1a;
+  border: 1px solid #c9a84c;
+  color: #c9a84c;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  z-index: 9997;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.omp-ptr-indicator.show { transform: translateX(-50%) translateY(0); }
+.omp-ptr-indicator.refreshing .omp-ptr-spinner {
+  animation: ptrSpin 0.8s linear infinite;
+}
+.omp-ptr-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(201,168,76,0.3);
+  border-top-color: #c9a84c;
+  border-radius: 50%;
+}
+@keyframes ptrSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================
+   ============ 📱 OMP MOBILE KIT — END ===================
+   ========================================================== */
 </style>
 </head>
 <body>
@@ -9536,9 +9994,17 @@ function _hideTeamSelection() {
 
   function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + id).classList.add('active');
+    var pageEl = document.getElementById('page-' + id);
+    if (pageEl) pageEl.classList.add('active');
     updateBreadcrumb(id);
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    // ✨ Sync la bottom nav mobile
+    if (typeof bnSyncActive === 'function') bnSyncActive(id);
+    
+    // ✨ Remonter en haut après changement de page
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) { window.scrollTo(0,0); }
+    
     if (id === 'equipe') chargerPageMembres();
     if (id === 'gestion-salles') chargerSalles();
     if (id === 'contacts-promo') chargerContactsPromo();
@@ -13941,6 +14407,9 @@ function _hideTeamSelection() {
     
     // Afficher le message de bienvenue personnalisé
     afficherMessageBienvenue();
+    
+    // ✨ Initialiser la bottom nav mobile
+    if (typeof bnInit === 'function') bnInit();
   }
 
   // Fonction pour afficher le message de bienvenue selon le rôle
@@ -18924,5 +19393,439 @@ function _hideTeamSelection() {
     </div>
   </div>
 </div>
+
+<!-- ==========================================================
+     ============ 📱 OMP MOBILE KIT — HTML =================
+     ========================================================== -->
+
+<!-- BOTTOM NAVIGATION BAR (mobile uniquement) -->
+<nav class="bottom-nav" id="omp-bottom-nav" data-role="staff">
+  <div class="bottom-nav-inner">
+    <!-- ADMIN : 4 items -->
+    <div class="bn-item bn-admin active" data-page="dashboard" onclick="bnNavigate('dashboard', this)">
+      <span class="bn-icon">🏠</span><span class="bn-label">Accueil</span>
+    </div>
+    <div class="bn-item bn-admin" data-page="tournees" onclick="bnNavigate('tournees', this)">
+      <span class="bn-icon">🎵</span><span class="bn-label">Tournées</span>
+    </div>
+    <div class="bn-item bn-admin" onclick="bnNavigateGestion(this)">
+      <span class="bn-icon">📋</span><span class="bn-label">Gestion</span>
+    </div>
+    <div class="bn-item bn-admin" onclick="bnNotifier(this)">
+      <span class="bn-icon">📨</span><span class="bn-label">Notifier</span>
+      <span class="bn-badge" id="bn-notif-badge">0</span>
+    </div>
+
+    <!-- STAFF / ARTISTE / TECH : 4 items -->
+    <div class="bn-item bn-staff active" onclick="bnNavigateStaff(this)">
+      <span class="bn-icon">🏠</span><span class="bn-label">Accueil</span>
+    </div>
+    <div class="bn-item bn-staff" onclick="bnNavigate('tournees', this)">
+      <span class="bn-icon">📅</span><span class="bn-label">Mes Dates</span>
+    </div>
+    <div class="bn-item bn-staff" onclick="bnNavigateVHR(this)">
+      <span class="bn-icon">🚗</span><span class="bn-label">VHR</span>
+    </div>
+    <div class="bn-item bn-staff" onclick="bnNavigateContacts(this)">
+      <span class="bn-icon">📞</span><span class="bn-label">Contacts</span>
+    </div>
+
+    <!-- PLUS (commun aux deux) -->
+    <div class="bn-item" onclick="bnOpenDrawer(this)">
+      <span class="bn-icon">☰</span><span class="bn-label">Plus</span>
+    </div>
+  </div>
+</nav>
+
+<!-- DRAWER "MENU PLUS" -->
+<div class="drawer-overlay" id="omp-drawer-overlay" onclick="bnCloseDrawer()"></div>
+<aside class="drawer-panel" id="omp-drawer-panel" role="dialog" aria-modal="true">
+  <div class="drawer-header">
+    <div class="drawer-user">
+      <div class="drawer-user-name" id="drawer-user-name">—</div>
+      <div class="drawer-user-role" id="drawer-user-role">—</div>
+    </div>
+    <button class="drawer-close" onclick="bnCloseDrawer()" aria-label="Fermer">✕</button>
+  </div>
+  <div class="drawer-content">
+    <div id="drawer-admin-section" style="display:none;">
+      <div class="drawer-section-title">Gestion OMP</div>
+      <button class="drawer-item" onclick="bnCloseDrawer(); showPage('equipe');">
+        <span class="drawer-icon">👥</span> Membres
+      </button>
+      <button class="drawer-item" onclick="bnCloseDrawer(); showPage('gestion-salles');">
+        <span class="drawer-icon">🏛️</span> Gestion Salles
+      </button>
+      <button class="drawer-item" onclick="bnCloseDrawer(); showPage('acces-frais');">
+        <span class="drawer-icon">💶</span> Notes de frais
+      </button>
+    </div>
+    <div class="drawer-section-title">Mon compte</div>
+    <button class="drawer-item" onclick="bnCloseDrawer(); hardReload();">
+      <span class="drawer-icon">🔄</span> Actualiser l'appli
+    </button>
+    <button class="drawer-item danger" onclick="bnCloseDrawer(); ompConfirm('Se déconnecter ?', 'Tu seras redirigé vers la page de connexion.', doLogout, null, {okLabel:'Déconnexion', danger:true});">
+      <span class="drawer-icon">🚪</span> Se déconnecter
+    </button>
+  </div>
+  <div class="drawer-footer">
+    APPLI OMP — v<span id="drawer-version">2026.04.17</span>
+  </div>
+</aside>
+
+<!-- TOAST CONTAINER -->
+<div class="omp-toast-container" id="omp-toast-container"></div>
+
+<!-- CONFIRM DIALOG NATIF -->
+<div class="omp-confirm-overlay" id="omp-confirm-overlay">
+  <div class="omp-confirm-box">
+    <div class="omp-confirm-icon" id="omp-confirm-icon">⚠️</div>
+    <div class="omp-confirm-title" id="omp-confirm-title">Confirmer ?</div>
+    <div class="omp-confirm-msg" id="omp-confirm-msg">—</div>
+    <div class="omp-confirm-actions">
+      <button class="omp-confirm-btn omp-confirm-btn-cancel" id="omp-confirm-cancel">Annuler</button>
+      <button class="omp-confirm-btn omp-confirm-btn-ok" id="omp-confirm-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- PULL-TO-REFRESH INDICATOR -->
+<div class="omp-ptr-indicator" id="omp-ptr-indicator">
+  <span class="omp-ptr-spinner"></span>
+  <span id="omp-ptr-label">Tirez pour actualiser</span>
+</div>
+
+<!-- ==========================================================
+     ============ 📱 OMP MOBILE KIT — JAVASCRIPT ==========
+     ========================================================== -->
+<script>
+// ========== 1) HAPTIC FEEDBACK ==========
+function ompHaptic(duration) {
+  if (navigator.vibrate) {
+    try { navigator.vibrate(duration || 10); } catch (e) {}
+  }
+}
+
+// ========== 2) BOTTOM NAV ==========
+function bnInit() {
+  var role = (typeof _currentUserRole !== 'undefined') ? _currentUserRole : 'staff';
+  var team = window._selectedTeam || 'prod';
+  var nav = document.getElementById('omp-bottom-nav');
+  if (!nav) return;
+  nav.setAttribute('data-role', role === 'admin' ? 'admin' : 'staff');
+
+  var drawerName = document.getElementById('drawer-user-name');
+  var drawerRole = document.getElementById('drawer-user-role');
+  if (drawerName) drawerName.textContent = (typeof _currentUserNom !== 'undefined' ? _currentUserNom : '') || 'Utilisateur';
+  if (drawerRole) {
+    var roleLabel = 'Membre';
+    if (role === 'admin') roleLabel = 'Administrateur';
+    else if (team === 'technique' || role === 'technique') roleLabel = 'Équipe Technique';
+    else if (team === 'artiste') roleLabel = 'Équipe Artistique';
+    else if (team === 'staff_omp') roleLabel = 'Staff OMP';
+    drawerRole.textContent = roleLabel;
+  }
+  var adminSection = document.getElementById('drawer-admin-section');
+  if (adminSection) adminSection.style.display = (role === 'admin') ? 'block' : 'none';
+}
+
+function bnSetActive(el) {
+  var items = document.querySelectorAll('#omp-bottom-nav .bn-item');
+  items.forEach(function(i) { i.classList.remove('active'); });
+  if (el) el.classList.add('active');
+}
+
+function bnNavigate(pageName, el) {
+  ompHaptic();
+  bnSetActive(el);
+  if (typeof showPage === 'function') showPage(pageName);
+}
+
+function bnNavigateGestion(el) {
+  ompHaptic();
+  bnSetActive(el);
+  if (typeof showGestionOMP === 'function') showGestionOMP();
+}
+
+function bnNavigateStaff(el) {
+  ompHaptic();
+  bnSetActive(el);
+  var team = window._selectedTeam || 'prod';
+  var role = (typeof _currentUserRole !== 'undefined') ? _currentUserRole : 'staff';
+  if (team === 'technique' || role === 'technique') showPage('dossier-technique');
+  else if (team === 'artiste') showPage('artistique');
+  else if (team === 'staff_omp') showPage('staff-omp');
+  else showPage('dashboard');
+}
+
+function bnNavigateVHR(el) {
+  ompHaptic();
+  bnSetActive(el);
+  if (typeof showPage === 'function') showPage('tournees');
+}
+
+function bnNavigateContacts(el) {
+  ompHaptic();
+  bnSetActive(el);
+  var team = window._selectedTeam || 'prod';
+  var role = (typeof _currentUserRole !== 'undefined') ? _currentUserRole : 'staff';
+  if (team === 'technique' || role === 'technique') showPage('contacts-presta-tech');
+  else showPage('contacts-presta');
+}
+
+function bnNotifier(el) {
+  ompHaptic(20);
+  if (typeof openModal === 'function') {
+    openModal('modal-notifier');
+    if (typeof chargerMembresNotif === 'function') chargerMembresNotif();
+  }
+}
+
+function bnOpenDrawer() {
+  ompHaptic();
+  var panel = document.getElementById('omp-drawer-panel');
+  var overlay = document.getElementById('omp-drawer-overlay');
+  if (panel) panel.classList.add('open');
+  if (overlay) overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  history.pushState({drawer:true}, '');
+}
+
+function bnCloseDrawer() {
+  var panel = document.getElementById('omp-drawer-panel');
+  var overlay = document.getElementById('omp-drawer-overlay');
+  if (panel) panel.classList.remove('open');
+  if (overlay) overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function bnSyncActive(pageName) {
+  var items = document.querySelectorAll('#omp-bottom-nav .bn-item[data-page]');
+  items.forEach(function(i) {
+    if (i.getAttribute('data-page') === pageName) {
+      items.forEach(function(x) { x.classList.remove('active'); });
+      i.classList.add('active');
+    }
+  });
+}
+
+// ========== 3) TOASTS (remplace alert) ==========
+function ompToast(message, type) {
+  type = type || 'info';
+  var container = document.getElementById('omp-toast-container');
+  if (!container) return;
+  var icon = '💬';
+  if (type === 'success') icon = '✅';
+  else if (type === 'error') icon = '❌';
+  else if (type === 'warning') icon = '⚠️';
+
+  var toast = document.createElement('div');
+  toast.className = 'omp-toast ' + type;
+  toast.innerHTML = '<span class="omp-toast-icon">' + icon + '</span><span class="omp-toast-msg">' + message + '</span>';
+  container.appendChild(toast);
+
+  setTimeout(function() { toast.classList.add('show'); }, 10);
+  setTimeout(function() {
+    toast.classList.remove('show');
+    setTimeout(function() { toast.remove(); }, 300);
+  }, 3500);
+
+  if (type === 'error') ompHaptic(30);
+  else if (type === 'success') ompHaptic(15);
+  else ompHaptic(10);
+}
+
+// Override de alert() pour utiliser toast
+window._originalAlert = window.alert;
+window.alert = function(msg) {
+  ompToast(String(msg), 'info');
+};
+
+// ========== 4) CONFIRM NATIF ==========
+function ompConfirm(title, message, onOk, onCancel, opts) {
+  opts = opts || {};
+  var overlay = document.getElementById('omp-confirm-overlay');
+  var titleEl = document.getElementById('omp-confirm-title');
+  var msgEl = document.getElementById('omp-confirm-msg');
+  var iconEl = document.getElementById('omp-confirm-icon');
+  var okBtn = document.getElementById('omp-confirm-ok');
+  var cancelBtn = document.getElementById('omp-confirm-cancel');
+
+  if (titleEl) titleEl.textContent = title || 'Confirmer ?';
+  if (msgEl) msgEl.textContent = message || '';
+  if (iconEl) iconEl.textContent = opts.icon || (opts.danger ? '⚠️' : '❓');
+  if (okBtn) okBtn.textContent = opts.okLabel || 'Confirmer';
+  if (cancelBtn) cancelBtn.textContent = opts.cancelLabel || 'Annuler';
+  if (okBtn) {
+    okBtn.className = 'omp-confirm-btn ' + (opts.danger ? 'omp-confirm-btn-danger' : 'omp-confirm-btn-ok');
+  }
+  overlay.classList.add('open');
+  ompHaptic(20);
+
+  function cleanup() {
+    overlay.classList.remove('open');
+    okBtn.onclick = null;
+    cancelBtn.onclick = null;
+  }
+  okBtn.onclick = function() {
+    ompHaptic();
+    cleanup();
+    if (typeof onOk === 'function') onOk();
+  };
+  cancelBtn.onclick = function() {
+    ompHaptic();
+    cleanup();
+    if (typeof onCancel === 'function') onCancel();
+  };
+}
+
+// ========== 5) BOTTOM SHEET ==========
+function ompSheet(title, htmlContent) {
+  var existing = document.getElementById('omp-dynamic-sheet');
+  if (existing) existing.remove();
+  var existingOv = document.getElementById('omp-dynamic-sheet-overlay');
+  if (existingOv) existingOv.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'omp-dynamic-sheet-overlay';
+  overlay.className = 'omp-sheet-overlay';
+  overlay.onclick = ompCloseSheet;
+
+  var sheet = document.createElement('div');
+  sheet.id = 'omp-dynamic-sheet';
+  sheet.className = 'omp-sheet';
+  sheet.innerHTML =
+    '<div class="omp-sheet-handle"></div>' +
+    '<div class="omp-sheet-header"><div class="omp-sheet-title">' + (title || '') + '</div></div>' +
+    '<div class="omp-sheet-content">' + (htmlContent || '') + '</div>';
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(sheet);
+  setTimeout(function() {
+    overlay.classList.add('open');
+    sheet.classList.add('open');
+  }, 10);
+  ompHaptic();
+}
+
+function ompCloseSheet() {
+  var sheet = document.getElementById('omp-dynamic-sheet');
+  var overlay = document.getElementById('omp-dynamic-sheet-overlay');
+  if (sheet) sheet.classList.remove('open');
+  if (overlay) overlay.classList.remove('open');
+  setTimeout(function() {
+    if (sheet) sheet.remove();
+    if (overlay) overlay.remove();
+  }, 350);
+}
+
+// ========== 6) PULL-TO-REFRESH ==========
+(function() {
+  if (!('ontouchstart' in window)) return;
+  var startY = 0, currentY = 0, pulling = false;
+  var threshold = 80;
+  var indicator = null, indicatorLabel = null;
+
+  function initPtr() {
+    indicator = document.getElementById('omp-ptr-indicator');
+    indicatorLabel = document.getElementById('omp-ptr-label');
+  }
+  document.addEventListener('DOMContentLoaded', initPtr);
+  if (document.readyState !== 'loading') initPtr();
+
+  document.addEventListener('touchstart', function(e) {
+    if (window.scrollY > 0) return;
+    startY = e.touches[0].clientY;
+    pulling = false;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e) {
+    if (window.scrollY > 0 || !startY) return;
+    currentY = e.touches[0].clientY;
+    var diff = currentY - startY;
+    if (diff > 10) {
+      pulling = true;
+      if (indicator) {
+        indicator.classList.add('show');
+        if (indicatorLabel) {
+          indicatorLabel.textContent = diff > threshold ? 'Relâcher pour actualiser' : 'Tirez pour actualiser';
+        }
+      }
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function() {
+    if (!pulling) return;
+    var diff = currentY - startY;
+    if (diff > threshold && indicator) {
+      indicator.classList.add('refreshing');
+      if (indicatorLabel) indicatorLabel.textContent = 'Actualisation…';
+      ompHaptic(30);
+      setTimeout(function() { window.location.reload(); }, 400);
+    } else if (indicator) {
+      indicator.classList.remove('show');
+    }
+    startY = 0; currentY = 0; pulling = false;
+  }, { passive: true });
+})();
+
+// ========== 7) HEADER QUI SE RÉTRACTE AU SCROLL ==========
+(function() {
+  var lastScrollY = 0;
+  var topbar = null;
+  var scrollDelta = 5;
+
+  function onScroll() {
+    if (!topbar) topbar = document.querySelector('.topbar');
+    if (!topbar || window.innerWidth > 768) return;
+    var currentY = window.scrollY;
+    if (Math.abs(currentY - lastScrollY) < scrollDelta) return;
+    if (currentY > lastScrollY && currentY > 60) {
+      topbar.classList.add('hidden-on-scroll');
+    } else {
+      topbar.classList.remove('hidden-on-scroll');
+    }
+    lastScrollY = currentY;
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
+
+// ========== 8) BOUTON RETOUR ANDROID ==========
+window.addEventListener('popstate', function(e) {
+  var drawer = document.getElementById('omp-drawer-panel');
+  if (drawer && drawer.classList.contains('open')) {
+    bnCloseDrawer();
+    return;
+  }
+  var sheet = document.getElementById('omp-dynamic-sheet');
+  if (sheet) {
+    ompCloseSheet();
+    return;
+  }
+  var openModals = document.querySelectorAll('.modal-overlay.open');
+  if (openModals.length > 0) {
+    openModals[openModals.length - 1].classList.remove('open');
+    return;
+  }
+  var confirmOv = document.getElementById('omp-confirm-overlay');
+  if (confirmOv && confirmOv.classList.contains('open')) {
+    confirmOv.classList.remove('open');
+    return;
+  }
+});
+
+// ========== 9) EXPOSER EN GLOBAL ==========
+window.ompHaptic = ompHaptic;
+window.ompToast = ompToast;
+window.ompConfirm = ompConfirm;
+window.ompSheet = ompSheet;
+window.ompCloseSheet = ompCloseSheet;
+window.bnInit = bnInit;
+window.bnSyncActive = bnSyncActive;
+window.bnCloseDrawer = bnCloseDrawer;
+
+console.log('✅ OMP Mobile Kit chargé');
+</script>
+
 </body>
 </html>
