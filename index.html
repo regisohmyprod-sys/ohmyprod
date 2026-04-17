@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.30">
+<meta name="version" content="2026.04.17.31">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -2101,9 +2101,14 @@
 }
 .bottom-nav-inner {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
   height: 62px;
   align-items: center;
+}
+.bottom-nav[data-role="admin"] .bottom-nav-inner {
+  grid-template-columns: repeat(5, 1fr);
+}
+.bottom-nav[data-role="staff"] .bottom-nav-inner {
+  grid-template-columns: repeat(6, 1fr);
 }
 .bn-item {
   display: flex;
@@ -4545,7 +4550,7 @@ function _hideTeamSelection() {
           <button class="btn btn-ghost filter-btn" onclick="filterDates('tout', this)">Tout</button>
           <button class="btn btn-ghost filter-btn" onclick="filterDates('passees', this)">Passées</button>
         </div>
-        <button class="btn btn-primary" onclick="openModal('modal-add-date')">+ Ajouter une date</button>
+        <button class="btn btn-primary" id="btn-ajouter-date" onclick="openModal('modal-add-date')">+ Ajouter une date</button>
       </div>
 
       <div class="dates-scroll" id="dyn-dates-scroll"></div>
@@ -5166,7 +5171,8 @@ function _hideTeamSelection() {
       </div>
 
       <!-- STATS TOURNÉES -->
-      <div id="artiste-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:28px;"></div>
+      <!-- ANCIEN stats-grid (vidé, remplacé par les 2 cartes cliquables ci-dessus) -->
+      <div id="artiste-stats-grid" style="display:none;"></div>
 
     </div>
 
@@ -13887,6 +13893,17 @@ function _hideTeamSelection() {
     document.getElementById('page-tournee-dynamic').classList.add('active');
     document.querySelectorAll('.tournee-item').forEach(t => t.classList.remove('active'));
     updateBreadcrumb('tournee-dynamic');
+    
+    // ✨ Reset scroll TOUT EN HAUT après que la page soit devenue active
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    // Double reset après le render pour être sûr
+    requestAnimationFrame(function() {
+      window.scrollTo(0, 0);
+      var sc = document.getElementById('dyn-dates-scroll');
+      if (sc) sc.scrollTop = 0;
+    });
   }
 
   function renderDatesScroll(tournee, tourneeId) {
@@ -14880,6 +14897,16 @@ function _hideTeamSelection() {
     }
     window._selectedTeam = team;
 
+    // Masquer le bouton "+ Ajouter une date" pour tous sauf admin et staff_omp
+    var btnAddDate = document.getElementById('btn-ajouter-date');
+    if (btnAddDate) {
+      if (role === 'admin' || role === 'staff_omp') {
+        btnAddDate.style.display = '';
+      } else {
+        btnAddDate.style.display = 'none';
+      }
+    }
+
     // Masquer la sidebar pour tous les non-admins
     var sidebar = document.getElementById('main-sidebar');
     var appScreen = document.getElementById('app-screen');
@@ -14908,8 +14935,7 @@ function _hideTeamSelection() {
       var navCrea = document.getElementById('nav-crea-suivi');
       if (navGestion) navGestion.style.display = 'none';
       if (navCrea) navCrea.style.display = 'none';
-      // Afficher les stats tournées dans l'espace artistique
-      renderArtisteStats();
+      // Plus besoin de renderArtisteStats : les 2 cartes cliquables sont rendues statiquement
     }
     // admin : page dashboard par défaut
     
