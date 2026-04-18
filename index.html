@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.57">
+<meta name="version" content="2026.04.17.58">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -2626,75 +2626,6 @@ html, body { overscroll-behavior-y: none; }
 /* ==========================================================
    ============ 📱 OMP MOBILE KIT — END ===================
    ========================================================== */
-
-/* ==========================================================
-   🖨️  IMPRESSION (A4) — Version simple, non-destructive
-   ========================================================== */
-@media print {
-  /* Forcer les couleurs d'accent à s'imprimer */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  
-  /* Fond global clair */
-  html, body {
-    background: #fff !important;
-    color: #000 !important;
-  }
-  
-  /* Cacher uniquement les éléments de navigation/interaction */
-  .sidebar,
-  .topbar,
-  .bottom-nav,
-  .drawer-overlay,
-  .drawer-panel,
-  .back-btn,
-  .no-print,
-  #splash-screen,
-  #login-screen,
-  #omp-toast-container {
-    display: none !important;
-  }
-  
-  /* Cacher les boutons (sauf ceux marqués .print-ok) */
-  button:not(.print-ok) {
-    display: none !important;
-  }
-  
-  /* Main : pleine largeur */
-  .main {
-    margin-left: 0 !important;
-    padding: 5mm !important;
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-  
-  /* Tableaux : bordures et page-break */
-  table {
-    page-break-inside: avoid;
-    width: 100% !important;
-  }
-  td, th {
-    color: #000 !important;
-  }
-  
-  /* Blocs principaux évitent de se couper */
-  #page-cloture-salle > div,
-  #page-decla-droits > div,
-  #page-bilan-amh > div,
-  #page-pilote-date > div,
-  #page-fiche-financier > div {
-    page-break-inside: avoid;
-    margin-bottom: 3mm !important;
-  }
-  
-  /* Format A4 portrait */
-  @page {
-    size: A4 portrait;
-    margin: 8mm;
-  }
-}
 </style>
 </head>
 <body>
@@ -3793,7 +3724,7 @@ function _hideTeamSelection() {
           <div id="fin-autosave-ind" style="font-size:11px;color:#22c55e;opacity:0;transition:opacity 0.3s;">✅ Auto-sauvegardé</div>
         </div>
         <div style="display:flex;gap:10px;">
-          <button onclick="window.print()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
+          <button onclick="imprimerPage('fiche-financier')" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
           <button onclick="finSauvegarder(false)" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
         </div>
       </div>
@@ -4071,7 +4002,7 @@ function _hideTeamSelection() {
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#22c55e;">🎯 PILOTE DATE</div>
           <div id="pilote-ville-date" style="font-size:13px;color:#888;"></div>
         </div>
-        <button onclick="window.print()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
+        <button onclick="imprimerPage('pilote-date')" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
       </div>
 
 
@@ -4285,7 +4216,7 @@ function _hideTeamSelection() {
     <div id="page-cloture-salle" class="page">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <button class="back-btn" style="margin-bottom:0;" onclick="showPage('pilote-date')">← Retour au Pilote Date</button>
-        <button onclick="window.print()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
+        <button onclick="imprimerPage('cloture-salle')" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
       </div>
         <div style="display:flex;gap:8px;flex-wrap:nowrap;margin:12px 0 12px 0;align-items:center;">
           <button onclick="fpOuvrirBilletterie()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🎟️ BILLETTERIE</button>
@@ -4359,7 +4290,7 @@ function _hideTeamSelection() {
     <div id="page-decla-droits" class="page">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <button class="back-btn" style="margin-bottom:0;" onclick="showPage('pilote-date')">← Retour au Pilote Date</button>
-        <button onclick="window.print()" style="background:#a855f7;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
+        <button onclick="imprimerPage('decla-droits')" style="background:#a855f7;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
       </div>
         <div style="display:flex;gap:8px;flex-wrap:nowrap;margin:12px 0 12px 0;align-items:center;">
           <button onclick="fpOuvrirBilletterie()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🎟️ BILLETTERIE</button>
@@ -4442,7 +4373,7 @@ function _hideTeamSelection() {
     <div id="page-bilan-amh" class="page">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <button class="back-btn" style="margin-bottom:0;" onclick="showPage('pilote-date')">← Retour au Pilote Date</button>
-        <button onclick="window.print()" style="background:#22c55e;color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
+        <button onclick="imprimerPage('bilan-amh')" style="background:#22c55e;color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
       </div>
         <div style="display:flex;gap:8px;flex-wrap:nowrap;margin:12px 0 12px 0;align-items:center;">
           <button onclick="fpOuvrirBilletterie()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🎟️ BILLETTERIE</button>
@@ -10664,6 +10595,93 @@ function _hideTeamSelection() {
     await chargerSalles();
   }
 
+
+  // 🖨️ Impression propre via fenêtre dédiée (fond blanc natif)
+  function imprimerPage(pageId) {
+    try {
+      var pageEl = document.getElementById('page-' + pageId);
+      if (!pageEl) {
+        alert('❌ Page introuvable');
+        return;
+      }
+      
+      // Cloner la page pour ne pas modifier l'original
+      var clone = pageEl.cloneNode(true);
+      
+      // Retirer les boutons (pas besoin dans le PDF)
+      clone.querySelectorAll('button, .back-btn').forEach(function(b) { b.remove(); });
+      
+      // Récupérer les valeurs des inputs (ils ne s'impriment pas sinon)
+      var originalInputs = pageEl.querySelectorAll('input, select, textarea');
+      var clonedInputs = clone.querySelectorAll('input, select, textarea');
+      originalInputs.forEach(function(origInput, idx) {
+        var clonedInput = clonedInputs[idx];
+        if (!clonedInput) return;
+        var val = origInput.value || '';
+        if (origInput.tagName === 'SELECT') {
+          var selOption = origInput.options[origInput.selectedIndex];
+          val = selOption ? selOption.text : '';
+        }
+        // Remplacer l'input par un span avec la valeur
+        var span = document.createElement('span');
+        span.textContent = val;
+        span.style.cssText = 'display:inline-block;padding:4px 8px;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;font-weight:600;min-width:60px;';
+        clonedInput.parentNode.replaceChild(span, clonedInput);
+      });
+      
+      // Récupérer le titre de la page
+      var titre = 'OH MY PROD - ' + pageId.toUpperCase().replace(/-/g,' ');
+      var dateImpression = new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+      
+      var html = ''
+        + '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+        + '<title>' + titre + '</title>'
+        + '<style>'
+        + '* { box-sizing:border-box; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }'
+        + 'body { font-family:Arial,sans-serif; margin:0; padding:15px; background:#fff; color:#000; font-size:11px; }'
+        + '.print-header { display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #c9a84c; padding-bottom:10px; margin-bottom:15px; }'
+        + '.print-title { font-size:20px; font-weight:bold; color:#c9a84c; letter-spacing:1px; }'
+        + '.print-date { font-size:11px; color:#666; }'
+        + 'table { width:100%; border-collapse:collapse; margin-bottom:10px; page-break-inside:avoid; }'
+        + 'td, th { padding:5px 8px; border:1px solid #ddd; font-size:10px; color:#000 !important; }'
+        + 'tr { background:#fff !important; }'
+        + 'tr:nth-child(even) td { background:#f9f9f9 !important; }'
+        + 'div { background:transparent !important; }'
+        + '/* Garder les titres colorés */'
+        + 'div[style*="background:#3b82f6"], div[style*="background: #3b82f6"] { background:#3b82f6 !important; color:#fff !important; padding:6px 10px !important; font-weight:bold; }'
+        + 'div[style*="background:#c9a84c"], div[style*="background: #c9a84c"] { background:#c9a84c !important; color:#000 !important; padding:6px 10px !important; font-weight:bold; }'
+        + 'div[style*="background:#a855f7"], div[style*="background: #a855f7"] { background:#a855f7 !important; color:#fff !important; padding:6px 10px !important; font-weight:bold; }'
+        + 'div[style*="background:#22c55e"], div[style*="background: #22c55e"] { background:#22c55e !important; color:#000 !important; padding:6px 10px !important; font-weight:bold; }'
+        + 'div[style*="background:#1e3a5f"], div[style*="background: #1e3a5f"] { background:#1e3a5f !important; color:#fff !important; padding:6px 10px !important; font-weight:bold; }'
+        + 'div[style*="background:#4a1a6e"], div[style*="background: #4a1a6e"] { background:#4a1a6e !important; color:#fff !important; padding:6px 10px !important; font-weight:bold; }'
+        + '.page { display:block !important; padding:0 !important; }'
+        + '.print-footer { margin-top:15px; padding-top:8px; border-top:1px solid #ddd; font-size:9px; color:#888; text-align:center; }'
+        + '@page { size:A4 portrait; margin:8mm; }'
+        + '</style>'
+        + '</head><body>'
+        + '<div class="print-header">'
+        + '  <div class="print-title">📊 ' + titre + '</div>'
+        + '  <div class="print-date">Imprimé le ' + dateImpression + '</div>'
+        + '</div>'
+        + clone.innerHTML
+        + '<div class="print-footer">OH MY PROD — APPLI OMP — Document généré automatiquement</div>'
+        + '<' + 'script>window.onload = function() { setTimeout(function() { window.print(); }, 400); };<' + '/script>'
+        + '</body></html>';
+      
+      var win = window.open('', '_blank');
+      if (!win) {
+        alert('❌ La fenêtre d\'impression a été bloquée. Autorise les popups pour ce site.');
+        return;
+      }
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+    } catch(e) {
+      console.error('imprimerPage error:', e);
+      alert('Erreur lors de l\'impression : ' + e.message);
+    }
+  }
+  window.imprimerPage = imprimerPage;
 
   function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
