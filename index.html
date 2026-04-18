@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.43">
+<meta name="version" content="2026.04.17.44">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1164,36 +1164,6 @@
 
   /* MOBILE */
   @media (max-width: 768px) {
-    /* ✨ ANTI-DÉBORDEMENT HORIZONTAL uniquement (scroll vertical préservé) */
-    html, body {
-      overflow-x: hidden !important;
-      overflow-y: auto !important;
-      max-width: 100vw !important;
-      height: auto !important;
-    }
-    .main {
-      max-width: 100vw !important;
-      overflow-x: hidden !important;
-      overflow-y: visible !important;
-    }
-    .page {
-      max-width: 100% !important;
-      overflow-x: hidden !important;
-      overflow-y: visible !important;
-    }
-    /* Tables et grilles qui débordent */
-    table {
-      max-width: 100% !important;
-    }
-    /* Chiffres gros qui débordent (142 443, etc.) */
-    .stat-card, .tournee-stat-card {
-      overflow: hidden !important;
-    }
-    .stat-value, .tournee-stat-value {
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-    }
-    
     .sidebar { transform: translateX(-100%); }
     .main { margin-left: 0; padding: 10px !important; }
     .stats-grid { grid-template-columns: 1fr !important; }
@@ -1769,9 +1739,7 @@
     }
     
     /* ✨ MOBILE : Empêcher les date-row de déborder à droite */
-    body {
-      overflow-x: hidden !important;
-    }.date-row {
+    .date-row {
       gap: 8px !important;
       padding: 10px 12px !important;
       overflow: hidden !important;
