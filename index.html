@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.59">
+<meta name="version" content="2026.04.17.61">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -25,6 +25,8 @@
 <!-- Firebase Cloud Messaging -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+<!-- SheetJS pour lire les fichiers Excel (import historique) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
   // Firebase configuration
   const firebaseConfig = {
@@ -36,9 +38,18 @@
     appId: "1:651166585451:web:a7fc7d0c6034d15509972e"
   };
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const messaging = firebase.messaging();
+  // Initialize Firebase (défensif : ne crash pas si Firebase est bloqué par adblock/CSP)
+  let messaging = null;
+  try {
+    if (typeof firebase !== 'undefined') {
+      firebase.initializeApp(firebaseConfig);
+      messaging = firebase.messaging();
+    } else {
+      console.warn('⚠️ Firebase non chargé (probablement bloqué par un adblocker). Les notifications push seront désactivées.');
+    }
+  } catch(e) {
+    console.warn('⚠️ Firebase init échouée :', e.message);
+  }
 
   // VAPID key for web push
   const vapidKey = "BIJjP7DD_R1zmGraswxfU_uCnm0XTjRXZCfpLSqiZR7BQ7ahz05kqrHMMCkqNjj7v4TLpiPkszYiNIzxdnSGCwY";
@@ -46,6 +57,11 @@
   // Request permission and get token, then save to Supabase
   async function initPushNotifications(userName, userRole) {
     try {
+      // ✨ Si Firebase n'est pas chargé, pas de push possible — on skip silencieusement
+      if (!messaging) {
+        console.log('ℹ️ Notifications push désactivées (Firebase non chargé)');
+        return null;
+      }
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         const token = await messaging.getToken({ vapidKey: vapidKey });
@@ -3361,7 +3377,10 @@ function _hideTeamSelection() {
     <div id="page-suivi-resume" class="page">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
         <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:0;">← Retour au Tableau de bord</button>
-        <button onclick="suiviImprimerPDF()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;">🖨️ IMPRIMER / PDF</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button onclick="ouvrirImportHistorique()" class="vhr-admin-action" style="background:#a855f7;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;">📥 IMPORT HISTORIQUE</button>
+          <button onclick="suiviImprimerPDF()" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;">🖨️ IMPRIMER / PDF</button>
+        </div>
       </div>
       <div class="page-title">📊 SUIVI DATES RÉSUMÉ</div>
       <div style="font-size:13px;color:#888;margin-bottom:16px;margin-top:-12px;font-style:italic;">Vue globale de toutes les dates — résultats actuels & projections</div>
@@ -17066,6 +17085,270 @@ function _hideTeamSelection() {
   /**
    * Ouvre la page SUIVI DATES RÉSUMÉ et déclenche le chargement.
    */
+  // ============================================================
+  // 📥 IMPORT HISTORIQUE - Dates passées depuis Excel
+  // ============================================================
+  var _importDatesParseData = null; // Stockage temporaire des données parsées
+  
+  function ouvrirImportHistorique() {
+    // Reset état modal
+    document.getElementById('import-step-1').style.display = 'block';
+    document.getElementById('import-step-2').style.display = 'none';
+    document.getElementById('import-step-3').style.display = 'none';
+    document.getElementById('import-step-4').style.display = 'none';
+    document.getElementById('import-file-input').value = '';
+    _importDatesParseData = null;
+    openModal('modal-import-historique');
+  }
+  window.ouvrirImportHistorique = ouvrirImportHistorique;
+  
+  // Parser date française JJ/MM/AAAA → ISO AAAA-MM-JJ
+  function _importParseDate(v) {
+    if (!v) return null;
+    // Si c'est déjà une date Excel (nombre de jours)
+    if (typeof v === 'number') {
+      var d = new Date(Math.round((v - 25569) * 86400 * 1000));
+      return d.toISOString().split('T')[0];
+    }
+    // Si c'est un objet Date
+    if (v instanceof Date) {
+      return v.toISOString().split('T')[0];
+    }
+    // Si c'est une string
+    var s = String(v).trim();
+    // Format JJ/MM/AAAA
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+      var parts = s.split('/');
+      var jj = parts[0].padStart(2, '0');
+      var mm = parts[1].padStart(2, '0');
+      var aaaa = parts[2];
+      return aaaa + '-' + mm + '-' + jj;
+    }
+    // Format AAAA-MM-JJ
+    if (/^\d{4}-\d{1,2}-\d{1,2}/.test(s)) {
+      return s.split('T')[0];
+    }
+    // Format JJ-MM-AAAA
+    if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(s)) {
+      var p = s.split('-');
+      return p[2] + '-' + p[1].padStart(2, '0') + '-' + p[0].padStart(2, '0');
+    }
+    return null;
+  }
+  
+  // Parser tournée → UUID
+  function _importParseTournee(v) {
+    if (!v) return '11111111-1111-1111-1111-111111111111'; // TWOQ par défaut
+    var s = String(v).trim().toUpperCase();
+    if (s.indexOf('2') >= 0 || s.indexOf('ETERNEL') >= 0 || s.indexOf('ÉTERNEL') >= 0) {
+      return '22222222-2222-2222-2222-222222222222'; // TWOQ Éternelle Légende
+    }
+    if (s.indexOf('GREG') >= 0 || s.indexOf('PETRAS') >= 0) {
+      return '33333333-3333-3333-3333-333333333333'; // Greg Petras
+    }
+    return '11111111-1111-1111-1111-111111111111'; // TWOQ par défaut
+  }
+  
+  async function importHistoriqueParser(file) {
+    if (!file) return;
+    try {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          var data = new Uint8Array(e.target.result);
+          var wb = XLSX.read(data, { type: 'array', cellDates: true });
+          var sheetName = wb.SheetNames[0];
+          var ws = wb.Sheets[sheetName];
+          // Lire avec headers à la ligne 4 (index 3)
+          var rows = XLSX.utils.sheet_to_json(ws, { 
+            range: 3, // Ligne 4 = header
+            header: ['date', 'ville', 'salle', 'tournee', 'billets', 'jauge', 'ca_ttc', 'pct_rempl', 'ca_ht', 'resultat_omp'],
+            defval: null,
+            raw: false
+          });
+          
+          // Filtrer les lignes vides (pas de date ou pas de ville)
+          var parsed = [];
+          var errors = [];
+          rows.forEach(function(r, idx) {
+            // Skip lignes vides
+            if (!r.date && !r.ville) return;
+            // Skip la ligne d'entête si elle est relue
+            if (r.date === 'DATE') return;
+            
+            var dateISO = _importParseDate(r.date);
+            if (!dateISO) {
+              errors.push('Ligne ' + (idx + 5) + ' : date invalide (' + r.date + ')');
+              return;
+            }
+            if (!r.ville) {
+              errors.push('Ligne ' + (idx + 5) + ' : ville manquante');
+              return;
+            }
+            
+            parsed.push({
+              date_iso: dateISO,
+              ville: String(r.ville).trim().toUpperCase(),
+              salle: r.salle ? String(r.salle).trim() : '',
+              tournee_id: _importParseTournee(r.tournee),
+              tournee_label: r.tournee ? String(r.tournee).trim() : 'TWOQ',
+              billets: parseInt(r.billets) || null,
+              jauge: parseInt(r.jauge) || null,
+              ca_ttc: r.ca_ttc != null ? parseFloat(r.ca_ttc) : null,
+              resultat_omp: r.resultat_omp != null ? parseFloat(r.resultat_omp) : null
+            });
+          });
+          
+          if (parsed.length === 0) {
+            alert('❌ Aucune donnée valide trouvée dans le fichier.\n\n' + (errors.length > 0 ? 'Erreurs :\n' + errors.slice(0, 5).join('\n') : ''));
+            return;
+          }
+          
+          _importDatesParseData = parsed;
+          importHistoriqueAfficherPreview(parsed, errors);
+        } catch(err) {
+          console.error('Parser error:', err);
+          alert('❌ Erreur lors de la lecture du fichier : ' + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } catch(e) {
+      alert('❌ Erreur : ' + e.message);
+    }
+  }
+  window.importHistoriqueParser = importHistoriqueParser;
+  
+  function importHistoriqueAfficherPreview(dates, errors) {
+    // Switch vers étape 2
+    document.getElementById('import-step-1').style.display = 'none';
+    document.getElementById('import-step-2').style.display = 'block';
+    
+    // Infos résumé
+    var info = document.getElementById('import-preview-info');
+    var total = dates.length;
+    var withCA = dates.filter(function(d){ return d.ca_ttc != null; }).length;
+    var withRes = dates.filter(function(d){ return d.resultat_omp != null; }).length;
+    info.innerHTML = '✅ <strong>' + total + ' dates</strong> détectées · ' + withCA + ' avec CA TTC · ' + withRes + ' avec Résultat OMP' + 
+                     (errors.length > 0 ? ' · <span style="color:#f59e0b;">⚠️ ' + errors.length + ' erreur(s) ignorée(s)</span>' : '');
+    
+    // Tableau aperçu
+    var table = document.getElementById('import-preview-table');
+    var html = '<thead><tr style="background:#1a1a1a;color:#c9a84c;font-weight:700;">' +
+               '<th style="padding:6px 8px;text-align:left;border-bottom:1px solid #333;">DATE</th>' +
+               '<th style="padding:6px 8px;text-align:left;border-bottom:1px solid #333;">VILLE</th>' +
+               '<th style="padding:6px 8px;text-align:left;border-bottom:1px solid #333;">SALLE</th>' +
+               '<th style="padding:6px 8px;text-align:left;border-bottom:1px solid #333;">TOURNÉE</th>' +
+               '<th style="padding:6px 8px;text-align:right;border-bottom:1px solid #333;">BILLETS</th>' +
+               '<th style="padding:6px 8px;text-align:right;border-bottom:1px solid #333;">JAUGE</th>' +
+               '<th style="padding:6px 8px;text-align:right;border-bottom:1px solid #333;">CA TTC</th>' +
+               '<th style="padding:6px 8px;text-align:right;border-bottom:1px solid #333;">RES. OMP</th>' +
+               '</tr></thead><tbody>';
+    
+    dates.forEach(function(d, i) {
+      var dateFr = d.date_iso.split('-').reverse().join('/');
+      var bg = i % 2 === 0 ? '#0a0a0a' : '#111';
+      var resColor = d.resultat_omp != null ? (d.resultat_omp >= 0 ? '#22c55e' : '#e31e24') : '#555';
+      html += '<tr style="background:' + bg + ';">' +
+              '<td style="padding:6px 8px;color:#ccc;">' + dateFr + '</td>' +
+              '<td style="padding:6px 8px;color:#fff;font-weight:600;">' + d.ville + '</td>' +
+              '<td style="padding:6px 8px;color:#aaa;">' + d.salle + '</td>' +
+              '<td style="padding:6px 8px;color:#7eb8d4;">' + d.tournee_label + '</td>' +
+              '<td style="padding:6px 8px;text-align:right;color:#fff;">' + (d.billets != null ? d.billets.toLocaleString('fr-FR') : '—') + '</td>' +
+              '<td style="padding:6px 8px;text-align:right;color:#aaa;">' + (d.jauge != null ? d.jauge.toLocaleString('fr-FR') : '—') + '</td>' +
+              '<td style="padding:6px 8px;text-align:right;color:#c9a84c;">' + (d.ca_ttc != null ? d.ca_ttc.toLocaleString('fr-FR', {minimumFractionDigits:2,maximumFractionDigits:2}) + ' €' : '—') + '</td>' +
+              '<td style="padding:6px 8px;text-align:right;color:' + resColor + ';font-weight:600;">' + (d.resultat_omp != null ? d.resultat_omp.toLocaleString('fr-FR', {minimumFractionDigits:2,maximumFractionDigits:2}) + ' €' : '—') + '</td>' +
+              '</tr>';
+    });
+    html += '</tbody>';
+    table.innerHTML = html;
+  }
+  
+  function importHistoriqueAnnuler() {
+    document.getElementById('import-step-1').style.display = 'block';
+    document.getElementById('import-step-2').style.display = 'none';
+    document.getElementById('import-file-input').value = '';
+    _importDatesParseData = null;
+  }
+  window.importHistoriqueAnnuler = importHistoriqueAnnuler;
+  
+  async function importHistoriqueValider() {
+    if (!_importDatesParseData || _importDatesParseData.length === 0) return;
+    
+    // Switch vers étape 3
+    document.getElementById('import-step-2').style.display = 'none';
+    document.getElementById('import-step-3').style.display = 'block';
+    
+    var progressBar = document.getElementById('import-progress-bar');
+    var progressDetail = document.getElementById('import-progress-detail');
+    var progressMsg = document.getElementById('import-progress-msg');
+    
+    var total = _importDatesParseData.length;
+    var created = 0;
+    var updated = 0;
+    var errors = 0;
+    
+    for (var i = 0; i < _importDatesParseData.length; i++) {
+      var d = _importDatesParseData[i];
+      var pct = Math.round(((i+1) / total) * 100);
+      progressBar.style.width = pct + '%';
+      progressDetail.textContent = (i+1) + ' / ' + total + ' — ' + d.ville + ' (' + d.date_iso.split('-').reverse().join('/') + ')';
+      
+      try {
+        // Chercher si une date existe déjà pour cette combinaison date + ville + tournée
+        var existing = await _supabase
+          .from('dates_concert')
+          .select('id')
+          .eq('date_concert', d.date_iso)
+          .eq('ville', d.ville)
+          .eq('tournee_id', d.tournee_id)
+          .maybeSingle();
+        
+        var payload = {
+          import_billets: d.billets,
+          import_jauge: d.jauge,
+          import_ca_ttc: d.ca_ttc,
+          import_resultat_omp: d.resultat_omp,
+          import_historique: true
+        };
+        
+        if (existing.data && existing.data.id) {
+          // Update : ajoute juste les champs import
+          var upd = await _supabase
+            .from('dates_concert')
+            .update(payload)
+            .eq('id', existing.data.id);
+          if (upd.error) throw upd.error;
+          updated++;
+        } else {
+          // Insert : crée la date complète
+          payload.date_concert = d.date_iso;
+          payload.ville = d.ville;
+          payload.nom_salle = d.salle;
+          payload.tournee_id = d.tournee_id;
+          payload.etat = 'effectue';
+          var ins = await _supabase
+            .from('dates_concert')
+            .insert([payload]);
+          if (ins.error) throw ins.error;
+          created++;
+        }
+      } catch(err) {
+        console.error('Import erreur ligne ' + (i+1) + ':', err);
+        errors++;
+      }
+    }
+    
+    // Étape 4 : résumé
+    document.getElementById('import-step-3').style.display = 'none';
+    document.getElementById('import-step-4').style.display = 'block';
+    var finalStats = document.getElementById('import-final-stats');
+    finalStats.innerHTML = 
+      '<div style="color:#22c55e;">✅ <strong>' + created + '</strong> date(s) créée(s)</div>' +
+      '<div style="color:#3b82f6;">🔄 <strong>' + updated + '</strong> date(s) mise(s) à jour</div>' +
+      (errors > 0 ? '<div style="color:#e31e24;">❌ <strong>' + errors + '</strong> erreur(s)</div>' : '');
+  }
+  window.importHistoriqueValider = importHistoriqueValider;
+
   async function ouvrirSuiviDatesResume() {
     showPage('suivi-resume');
     if (!_suiviEnCours) {
@@ -17275,6 +17558,19 @@ function _hideTeamSelection() {
         var calc = _suiviCalculerResultatOMP(fiche);
 
         var jauge = parseInt(d.jauge_choisie || d.jauge_max || 0, 10);
+        
+        // ✨ OVERRIDE avec les données d'import historique (pour les anciennes dates)
+        if (d.import_historique === true) {
+          if (d.import_billets != null) calc.billets = parseInt(d.import_billets);
+          if (d.import_jauge != null) jauge = parseInt(d.import_jauge);
+          if (d.import_ca_ttc != null) {
+            calc.recTTC = parseFloat(d.import_ca_ttc);
+            calc.recHT = calc.recTTC / 1.021;
+          }
+          if (d.import_resultat_omp != null) calc.resultatOMP = parseFloat(d.import_resultat_omp);
+          calc.complet = true;
+        }
+        
         var pctRempl = jauge > 0 ? (calc.billets / jauge) * 100 : 0;
         var prixMoyen = calc.billets > 0 ? calc.recTTC / calc.billets : 0;
 
@@ -20194,7 +20490,75 @@ function _hideTeamSelection() {
   </div>
 </div>
 
-<!-- MODALE MENU GESTION TOUR RÉGIS -->
+<!-- MODALE IMPORT HISTORIQUE DATES -->
+<div id="modal-import-historique" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box" style="max-width:900px;max-height:90vh;overflow-y:auto;">
+    <div class="modal-header">
+      <div class="modal-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:18px;color:#a855f7;">📥 IMPORT HISTORIQUE DATES</div>
+      <button class="modal-close" onclick="closeModal('modal-import-historique')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      
+      <!-- ÉTAPE 1 : Upload -->
+      <div id="import-step-1">
+        <div style="background:#1a1a1a;border:1px solid #a855f7;border-radius:8px;padding:16px;margin-bottom:16px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#a855f7;margin-bottom:8px;">📋 Format attendu</div>
+          <div style="font-size:12px;color:#ccc;line-height:1.6;">
+            Fichier Excel (.xlsx) avec les colonnes :<br>
+            <strong>DATE</strong> (JJ/MM/AAAA) · <strong>VILLE</strong> · <strong>SALLE</strong> · <strong>TOURNEE</strong> (TWOQ ou TWOQ2) · 
+            <strong>BILLETS VENDUS</strong> · <strong>JAUGE</strong> · <strong>CA TTC</strong> · <strong>RESULTAT OMP</strong>
+          </div>
+        </div>
+        
+        <label style="display:block;cursor:pointer;">
+          <div style="border:2px dashed #a855f7;border-radius:8px;padding:40px 20px;text-align:center;background:rgba(168,85,247,0.05);">
+            <div style="font-size:40px;margin-bottom:10px;">📁</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#a855f7;letter-spacing:1px;">CLIQUE POUR SÉLECTIONNER</div>
+            <div style="font-size:11px;color:#888;margin-top:6px;">fichier .xlsx</div>
+          </div>
+          <input type="file" id="import-file-input" accept=".xlsx,.xls" style="display:none;" onchange="importHistoriqueParser(this.files[0])">
+        </label>
+      </div>
+      
+      <!-- ÉTAPE 2 : Aperçu -->
+      <div id="import-step-2" style="display:none;">
+        <div id="import-preview-info" style="background:#1a1a1a;border:1px solid #22c55e;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:13px;color:#22c55e;"></div>
+        <div style="max-height:350px;overflow-y:auto;overflow-x:auto;border:1px solid #2a2a2a;border-radius:8px;margin-bottom:16px;">
+          <table id="import-preview-table" style="width:100%;border-collapse:collapse;font-size:11px;min-width:800px;">
+          </table>
+        </div>
+        
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button onclick="importHistoriqueAnnuler()" style="background:#2a2a2a;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">ANNULER</button>
+          <button onclick="importHistoriqueValider()" style="background:#22c55e;color:#000;border:none;border-radius:6px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✅ VALIDER L'IMPORT</button>
+        </div>
+      </div>
+      
+      <!-- ÉTAPE 3 : Import en cours -->
+      <div id="import-step-3" style="display:none;text-align:center;padding:40px 20px;">
+        <div id="import-progress-msg" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#a855f7;letter-spacing:1px;margin-bottom:20px;">IMPORT EN COURS...</div>
+        <div id="import-progress-bar-container" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden;height:24px;">
+          <div id="import-progress-bar" style="height:100%;background:linear-gradient(90deg,#a855f7,#c084fc);width:0%;transition:width 0.3s;"></div>
+        </div>
+        <div id="import-progress-detail" style="font-size:12px;color:#888;margin-top:12px;"></div>
+      </div>
+      
+      <!-- ÉTAPE 4 : Résumé -->
+      <div id="import-step-4" style="display:none;">
+        <div style="background:#1a1a1a;border:2px solid #22c55e;border-radius:8px;padding:20px;margin-bottom:16px;text-align:center;">
+          <div style="font-size:40px;margin-bottom:10px;">✅</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;letter-spacing:2px;margin-bottom:8px;">IMPORT TERMINÉ</div>
+          <div id="import-final-stats" style="font-size:13px;color:#ccc;line-height:1.8;"></div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button onclick="closeModal('modal-import-historique'); ouvrirSuiviDatesResume();" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🔄 RAFRAÎCHIR LA VUE</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
 <div id="modal-gestion-tour-regis" class="modal-overlay" onclick="closeModalOutside(event)">
   <div class="modal-box" style="max-width:540px;">
     <div class="modal-header">
