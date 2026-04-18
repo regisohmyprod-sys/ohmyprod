@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.45">
+<meta name="version" content="2026.04.17.49">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3127,6 +3127,17 @@ function _hideTeamSelection() {
       <span class="icon">👥</span> Membres
     </a>
 
+    <!-- Section Outils Admin (visible uniquement pour admin) -->
+    <div id="sidebar-admin-tools" style="display:none;">
+      <div class="nav-label" style="margin-top:12px;">🔧 Outils admin</div>
+      <a class="nav-item" onclick="backupLocal()" style="cursor:pointer;">
+        <span class="icon">💾</span> Backup local
+      </a>
+      <a class="nav-item" onclick="ompConfirm('🔄 Hard Refresh ?', 'Efface TOUT le cache local et recharge l\'appli. Tu devras te reconnecter. Continuer ?', superHardRefresh, null, {okLabel:'Oui, tout effacer', danger:true});" style="cursor:pointer;">
+        <span class="icon">🔄</span> Hard refresh
+      </a>
+    </div>
+
     <!-- Photo déco bas de nav -->
     <div style="margin-top:32px;padding:0 8px 16px 8px;">
       <div style="border-radius:10px;overflow:hidden;border:1px solid #2a2a2a;box-shadow:0 4px 16px rgba(0,0,0,0.5);">
@@ -3865,7 +3876,7 @@ function _hideTeamSelection() {
               <tbody>
                 <!-- Salaires -->
                 <tr style="background:#242424;"><td colspan="3" style="padding:5px 10px;color:#c9a84c;font-weight:700;font-size:11px;text-transform:uppercase;">Salaires</td></tr>
-                <tr><td style="padding:5px 10px;color:#ccc;">Salaires tournée</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-sal-tournee" placeholder="0" style="width:90px;"></td><td id="fin-omp-sal-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
+                <tr><td style="padding:5px 10px;color:#ccc;">Salaires tournée</td><td style="padding:4px 8px;text-align:right;white-space:nowrap;"><input type="number" class="fin-input" id="fin-omp-sal-tournee" placeholder="0" style="width:75px;"><button type="button" onclick="calculerSalaireSelonJauge()" title="Calculer automatiquement selon le nombre de billets vendus" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer;margin-left:4px;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">🎯 AUTO</button></td><td id="fin-omp-sal-total" style="padding:5px 10px;text-align:right;color:#c9a84c;font-weight:700;">0</td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Salaires road + carite</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-sal-road" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <tr><td style="padding:5px 10px;color:#ccc;">Personnel promo locale</td><td style="padding:4px 8px;text-align:right;"><input type="number" class="fin-input" id="fin-omp-sal-promo" placeholder="0" style="width:90px;"></td><td></td></tr>
                 <!-- Prestataires techniques -->
@@ -11556,13 +11567,16 @@ function _hideTeamSelection() {
     set('pilote-salle', salle.toUpperCase());
     set('pilote-heure', (heure || '20:30').substring(0,5).replace(':','H'));
     set('pilote-jauge', document.getElementById('fp-jauge-finale').value || jauge);
-    set('pilote-ventes', ventes);
+    // ✨ Si on a des billets calculés depuis la fiche billetterie, on prend cette valeur (fiable)
+    // Sinon on garde la valeur du champ manuel "fp-etat-ventes" (fallback)
+    var ventesAffichees = gBilletsPilote > 0 ? gBilletsPilote.toString() : ventes;
+    set('pilote-ventes', ventesAffichees);
     set('pilote-invitations', invits);
     set('pilote-total-jauge', totalJauge);
     set('pilote-mg', mg + ' €');
     set('pilote-deal-omp', dealOmp);
     set('pilote-bill-gest', document.getElementById('fp-billetterie').value || 'OMP');
-    set('pilote-etat-ventes2', ventes);
+    set('pilote-etat-ventes2', ventesAffichees);
     // N° jours depuis ouverture = aujourd'hui - date MEV
     var dateMev = document.getElementById('fp-date-mev').value;
     if (dateMev) {
@@ -12139,6 +12153,80 @@ function _hideTeamSelection() {
     // Mettre à jour le bloc RESULTAT OMP
     bilanCalcResultatOMP();
   }
+
+  // 🎯 Calcul automatique du salaire tournée selon la jauge (billets vendus)
+  // Même barème que BILAN AMH : <1500=9300 / <2000=9680 / <2500=10250 / <3000=12000 / ≥3000=13500
+  async function calculerSalaireSelonJauge() {
+    try {
+      // Récupérer les billets vendus depuis billetterie_data
+      var gBillets = 0;
+      
+      if (_fpDateId) {
+        var bdRes = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', _fpDateId).single();
+        if (bdRes.data && bdRes.data.billetterie_data) {
+          var parsed = JSON.parse(bdRes.data.billetterie_data);
+          var ops = ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'];
+          for (var oi=0; oi<ops.length; oi++) {
+            var opData = parsed[ops[oi]];
+            if (!opData) continue;
+            for (var ci=0; ci<opData.length; ci++) {
+              var catData = opData[ci];
+              if (!catData) continue;
+              for (var ri=0; ri<catData.length; ri++) {
+                var row = catData[ri];
+                if (!row) continue;
+                gBillets += parseFloat(row.billets) || 0;
+              }
+            }
+          }
+        }
+      }
+      
+      // Si pas de billets, essayer le pointage_ventes sur la date
+      if (gBillets === 0 && _fpDateId) {
+        try {
+          var dcRes = await _supabase.from('dates_concert').select('pointage_ventes').eq('id', _fpDateId).single();
+          if (dcRes.data && dcRes.data.pointage_ventes) {
+            gBillets = parseFloat(dcRes.data.pointage_ventes) || 0;
+          }
+        } catch(e) {}
+      }
+      
+      if (gBillets === 0) {
+        if (typeof ompToast === 'function') {
+          ompToast('⚠️ Aucun billet vendu enregistré. Remplir la billetterie d\'abord.', 'warning');
+        } else {
+          alert('⚠️ Aucun billet vendu enregistré. Remplir la billetterie d\'abord.');
+        }
+        return;
+      }
+      
+      // Calcul du salaire selon le barème
+      var salaire = 0;
+      if (gBillets < 1500) salaire = 9300;
+      else if (gBillets < 2000) salaire = 9680;
+      else if (gBillets < 2500) salaire = 10250;
+      else if (gBillets < 3000) salaire = 12000;
+      else salaire = 13500;
+      
+      // Appliquer dans l'input
+      var input = document.getElementById('fin-omp-sal-tournee');
+      if (input) {
+        input.value = salaire;
+        // Déclencher les events pour recalcul/sauvegarde
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        if (typeof ompToast === 'function') {
+          ompToast('💰 Salaire calculé : ' + salaire + '€ (pour ' + gBillets + ' billets)', 'success');
+        }
+      }
+    } catch(e) {
+      console.error('calculerSalaireSelonJauge:', e);
+      alert('Erreur lors du calcul : ' + e.message);
+    }
+  }
+  window.calculerSalaireSelonJauge = calculerSalaireSelonJauge;
 
   function bilanCalcDepenses() {
     // Recalcul TOTAL DEPENSES quand on modifie DIVERS ou AUTRES
@@ -14991,6 +15079,12 @@ function _hideTeamSelection() {
       document.body.classList.add('role-not-admin');
     }
 
+    // Toggle section outils admin dans la sidebar desktop
+    var sidebarAdminTools = document.getElementById('sidebar-admin-tools');
+    if (sidebarAdminTools) {
+      sidebarAdminTools.style.display = (role === 'admin') ? '' : 'none';
+    }
+
     // Masquer le bouton "+ Ajouter une date" pour tous sauf admin (toi et Alexandrine)
     var btnAddDate = document.getElementById('btn-ajouter-date');
     if (btnAddDate) {
@@ -16104,6 +16198,19 @@ function _hideTeamSelection() {
         setVal('pilote-tendance', '');
         setVal('pilote-proj-payants', '');
         setVal('pilote-proj-total', '');
+        
+        // ✨ Au moins afficher les ventes à ce jour depuis la billetterie
+        try {
+          if (dateId) {
+            var bdNoSnap = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', dateId).single();
+            if (bdNoSnap.data && bdNoSnap.data.billetterie_data) {
+              var bdNSParsed = JSON.parse(bdNoSnap.data.billetterie_data);
+              var calcNS = _projCalculerTotalBilletterie(bdNSParsed);
+              if (calcNS.total > 0) setNum('pilote-proj-ventes-actuelles', calcNS.total);
+            }
+          }
+        } catch(e) { console.log('Total billetterie sans snapshot:', e); }
+        
         console.log('ℹ️ Aucun snapshot pour cette date — projection indisponible');
         return;
       }
@@ -16112,7 +16219,20 @@ function _hideTeamSelection() {
       var today = new Date();
       today.setHours(0, 0, 0, 0);
       var dernier = snapshots[snapshots.length - 1];
+      
+      // ✨ Total actuel : lire DIRECTEMENT depuis la billetterie Supabase (source de vérité)
+      // Sinon fallback sur le dernier snapshot
       var totalActuel = dernier.total_cumul;
+      try {
+        if (dateId) {
+          var bdLive = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', dateId).single();
+          if (bdLive.data && bdLive.data.billetterie_data) {
+            var bdParsed = JSON.parse(bdLive.data.billetterie_data);
+            var calcLive = _projCalculerTotalBilletterie(bdParsed);
+            if (calcLive.total > 0) totalActuel = calcLive.total;
+          }
+        }
+      } catch(e) { console.log('Total live billetterie:', e); }
 
       var moy7j = _projMoyennePeriode(snapshots, today, 7);
       var moy30j = _projMoyennePeriode(snapshots, today, 30);
