@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.61">
+<meta name="version" content="2026.04.17.62">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -17516,7 +17516,7 @@ function _hideTeamSelection() {
       // 2. Toutes les dates
       var rDates = await _supabase
         .from('dates_concert')
-        .select('id, tournee_id, date_concert, ville, nom_salle, jauge_choisie, jauge_max, statut')
+        .select('id, tournee_id, date_concert, ville, nom_salle, jauge_choisie, jauge_max, statut, import_historique, import_billets, import_jauge, import_ca_ttc, import_resultat_omp')
         .order('date_concert', { ascending: true });
 
       var dates = rDates.data || [];
