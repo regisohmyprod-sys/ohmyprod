@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.51">
+<meta name="version" content="2026.04.17.52">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4093,8 +4093,16 @@ function _hideTeamSelection() {
           <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DEAL DL CO PROD</td><td id="pilote-deal-dl-coprod" style="padding:10px 16px;color:#22c55e;text-align:right;font-weight:700;"></td></tr>
           <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DROITS OMP</td><td id="pilote-droits-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
           <tr style="border-bottom:2px solid #333;"><td style="padding:10px 16px;color:#ccc;">DROIT AU TIRAGE</td><td id="pilote-droit-tirage" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="background:#1a1a2e;border-top:2px solid #fbbf24;">
+            <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;color:#fbbf24;">RÉSULTAT BRUT</td>
+            <td id="pilote-resultat-brut" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#fbbf24;"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;">
+            <td style="padding:8px 16px;color:#a78bfa;" id="pilote-res-part-partenaire-label">PART PARTENAIRE</td>
+            <td id="pilote-res-part-partenaire" style="padding:8px 16px;text-align:right;color:#a78bfa;font-weight:600;"></td>
+          </tr>
           <tr style="background:linear-gradient(90deg, #1a1a2e 0%, #2a1a3a 100%);border-top:2px solid #c9a84c;">
-            <td style="padding:14px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:16px;color:#c9a84c;">RÉSULTAT OMP</td>
+            <td style="padding:14px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:16px;color:#c9a84c;" id="pilote-resultat-omp-label">RÉSULTAT OMP</td>
             <td id="pilote-resultat-omp" style="padding:14px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:900;"></td>
           </tr>
         </table>
@@ -11762,8 +11770,55 @@ function _hideTeamSelection() {
           // DROIT AU TIRAGE = CNM × 60%
           setEl('pilote-droit-tirage', droitTirage > 0 ? fmt(droitTirage) : '');
           
-          // RÉSULTAT OMP = Recette TTC - Montant CNM - Droits - Dépenses + Droits OMP + Droit au Tirage
-          var resultatOMP = recTotal - montantCNM - droitsTotal - sumFin + droitsOMP + droitTirage;
+          // RÉSULTAT BRUT = Recette TTC - Montant CNM - Droits - Dépenses + Droits OMP + Droit au Tirage
+          var resultatBrut = recTotal - montantCNM - droitsTotal - sumFin + droitsOMP + droitTirage;
+          
+          // ✨ Lire le Deal OMP % depuis la fiche identification
+          var dealOmpFiche = document.getElementById('fp-deal-omp')?.value || '100% OMP';
+          var pctOMPdeal = 1;
+          var pctPartenaireDeal = 0;
+          var labelOMP = 'RÉSULTAT OMP';
+          var labelPartenaire = 'PART PARTENAIRE';
+          
+          if (dealOmpFiche === '100% OMP' || dealOmpFiche === 'VENTE') {
+            pctOMPdeal = 1;
+            pctPartenaireDeal = 0;
+          } else {
+            var dealParts = dealOmpFiche.split('/');
+            if (dealParts.length === 2) {
+              var pO = parseFloat(dealParts[0]) || 100;
+              var pP = parseFloat(dealParts[1]) || 0;
+              pctOMPdeal = pO / 100;
+              pctPartenaireDeal = pP / 100;
+              labelOMP = 'RÉSULTAT OMP (' + pO + '%)';
+              labelPartenaire = 'PART PARTENAIRE (' + pP + '%)';
+            }
+          }
+          
+          var resultatOMP = resultatBrut * pctOMPdeal;
+          var partPartenaire = resultatBrut * pctPartenaireDeal;
+          
+          // Afficher le résultat brut
+          var elBrut = document.getElementById('pilote-resultat-brut');
+          if (elBrut) elBrut.textContent = fmt(resultatBrut);
+          
+          // Afficher la part partenaire (masquée si 100% OMP)
+          var elPart = document.getElementById('pilote-res-part-partenaire');
+          var elPartLbl = document.getElementById('pilote-res-part-partenaire-label');
+          if (elPart && elPartLbl) {
+            if (pctPartenaireDeal > 0) {
+              elPart.parentElement.style.display = '';
+              elPartLbl.textContent = labelPartenaire;
+              elPart.textContent = fmt(partPartenaire);
+            } else {
+              elPart.parentElement.style.display = 'none';
+            }
+          }
+          
+          // Mettre à jour le label RÉSULTAT OMP avec le %
+          var elOmpLbl = document.getElementById('pilote-resultat-omp-label');
+          if (elOmpLbl) elOmpLbl.textContent = labelOMP;
+          
           var elResOMP = document.getElementById('pilote-resultat-omp');
           if (elResOMP) {
             elResOMP.textContent = fmt(resultatOMP);
