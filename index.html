@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.49">
+<meta name="version" content="2026.04.17.50">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -16174,7 +16174,18 @@ function _hideTeamSelection() {
         .eq('date_id', dateId)
         .order('snapshot_date', { ascending: true });
 
-      var snapshots = r.data || [];
+      var rawSnapshots = r.data || [];
+      
+      // ✨ FILTRE : Ignorer les snapshots avec une date farfelue (dans le futur ou > date du concert)
+      var todayISO = new Date().toISOString().split('T')[0];
+      var snapshots = rawSnapshots.filter(function(snap) {
+        // Supprimer les snapshots futurs (erreur de saisie comme 2028)
+        if (snap.snapshot_date > todayISO) {
+          console.warn('⚠️ Snapshot ignoré (date future) :', snap.snapshot_date, 'cumul=' + snap.total_cumul);
+          return false;
+        }
+        return true;
+      });
 
       var setVal = function(id, v, suf) {
         var el = document.getElementById(id);
