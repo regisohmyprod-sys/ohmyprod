@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.44">
+<meta name="version" content="2026.04.17.45">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -2750,10 +2750,6 @@ html, body { overscroll-behavior-y: none; }
     text-align:center;
   ">
     @OMPdesign — RÉSERVÉ
-    <div style="margin-top:8px;">
-      <button onclick="superHardRefresh()" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:rgba(255,255,255,0.4);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;font-family:'Trebuchet MS',sans-serif;" onmouseover="this.style.borderColor='#e31e24';this.style.color='#e31e24';" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.4)';">🔄 HARD REFRESH</button>
-      <button onclick="backupLocal()" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:rgba(255,255,255,0.4);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;font-family:'Trebuchet MS',sans-serif;margin-left:6px;" onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c';" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.4)';">💾 BACKUP LOCAL</button>
-    </div>
   </div>
 </div>
 
@@ -20108,6 +20104,13 @@ function _hideTeamSelection() {
       </button>
       <button class="drawer-item" onclick="bnCloseDrawer(); showPage('acces-frais');">
         <span class="drawer-icon">💶</span> Notes de frais
+      </button>
+      <div class="drawer-section-title" style="margin-top:18px;">🔧 Outils admin</div>
+      <button class="drawer-item" onclick="bnCloseDrawer(); backupLocal();">
+        <span class="drawer-icon">💾</span> Backup local
+      </button>
+      <button class="drawer-item danger" onclick="bnCloseDrawer(); ompConfirm('🔄 Hard Refresh ?', 'Efface TOUT le cache local et recharge l\\'appli. Tu devras te reconnecter. Continuer ?', superHardRefresh, null, {okLabel:'Oui, tout effacer', danger:true});">
+        <span class="drawer-icon">🔄</span> Hard refresh
       </button>
     </div>
     <div class="drawer-section-title">Mon compte</div>
