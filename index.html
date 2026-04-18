@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.52">
+<meta name="version" content="2026.04.17.56">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -2626,6 +2626,131 @@ html, body { overscroll-behavior-y: none; }
 /* ==========================================================
    ============ 📱 OMP MOBILE KIT — END ===================
    ========================================================== */
+
+/* ==========================================================
+   🖨️  IMPRESSION (A4) — Pages Clôture Salle / Décla Droits / Bilan AMH
+   ========================================================== */
+@media print {
+  /* Inversion des couleurs pour impression lisible */
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Forcer les couleurs d'accent à s'imprimer */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Cacher les éléments de navigation et actions */
+  .sidebar,
+  .topbar,
+  .bottom-nav,
+  .drawer-overlay,
+  .drawer-panel,
+  .back-btn,
+  .no-print,
+  #splash-screen,
+  #login-screen,
+  .breadcrumb,
+  #omp-toast-container {
+    display: none !important;
+  }
+  
+  /* Cacher tous les boutons sauf ceux marqués imprimer-ok */
+  button:not(.print-ok) {
+    display: none !important;
+  }
+  
+  /* Main : plein écran */
+  .main {
+    margin-left: 0 !important;
+    padding: 10mm !important;
+    max-width: 100% !important;
+  }
+  
+  /* Cacher les autres pages que celle active */
+  .page { display: none !important; }
+  .page.active { display: block !important; padding: 0 !important; }
+  
+  /* Fonds blancs pour tous les blocs sombres */
+  [style*="background:#1a1a1a"],
+  [style*="background:#0a0a0a"],
+  [style*="background: #1a1a1a"],
+  [style*="background: #0a0a0a"],
+  [style*="background:#111"],
+  [style*="background: #111"] {
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+  }
+  
+  /* Textes clairs → noirs pour impression */
+  [style*="color:#fff"],
+  [style*="color: #fff"],
+  [style*="color:#ccc"],
+  [style*="color: #ccc"],
+  [style*="color:#aaa"],
+  [style*="color: #aaa"],
+  [style*="color:#888"],
+  [style*="color: #888"] {
+    color: #222 !important;
+  }
+  
+  /* Cellules de tableau : bordures visibles */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: avoid;
+  }
+  td, th {
+    border: 1px solid #ddd !important;
+    color: #000 !important;
+  }
+  
+  /* Titres de sections colorés restent colorés (c'est joli) */
+  [style*="background:#3b82f6"],
+  [style*="background: #3b82f6"],
+  [style*="background:#c9a84c"],
+  [style*="background: #c9a84c"],
+  [style*="background:#a855f7"],
+  [style*="background: #a855f7"],
+  [style*="background:#22c55e"],
+  [style*="background: #22c55e"],
+  [style*="background:#1e3a5f"],
+  [style*="background: #1e3a5f"] {
+    color: inherit !important;
+    /* Le fond reste coloré pour les titres */
+  }
+  
+  /* Saut de page entre blocs principaux */
+  #page-cloture-salle > div,
+  #page-decla-droits > div,
+  #page-bilan-amh > div,
+  #page-pilote-date > div,
+  #page-fiche-financier > div {
+    page-break-inside: avoid;
+    margin-bottom: 4mm !important;
+  }
+  
+  /* Format A4 portrait avec marges minimes */
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+  
+  /* Font plus compacte pour tenir sur la page */
+  body, table, td, th, span, div {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+  /* Titres conservent leur taille */
+  [style*="Bebas Neue"] {
+    font-size: inherit !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -3723,7 +3848,10 @@ function _hideTeamSelection() {
           <div id="fin-ville-date" style="font-size:13px;color:#888;"></div>
           <div id="fin-autosave-ind" style="font-size:11px;color:#22c55e;opacity:0;transition:opacity 0.3s;">✅ Auto-sauvegardé</div>
         </div>
-        <button onclick="finSauvegarder(false)" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
+        <div style="display:flex;gap:10px;">
+          <button onclick="window.print()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
+          <button onclick="finSauvegarder(false)" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
+        </div>
       </div>
 
       <!-- SECTION 1 : LOCATION SALLE -->
@@ -3999,6 +4127,7 @@ function _hideTeamSelection() {
           <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#22c55e;">🎯 PILOTE DATE</div>
           <div id="pilote-ville-date" style="font-size:13px;color:#888;"></div>
         </div>
+        <button onclick="window.print()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
       </div>
 
 
@@ -4232,14 +4361,14 @@ function _hideTeamSelection() {
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <div style="background:#3b82f6;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#fff;text-align:center;">ESPACE TOURNÉES</div>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;width:40%;">SPECTACLE</td><td style="padding:7px 16px;color:#fff;font-weight:700;">THE WORLD OF QUEEN</td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">DATE</td><td id="cs-date" style="padding:7px 16px;color:#3b82f6;font-weight:600;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">PRODUCTEUR</td><td style="padding:7px 16px;color:#fff;font-weight:600;">OH MY PROD</td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">PROMOTEUR LOCAL</td><td id="cs-promo" style="padding:7px 16px;color:#e31e24;font-weight:700;">PAS DE PL</td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">GESTION BILLETTERIE</td><td style="padding:7px 16px;color:#fff;font-weight:600;">OMP</td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">VILLE</td><td id="cs-ville" style="padding:7px 16px;color:#3b82f6;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Salle</td><td id="cs-salle" style="padding:7px 16px;color:#fff;font-weight:700;text-transform:uppercase;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">HEURE</td><td id="cs-heure" style="padding:7px 16px;color:#fff;font-weight:600;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;width:40%;">SPECTACLE</td><td style="padding:7px 16px;color:#fff;font-weight:700;text-align:center;">THE WORLD OF QUEEN</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">DATE</td><td id="cs-date" style="padding:7px 16px;color:#3b82f6;font-weight:600;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">PRODUCTEUR</td><td style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;">OH MY PROD</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">PROMOTEUR LOCAL</td><td id="cs-promo" style="padding:7px 16px;color:#e31e24;font-weight:700;text-align:center;">PAS DE PL</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">GESTION BILLETTERIE</td><td style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;">OMP</td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">VILLE</td><td id="cs-ville" style="padding:7px 16px;color:#3b82f6;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Salle</td><td id="cs-salle" style="padding:7px 16px;color:#fff;font-weight:700;text-transform:uppercase;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">HEURE</td><td id="cs-heure" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
         </table>
       </div>
 
@@ -4261,14 +4390,14 @@ function _hideTeamSelection() {
           <span>SALLE</span><span>RECETTES &amp; FACTURES</span>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Recette HT billetterie</td><td id="cs-rec-ht" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% Salle contrat</td><td id="cs-pct-salle" style="padding:7px 16px;color:#c9a84c;font-weight:700;text-align:right;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Facture salle prestations</td><td id="cs-fact-presta" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Location calculée MG &amp; %</td><td id="cs-loc-mg" style="padding:7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Acompte versé</td><td style="padding:7px 16px;"><input type="number" class="fin-input" id="cs-acompte" placeholder="0" oninput="csCalcTotal(); csSauvegarder()" style="width:120px;float:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Recette HT billetterie</td><td id="cs-rec-ht" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% Salle contrat</td><td id="cs-pct-salle" style="padding:7px 16px;color:#c9a84c;font-weight:700;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Facture salle prestations</td><td id="cs-fact-presta" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Location calculée MG &amp; %</td><td id="cs-loc-mg" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Acompte versé</td><td style="padding:7px 16px;text-align:center;"><input type="number" class="fin-input" id="cs-acompte" placeholder="0" oninput="csCalcTotal(); csSauvegarder()" style="width:120px;text-align:center;"></td></tr>
           <tr style="background:#1a1a2e;border-top:2px solid #3b82f6;">
             <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#fff;">FACTURE SALLE TOTAL</td>
-            <td id="cs-fact-total" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#3b82f6;font-weight:700;"></td>
+            <td id="cs-fact-total" style="padding:10px 16px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#3b82f6;font-weight:700;"></td>
           </tr>
         </table>
       </div>
@@ -12956,18 +13085,31 @@ function _hideTeamSelection() {
             if (elA) { elA.value = ra.data.cs_acompte; csCalcTotal(); }
           }
         });
-        var pctSalle = parseFloat(fd['fin-omp-loc-pct']) || 0;
+        var pctSalle = parseFloat(fd['fin-omp-loc-pct']) || parseFloat(fd['fin-pl-loc-pct']) || 0;
         setEl('cs-pct-salle', pctSalle + ' %');
-        // Location MG = MAX(MG saisi, loc-ht sauvegardé) - exactement comme Fiche Dépenses
-        var locMG = parseFloat(fd['fin-omp-loc-mg']) || 0;
-        var locHT = parseFloat(fd['fin-omp-loc-ht']) || 0;
-        var locCalc = Math.max(locMG, locHT);
+        
+        // Location MG = MAX(MG saisi, loc-ht sauvegardé) — somme OMP + PROMOTEUR LOCAL
+        var locMG_omp = parseFloat(fd['fin-omp-loc-mg']) || 0;
+        var locHT_omp = parseFloat(fd['fin-omp-loc-ht']) || 0;
+        var locCalc_omp = Math.max(locMG_omp, locHT_omp);
+        
+        var locMG_pl = parseFloat(fd['fin-pl-loc-mg']) || 0;
+        var locHT_pl = parseFloat(fd['fin-pl-loc-ht']) || 0;
+        var locCalc_pl = Math.max(locMG_pl, locHT_pl);
+        
+        var locCalc = locCalc_omp + locCalc_pl;
         setEl('cs-loc-mg', locCalc > 0 ? fmtCs(locCalc) : '');
-        // Prestations/personne salle
+        
+        // Prestations/personne salle — somme OMP + PROMOTEUR LOCAL
         var ompPrest = (parseFloat(fd['fin-omp-prest-energie'])||0)+(parseFloat(fd['fin-omp-prest-chauf'])||0)+(parseFloat(fd['fin-omp-prest-config'])||0)+(parseFloat(fd['fin-omp-prest-fenwick'])||0)+(parseFloat(fd['fin-omp-prest-accroches'])||0)+(parseFloat(fd['fin-omp-prest-elec'])||0);
         var ompPers = (parseFloat(fd['fin-omp-pers-nettoyage'])||0)+(parseFloat(fd['fin-omp-pers-nett-supp'])||0)+(parseFloat(fd['fin-omp-pers-elec'])||0)+(parseFloat(fd['fin-omp-pers-hriger'])||0)+(parseFloat(fd['fin-omp-pers-regisseur'])||0)+(parseFloat(fd['fin-omp-pers-forfait'])||0)+(parseFloat(fd['fin-omp-pers-caissier'])||0)+(parseFloat(fd['fin-omp-pers-rigg'])||0)+(parseFloat(fd['fin-omp-pers-hotesses'])||0)+(parseFloat(fd['fin-omp-pers-controle'])||0)+(parseFloat(fd['fin-omp-pers-parking'])||0)+(parseFloat(fd['fin-omp-pers-secu'])||0)+(parseFloat(fd['fin-omp-pers-vigi'])||0)+(parseFloat(fd['fin-omp-pers-consigne'])||0)+(parseFloat(fd['fin-omp-pers-gardien'])||0);
         var ompSecu = (parseFloat(fd['fin-omp-secu-ssiap1'])||0)+(parseFloat(fd['fin-omp-secu-ssiap2'])||0)+(parseFloat(fd['fin-omp-secu-protciv'])||0)+(parseFloat(fd['fin-omp-secu-vigi2'])||0)+(parseFloat(fd['fin-omp-secu-medical'])||0)+(parseFloat(fd['fin-omp-secu-autres'])||0);
-        var ppersonne = ompPrest + ompPers + ompSecu;
+        
+        var plPrest = (parseFloat(fd['fin-pl-prest-energie'])||0)+(parseFloat(fd['fin-pl-prest-chauf'])||0)+(parseFloat(fd['fin-pl-prest-config'])||0)+(parseFloat(fd['fin-pl-prest-fenwick'])||0)+(parseFloat(fd['fin-pl-prest-accroches'])||0)+(parseFloat(fd['fin-pl-prest-elec'])||0);
+        var plPers = (parseFloat(fd['fin-pl-pers-nettoyage'])||0)+(parseFloat(fd['fin-pl-pers-nett-supp'])||0)+(parseFloat(fd['fin-pl-pers-elec'])||0)+(parseFloat(fd['fin-pl-pers-hriger'])||0)+(parseFloat(fd['fin-pl-pers-regisseur'])||0)+(parseFloat(fd['fin-pl-pers-forfait'])||0)+(parseFloat(fd['fin-pl-pers-caissier'])||0)+(parseFloat(fd['fin-pl-pers-rigg'])||0)+(parseFloat(fd['fin-pl-pers-hotesses'])||0)+(parseFloat(fd['fin-pl-pers-controle'])||0)+(parseFloat(fd['fin-pl-pers-parking'])||0)+(parseFloat(fd['fin-pl-pers-secu'])||0)+(parseFloat(fd['fin-pl-pers-vigi'])||0)+(parseFloat(fd['fin-pl-pers-consigne'])||0)+(parseFloat(fd['fin-pl-pers-gardien'])||0);
+        var plSecu = (parseFloat(fd['fin-pl-secu-ssiap1'])||0)+(parseFloat(fd['fin-pl-secu-ssiap2'])||0)+(parseFloat(fd['fin-pl-secu-protciv'])||0)+(parseFloat(fd['fin-pl-secu-vigi2'])||0)+(parseFloat(fd['fin-pl-secu-medical'])||0)+(parseFloat(fd['fin-pl-secu-autres'])||0);
+        
+        var ppersonne = ompPrest + ompPers + ompSecu + plPrest + plPers + plSecu;
         setEl('cs-fact-presta', ppersonne > 0 ? fmtCs(ppersonne) : '');
         setTimeout(csCalcTotal, 100);
       });
