@@ -14437,6 +14437,11 @@ function _hideTeamSelection() {
         btn.style.background = '#e31e24';
         btn.disabled = false;
       }, 2000);
+      // ✨ Rafraîchir _allTournees en arrière-plan pour que toute modif (statut, ville, date...)
+      // soit propagée immédiatement au dashboard + page tournée dynamique + Créa/Suivi
+      if (typeof chargerTournees === 'function') {
+        chargerTournees().catch(function(e) { console.error('refresh fpSauvegarder:', e); });
+      }
     }
   }
 
