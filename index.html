@@ -10356,12 +10356,14 @@ function _hideTeamSelection() {
 
   function ouvrirModalCreerSalle() {
     window._salleEditId = null;
+    window._salleNouvellePhotoEnAttente = null; // ✨ reset photo en attente
     document.getElementById('modal-salle-titre').textContent = 'NOUVELLE SALLE';
     ['ville_nom','adresse','capacite_max','capacite_min','contact_principal','contact_technique','telephone','email','promoteur_local','zone_geo','conditions_location','notes'].forEach(f => {
       const el = document.getElementById('salle-' + f);
       if (el) el.value = '';
     });
     document.getElementById('salle-photo-bloc').style.display = 'none';
+    document.getElementById('salle-photo-preview').src = ''; // ✨ vider la preview
     // Réinitialiser sur onglet INFOS
     afficherOngletSalle('infos');
     openModal('modal-fiche-salle');
@@ -10377,12 +10379,34 @@ function _hideTeamSelection() {
     data.capacite_min = parseInt(document.getElementById('salle-capacite_min')?.value) || null;
 
     let error;
+    let nouvelSalleId = null;
     if (window._salleEditId) {
       ({ error } = await _supabase.from('salles').update(data).eq('id', window._salleEditId));
     } else {
-      ({ error } = await _supabase.from('salles').insert(data));
+      // ✨ Création : on récupère l'ID retourné pour pouvoir uploader la photo après
+      const res = await _supabase.from('salles').insert(data).select('id').single();
+      error = res.error;
+      if (res.data) nouvelSalleId = res.data.id;
     }
     if (error) { alert('Erreur : ' + error.message); return; }
+
+    // ✨ Si une photo était en attente (création), on l'upload maintenant qu'on a un ID
+    if (nouvelSalleId && window._salleNouvellePhotoEnAttente) {
+      try {
+        const file = window._salleNouvellePhotoEnAttente;
+        const ext = file.name.split('.').pop();
+        const path = 'salles/' + nouvelSalleId + '.' + ext;
+        const { error: upErr } = await _supabase.storage.from('photos-salles').upload(path, file, { upsert: true });
+        if (!upErr) {
+          const { data: urlData } = _supabase.storage.from('photos-salles').getPublicUrl(path);
+          await _supabase.from('salles').update({ photo_url: urlData.publicUrl }).eq('id', nouvelSalleId);
+        } else {
+          console.error('Erreur upload photo après création salle:', upErr);
+        }
+      } catch(e) { console.error('Upload photo post-création:', e); }
+      window._salleNouvellePhotoEnAttente = null;
+    }
+
     closeModal('modal-fiche-salle');
     await chargerSalles();
   }
@@ -10636,17 +10660,32 @@ function _hideTeamSelection() {
   }
 
   async function uploaderPhotoSalleModal(input) {
-    if (!input.files?.[0] || !window._salleEditId) return;
+    if (!input.files?.[0]) return;
     const file = input.files[0];
-    const ext = file.name.split('.').pop();
-    const path = 'salles/' + window._salleEditId + '.' + ext;
-    const { error } = await _supabase.storage.from('photos-salles').upload(path, file, { upsert: true });
-    if (error) { alert('Erreur upload : ' + error.message); return; }
-    const { data: urlData } = _supabase.storage.from('photos-salles').getPublicUrl(path);
-    await _supabase.from('salles').update({ photo_url: urlData.publicUrl }).eq('id', window._salleEditId);
-    document.getElementById('salle-photo-preview').src = urlData.publicUrl;
-    document.getElementById('salle-photo-bloc').style.display = 'block';
-    await chargerSalles();
+
+    // ✨ CAS 1 : Salle existante → upload direct
+    if (window._salleEditId) {
+      const ext = file.name.split('.').pop();
+      const path = 'salles/' + window._salleEditId + '.' + ext;
+      const { error } = await _supabase.storage.from('photos-salles').upload(path, file, { upsert: true });
+      if (error) { alert('Erreur upload : ' + error.message); return; }
+      const { data: urlData } = _supabase.storage.from('photos-salles').getPublicUrl(path);
+      await _supabase.from('salles').update({ photo_url: urlData.publicUrl }).eq('id', window._salleEditId);
+      document.getElementById('salle-photo-preview').src = urlData.publicUrl;
+      document.getElementById('salle-photo-bloc').style.display = 'block';
+      await chargerSalles();
+      return;
+    }
+
+    // ✨ CAS 2 : Nouvelle salle (pas encore d'ID) → on garde le fichier en attente
+    // et on affiche un aperçu local. L'upload réel se fera après la sauvegarde de la salle.
+    window._salleNouvellePhotoEnAttente = file;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('salle-photo-preview').src = e.target.result;
+      document.getElementById('salle-photo-bloc').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
   }
 
 
