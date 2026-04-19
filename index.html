@@ -120,6 +120,40 @@
     display: none !important;
   }
 
+  /* ✨ SÉCURITÉ : Masquer TOUT le dashboard admin aux non-admins, même si par erreur
+     showPage('dashboard') est appelé, rien ne s'affichera. */
+  body.role-not-admin #page-dashboard {
+    display: none !important;
+  }
+
+  /* ✨ SÉCURITÉ : Masquer les pages admin-only aux non-admins (défense en profondeur) */
+  body.role-not-admin #page-gestion-omp,
+  body.role-not-admin #page-suivi-resume,
+  body.role-not-admin #page-fiche-prod,
+  body.role-not-admin #page-fiche-financier,
+  body.role-not-admin #page-pilote-date,
+  body.role-not-admin #page-cloture-salle,
+  body.role-not-admin #page-decla-droits,
+  body.role-not-admin #page-bilan-amh,
+  body.role-not-admin #page-fiche-billetterie,
+  body.role-not-admin #page-tournees,
+  body.role-not-admin #page-tournee-dynamic,
+  body.role-not-admin #page-date-dynamic,
+  body.role-not-admin #page-gestion-salles,
+  body.role-not-admin #page-equipe,
+  body.role-not-admin #page-contacts-promo,
+  body.role-not-admin #page-recap-frais,
+  body.role-not-admin #page-fichiers-justificatifs {
+    display: none !important;
+  }
+
+  /* ✨ SÉCURITÉ : Masquer la sidebar et le contenu admin par défaut pendant le chargement
+     (évite le flash visuel avant que applyRoleUI ne soit appelée) */
+  body.role-pending #main-sidebar,
+  body.role-pending #page-dashboard {
+    display: none !important;
+  }
+
   /* LOGIN */
   #login-screen {
     display: flex;
@@ -2644,7 +2678,7 @@ html, body { overscroll-behavior-y: none; }
    ========================================================== */
 </style>
 </head>
-<body>
+<body class="role-pending role-not-admin">
 
 <!-- ==================== SPLASH SCREEN ==================== -->
 <div id="splash-screen" style="
@@ -4997,7 +5031,7 @@ function _hideTeamSelection() {
 
     <!-- PAGE DOSSIER TECHNIQUE -->
     <div id="page-dossier-technique" class="page">
-      <button class="back-btn" onclick="showPage('dashboard')">← Tableau de bord</button>
+      <button class="back-btn" onclick="retourAccueil()">← Accueil</button>
 
       <!-- Message de bienvenue personnalisé -->
       <div id="welcome-msg-technique" style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
@@ -5090,7 +5124,7 @@ function _hideTeamSelection() {
     
 
 <div id="page-staff-omp" class="page">
-      <button class="back-btn" onclick="showPage('dashboard')">← Tableau de bord</button>
+      <button class="back-btn" onclick="retourAccueil()">← Accueil</button>
 
       <!-- Message de bienvenue personnalisé -->
       <div id="welcome-msg-staff" style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
@@ -5210,7 +5244,7 @@ function _hideTeamSelection() {
     
 
 <div id="page-artistique" class="page">
-      <button class="back-btn" onclick="showPage('dashboard')">← Tableau de bord</button>
+      <button class="back-btn" onclick="retourAccueil()">← Accueil</button>
 
       <!-- Message de bienvenue personnalisé -->
       <div id="welcome-msg-artistique" style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none;">
@@ -5725,7 +5759,7 @@ function _hideTeamSelection() {
 
 <!-- ========== PAGE FRAIS - DÉPÔT JUSTIFICATIF (NOUVEAU SYSTÈME) ========== -->
 <div id="page-frais" class="page">
-  <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
+  <button class="back-btn" onclick="retourAccueil()" style="margin-bottom:12px;">← Accueil</button>
   
   <!-- HEADER -->
   <div style="margin-bottom:24px;">
@@ -10702,7 +10736,76 @@ function _hideTeamSelection() {
   }
   window.imprimerPage = imprimerPage;
 
+  // ✨ SÉCURITÉ : Table de permissions par page et par rôle
+  // admin = accès partout. Les autres rôles ont une whitelist stricte.
+  var PAGE_PERMISSIONS = {
+    // Pages communes accessibles selon rôle
+    'dashboard':            ['admin'],
+    'suivi-resume':         ['admin'],
+    'gestion-omp':          ['admin'],
+    'fiche-prod':           ['admin'],
+    'fiche-financier':      ['admin'],
+    'pilote-date':          ['admin'],
+    'cloture-salle':        ['admin'],
+    'decla-droits':         ['admin'],
+    'bilan-amh':            ['admin'],
+    'fiche-billetterie':    ['admin'],
+    'tournees':             ['admin'],
+    'tournee-dynamic':      ['admin'],
+    'date-dynamic':         ['admin'],
+    'gestion-salles':       ['admin'],
+    'equipe':               ['admin'],
+    'contacts-promo':       ['admin'],
+    // Pages espaces spécifiques
+    'staff-omp':            ['admin', 'staff_omp'],
+    'artistique':           ['admin', 'artiste'],
+    'artiste-vhr':          ['admin', 'artiste'],
+    'artiste-date':         ['admin', 'artiste'],
+    'dossier-technique':    ['admin', 'technique', 'staff_omp'],
+    'fiche-vhr':            ['admin', 'staff_omp', 'artiste', 'technique'],
+    'contacts-presta':      ['admin', 'staff_omp', 'artiste'],
+    'contacts-presta-tech': ['admin', 'technique', 'staff_omp'],
+    'frais':                ['admin', 'staff_omp', 'artiste', 'technique'],
+    'recap-frais':          ['admin', 'staff_omp', 'artiste', 'technique'],
+    'fichiers-justificatifs': ['admin', 'staff_omp', 'artiste', 'technique'],
+    'acces-frais':          ['admin', 'staff_omp', 'artiste', 'technique'],
+  };
+
+  // Page d'accueil par rôle (pour redirection sur refus d'accès)
+  function getHomePageForRole(role) {
+    if (role === 'admin') return 'dashboard';
+    if (role === 'staff_omp') return 'staff-omp';
+    if (role === 'artiste') return 'artistique';
+    if (role === 'technique') return 'dossier-technique';
+    return 'staff-omp'; // fallback ultra-restrictif
+  }
+
+  // Fonction unifiée pour les boutons "← Retour" : redirige selon le rôle
+  function retourAccueil() {
+    var role = (typeof _currentUserRole !== 'undefined') ? _currentUserRole : 'staff_omp';
+    showPage(getHomePageForRole(role));
+  }
+  window.retourAccueil = retourAccueil;
+
   function showPage(id) {
+    // ✨ SÉCURITÉ : Contrôle d'accès strict par rôle
+    var role = (typeof _currentUserRole !== 'undefined') ? _currentUserRole : null;
+    var allowed = PAGE_PERMISSIONS[id];
+    if (role && allowed && allowed.indexOf(role) === -1) {
+      console.warn('[SÉCURITÉ] Accès refusé à la page "' + id + '" pour le rôle "' + role + '"');
+      if (typeof ompToast === 'function') {
+        ompToast('🔒 Accès réservé — cette page n\'est pas disponible pour votre rôle.', 'error');
+      }
+      // Redirection silencieuse vers la page d'accueil du rôle
+      var home = getHomePageForRole(role);
+      if (id !== home) {
+        // Éviter boucle infinie
+        id = home;
+      } else {
+        return; // si déjà sur home autorisée, on ne fait rien
+      }
+    }
+
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     var pageEl = document.getElementById('page-' + id);
     if (pageEl) pageEl.classList.add('active');
@@ -15234,14 +15337,15 @@ function _hideTeamSelection() {
       return;
     }
 
-    // Mémoriser email et code
+    // ✨ SÉCURITÉ : On ne stocke plus le code d'accès en clair dans localStorage.
+    // Seul l'email est mémorisé pour pré-remplir le formulaire.
     if (remember) {
       localStorage.setItem('omp_email', email);
-      localStorage.setItem('omp_code', code);
     } else {
       localStorage.removeItem('omp_email');
-      localStorage.removeItem('omp_code');
     }
+    // Nettoyage des anciens codes éventuellement stockés par les versions précédentes
+    localStorage.removeItem('omp_code');
     
     // Toujours ajouter l'email à l'historique (même sans "Se souvenir")
     var emailsHistory = JSON.parse(localStorage.getItem('omp_emails_history') || '[]');
@@ -15315,6 +15419,8 @@ function _hideTeamSelection() {
     } else {
       document.body.classList.add('role-not-admin');
     }
+    // ✨ SÉCURITÉ : rôle appliqué, on peut afficher l'UI sans flash
+    document.body.classList.remove('role-pending');
 
     // Toggle section outils admin dans la sidebar desktop
     var sidebarAdminTools = document.getElementById('sidebar-admin-tools');
@@ -20944,10 +21050,11 @@ function bnNavigateStaff(el) {
   bnSetActive(el);
   var team = window._selectedTeam || 'prod';
   var role = (typeof _currentUserRole !== 'undefined') ? _currentUserRole : 'staff';
-  if (team === 'technique' || role === 'technique') showPage('dossier-technique');
-  else if (team === 'artiste') showPage('artistique');
-  else if (team === 'staff_omp') showPage('staff-omp');
-  else showPage('dashboard');
+  if (role === 'admin') showPage('dashboard');
+  else if (role === 'technique' || team === 'technique') showPage('dossier-technique');
+  else if (role === 'artiste' || team === 'artiste') showPage('artistique');
+  else if (role === 'staff_omp' || team === 'staff_omp') showPage('staff-omp');
+  else showPage('staff-omp'); // fallback restrictif (jamais vers dashboard admin)
 }
 
 function bnNavigateVHR(el) {
