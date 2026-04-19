@@ -10824,6 +10824,11 @@ function _hideTeamSelection() {
     if (id === 'contacts-promo') chargerContactsPromo();
     if (id === 'contacts-presta') chargerPrestas();
     if (id === 'contacts-presta-tech') chargerPrestasTech();
+    // ✨ Refresh automatique des tournées quand on arrive sur dashboard
+    // (évite d'avoir à refresh manuellement après création/duplication d'une date)
+    if (id === 'dashboard' && typeof chargerTournees === 'function' && typeof _currentUserRole !== 'undefined' && _currentUserRole === 'admin') {
+      chargerTournees().catch(function(e) { console.error('refresh dashboard:', e); });
+    }
     if (id === 'acces-frais') {
       // Afficher vue admin ou membre selon le rôle
       var adminView = document.getElementById('frais-admin-view');
@@ -11247,8 +11252,18 @@ function _hideTeamSelection() {
 
     // Recharger la liste en arrière-plan
     csChargerDates();
-    // ✨ Recharger aussi les tournées (dashboard + page tournée dynamique + stats)
-    chargerTournees().catch(function(e) { console.error('chargerTournees:', e); });
+    // ✨ Attendre que chargerTournees soit fini AVANT de continuer
+    // (pour que dashboard + page tournée dynamique soient à jour de suite)
+    try {
+      await chargerTournees();
+      // Si la page tournée dynamique est la dernière visitée, la rafraîchir aussi
+      if (_tourneeActive && _tourneeActive.id === tourneeId) {
+        var idPage = _tourneeActive.nom_spectacle && _tourneeActive.nom_spectacle.includes('ternelle') ? 'twoq2' : 'twoq';
+        // Met à jour l'affichage sans forcer la navigation (on va quand même sur fiche-prod)
+        var tourneeMaj = _allTournees?.find(function(t){ return t.id === tourneeId; });
+        if (tourneeMaj) { _tourneeActive = tourneeMaj; }
+      }
+    } catch(e) { console.error('chargerTournees:', e); }
     showPage('fiche-prod');
   }
 
@@ -11328,8 +11343,8 @@ function _hideTeamSelection() {
 
     // Recharger la liste et ouvrir la nouvelle fiche
     await csChargerDates();
-    // ✨ Recharger aussi les tournées (dashboard + page tournée dynamique + stats)
-    chargerTournees().catch(function(e) { console.error('chargerTournees:', e); });
+    // ✨ Attendre la MàJ des tournées AVANT d'ouvrir la fiche
+    try { await chargerTournees(); } catch(e) { console.error('chargerTournees:', e); }
     fpOuvrir(nouvelle.id, nouvelle.ville || '', nouvelleDate);
   }
 
@@ -14454,7 +14469,11 @@ function _hideTeamSelection() {
   let _datesActives = [];
   let _dateActiveIdx = 0;
 
-  function showTournee(id) {
+  async function showTournee(id) {
+    // ✨ Rafraîchir les données en mémoire pour toujours afficher les infos à jour
+    // (évite les décalages après création/duplication d'une date depuis Créa/Suivi)
+    try { await chargerTournees(); } catch(e) { console.error('refresh showTournee:', e); }
+
     const tournee = _allTournees?.find(t => {
       if (id === 'twoq') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('hommage');
       if (id === 'twoq2') return t.nom_groupe === 'THE WORLD OF QUEEN' && t.nom_spectacle.includes('ternelle');
