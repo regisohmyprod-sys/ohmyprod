@@ -11186,6 +11186,7 @@ function _hideTeamSelection() {
 
   function csCreerDate() {
     // Ouvrir la mini-modale de création rapide
+    document.getElementById('cs-new-type-date').value = 'Concert/Spectacle';
     document.getElementById('cs-new-ville').value = '';
     document.getElementById('cs-new-date').value = '';
     document.getElementById('cs-new-heure').value = '20:30';
@@ -11193,6 +11194,7 @@ function _hideTeamSelection() {
   }
 
   async function csCreerDateValider() {
+    const typeDate = document.getElementById('cs-new-type-date').value || 'Concert/Spectacle';
     const ville = document.getElementById('cs-new-ville').value.trim();
     const date = document.getElementById('cs-new-date').value;
     const heure = document.getElementById('cs-new-heure').value || '20:30';
@@ -11208,6 +11210,7 @@ function _hideTeamSelection() {
       heure_show: heure,
       tournee_id: tourneeId,
       statut: 'confirmee',
+      type_date: typeDate,
     }).select().single();
 
     if (error || !data) { alert('Erreur création : ' + (error?.message || '')); return; }
@@ -19216,6 +19219,21 @@ function _hideTeamSelection() {
       <button class="modal-close" onclick="closeModal('modal-cs-creer-date')">✕</button>
     </div>
     <div class="modal-body">
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Type de date *</label>
+          <select id="cs-new-type-date" style="background:var(--black); border:1px solid var(--border); border-radius:8px; color:var(--white); padding:10px 12px; font-size:13px; font-family:'Inter',sans-serif; outline:none; width:100%;">
+            <option value="Concert/Spectacle">🎵 Concert/Spectacle</option>
+            <option value="Jour off">☀️ Jour off</option>
+            <option value="Promo">📢 Promo</option>
+            <option value="Répétition">🎸 Répétition</option>
+            <option value="Trajet">🚌 Trajet</option>
+            <option value="Séance de studio">🎙️ Séance de studio</option>
+            <option value="Résidence">🏠 Résidence</option>
+            <option value="Autre">📝 Autre</option>
+          </select>
+        </div>
+      </div>
       <div class="modal-row">
         <div class="modal-field">
           <label>Ville *</label>
