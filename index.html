@@ -3567,6 +3567,7 @@ function _hideTeamSelection() {
           <button onclick="fpOuvrirClotureSalle()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🏟️ CLÔTURE SALLE</button>
           <button onclick="fpOuvrirDecla()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📋 DÉCLA DROITS</button>
           <button onclick="fpOuvrirBilanAMH()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📊 BILAN AMH</button>
+          <button onclick="if(_fpDateId){dupliquerDateOuvrir(_fpDateId)}else{alert('Aucune date ouverte.')}" title="Dupliquer cette date" style="background:#1a1a1a;color:#c9a84c;border:1px solid #c9a84c;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📋 DUPLIQUER</button>
         </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -11249,6 +11250,85 @@ function _hideTeamSelection() {
     showPage('fiche-prod');
   }
 
+  // ============================================================
+  // DUPLICATION D'UNE DATE — ne duplique QUE la date
+  // (pas la fiche prod, billetterie ni financier)
+  // ============================================================
+  var _dupDateIdSource = null;
+
+  function dupliquerDateOuvrir(dateId) {
+    _dupDateIdSource = dateId;
+    // Reset du modal
+    var dInput = document.getElementById('dup-new-date');
+    if (dInput) dInput.value = '';
+    var infoEl = document.getElementById('dup-source-info');
+    if (infoEl) infoEl.textContent = 'Chargement...';
+
+    // Charger les infos de la date source pour affichage
+    _supabase.from('dates_concert')
+      .select('ville, date_concert, type_date, tournee_id')
+      .eq('id', dateId)
+      .single()
+      .then(function(res) {
+        if (res.data && infoEl) {
+          var d = res.data;
+          var dateStr = d.date_concert 
+            ? new Date(d.date_concert.substring(0,10) + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'long', year:'numeric'})
+            : '—';
+          infoEl.innerHTML = '📍 <strong>' + (d.ville || '—') + '</strong> · ' + dateStr + ' · <em>' + (d.type_date || 'Concert/Spectacle') + '</em>';
+        }
+      });
+
+    openModal('modal-dup-date');
+  }
+
+  async function dupliquerDateValider() {
+    if (!_dupDateIdSource) { alert('Date source introuvable.'); return; }
+    var nouvelleDate = document.getElementById('dup-new-date').value;
+    if (!nouvelleDate) { alert('Choisis une date pour la duplication.'); return; }
+
+    // Charger toutes les infos de la date source
+    var { data: src, error: errSrc } = await _supabase
+      .from('dates_concert')
+      .select('*')
+      .eq('id', _dupDateIdSource)
+      .single();
+
+    if (errSrc || !src) { alert('Erreur lecture date source : ' + (errSrc?.message || '')); return; }
+
+    // Construire le payload de la nouvelle date (sans l'id, avec la nouvelle date)
+    var payload = {
+      ville: src.ville,
+      date_concert: nouvelleDate,
+      heure_show: src.heure_show || '20:30',
+      tournee_id: src.tournee_id,
+      statut: 'option', // option par défaut pour une date dupliquée (à confirmer)
+      type_date: src.type_date || 'Concert/Spectacle',
+      nom_salle: src.nom_salle || null,
+    };
+
+    var { data: nouvelle, error: errIns } = await _supabase
+      .from('dates_concert')
+      .insert(payload)
+      .select()
+      .single();
+
+    if (errIns || !nouvelle) { alert('Erreur duplication : ' + (errIns?.message || '')); return; }
+
+    closeModal('modal-dup-date');
+    _dupDateIdSource = null;
+
+    if (typeof ompToast === 'function') {
+      ompToast('✅ Date dupliquée — statut OPTION, à modifier', 'success');
+    } else {
+      alert('✅ Date dupliquée en "option". Tu peux maintenant modifier la ville, la salle, etc.');
+    }
+
+    // Recharger la liste et ouvrir la nouvelle fiche
+    await csChargerDates();
+    fpOuvrir(nouvelle.id, nouvelle.ville || '', nouvelleDate);
+  }
+
 
   // Charger les salles depuis Supabase dans la datalist
   async function csChargerSallesDatalist() {
@@ -11473,6 +11553,9 @@ function _hideTeamSelection() {
               ? '<span style="font-size:11px;color:#4caf50;font-weight:700;background:rgba(76,175,80,0.1);border:1px solid #4caf50;border-radius:4px;padding:2px 8px;">✅ FICHE</span>'
               : '<span style="font-size:11px;color:#888;background:#111;border:1px solid #333;border-radius:4px;padding:2px 8px;">— vide</span>'
             }
+            <button onclick="dupliquerDateOuvrir('${d.id}')" title="Dupliquer cette date" style="background:#1a1a1a;color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+              📋 Dupliquer
+            </button>
             <button onclick="fpOuvrir('${d.id}','${(d.ville||'').replace(/'/g,"\\'")}','${dateStr.replace(/'/g,"\\'")}')" style="background:#1a2f4a;color:#7eb8d4;border:1px solid #3b82f6;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
               ${hasFiche ? '✏️ FICHE' : '📋 Suivre'}
             </button>
@@ -19254,6 +19337,38 @@ function _hideTeamSelection() {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-cs-creer-date')">Annuler</button>
       <button class="btn btn-primary" onclick="csCreerDateValider()">✅ Créer et ouvrir la fiche</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE DUPLIQUER UNE DATE -->
+<div id="modal-dup-date" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box" style="max-width:460px;">
+    <div class="modal-header">
+      <div class="modal-title">📋 DUPLIQUER LA DATE</div>
+      <button class="modal-close" onclick="closeModal('modal-dup-date')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#0f1419;border:1px solid #2a3a4a;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Date source</div>
+        <div id="dup-source-info" style="font-size:13px;color:#fff;">Chargement...</div>
+      </div>
+      <div style="background:#1a1400;border:1px solid #c9a84c;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#c9a84c;line-height:1.5;">
+        ⚠️ Seule <strong>la date</strong> sera dupliquée (ville, salle, type, heure, statut).<br>
+        La fiche production, la billetterie et le financier <strong>ne seront PAS copiés</strong>.<br>
+        Statut initial : <strong>OPTION</strong> (à confirmer manuellement).
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Nouvelle date *</label>
+          <input type="date" id="dup-new-date" />
+        </div>
+      </div>
+      <div style="font-size:11px;color:#888;margin-top:8px;">💡 Tu pourras modifier la ville et les autres infos juste après sur la fiche.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-dup-date')">Annuler</button>
+      <button class="btn btn-primary" onclick="dupliquerDateValider()">📋 Dupliquer</button>
     </div>
   </div>
 </div>
