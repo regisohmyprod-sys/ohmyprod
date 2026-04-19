@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>OH MY PROD – Gestion Tournées</title>
 <!-- VERSION pour forcer le refresh - change ce numéro à chaque mise à jour -->
-<meta name="version" content="2026.04.17.62">
+<meta name="version" content="2026.04.19.1">
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -11247,6 +11247,8 @@ function _hideTeamSelection() {
 
     // Recharger la liste en arrière-plan
     csChargerDates();
+    // ✨ Recharger aussi les tournées (dashboard + page tournée dynamique + stats)
+    chargerTournees().catch(function(e) { console.error('chargerTournees:', e); });
     showPage('fiche-prod');
   }
 
@@ -11326,6 +11328,8 @@ function _hideTeamSelection() {
 
     // Recharger la liste et ouvrir la nouvelle fiche
     await csChargerDates();
+    // ✨ Recharger aussi les tournées (dashboard + page tournée dynamique + stats)
+    chargerTournees().catch(function(e) { console.error('chargerTournees:', e); });
     fpOuvrir(nouvelle.id, nouvelle.ville || '', nouvelleDate);
   }
 
@@ -11553,10 +11557,10 @@ function _hideTeamSelection() {
               ? '<span style="font-size:11px;color:#4caf50;font-weight:700;background:rgba(76,175,80,0.1);border:1px solid #4caf50;border-radius:4px;padding:2px 8px;">✅ FICHE</span>'
               : '<span style="font-size:11px;color:#888;background:#111;border:1px solid #333;border-radius:4px;padding:2px 8px;">— vide</span>'
             }
-            <button onclick="dupliquerDateOuvrir('${d.id}')" title="Dupliquer cette date" style="background:#1a1a1a;color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+            <button onclick="dupliquerDateOuvrir('${d.id}')" title="Dupliquer cette date" style="background:#1a1a1a;color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;min-width:110px;text-align:center;">
               📋 Dupliquer
             </button>
-            <button onclick="fpOuvrir('${d.id}','${(d.ville||'').replace(/'/g,"\\'")}','${dateStr.replace(/'/g,"\\'")}')" style="background:#1a2f4a;color:#7eb8d4;border:1px solid #3b82f6;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+            <button onclick="fpOuvrir('${d.id}','${(d.ville||'').replace(/'/g,"\\'")}','${dateStr.replace(/'/g,"\\'")}')" style="background:#1a2f4a;color:#7eb8d4;border:1px solid #3b82f6;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;min-width:110px;text-align:center;">
               ${hasFiche ? '✏️ FICHE' : '📋 Suivre'}
             </button>
           </div>
