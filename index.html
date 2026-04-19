@@ -11601,6 +11601,14 @@ function _hideTeamSelection() {
     document.getElementById('fp-producteur').value = 'OH MY PROD';
     document.getElementById('fp-cout-plateau-mg').checked = false;
     document.getElementById('fp-ville').value = ville;
+    // ✨ Reset photo salle immédiat (évite l'affichage d'une photo d'une autre fiche pendant le chargement)
+    var _resetBlocPhoto = document.getElementById('fp-photo-salle-bloc');
+    var _resetUpload = document.getElementById('fp-photo-salle-upload');
+    if (_resetBlocPhoto) _resetBlocPhoto.style.display = 'none';
+    if (_resetUpload) _resetUpload.style.display = 'none';
+    var _resetImg = document.getElementById('fp-photo-salle-img');
+    if (_resetImg) _resetImg.src = '';
+    window._fpSalleId = null;
     console.log('Champs réinitialisés');
 
     // Charger salles depuis Supabase
@@ -11653,6 +11661,36 @@ function _hideTeamSelection() {
       if (fiche.ville) document.getElementById('fp-ville').value = fiche.ville;
       if (fiche.statut_date) document.getElementById('fp-statut').value = fiche.statut_date;
     }
+
+    // ✨ Charger la photo de la salle depuis la table `salles` (matching par nom)
+    // Corrige le bug : avant, la photo affichée était celle d'une ancienne fiche.
+    try {
+      var nomSalleActuel = (document.getElementById('fp-salle').value || '').trim();
+      var blocPhoto = document.getElementById('fp-photo-salle-bloc');
+      var uploadPhoto = document.getElementById('fp-photo-salle-upload');
+      if (!nomSalleActuel) {
+        // Aucune salle → cacher les 2 blocs
+        if (blocPhoto) blocPhoto.style.display = 'none';
+        if (uploadPhoto) uploadPhoto.style.display = 'none';
+        window._fpSalleId = null;
+      } else {
+        // Cacher tant qu'on n'a pas confirmé la correspondance (évite le flash d'ancienne photo)
+        if (blocPhoto) blocPhoto.style.display = 'none';
+        if (uploadPhoto) uploadPhoto.style.display = 'none';
+        // Chercher la salle exacte (case-insensitive) dans Supabase
+        var { data: sallesMatch } = await _supabase
+          .from('salles')
+          .select('id, ville_nom, photo_url')
+          .ilike('ville_nom', nomSalleActuel)
+          .limit(1);
+        if (sallesMatch && sallesMatch.length > 0) {
+          fpAfficherPhotoSalle(sallesMatch[0]);
+        } else {
+          // Salle non trouvée dans la base : on laisse les 2 blocs cachés
+          window._fpSalleId = null;
+        }
+      }
+    } catch(ePhoto) { console.log('Photo salle:', ePhoto); }
 
     console.log('Affichage page fiche-prod...');
     showPage('fiche-prod');
