@@ -3694,12 +3694,12 @@ function _hideTeamSelection() {
             <input id="fp-jauge-depart" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">État des ventes</label>
-            <input id="fp-etat-ventes" type="number" placeholder="0" oninput="fpCalcTotal()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">État des ventes <span style="color:#c9a84c;font-size:9px;">🔄 AUTO</span></label>
+            <input id="fp-etat-ventes" type="number" placeholder="0" readonly title="Calculé automatiquement depuis la Fiche Billetterie (billets vendus tous opérateurs)" style="width:100%;background:#111;border:1px solid #c9a84c;border-radius:6px;color:#c9a84c;padding:8px 10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;box-sizing:border-box;cursor:not-allowed;">
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Invitations</label>
-            <input id="fp-invitations" type="number" placeholder="0" oninput="fpCalcTotal()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Invitations <span style="color:#c9a84c;font-size:9px;">🔄 AUTO</span></label>
+            <input id="fp-invitations" type="number" placeholder="0" readonly title="Calculé automatiquement depuis la Fiche Billetterie (toutes invitations : validées + en attente + refusées)" style="width:100%;background:#111;border:1px solid #c9a84c;border-radius:6px;color:#c9a84c;padding:8px 10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;box-sizing:border-box;cursor:not-allowed;">
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Total jauge à ce jour</label>
@@ -3713,14 +3713,9 @@ function _hideTeamSelection() {
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Jauge finale choisie</label>
             <input id="fp-jauge-finale" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
-          <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">DL OMP %</label>
-            <input id="fp-dl-omp" type="number" placeholder="100" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-          </div>
-          <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">DL Prod locale %</label>
-            <input id="fp-dl-prod-locale" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-          </div>
+          <!-- Champs DL OMP % et DL PROD LOCALE % cachés (doublon avec DEAL BILLETTERIE dans INFOS GÉNÉRALES) -->
+          <input id="fp-dl-omp" type="hidden" value="">
+          <input id="fp-dl-prod-locale" type="hidden" value="">
           <div style="display:flex;align-items:center;gap:8px;padding-top:20px;">
             <input id="fp-cout-plateau-mg" type="checkbox" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:16px;height:16px;accent-color:#e31e24;">
             <label for="fp-cout-plateau-mg" style="font-size:13px;color:#fff;">Coût plateau sur MG ?</label>
@@ -4591,14 +4586,14 @@ function _hideTeamSelection() {
 
       <!-- ONGLETS RÉSEAUX -->
       <div style="display:flex;gap:4px;margin-bottom:0;flex-wrap:wrap;">
-        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #22c55e;border-bottom:none;background:#22c55e;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">TM</button>
+        <button class="bill-tab" onclick="billSetTab('invit', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #c9a84c;border-bottom:none;background:#c9a84c;color:#000;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">🎫 INVIT</button>
+        <button class="bill-tab" onclick="billSetTab('tm', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">TM</button>
         <button class="bill-tab" onclick="billSetTab('fnac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FNAC</button>
         <button class="bill-tab" onclick="billSetTab('ldc', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">LDC</button>
         <button class="bill-tab" onclick="billSetTab('nda', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">NDA</button>
         <button class="bill-tab" onclick="billSetTab('salle', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">SALLE</button>
         <button class="bill-tab" onclick="billSetTab('fimalac', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">FIMALAC</button>
         <button class="bill-tab" onclick="billSetTab('bleucitron', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">BLEU CITRON</button>
-        <button class="bill-tab" onclick="billSetTab('invit', this)" style="padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #2a2a2a;border-bottom:none;background:#1a1a1a;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">🎫 INVIT</button>
       </div>
       <div style="background:#1a1a1a;border:1px solid #3b82f6;border-radius:0 10px 10px 10px;padding:16px;overflow-x:auto;">
 
@@ -11708,6 +11703,9 @@ function _hideTeamSelection() {
       if (fiche.statut_date) document.getElementById('fp-statut').value = fiche.statut_date;
     }
 
+    // 🎯 Auto-calcul "État des ventes" depuis billetterie_data
+    await fpChargerEtatVentesAuto();
+
     // ✨ Charger la photo de la salle depuis la table `salles` (matching par nom)
     // Corrige le bug : avant, la photo affichée était celle d'une ancienne fiche.
     try {
@@ -11749,6 +11747,50 @@ function _hideTeamSelection() {
     const ventes = parseInt(document.getElementById('fp-etat-ventes').value) || 0;
     const invits = parseInt(document.getElementById('fp-invitations').value) || 0;
     document.getElementById('fp-total-jauge').value = ventes + invits;
+  }
+
+  // 🎯 Auto-calcul "État des ventes" et "Invitations" depuis Supabase
+  async function fpChargerEtatVentesAuto() {
+    var dateId = _fpDateId || _dateActiveId;
+    if (!dateId) return;
+
+    // === A. État des ventes (somme billets tous opérateurs depuis billetterie_data) ===
+    try {
+      var r = await _supabase.from('fiches_production').select('billetterie_data').eq('date_concert_id', dateId).single();
+      if (r.data && r.data.billetterie_data) {
+        var bd = JSON.parse(r.data.billetterie_data);
+        var totalBillets = 0;
+        ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'].forEach(function(op) {
+          if (!bd[op]) return;
+          bd[op].forEach(function(cat) {
+            (cat||[]).forEach(function(d) {
+              totalBillets += (parseInt(d.billets)||0);
+            });
+          });
+        });
+        var champVentes = document.getElementById('fp-etat-ventes');
+        if (champVentes) champVentes.value = totalBillets;
+      }
+    } catch(e) {
+      console.log('fpChargerEtatVentesAuto (ventes):', e);
+    }
+
+    // === B. Invitations (TOUTES : validées + en attente + refusées) depuis table invitations ===
+    try {
+      var rInv = await _supabase.from('invitations').select('nombre').eq('date_concert_id', dateId);
+      var totalInvits = 0;
+      if (rInv.data && rInv.data.length > 0) {
+        totalInvits = rInv.data.reduce(function(sum, inv) { return sum + (inv.nombre || 1); }, 0);
+      }
+      var champInvits = document.getElementById('fp-invitations');
+      if (champInvits) champInvits.value = totalInvits;
+    } catch(e) {
+      console.log('fpChargerEtatVentesAuto (invitations):', e);
+    }
+
+    // Recalcul total jauge + sauvegarde
+    fpCalcTotal();
+    autoSave('fiche');
   }
 
   let _fpAdresseTimer = null;
@@ -12025,11 +12067,23 @@ function _hideTeamSelection() {
   async function piloteChargerBill(dateId) {
     try {
       var r = await _supabase.from('fiches_production')
-        .select('billetterie_data, dl_omp_pct, dl_prod_locale_pct, pilote_taux')
+        .select('billetterie_data, deal_billetterie, pilote_taux')
         .eq('date_concert_id', dateId).single();
       if (!r.data) return;
-      var pctOMP = parseFloat(r.data.dl_omp_pct) || 100;
-      var pctPL  = parseFloat(r.data.dl_prod_locale_pct) || 0;
+      // 🎯 Source unique = DEAL BILLETTERIE (Infos Générales)
+      // Valeurs possibles : "100%", "50/50", "80/20", "AUTRES"
+      var dealBill = (r.data.deal_billetterie || '100%').toString();
+      var pctOMP = 100, pctPL = 0;
+      if (dealBill.indexOf('/') !== -1) {
+        // Format "80/20" → OMP = 80, PL = 20
+        var parts = dealBill.split('/');
+        pctOMP = parseFloat(parts[0]) || 100;
+        pctPL  = parseFloat(parts[1]) || 0;
+      } else {
+        // Format "100%" ou similaire
+        pctOMP = parseFloat(dealBill) || 100;
+        pctPL  = 100 - pctOMP;
+      }
       // Restaurer les taux saisis manuellement
       if (r.data.pilote_taux) {
         try {
@@ -13639,12 +13693,12 @@ function _hideTeamSelection() {
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
     const el = document.getElementById('bill-ville-date');
     if (el) el.textContent = label;
-    _billTabActif = 'tm';  // TM est le premier onglet affiché
-    // Reset visuels onglets - TM est le premier (index 0)
+    _billTabActif = 'invit';  // INVIT est le premier onglet affiché (couleur OR)
+    // Reset visuels onglets - INVIT est le premier (index 0), texte noir sur fond or
     document.querySelectorAll('.bill-tab').forEach((t,i) => {
-      t.style.background = i === 0 ? '#22c55e' : '#1a1a1a';  // Vert pour TM
-      t.style.color = i === 0 ? '#fff' : '#888';
-      t.style.borderColor = i === 0 ? '#22c55e' : '#2a2a2a';
+      t.style.background = i === 0 ? '#c9a84c' : '#1a1a1a';  // Or pour INVIT
+      t.style.color = i === 0 ? '#000' : '#888';
+      t.style.borderColor = i === 0 ? '#c9a84c' : '#2a2a2a';
     });
     // Réinitialiser les données avec les bonnes grilles
     billInitData();
@@ -13661,7 +13715,10 @@ function _hideTeamSelection() {
     document.querySelectorAll('.bill-tab').forEach(t => {
       t.style.background = '#1a1a1a'; t.style.color = '#888'; t.style.borderColor = '#2a2a2a';
     });
-    btn.style.background = color; btn.style.color = '#fff'; btn.style.borderColor = color;
+    // INVIT (or) utilise texte noir pour lisibilité, les autres texte blanc
+    btn.style.background = color;
+    btn.style.color = op === 'invit' ? '#000' : '#fff';
+    btn.style.borderColor = color;
     // Masquer le thead standard pour l'onglet invitations
     const thead = document.querySelector('#bill-table thead');
     if (thead) thead.style.display = op === 'invit' ? 'none' : '';
@@ -17666,8 +17723,14 @@ function _hideTeamSelection() {
   function _suiviCalculerResultatOMP(ficheData) {
     if (!ficheData) return { recTTC: 0, recHT: 0, billets: 0, resultatOMP: 0, complet: false };
 
-    var pctOMP = parseFloat(ficheData.dl_omp_pct) || 100;
-    // var pctPL = parseFloat(ficheData.dl_prod_locale_pct) || 0;
+    // 🎯 Source unique = DEAL BILLETTERIE (Infos Générales)
+    var dealBill = (ficheData.deal_billetterie || '100%').toString();
+    var pctOMP = 100;
+    if (dealBill.indexOf('/') !== -1) {
+      pctOMP = parseFloat(dealBill.split('/')[0]) || 100;
+    } else {
+      pctOMP = parseFloat(dealBill) || 100;
+    }
 
     // Taux personnalisés (ASSRC / ORGANIC)
     var assrcTaux = 0, organicTaux = 0;
@@ -17826,7 +17889,7 @@ function _hideTeamSelection() {
       // 3. Toutes les fiches_production avec billetterie_data + financier_data (en une seule requête)
       var rFiches = await _supabase
         .from('fiches_production')
-        .select('date_concert_id, billetterie_data, financier_data, dl_omp_pct, dl_prod_locale_pct, pilote_taux, total_jauge, invitations, boost_bonus')
+        .select('date_concert_id, billetterie_data, financier_data, deal_billetterie, dl_omp_pct, dl_prod_locale_pct, pilote_taux, total_jauge, invitations, boost_bonus')
         .in('date_concert_id', dateIds);
 
       var fichesByDateId = {};
