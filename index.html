@@ -4146,6 +4146,7 @@ function _hideTeamSelection() {
           <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DEAL DL CO PROD</td><td id="pilote-deal-dl-coprod" style="padding:10px 16px;color:#22c55e;text-align:right;font-weight:700;"></td></tr>
           <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DROITS OMP</td><td id="pilote-droits-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
           <tr style="border-bottom:2px solid #333;"><td style="padding:10px 16px;color:#ccc;">DROIT AU TIRAGE</td><td id="pilote-droit-tirage" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr style="border-bottom:2px solid #333;background:#111;"><td style="padding:10px 16px;color:#f97316;">% PROMO LOCALE <span id="pilote-promo-locale-pct" style="color:#888;font-size:11px;"></span></td><td id="pilote-promo-locale-mt" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td></tr>
           <tr style="background:#1a1a2e;border-top:2px solid #fbbf24;">
             <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;color:#fbbf24;">RÉSULTAT BRUT</td>
             <td id="pilote-resultat-brut" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#fbbf24;"></td>
@@ -4504,6 +4505,7 @@ function _hideTeamSelection() {
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">TOTAL VHR</td><td id="bilan-total-vhr" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">SALLE GLOBALE</td><td id="bilan-salle" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">CO-PROD FRAIS</td><td id="bilan-coprod-frais" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Salle PL + Autres PL</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#f97316;font-weight:700;">% PROMO LOCALE</td><td id="bilan-promo-locale" style="padding:8px 16px;text-align:right;color:#f97316;font-weight:700;"></td><td id="bilan-promo-locale-detail" style="padding:8px 12px;color:#555;font-size:11px;"></td></tr>
             <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#22c55e;">TOTAL DEPENSES</td><td id="bilan-total-depenses" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;font-weight:700;"></td><td></td></tr>
           </tbody>
         </table>
@@ -12224,8 +12226,16 @@ function _hideTeamSelection() {
           // DROIT AU TIRAGE = CNM × 60%
           setEl('pilote-droit-tirage', droitTirage > 0 ? fmt(droitTirage) : '');
           
-          // RÉSULTAT BRUT = Recette TTC - Montant CNM - Droits - Dépenses + Droits OMP + Droit au Tirage
-          var resultatBrut = recTotal - montantCNM - droitsTotal - sumFin + droitsOMP + droitTirage;
+          // 🎯 % PROMO LOCALE = Recette HT HCNM × deal_promo_locale_pct
+          var dealPromoPct = parseFloat(document.getElementById('fp-deal-promo')?.value) || 0;
+          var recHTpilote = recTotal / 1.021;
+          var recHTHCNMpilote = recHTpilote * (1 - 0.035);
+          var montantPromoLocale = recHTHCNMpilote * dealPromoPct / 100;
+          setEl('pilote-promo-locale-pct', dealPromoPct > 0 ? '(' + dealPromoPct + '% sur HT HCNM)' : '');
+          setEl('pilote-promo-locale-mt', montantPromoLocale > 0 ? '- ' + fmt(montantPromoLocale) : '');
+          
+          // RÉSULTAT BRUT = Recette TTC - Montant CNM - Droits - Dépenses + Droits OMP + Droit au Tirage - % Promo Locale
+          var resultatBrut = recTotal - montantCNM - droitsTotal - sumFin + droitsOMP + droitTirage - montantPromoLocale;
           
           // ✨ Lire le Deal OMP % depuis la fiche identification
           var dealOmpFiche = document.getElementById('fp-deal-omp')?.value || '100% OMP';
@@ -12764,8 +12774,9 @@ function _hideTeamSelection() {
     var promo = window._bilanPromo || 0;
     var salleGlobale = window._bilanSalleGlobale || 0;
     var coprodFrais = window._bilanCoprodFrais || 0;
+    var promoLocale = window._bilanPromoLocale || 0;
     
-    var totalDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais;
+    var totalDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais + promoLocale;
     document.getElementById('bilan-total-depenses').textContent = fmt(totalDepenses);
     
     // Stocker pour calcul RESULTAT OMP
@@ -13119,8 +13130,19 @@ function _hideTeamSelection() {
         setEl('bilan-coprod-frais', coprodFrais > 0 ? fmt(coprodFrais) : '');
         window._bilanCoprodFrais = coprodFrais;
 
-        // Base dépenses pour recalcul dynamique
-        var baseDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais;
+        // 🎯 % PROMO LOCALE = Recette HT HCNM × deal_promo_locale_pct
+        var dealPromoPct = parseFloat(document.getElementById('fp-deal-promo')?.value) || 0;
+        var recTTCbilan = window._bilanRecTTC || 0;
+        var recHTbilan = recTTCbilan / 1.021;
+        var recHTHCNMbilan = recHTbilan * (1 - 0.035);
+        var montantPromoLocale = recHTHCNMbilan * dealPromoPct / 100;
+        setEl('bilan-promo-locale', montantPromoLocale > 0 ? fmt(montantPromoLocale) : '');
+        var elDetail = document.getElementById('bilan-promo-locale-detail');
+        if (elDetail) elDetail.textContent = dealPromoPct > 0 ? dealPromoPct + '% sur HT HCNM' : '';
+        window._bilanPromoLocale = montantPromoLocale;
+
+        // Base dépenses pour recalcul dynamique (INCLUT la % promo locale)
+        var baseDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais + montantPromoLocale;
         window._bilanBaseDepenses = baseDepenses;
 
         // TOTAL DEPENSES
