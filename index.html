@@ -13995,6 +13995,15 @@ function _hideTeamSelection() {
       btn.onclick = async function() {
         var ville = document.getElementById('bill-ville-date') ? document.getElementById('bill-ville-date').textContent : '';
         
+        // Récupérer le nom de la salle depuis fiches_production
+        var nomSalle = '';
+        try {
+          if (_fpDateId) {
+            var rSalle = await _supabase.from('fiches_production').select('nom_salle').eq('date_concert_id', _fpDateId).single();
+            if (rSalle.data && rSalle.data.nom_salle) nomSalle = rSalle.data.nom_salle;
+          }
+        } catch(e) {}
+        
         // Récap par type
         var total = 0;
         var recapHTML = '';
@@ -14038,9 +14047,12 @@ function _hideTeamSelection() {
         win.document.write('<style>');
         win.document.write('*{margin:0;padding:0;box-sizing:border-box;}');
         win.document.write('body{font-family:Inter,Arial,sans-serif;padding:30px;color:#111;font-size:12px;}');
-        win.document.write('.top-header{text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #e31e24;}');
-        win.document.write('.spectacle-nom{font-size:28px;font-weight:800;text-transform:uppercase;letter-spacing:2px;}');
-        win.document.write('.spectacle-details{font-size:18px;font-weight:700;color:#e31e24;margin-top:6px;text-transform:uppercase;}');
+        win.document.write('.top-header{position:relative;margin-bottom:24px;padding:10px 0 16px 0;border-bottom:3px solid #e31e24;min-height:80px;}');
+        win.document.write('.top-logo{position:absolute;top:0;left:0;height:70px;width:auto;}');
+        win.document.write('.top-title-wrap{text-align:center;padding-top:6px;}');
+        win.document.write('.spectacle-nom{font-size:26px;font-weight:800;text-transform:uppercase;letter-spacing:2px;}');
+        win.document.write('.spectacle-details{font-size:17px;font-weight:700;color:#e31e24;margin-top:6px;text-transform:uppercase;}');
+        win.document.write('.spectacle-salle{font-size:13px;font-weight:600;color:#444;margin-top:4px;text-transform:uppercase;letter-spacing:1px;}');
         win.document.write('.section-titre{font-size:14px;font-weight:700;background:#111;color:#fff;padding:10px 16px;margin:20px 0 12px;text-transform:uppercase;letter-spacing:1px;}');
         win.document.write('table{width:100%;border-collapse:collapse;margin-bottom:20px;}');
         win.document.write('thead tr{background:#e31e24;color:#fff;}');
@@ -14049,13 +14061,21 @@ function _hideTeamSelection() {
         win.document.write('tbody tr:nth-child(even){background:#f5f5f5;}');
         win.document.write('.total-row{background:#111!important;color:#fff;font-weight:700;}');
         win.document.write('.total-row td{padding:12px!important;color:#fff!important;}');
-        win.document.write('@media print{body{padding:15px;}}');
+        win.document.write('.zone-commentaires{margin-top:30px;border:2px solid #e31e24;border-radius:8px;padding:14px 16px;page-break-inside:avoid;}');
+        win.document.write('.zone-commentaires-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#e31e24;margin-bottom:12px;}');
+        win.document.write('.zone-commentaires-lines{display:flex;flex-direction:column;gap:10px;}');
+        win.document.write('.zone-commentaires-line{border-bottom:1px solid #ccc;height:24px;}');
+        win.document.write('.print-footer{margin-top:20px;text-align:center;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:10px;}');
+        win.document.write('@media print{body{padding:15px;} .zone-commentaires{page-break-inside:avoid;}}');
         win.document.write('</style></head><body>');
         
-        // Header
+        // Header avec logo en haut à gauche + titre centré
         win.document.write('<div class="top-header">');
+        win.document.write('<img src="assets/LOGO OMP OHS.png" alt="OMP" class="top-logo" />');
+        win.document.write('<div class="top-title-wrap">');
         win.document.write('<div class="spectacle-nom">THE WORLD OF QUEEN</div>');
-        win.document.write('<div class="spectacle-details">'+ville+'</div>');
+        win.document.write('<div class="spectacle-details">'+ville+(nomSalle ? ' · '+nomSalle : '')+'</div>');
+        win.document.write('</div>');
         win.document.write('</div>');
         
         // Section 1 : Récap par type
@@ -14076,11 +14096,24 @@ function _hideTeamSelection() {
         }
         win.document.write('</tbody></table>');
         
+        // Zone commentaires (encadré vide pour écriture manuscrite)
+        win.document.write('<div class="zone-commentaires">');
+        win.document.write('<div class="zone-commentaires-title">✍️ COMMENTAIRES / OBSERVATIONS</div>');
+        win.document.write('<div class="zone-commentaires-lines">');
+        for (var li = 0; li < 6; li++) {
+          win.document.write('<div class="zone-commentaires-line"></div>');
+        }
+        win.document.write('</div>');
+        win.document.write('</div>');
+        
+        // Footer
+        win.document.write('<div class="print-footer">OH MY PROD · Document confidentiel · Imprimé le '+new Date().toLocaleDateString('fr-FR')+' à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</div>');
+        
         win.document.write('<script>window.onload=function(){window.print();}<\/script>');
         win.document.write('</body></html>');
         win.document.close();
       };
-    tbody.closest('table').parentNode.appendChild(btn);
+    // Ajout du bouton après la liste (voir plus bas)
 
     // === SECTION LISTE DES DEMANDES D'INVITATIONS ===
     var listeContainer = document.getElementById('bill-invit-liste-container');
@@ -14094,6 +14127,9 @@ function _hideTeamSelection() {
       listeContainer.style.overflow = 'hidden';
       tbody.closest('table').parentNode.appendChild(listeContainer);
     }
+    // Placer le bouton PDF APRÈS la liste des demandes (en bas)
+    btn.style.margin = '20px auto 0 auto';
+    listeContainer.parentNode.insertBefore(btn, listeContainer.nextSibling);
     // Charger et afficher les demandes
     billChargerListeInvitations();
   }
@@ -14168,13 +14204,6 @@ function _hideTeamSelection() {
           </tbody>
         </table>
       `;
-      
-      // Ajouter bouton imprimer en bas (visible surtout sur mobile)
-      body.innerHTML += `
-        <div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px solid #333;">
-          <button onclick="imprimerListeInvitations()" style="background:#c9a84c;color:#000;border:none;border-radius:6px;padding:8px 16px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER LISTE</button>
-        </div>
-      `;
     } catch(e) {
       console.error('Erreur chargement invitations:', e);
       document.getElementById('bill-invit-liste-body').innerHTML = '<div style="color:#ef4444;text-align:center;padding:20px;">Erreur de chargement</div>';
@@ -14191,43 +14220,6 @@ function _hideTeamSelection() {
     } catch(e) {
       alert('Erreur mise à jour statut');
     }
-  }
-
-  // Imprimer la liste des invitations
-  function imprimerListeInvitations() {
-    const container = document.getElementById('bill-invit-liste-body');
-    if (!container) return;
-    
-    const villeEl = document.getElementById('fb-ville-date');
-    const villeInfo = villeEl ? villeEl.textContent : 'Concert';
-    
-    const printContent = `
-      <html>
-      <head>
-        <title>Liste Invitations - ${villeInfo}</title>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          h1 { font-size: 18px; margin-bottom: 5px; }
-          h2 { font-size: 14px; color: #666; margin-bottom: 20px; }
-          table { width: 100%; border-collapse: collapse; font-size: 11px; }
-          th { background: #f0f0f0; padding: 8px; text-align: left; border: 1px solid #ddd; }
-          td { padding: 8px; border: 1px solid #ddd; }
-          .footer { margin-top: 20px; font-size: 10px; color: #999; }
-        </style>
-      </head>
-      <body>
-        <h1>📋 LISTE DES INVITATIONS</h1>
-        <h2>${villeInfo}</h2>
-        ${container.querySelector('table') ? container.querySelector('table').outerHTML : '<p>Aucune invitation</p>'}
-        <div class="footer">Imprimé le ${new Date().toLocaleDateString('fr-FR')} - OH MY PROD</div>
-      </body>
-      </html>
-    `;
-    
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    printWindow.print();
   }
 
   // Recalculer les totaux par type à partir des invitations VALIDÉES
