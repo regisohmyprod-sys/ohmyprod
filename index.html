@@ -7239,6 +7239,13 @@ function _hideTeamSelection() {
       nombre: parseInt(places) || 1,
       valide: statut === 'valide' ? 1 : (statut === 'refuse' ? -1 : 0),
       date_demande: date || null,
+      notes: notes || null,
+      email: email || null,
+      places_num: placesNum || null,
+      pass: pass,
+      loge: loge,
+      parking: parking,
+      repas: repas,
     };
     
     // Mode édition ou création ?
