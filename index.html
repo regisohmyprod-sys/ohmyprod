@@ -3613,16 +3613,18 @@ function _hideTeamSelection() {
       </div>
 
       <!-- BLOC 1 : Infos générales -->
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
-        <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:16px;">📋 INFOS GÉNÉRALES</div>
+      <div id="fp-bloc-infos-gen" style="background:#1a1a1a;border:2px solid #e31e24;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 0 0 1px rgba(227,30,36,0.2);">
+        <div style="color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:8px;">⚠️ INFOS GÉNÉRALES (OBLIGATOIRE)</div>
+        <div style="color:#888;font-size:11px;margin-bottom:16px;font-style:italic;">Tous les champs doivent être remplis avant de continuer</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Producteur</label>
-            <input id="fp-producteur" type="text" value="OH MY PROD" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Producteur *</label>
+            <input id="fp-producteur" type="text" value="OH MY PROD" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Promoteur local</label>
-            <select id="fp-promoteur" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Promoteur local *</label>
+            <select id="fp-promoteur" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="">-- Choix --</option>
               <option value="PAS DE PL">PAS DE PL</option>
               <option value="LDC">LDC</option>
               <option value="NDA">NDA</option>
@@ -3632,8 +3634,9 @@ function _hideTeamSelection() {
             </select>
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Type de prod</label>
-            <select id="fp-type-prod" oninput="autoSave('fiche')" onchange="fpToggleModeVente(); autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Type de prod *</label>
+            <select id="fp-type-prod" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="fpToggleModeVente(); autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="">-- Choix --</option>
               <option value="PROD OMP">PROD OMP</option>
               <option value="CO-PROD">CO-PROD</option>
               <option value="PLOCALE">PLOCALE</option>
@@ -3641,12 +3644,13 @@ function _hideTeamSelection() {
             </select>
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal OMP %</label>
-            <select id="fp-deal-omp" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal OMP % *</label>
+            <select id="fp-deal-omp" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="">-- Choix --</option>
               <option value="50/50">50/50</option>
               <option value="60/40">60/40</option>
               <option value="80/20">80/20</option>
-              <option value="100% OMP" selected>100% OMP</option>
+              <option value="100% OMP">100% OMP</option>
               <option value="VENTE">VENTE</option>
             </select>
           </div>
@@ -3659,8 +3663,8 @@ function _hideTeamSelection() {
             <input id="fp-deal-promo" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Gestion billetterie</label>
-            <select id="fp-billetterie" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Gestion billetterie *</label>
+            <select id="fp-billetterie" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="OMP">OMP</option>
               <option value="LDC">LDC</option>
@@ -3672,14 +3676,19 @@ function _hideTeamSelection() {
             </select>
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal billetterie</label>
-            <select id="fp-deal-billetterie" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal billetterie *</label>
+            <select id="fp-deal-billetterie" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="">-- Choix --</option>
               <option value="100%">100%</option>
               <option value="50/50">50/50</option>
               <option value="80/20">80/20</option>
               <option value="AUTRES">AUTRES</option>
             </select>
           </div>
+        </div>
+        <!-- Message d'alerte si champs manquants -->
+        <div id="fp-alerte-infos-gen" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(227,30,36,0.15);border:1px solid #e31e24;border-radius:6px;color:#e31e24;font-size:12px;font-weight:600;">
+          ⚠️ Merci de remplir tous les champs obligatoires (*) avant de poursuivre.
         </div>
       </div>
 
@@ -3746,7 +3755,7 @@ function _hideTeamSelection() {
       </div>
 
       <!-- BLOC 2 : Infos salle & ventes -->
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
+      <div class="fp-bloc-apres-infos" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
         <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:16px;">🏟️ SALLE & VENTES</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div>
@@ -11394,6 +11403,9 @@ function _hideTeamSelection() {
       }
     } catch(e) { console.error('chargerTournees:', e); }
     showPage('fiche-prod');
+    // Valider le bloc infos générales (toutes les valeurs par défaut sont OK donc blocs suivants visibles)
+    if (typeof fpValiderInfosGen === 'function') fpValiderInfosGen();
+    if (typeof fpToggleModeVente === 'function') fpToggleModeVente();
   }
 
   // ============================================================
@@ -11807,6 +11819,9 @@ function _hideTeamSelection() {
     // 🎯 Bascule UI selon TYPE DE PROD (VENTE vs autre)
     fpToggleModeVente();
 
+    // 🔒 Valider le bloc INFOS GÉNÉRALES (masque blocs suivants si champs vides)
+    fpValiderInfosGen();
+
     // 🎯 Auto-calcul "État des ventes" depuis billetterie_data
     await fpChargerEtatVentesAuto();
 
@@ -11894,6 +11909,84 @@ function _hideTeamSelection() {
     var elTtc = document.getElementById('fp-vente-ttc');
     if (elTva) elTva.value = fmt(tva);
     if (elTtc) elTtc.value = fmt(ttc);
+  }
+
+  // 🔒 Validation du bloc INFOS GÉNÉRALES — bloque les blocs suivants tant que tous les champs requis ne sont pas remplis
+  function fpValiderInfosGen() {
+    var bloc = document.getElementById('fp-bloc-infos-gen');
+    if (!bloc) return true;
+
+    // Liste des champs obligatoires, avec gestion du mode VENTE
+    var typeProd = document.getElementById('fp-type-prod')?.value || '';
+    var isVente = (typeProd === 'VENTE');
+    
+    // Champs toujours requis
+    var champsRequis = ['fp-producteur', 'fp-promoteur', 'fp-type-prod', 'fp-billetterie'];
+    // Champs requis UNIQUEMENT si pas en mode VENTE
+    if (!isVente) {
+      champsRequis.push('fp-deal-omp', 'fp-deal-billetterie');
+    }
+
+    var tousValides = true;
+    champsRequis.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var valeur = (el.value || '').trim();
+      if (!valeur) {
+        tousValides = false;
+        // Mettre la bordure en rouge clignotant pour signaler
+        el.style.border = '2px solid #e31e24';
+        el.style.background = 'rgba(227,30,36,0.08)';
+      } else {
+        // Remettre le style normal
+        el.style.border = '1px solid #2a2a2a';
+        el.style.background = '#0a0a0a';
+      }
+    });
+
+    // Afficher/masquer l'alerte
+    var alerte = document.getElementById('fp-alerte-infos-gen');
+    if (alerte) alerte.style.display = tousValides ? 'none' : 'block';
+
+    // Masquer/afficher TOUS les blocs qui suivent INFOS GÉNÉRALES
+    var blocsSuivants = [
+      'fp-bloc-vente',      // Mode vente
+      'fp-bloc-client',     // Infos client
+    ];
+    blocsSuivants.forEach(function(bid) {
+      var el = document.getElementById(bid);
+      if (!el) return;
+      // Ne rien faire si déjà caché par le mode (ex: fp-bloc-vente caché en non-vente)
+      // On stocke l'état "should be shown" dans data-should-show si besoin
+      // Ici on utilise opacity + pointer-events pour griser sans casser la structure
+      if (!tousValides) {
+        el.style.opacity = '0.3';
+        el.style.pointerEvents = 'none';
+      } else {
+        el.style.opacity = '';
+        el.style.pointerEvents = '';
+      }
+    });
+
+    // Masquer/afficher le reste de la fiche (bloc SALLE & VENTES + PHOTO + sections financières)
+    // On cible tous les blocs de la page fp après INFOS GÉNÉRALES
+    var page = document.getElementById('page-fiche-prod');
+    if (page) {
+      var blocsApres = page.querySelectorAll('.fp-bloc-apres-infos');
+      blocsApres.forEach(function(b) {
+        if (!tousValides) {
+          b.style.opacity = '0.3';
+          b.style.pointerEvents = 'none';
+          b.style.filter = 'blur(1px)';
+        } else {
+          b.style.opacity = '';
+          b.style.pointerEvents = '';
+          b.style.filter = '';
+        }
+      });
+    }
+
+    return tousValides;
   }
 
   // 🎯 Auto-calcul "État des ventes" et "Invitations" depuis Supabase
