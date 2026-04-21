@@ -12285,7 +12285,7 @@ function _hideTeamSelection() {
 
     try {
       console.log('[CARTE TOURNEE] Chargement dates pour tournées:', tourneesIds);
-      var res = await _supabase.from('dates_concerts').select('*').in('tournee_id', tourneesIds).order('date_concert', { ascending: true });
+      var res = await _supabase.from('dates_concert').select('*').in('tournee_id', tourneesIds).order('date_concert', { ascending: true });
       var dates = res.data || [];
       console.log('[CARTE TOURNEE] Dates récupérées:', dates.length, dates);
 
@@ -12417,9 +12417,9 @@ function _hideTeamSelection() {
   // 🗺️ CARTE DATE : zoom sur la ville / salle d'une date
   // =========================================================
   // 🗺️ Ouvrir la carte date depuis un espace (artistique / staff / technique)
-  // Utilise _dateActiveId si disponible, sinon _fpDateId
+  // Utilise _dateActiveId en priorité, sinon _fpDateId
   async function ouvrirCarteDepuisEspace() {
-    var dateId = _fpDateId || _dateActiveId;
+    var dateId = _dateActiveId || _fpDateId;
     if (!dateId) {
       alert('Aucune date sélectionnée.');
       return;
@@ -12429,8 +12429,34 @@ function _hideTeamSelection() {
     if (pageActive) {
       window._carteDateRetourPage = pageActive.id.replace(/^page-/, '');
     }
+    // 🎯 Forcer le reset des champs DOM de la fiche prod pour que carteDateOuvrir
+    // recharge depuis Supabase (évite d'afficher une ancienne ville type "Niort")
+    var fpVille = document.getElementById('fp-ville');
+    var fpSalle = document.getElementById('fp-salle');
+    var fpAdresse = document.getElementById('fp-adresse-salle');
+    var fpDate = document.getElementById('fp-date-concert');
+    // Sauvegarder les valeurs actuelles et les vider
+    var saveBack = {
+      ville: fpVille?.value, salle: fpSalle?.value,
+      adresse: fpAdresse?.value, date: fpDate?.value,
+      prevDateId: _fpDateId
+    };
+    if (fpVille) fpVille.value = '';
+    if (fpSalle) fpSalle.value = '';
+    if (fpAdresse) fpAdresse.value = '';
+    if (fpDate) fpDate.value = '';
+    
     _fpDateId = dateId;
     await carteDateOuvrir();
+    
+    // Restaurer les valeurs (pour que la fiche prod admin ne soit pas cassée)
+    if (saveBack.prevDateId && saveBack.prevDateId !== dateId) {
+      if (fpVille) fpVille.value = saveBack.ville || '';
+      if (fpSalle) fpSalle.value = saveBack.salle || '';
+      if (fpAdresse) fpAdresse.value = saveBack.adresse || '';
+      if (fpDate) fpDate.value = saveBack.date || '';
+      _fpDateId = saveBack.prevDateId;
+    }
   }
 
   // Retour intelligent depuis carte-date
@@ -12460,7 +12486,7 @@ function _hideTeamSelection() {
           nomSalle = fpRes.data.nom_salle || '';
           adresse = fpRes.data.adresse_salle || '';
         }
-        var dcRes = await _supabase.from('dates_concerts').select('date_concert, ville, nom_salle').eq('id', _fpDateId).maybeSingle();
+        var dcRes = await _supabase.from('dates_concert').select('date_concert, ville, nom_salle').eq('id', _fpDateId).maybeSingle();
         if (dcRes.data) {
           dateStr = dcRes.data.date_concert || dateStr;
           ville = ville || dcRes.data.ville || '';
