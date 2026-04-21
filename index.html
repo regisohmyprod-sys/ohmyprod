@@ -1909,6 +1909,37 @@
     }
   }
 
+  /* 🎯 FICHE PROD — Barre menu 8 boutons : responsive grid */
+  @media (max-width: 1024px) {
+    .fp-menu-btns {
+      grid-template-columns: repeat(4, 1fr) !important;
+    }
+    .fp-btn-menu {
+      padding: 7px 8px !important;
+      font-size: 11px !important;
+    }
+  }
+  @media (max-width: 768px) {
+    .fp-menu-btns {
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 5px !important;
+    }
+    .fp-btn-menu {
+      padding: 8px 4px !important;
+      font-size: 10px !important;
+      letter-spacing: 0.5px !important;
+    }
+  }
+  @media (max-width: 520px) {
+    .fp-menu-btns {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .fp-btn-menu {
+      font-size: 11px !important;
+      padding: 9px 4px !important;
+    }
+  }
+
   .back-btn {
     display: inline-flex;
     align-items: center;
@@ -3516,7 +3547,6 @@ function _hideTeamSelection() {
       <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
         <div class="page-title" style="margin-bottom:0;">📋 CRÉA / SUIVI DATES</div>
-        <button onclick="carteTourneeOuvrir()" style="background:linear-gradient(135deg,#e31e24,#c9a84c);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:700;box-shadow:0 2px 8px rgba(227,30,36,0.3);">🗺️ VOIR SUR LA CARTE</button>
       </div>
       <div style="font-size:13px;color:#888;margin-bottom:20px;margin-top:8px;font-style:italic;">Merci de choisir votre tournée !</div>
 
@@ -3603,6 +3633,27 @@ function _hideTeamSelection() {
         <!-- Liste dates -->
         <div id="cs-liste-dates" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div><!-- fin encadrement or -->
+
+        <!-- 🗺️ CARTE INTÉGRÉE : toutes les dates visualisées directement -->
+        <div id="cs-carte-integree-bloc" style="margin-top:20px;border:1px solid rgba(201,168,76,0.4);border-radius:14px;overflow:hidden;background:rgba(201,168,76,0.03);">
+          <div onclick="csToggleCarteIntegree()" style="cursor:pointer;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;background:rgba(201,168,76,0.08);">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;">🗺️ CARTE DE LA TOURNÉE</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span id="cs-carte-nb-badge" style="background:#e31e24;color:#fff;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">0</span>
+              <span id="cs-carte-toggle-icon" style="color:#c9a84c;font-size:16px;">▼</span>
+            </div>
+          </div>
+          <div id="cs-carte-integree-content" style="display:none;padding:14px;">
+            <div id="cs-carte-sous-titre" style="font-size:11px;color:#888;margin-bottom:10px;text-align:center;font-style:italic;">Chargement…</div>
+            <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;font-size:10px;color:#888;">
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#22c55e;border-radius:50%;"></span>Confirmée</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#f97316;border-radius:50%;"></span>Option</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#3b82f6;border-radius:50%;"></span>Reportée</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:#888;border-radius:50%;"></span>Annulée</span>
+            </div>
+            <div id="cs-carte-integree-map" style="width:100%;height:450px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -3642,7 +3693,22 @@ function _hideTeamSelection() {
           <div id="carte-date-ville" class="page-title" style="margin-bottom:4px;">VILLE</div>
           <div id="carte-date-sous-titre" style="font-size:12px;color:#c9a84c;"></div>
         </div>
-        <button id="carte-date-gps" onclick="carteDateOuvrirGPS()" title="Ouvrir dans Maps (GPS)" style="background:#c9a84c;color:#000;border:none;border-radius:10px;width:48px;height:48px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;">➤</button>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <!-- Sélecteur de zoom -->
+          <div style="display:flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:4px 10px;">
+            <span style="font-size:11px;color:#888;">🔍 Zoom</span>
+            <select id="carte-date-zoom-select" onchange="carteDateChangerZoom(this.value)" style="background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#c9a84c;padding:4px 8px;font-size:12px;cursor:pointer;font-family:Inter,sans-serif;">
+              <option value="11" selected>Région</option>
+              <option value="12">Agglo</option>
+              <option value="13">Ville</option>
+              <option value="14">Quartier</option>
+              <option value="15">Rues</option>
+              <option value="16">Salle</option>
+              <option value="17">Très zoomé</option>
+            </select>
+          </div>
+          <button id="carte-date-gps" onclick="carteDateOuvrirGPS()" title="Ouvrir dans Maps (GPS)" style="background:#c9a84c;color:#000;border:none;border-radius:10px;width:48px;height:48px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;">➤</button>
+        </div>
       </div>
       <div id="carte-date-map" style="width:100%;height:55vh;min-height:320px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:12px;"></div>
       <!-- Card salle -->
@@ -3663,15 +3729,15 @@ function _hideTeamSelection() {
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-top:8px;margin-bottom:16px;">
         <div style="margin-bottom:8px;">
           <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:10px;">📍 IDENTIFICATION DE LA DATE</div>
-        <div style="display:flex;gap:8px;flex-wrap:nowrap;margin:12px 0 12px 0;align-items:center;">
-          <button onclick="fpOuvrirBilletterie()" class="btn-billetterie-nav" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🎟️ BILLETTERIE</button>
-          <button onclick="fpOuvrirFinancier()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📊 DÉPENSES</button>
-          <button onclick="fpOuvrirPilote()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🎯 PILOTE DATE</button>
-          <button onclick="fpOuvrirClotureSalle()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🏟️ CLÔTURE SALLE</button>
-          <button onclick="fpOuvrirDecla()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📋 DÉCLA DROITS</button>
-          <button onclick="fpOuvrirBilanAMH()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📊 BILAN AMH</button>
-          <button onclick="if(_fpDateId){dupliquerDateOuvrir(_fpDateId)}else{alert('Aucune date ouverte.')}" title="Dupliquer cette date" style="background:#1a1a1a;color:#c9a84c;border:1px solid #c9a84c;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📋 DUPLIQUER</button>
-          <button onclick="carteDateOuvrir()" title="Voir la ville de cette date sur une carte" style="background:#1a1a1a;color:#22c55e;border:1px solid #22c55e;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🗺️ CARTE</button>
+        <div class="fp-menu-btns" style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:12px 0 12px 0;">
+          <button onclick="fpOuvrirBilletterie()" class="btn-billetterie-nav fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🎟️ BILLETTERIE</button>
+          <button onclick="fpOuvrirFinancier()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📊 DÉPENSES</button>
+          <button onclick="fpOuvrirPilote()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🎯 PILOTE</button>
+          <button onclick="fpOuvrirClotureSalle()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🏟️ CLÔTURE</button>
+          <button onclick="fpOuvrirDecla()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📋 DÉCLA</button>
+          <button onclick="fpOuvrirBilanAMH()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📊 BILAN AMH</button>
+          <button onclick="if(_fpDateId){dupliquerDateOuvrir(_fpDateId)}else{alert('Aucune date ouverte.')}" class="fp-btn-menu" title="Dupliquer cette date" style="background:#1a1a1a;color:#c9a84c;border:1px solid #c9a84c;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📋 DUPLIQUER</button>
+          <button onclick="carteDateOuvrir()" class="fp-btn-menu" title="Voir la ville de cette date sur une carte" style="background:#1a1a1a;color:#22c55e;border:1px solid #22c55e;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🗺️ CARTE</button>
         </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -5001,7 +5067,7 @@ function _hideTeamSelection() {
         <div style="background:linear-gradient(135deg,#1e3a5f,#1565c0);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">🚌 VHR — VOYAGES · HÉBERGEMENT · RESSOURCES</div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <button onclick="ouvrirCarteDepuisEspace()" title="Voir la ville sur la carte" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:#fff;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🗺️ PLAN</button>
+            <button onclick="ouvrirCarteDepuisEspace()" title="Voir la ville sur la carte" style="background:#e31e24;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:5px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:700;box-shadow:0 2px 4px rgba(227,30,36,0.3);">🗺️ PLAN</button>
             <button onclick="toggleBlocVHR()" id="btn-toggle-vhr" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:#fff;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;">▼ Réduire</button>
           </div>
         </div>
@@ -5158,7 +5224,7 @@ function _hideTeamSelection() {
             <span style="font-size:20px;">🚌</span>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;">VHR – VOYAGES · HÉBERGEMENT · RESSOURCES</div>
           </div>
-          <button onclick="ouvrirCarteDepuisEspace()" title="Voir la ville sur la carte" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:#fff;padding:5px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🗺️ PLAN</button>
+          <button onclick="ouvrirCarteDepuisEspace()" title="Voir la ville sur la carte" style="background:#e31e24;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:5px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:700;box-shadow:0 2px 4px rgba(227,30,36,0.3);">🗺️ PLAN</button>
         </div>
         <div style="padding:16px;" id="avhr-vhr-content">
           <div style="color:#888;text-align:center;padding:20px;">Chargement...</div>
@@ -11092,7 +11158,7 @@ function _hideTeamSelection() {
     'staff-omp':            ['admin', 'staff_omp'],
     'artistique':           ['admin', 'artiste'],
     'artiste-vhr':          ['admin', 'artiste'],
-    'artiste-date':         ['admin', 'artiste'],
+    'artiste-date':         ['admin', 'staff_omp', 'artiste', 'technique'],
     'dossier-technique':    ['admin', 'technique', 'staff_omp'],
     'fiche-vhr':            ['admin', 'staff_omp', 'artiste', 'technique'],
     'contacts-presta':      ['admin', 'staff_omp', 'artiste'],
@@ -12416,6 +12482,140 @@ function _hideTeamSelection() {
   // =========================================================
   // 🗺️ CARTE DATE : zoom sur la ville / salle d'une date
   // =========================================================
+  // 🗺️ CARTE INTÉGRÉE dans Créa/Suivi dates — version compacte
+  var _csCarteIntegreeMap = null;
+  var _csCarteIntegreeMarkers = [];
+  var _csCarteIntegreeLoaded = false;
+
+  async function csToggleCarteIntegree() {
+    var content = document.getElementById('cs-carte-integree-content');
+    var icon = document.getElementById('cs-carte-toggle-icon');
+    if (!content) return;
+    var estOuvert = content.style.display !== 'none';
+    if (estOuvert) {
+      content.style.display = 'none';
+      if (icon) icon.textContent = '▼';
+    } else {
+      content.style.display = 'block';
+      if (icon) icon.textContent = '▲';
+      // Charger la carte si pas encore fait
+      if (!_csCarteIntegreeLoaded) {
+        await csChargerCarteIntegree();
+        _csCarteIntegreeLoaded = true;
+      } else if (_csCarteIntegreeMap) {
+        setTimeout(function() { _csCarteIntegreeMap.invalidateSize(); }, 100);
+      }
+    }
+  }
+
+  async function csChargerCarteIntegree() {
+    var mapEl = document.getElementById('cs-carte-integree-map');
+    var sousTitre = document.getElementById('cs-carte-sous-titre');
+    var badge = document.getElementById('cs-carte-nb-badge');
+    if (!mapEl) return;
+
+    // Init carte
+    if (!_csCarteIntegreeMap) {
+      _csCarteIntegreeMap = L.map('cs-carte-integree-map', { zoomControl: true }).setView([46.5, 2.5], 5);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap · © CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(_csCarteIntegreeMap);
+      setTimeout(function() { _csCarteIntegreeMap.invalidateSize(); }, 150);
+    }
+
+    // Nettoyer anciens markers
+    _csCarteIntegreeMarkers.forEach(function(m) { _csCarteIntegreeMap.removeLayer(m); });
+    _csCarteIntegreeMarkers = [];
+
+    if (sousTitre) sousTitre.textContent = 'Chargement des dates…';
+
+    try {
+      var tourneesIds = [
+        '11111111-1111-1111-1111-111111111111',
+        '22222222-2222-2222-2222-222222222222'
+      ];
+      var res = await _supabase.from('dates_concert').select('*').in('tournee_id', tourneesIds).order('date_concert', { ascending: true });
+      var dates = res.data || [];
+      var fichesRes = dates.length > 0
+        ? await _supabase.from('fiches_production').select('date_concert_id, nom_salle, adresse_salle, ville').in('date_concert_id', dates.map(function(d){ return d.id; }))
+        : { data: [] };
+      var fichesByDateId = {};
+      (fichesRes.data || []).forEach(function(f) { fichesByDateId[f.date_concert_id] = f; });
+
+      var colorParStatut = {
+        confirmee: '#22c55e', option: '#f97316',
+        reportee: '#3b82f6', annulee: '#888888', default: '#e31e24'
+      };
+
+      var placesTrouvees = 0;
+      var latlngs = [];
+
+      for (var i = 0; i < dates.length; i++) {
+        var d = dates[i];
+        var fiche = fichesByDateId[d.id] || {};
+        var nomSalle = fiche.nom_salle || d.nom_salle || '';
+        var adresse = fiche.adresse_salle || '';
+        var ville = fiche.ville || d.ville || '';
+
+        if (sousTitre) sousTitre.textContent = 'Géocodage ' + (i+1) + '/' + dates.length + '…';
+
+        var coords = null;
+        if (ville) coords = await geoCoderAdresse(ville);
+        if (!coords && nomSalle) coords = await geoCoderAdresse(nomSalle + ' ' + (ville || '') + ' France');
+        if (!coords && adresse) coords = await geoCoderAdresse(adresse);
+        if (!coords) continue;
+
+        placesTrouvees++;
+        latlngs.push([coords.lat, coords.lng]);
+        var statut = d.statut || 'default';
+        var color = colorParStatut[statut] || colorParStatut.default;
+        var dtFormatee = d.date_concert ? new Date(d.date_concert + 'T00:00:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' }) : '';
+
+        var popup =
+          '<div style="font-family:Inter,sans-serif;min-width:180px;">' +
+            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;margin-bottom:3px;">' + (ville||'Ville').toUpperCase() + '</div>' +
+            '<div style="font-size:10px;color:#666;margin-bottom:5px;">' + dtFormatee + '</div>' +
+            (nomSalle ? '<div style="font-size:12px;color:#222;font-weight:600;margin-bottom:3px;">' + nomSalle + '</div>' : '') +
+            (adresse ? '<div style="font-size:10px;color:#555;margin-bottom:6px;">' + adresse + '</div>' : '') +
+            '<button onclick="_carteTourneePopupZoom(\'' + d.id + '\')" style="background:#c9a84c;color:#000;border:none;border-radius:4px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer;width:100%;">🗺️ Voir zoomée</button>' +
+          '</div>';
+
+        var marker = L.marker([coords.lat, coords.lng], { icon: _creerPinIcon(color) })
+          .addTo(_csCarteIntegreeMap)
+          .bindPopup(popup);
+        _csCarteIntegreeMarkers.push(marker);
+
+        if (coords.source === 'nominatim' && i % 3 === 2) await new Promise(function(r) { setTimeout(r, 400); });
+      }
+
+      if (badge) badge.textContent = placesTrouvees;
+      if (sousTitre) sousTitre.textContent = 'TWOQ Hommage + Éternelle Légende · ' + placesTrouvees + ' dates localisées';
+      if (latlngs.length > 0) {
+        _csCarteIntegreeMap.fitBounds(latlngs, { padding: [30, 30], maxZoom: 8 });
+      }
+    } catch(e) {
+      console.error('[CS CARTE]', e);
+      if (sousTitre) sousTitre.textContent = 'Erreur : ' + e.message;
+    }
+  }
+
+  // 🗺️ Niveau de zoom par défaut pour la carte date (11 = Région)
+  // Valeurs possibles : 10 (département) | 11 (région) | 12 (agglo) | 13 (ville) | 14 (quartier) | 15 (rues) | 16 (immeuble)
+  var _CARTE_DATE_ZOOM = parseInt(localStorage.getItem('omp_carte_date_zoom') || '11', 10);
+
+  // Changer le zoom de la carte date en direct (appelé depuis le sélecteur)
+  function carteDateChangerZoom(niveau) {
+    niveau = parseInt(niveau, 10);
+    if (isNaN(niveau)) return;
+    _CARTE_DATE_ZOOM = niveau;
+    localStorage.setItem('omp_carte_date_zoom', String(niveau));
+    if (_carteDateMap && _carteDateCurrent && _carteDateCurrent.lat) {
+      _carteDateMap.setZoom(niveau);
+    }
+  }
+
   // 🗺️ Ouvrir la carte date depuis un espace (artistique / staff / technique)
   // Utilise _dateActiveId en priorité, sinon _fpDateId
   async function ouvrirCarteDepuisEspace() {
@@ -12506,6 +12706,10 @@ function _hideTeamSelection() {
 
     showPage('carte-date');
 
+    // Synchroniser le sélecteur de zoom avec la préférence sauvegardée
+    var selZoom = document.getElementById('carte-date-zoom-select');
+    if (selZoom) selZoom.value = String(_CARTE_DATE_ZOOM);
+
     // Init ou reset de la carte après rendu de la page
     setTimeout(async function() {
       var mapEl = document.getElementById('carte-date-map');
@@ -12535,7 +12739,7 @@ function _hideTeamSelection() {
       if (coords) {
         _carteDateCurrent.lat = coords.lat;
         _carteDateCurrent.lng = coords.lng;
-        _carteDateMap.setView([coords.lat, coords.lng], 13);
+        _carteDateMap.setView([coords.lat, coords.lng], _CARTE_DATE_ZOOM);
         L.marker([coords.lat, coords.lng], { icon: _creerPinIcon('#e31e24') })
           .addTo(_carteDateMap)
           .bindPopup('<b>' + (nomSalle || ville) + '</b><br>' + (adresse || ''));
