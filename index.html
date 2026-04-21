@@ -7392,6 +7392,22 @@ function _hideTeamSelection() {
     closeModal('modal-add-doc');
   }
 
+  function onInvitBilletsEnvoyesChange() {
+    const oui = document.getElementById('invit-billets-oui');
+    const dateEnvoi = document.getElementById('invit-date-envoi-billets');
+    if (!oui || !dateEnvoi) return;
+    if (oui.checked && !dateEnvoi.value) {
+      // Auto-remplir avec la date du jour
+      dateEnvoi.value = new Date().toISOString().split('T')[0];
+    }
+    if (!oui.checked) {
+      // Si on repasse sur Non, on vide date + type envoi
+      dateEnvoi.value = '';
+      const typeEnvoi = document.getElementById('invit-type-envoi');
+      if (typeEnvoi) typeEnvoi.value = '';
+    }
+  }
+
   function addInvitation() {
     // Utiliser _fpDateId (admin) ou _dateActiveId (team artistique)
     const dateId = _fpDateId || _dateActiveId;
@@ -7406,11 +7422,16 @@ function _hideTeamSelection() {
     const placesNum = document.getElementById('invit-places-num').value.trim();
     const date = document.getElementById('invit-date').value;
     const statut = document.getElementById('invit-statut').value;
+    const validePar = document.getElementById('invit-valide-par')?.value.trim() || '';
     const notes = document.getElementById('invit-notes').value.trim();
     const pass = document.getElementById('invit-pass').checked;
     const loge = document.getElementById('invit-loge').checked;
     const parking = document.getElementById('invit-parking').checked;
     const repas = document.getElementById('invit-repas').checked;
+    // Envoi billets
+    const billetsEnvoyes = document.getElementById('invit-billets-oui')?.checked || false;
+    const dateEnvoiBillets = document.getElementById('invit-date-envoi-billets')?.value || '';
+    const typeEnvoi = document.getElementById('invit-type-envoi')?.value || '';
 
     if (!nom && !prenom) { alert('Merci de saisir le nom de l\'invité.'); return; }
 
@@ -7439,10 +7460,14 @@ function _hideTeamSelection() {
       notes: notes || null,
       email: email || null,
       places_num: placesNum || null,
+      valide_par: validePar || null,
       pass: pass,
       loge: loge,
       parking: parking,
       repas: repas,
+      billets_envoyes: billetsEnvoyes,
+      date_envoi_billets: dateEnvoiBillets || null,
+      type_envoi: typeEnvoi || null,
     };
     
     // Mode édition ou création ?
@@ -7468,9 +7493,12 @@ function _hideTeamSelection() {
         if (typeof billRecalculerTotauxParType === 'function') await billRecalculerTotauxParType();
       });
     }
-    ['invit-prenom','invit-nom','invit-email','invit-demandeur','invit-places-num','invit-date','invit-valide-par','invit-notes'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    ['invit-prenom','invit-nom','invit-email','invit-demandeur','invit-places-num','invit-date','invit-valide-par','invit-notes','invit-date-envoi-billets'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
     document.getElementById('invit-places').value = '1';
     ['invit-pass','invit-loge','invit-parking','invit-repas'].forEach(id => document.getElementById(id).checked = false);
+    const elNon = document.getElementById('invit-billets-non'); if (elNon) elNon.checked = true;
+    const elOui = document.getElementById('invit-billets-oui'); if (elOui) elOui.checked = false;
+    const elTypeEnvoi = document.getElementById('invit-type-envoi'); if (elTypeEnvoi) elTypeEnvoi.value = '';
     document.getElementById('invit-statut').selectedIndex = 0;
   }
 
@@ -14499,8 +14527,17 @@ function _hideTeamSelection() {
           
           if (invitations && invitations.length > 0) {
             var statutLabels = { 1: '✅ Validé', 0: '⏳ En attente', '-1': '❌ Refusé' };
+            var typeEnvoiLabels = { 'mail': '📧 Mail', 'texto': '💬 Texto', 'guichet': '🏟️ Guichet', 'main-propre': '🤝 Main propre' };
             invitations.forEach(function(inv) {
               var statut = statutLabels[inv.valide] || '⏳ En attente';
+              var envoi = '–';
+              if (inv.billets_envoyes) {
+                var typeLabel = typeEnvoiLabels[inv.type_envoi] || '';
+                var dateStr = inv.date_envoi_billets ? new Date(inv.date_envoi_billets).toLocaleDateString('fr-FR') : '';
+                envoi = '<span style="color:#22c55e;font-weight:600;">✓</span> '+typeLabel+(dateStr?'<br><span style="font-size:10px;color:#666;">'+dateStr+'</span>':'');
+              } else {
+                envoi = '<span style="color:#ef4444;font-weight:600;">✗ Non</span>';
+              }
               totalDetails += inv.nombre || 1;
               detailsHTML += '<tr>';
               detailsHTML += '<td style="padding:8px 10px;">'+( inv.nom_invite || '–')+'</td>';
@@ -14509,6 +14546,7 @@ function _hideTeamSelection() {
               detailsHTML += '<td style="padding:8px 10px;text-align:center;font-weight:700;">'+(inv.nombre || 1)+'</td>';
               detailsHTML += '<td style="padding:8px 10px;text-align:center;font-weight:600;">'+(inv.places_num || '–')+'</td>';
               detailsHTML += '<td style="padding:8px 10px;text-align:center;">'+statut+'</td>';
+              detailsHTML += '<td style="padding:8px 10px;text-align:center;font-size:11px;">'+envoi+'</td>';
               detailsHTML += '<td style="padding:8px 10px;font-size:11px;color:#666;">'+(inv.notes || '')+'</td>';
               detailsHTML += '</tr>';
             });
@@ -14561,11 +14599,11 @@ function _hideTeamSelection() {
         // Section 2 : Détail des invitations
         win.document.write('<div class="section-titre">📋 DÉTAIL DES INVITATIONS</div>');
         win.document.write('<table><thead><tr>');
-        win.document.write('<th>Invité</th><th>Demandeur</th><th>Liste</th><th style="text-align:center;">Nb</th><th style="text-align:center;">N° Place</th><th style="text-align:center;">Statut</th><th>Notes</th>');
+        win.document.write('<th>Invité</th><th>Demandeur</th><th>Liste</th><th style="text-align:center;">Nb</th><th style="text-align:center;">N° Place</th><th style="text-align:center;">Statut</th><th style="text-align:center;">Envoi</th><th>Notes</th>');
         win.document.write('</tr></thead><tbody>');
-        win.document.write(detailsHTML || '<tr><td colspan="7" style="padding:12px;color:#888;text-align:center;">Aucune demande enregistrée</td></tr>');
+        win.document.write(detailsHTML || '<tr><td colspan="8" style="padding:12px;color:#888;text-align:center;">Aucune demande enregistrée</td></tr>');
         if (detailsHTML) {
-          win.document.write('<tr class="total-row"><td colspan="3">TOTAL DEMANDES</td><td style="text-align:center;">'+totalDetails+'</td><td colspan="3"></td></tr>');
+          win.document.write('<tr class="total-row"><td colspan="3">TOTAL DEMANDES</td><td style="text-align:center;">'+totalDetails+'</td><td colspan="4"></td></tr>');
         }
         win.document.write('</tbody></table>');
         
@@ -14790,6 +14828,18 @@ function _hideTeamSelection() {
       const elLoge = document.getElementById('invit-loge'); if (elLoge) elLoge.checked = !!inv.loge;
       const elParking = document.getElementById('invit-parking'); if (elParking) elParking.checked = !!inv.parking;
       const elRepas = document.getElementById('invit-repas'); if (elRepas) elRepas.checked = !!inv.repas;
+      // Envoi billets
+      const elBilletsOui = document.getElementById('invit-billets-oui');
+      const elBilletsNon = document.getElementById('invit-billets-non');
+      if (inv.billets_envoyes) {
+        if (elBilletsOui) elBilletsOui.checked = true;
+        if (elBilletsNon) elBilletsNon.checked = false;
+      } else {
+        if (elBilletsOui) elBilletsOui.checked = false;
+        if (elBilletsNon) elBilletsNon.checked = true;
+      }
+      const elDateEnvoi = document.getElementById('invit-date-envoi-billets'); if (elDateEnvoi) elDateEnvoi.value = inv.date_envoi_billets || '';
+      const elTypeEnvoi = document.getElementById('invit-type-envoi'); if (elTypeEnvoi) elTypeEnvoi.value = inv.type_envoi || '';
       
       // Stocker l'ID pour la mise à jour
       window._editingInvitId = invitId;
@@ -19273,6 +19323,34 @@ function _hideTeamSelection() {
         <div class="modal-field">
           <label>Validé par</label>
           <input type="text" id="invit-valide-par" placeholder="ex: Régis" />
+        </div>
+      </div>
+
+      <!-- ENVOI BILLETS -->
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>🎟️ Billets envoyés</label>
+          <div style="display:flex; gap:12px; align-items:center; padding:8px 0;">
+            <label class="notif-check" style="margin:0;"><input type="radio" name="invit-billets-envoyes" id="invit-billets-oui" value="oui" onchange="onInvitBilletsEnvoyesChange()"> Oui</label>
+            <label class="notif-check" style="margin:0;"><input type="radio" name="invit-billets-envoyes" id="invit-billets-non" value="non" onchange="onInvitBilletsEnvoyesChange()" checked> Non</label>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label>📅 Date envoi billets</label>
+          <input type="date" id="invit-date-envoi-billets" />
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>📤 Type d'envoi</label>
+          <select id="invit-type-envoi">
+            <option value="">— Choisir —</option>
+            <option value="mail">📧 Mail</option>
+            <option value="texto">💬 Texto</option>
+            <option value="guichet">🏟️ Guichet sur place</option>
+            <option value="main-propre">🤝 En main propre</option>
+          </select>
         </div>
       </div>
 
