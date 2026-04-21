@@ -14507,6 +14507,7 @@ function _hideTeamSelection() {
               detailsHTML += '<td style="padding:8px 10px;">'+(inv.demandeur || '–')+'</td>';
               detailsHTML += '<td style="padding:8px 10px;">'+(inv.nom_liste || '–')+'</td>';
               detailsHTML += '<td style="padding:8px 10px;text-align:center;font-weight:700;">'+(inv.nombre || 1)+'</td>';
+              detailsHTML += '<td style="padding:8px 10px;text-align:center;font-weight:600;">'+(inv.places_num || '–')+'</td>';
               detailsHTML += '<td style="padding:8px 10px;text-align:center;">'+statut+'</td>';
               detailsHTML += '<td style="padding:8px 10px;font-size:11px;color:#666;">'+(inv.notes || '')+'</td>';
               detailsHTML += '</tr>';
@@ -14560,11 +14561,11 @@ function _hideTeamSelection() {
         // Section 2 : Détail des invitations
         win.document.write('<div class="section-titre">📋 DÉTAIL DES INVITATIONS</div>');
         win.document.write('<table><thead><tr>');
-        win.document.write('<th>Invité</th><th>Demandeur</th><th>Liste</th><th style="text-align:center;">Nb</th><th style="text-align:center;">Statut</th><th>Notes</th>');
+        win.document.write('<th>Invité</th><th>Demandeur</th><th>Liste</th><th style="text-align:center;">Nb</th><th style="text-align:center;">N° Place</th><th style="text-align:center;">Statut</th><th>Notes</th>');
         win.document.write('</tr></thead><tbody>');
-        win.document.write(detailsHTML || '<tr><td colspan="6" style="padding:12px;color:#888;text-align:center;">Aucune demande enregistrée</td></tr>');
+        win.document.write(detailsHTML || '<tr><td colspan="7" style="padding:12px;color:#888;text-align:center;">Aucune demande enregistrée</td></tr>');
         if (detailsHTML) {
-          win.document.write('<tr class="total-row"><td colspan="3">TOTAL DEMANDES</td><td style="text-align:center;">'+totalDetails+'</td><td colspan="2"></td></tr>');
+          win.document.write('<tr class="total-row"><td colspan="3">TOTAL DEMANDES</td><td style="text-align:center;">'+totalDetails+'</td><td colspan="3"></td></tr>');
         }
         win.document.write('</tbody></table>');
         
