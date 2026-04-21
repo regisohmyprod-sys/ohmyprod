@@ -14726,13 +14726,23 @@ function _hideTeamSelection() {
         .eq('date_concert_id', _fpDateId);
       
       // Mapper les noms de liste vers les clés BILL_INVIT_TYPES
+      // Accepte plusieurs formats : snake_case court ET libellés longs
       const listeToKey = {
+        // Format snake_case (utilisé dans les listes du formulaire)
+        'prod_artistes': 'prod_artistes',
+        'invit_salle':   'invit_salle',
+        'servitudes':    'servitudes',
+        'partenaires':   'partenaires',
+        'presse':        'presse',
+        'autres':        'autres',
+        'jeu_concours':  'prod_artistes',  // jeu concours = rangé dans Production/Artistes
+        // Format libellé long (au cas où)
         'Invitations Production/Artistes': 'prod_artistes',
-        'Invitations Salle': 'invit_salle',
-        'Servitudes Salle': 'servitudes',
-        'Invitations Partenaires': 'partenaires',
-        'Invitations Presse': 'presse',
-        'Invitations Autres': 'autres'
+        'Invitations Salle':               'invit_salle',
+        'Servitudes Salle':                'servitudes',
+        'Invitations Partenaires':         'partenaires',
+        'Invitations Presse':              'presse',
+        'Invitations Autres':              'autres'
       };
       
       // Reset tous les totaux
@@ -14742,14 +14752,20 @@ function _hideTeamSelection() {
       // Calculer les totaux par type
       if (invitations) {
         invitations.forEach(inv => {
-          const key = listeToKey[inv.nom_liste];
-          if (key && _billData['invit'][key] !== undefined) {
+          var nomListe = (inv.nom_liste || '').toString().trim();
+          var key = listeToKey[nomListe];
+          // Fallback si non trouvé → ranger dans "autres"
+          if (!key) {
+            key = 'autres';
+            console.log('[INVIT] Liste non mappée:', nomListe, '→ rangée dans autres');
+          }
+          if (_billData['invit'][key] !== undefined) {
             _billData['invit'][key] += (inv.nombre || 1);
           }
         });
       }
       
-      // Mettre à jour l'affichage des inputs
+      // Mettre à jour l'affichage des inputs (readonly)
       BILL_INVIT_TYPES.forEach(t => {
         const input = document.querySelector(`input[oninput="billUpdateInvit('${t.key}',this.value)"]`);
         if (input) {
@@ -14757,7 +14773,13 @@ function _hideTeamSelection() {
         }
       });
       
-      // Mettre à jour les totaux affichés
+      // Mettre à jour la ligne TOTAL INVITATIONS
+      var totalInvit = 0;
+      BILL_INVIT_TYPES.forEach(function(t) { totalInvit += (_billData['invit'][t.key] || 0); });
+      var totalEl = document.getElementById('bill-invit-total');
+      if (totalEl) totalEl.textContent = totalInvit;
+      
+      // Mettre à jour les totaux affichés (header fiche billetterie)
       billUpdateInvitTotals();
       
       // Marquer comme modifié et sauvegarder
