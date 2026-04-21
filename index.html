@@ -7209,31 +7209,56 @@ function _hideTeamSelection() {
     container.querySelector('textarea').value = '';
   }
 
-  function imprimerListeInvit(btn) {
-    const bloc = btn.closest('.invit-liste-bloc');
-    const titre = bloc.querySelector('[style*="font-weight:700"]')?.textContent || 'LISTE INVITATIONS';
-    const rows = bloc.querySelectorAll('table tbody tr');
-    const total = bloc.querySelector('.inv-total')?.innerHTML || '';
+  async function imprimerListeInvit(btn) {
+    const bloc = btn.closest('.invit-liste-bloc') || document.body;
+    const titreEl = bloc.querySelector('[style*="font-weight:700"]');
+    const titre = titreEl?.textContent || 'LISTE INVITATIONS';
 
     // Infos spectacle depuis la page en cours
     const ville = document.querySelector('.city-title')?.textContent || '';
     const dateSpec = document.querySelector('.date-header-date')?.textContent || document.querySelector('[class*="date-info"]')?.textContent || '';
     const spectacle = document.querySelector('.page-title')?.textContent || 'THE WORLD OF QUEEN';
 
+    // Charger TOUTES les invitations de la date depuis Supabase (pour avoir notes, places_num, email)
+    let invitations = [];
+    try {
+      const { data } = await _supabase
+        .from('invitations')
+        .select('*')
+        .eq('date_concert_id', _fpDateId)
+        .order('created_at', { ascending: true });
+      invitations = data || [];
+    } catch(e) {
+      console.error('Erreur chargement invitations pour impression', e);
+    }
+
+    const statutBadge = (v) => {
+      if (v === 1) return '<span class="badge-green">Validé</span>';
+      if (v === -1) return '<span class="badge-red">Refusé</span>';
+      return '<span class="badge-orange">En attente</span>';
+    };
+
+    let totalNb = 0, totalValide = 0;
     let rowsHTML = '';
-    rows.forEach(row => {
-      const cells = row.querySelectorAll('td');
+    invitations.forEach(inv => {
+      const dateStr = inv.date_demande ? new Date(inv.date_demande).toLocaleDateString('fr-FR') : '–';
+      const nb = parseInt(inv.nombre) || 1;
+      totalNb += nb;
+      if (inv.valide === 1) totalValide += nb;
+      const options = [inv.pass?'🎫':'', inv.loge?'🚪':'', inv.parking?'🅿️':'', inv.repas?'🍽️':''].filter(Boolean).join(' ');
       rowsHTML += `<tr>
-        <td>${cells[0]?.textContent || ''}</td>
-        <td>${cells[1]?.textContent || ''}</td>
-        <td>${cells[2]?.textContent || ''}</td>
-        <td style="text-align:center;">${cells[3]?.textContent || ''}</td>
-        <td>${cells[4]?.innerHTML || ''}</td>
-        <td>${cells[5]?.textContent || ''}</td>
-        <td>${cells[6]?.textContent || ''}</td>
-        <td>${cells[7]?.textContent || ''}</td>
+        <td>${dateStr}</td>
+        <td>${inv.demandeur || '–'}</td>
+        <td><strong>${inv.nom_invite || '–'}</strong>${options?'<br><span style="font-size:10px;color:#666;">'+options+'</span>':''}</td>
+        <td style="text-align:center;">${nb}</td>
+        <td>${statutBadge(inv.valide)}</td>
+        <td style="font-weight:600;">${inv.places_num || '–'}</td>
+        <td style="font-size:10px;">${inv.email || '–'}</td>
+        <td style="font-size:10px;color:#555;">${inv.notes || ''}</td>
       </tr>`;
     });
+
+    const totalHTML = `Total : ${totalNb}  ·  Validé : ${totalValide}`;
 
     const win = window.open('', '_blank');
     win.document.write(`<!DOCTYPE html><html><head>
@@ -7254,7 +7279,7 @@ function _hideTeamSelection() {
         thead th { padding:10px 12px; text-align:left; font-weight:600; text-transform:uppercase; font-size:10px; letter-spacing:0.5px; }
         tbody tr { border-bottom:1px solid #eee; }
         tbody tr:nth-child(even) { background:#f9f9f9; }
-        tbody td { padding:9px 12px; }
+        tbody td { padding:9px 12px; vertical-align:top; }
         .total { margin-top:16px; text-align:right; font-weight:700; font-size:13px; color:#e31e24; }
         .badge-green { background:#22c55e; color:white; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:600; }
         .badge-orange { background:#f59e0b; color:white; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:600; }
@@ -7264,22 +7289,9 @@ function _hideTeamSelection() {
         .notes-lines { display:flex; flex-direction:column; gap:8px; }
         .notes-line { border-bottom:1px solid #ddd; height:22px; }
         .footer-logo { margin-top:30px; text-align:center; border-top:1px solid #eee; padding-top:16px; }
-        .footer-logo img { height:50px; opacity:0.85; }
         .footer-text { font-size:10px; color:#999; margin-top:6px; }
-        @media print { body { padding:15px; } }
-        @media print {
-    .sidebar, .topbar, .back-btn, button { display: none !important; }
-    .main-content { margin-left: 0 !important; padding: 0 !important; }
-    #page-cloture-salle, #page-decla-droits, #page-bilan-amh { display: block !important; padding: 0 !important; }
-    .page:not(#page-cloture-salle):not(#page-decla-droits):not(#page-bilan-amh) { display: none !important; }
-    body { background: #fff !important; color: #000 !important; margin: 0 !important; padding: 0 !important; }
-    * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
-    #page-cloture-salle > div, #page-decla-droits > div { margin-bottom: 6px !important; }
-    #page-cloture-salle table, #page-decla-droits table { font-size: 10px !important; }
-    #page-cloture-salle td, #page-decla-droits td { padding: 3px 8px !important; }
-    @page { size: A4 portrait; margin: 8mm; }
-  }
-</style>
+        @media print { body { padding:15px; } @page { size: A4 landscape; margin: 8mm; } }
+      </style>
     </head><body>
       <div class="top-header">
         <div class="spectacle-nom">${spectacle}</div>
@@ -7291,19 +7303,19 @@ function _hideTeamSelection() {
       <table>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Demandeur</th>
-            <th>Invité(e)</th>
-            <th>Nb</th>
-            <th>Statut</th>
-            <th>N° Place</th>
-            <th>Mail</th>
-            <th>Notes</th>
+            <th style="width:9%;">Date</th>
+            <th style="width:12%;">Demandeur</th>
+            <th style="width:20%;">Invité(e)</th>
+            <th style="width:5%;">Nb</th>
+            <th style="width:10%;">Statut</th>
+            <th style="width:12%;">N° Place</th>
+            <th style="width:15%;">Mail</th>
+            <th style="width:17%;">Notes</th>
           </tr>
         </thead>
-        <tbody>${rowsHTML}</tbody>
+        <tbody>${rowsHTML || '<tr><td colspan="8" style="text-align:center;padding:20px;color:#999;">Aucune invitation</td></tr>'}</tbody>
       </table>
-      <div class="total">${total.replace(/<[^>]*>/g,'  ')}</div>
+      <div class="total">${totalHTML}</div>
 
       <div class="notes-box">
         <div class="notes-box-title">⚠️ Notes importantes</div>
@@ -7315,12 +7327,10 @@ function _hideTeamSelection() {
         </div>
       </div>
 
-      <div class="footer-logo">" alt="OH MY PROD" />
+      <div class="footer-logo">
         <div class="footer-text">OH MY PROD · Document confidentiel · ${titre}</div>
       </div>
       <script>window.onload = function(){ window.print(); }<\/script>
-</div>
-
 </body></html>`);
     win.document.close();
   }
@@ -14770,6 +14780,15 @@ function _hideTeamSelection() {
       document.getElementById('invit-liste').value = inv.nom_liste || '';
       document.getElementById('invit-date').value = inv.date_demande || new Date().toISOString().split('T')[0];
       document.getElementById('invit-statut').value = inv.valide === 1 ? 'valide' : (inv.valide === -1 ? 'refuse' : 'en-attente');
+      // Champs qui étaient oubliés ⤵
+      const elEmail = document.getElementById('invit-email'); if (elEmail) elEmail.value = inv.email || '';
+      const elPlacesNum = document.getElementById('invit-places-num'); if (elPlacesNum) elPlacesNum.value = inv.places_num || '';
+      const elNotes = document.getElementById('invit-notes'); if (elNotes) elNotes.value = inv.notes || '';
+      const elValidePar = document.getElementById('invit-valide-par'); if (elValidePar) elValidePar.value = inv.valide_par || '';
+      const elPass = document.getElementById('invit-pass'); if (elPass) elPass.checked = !!inv.pass;
+      const elLoge = document.getElementById('invit-loge'); if (elLoge) elLoge.checked = !!inv.loge;
+      const elParking = document.getElementById('invit-parking'); if (elParking) elParking.checked = !!inv.parking;
+      const elRepas = document.getElementById('invit-repas'); if (elRepas) elRepas.checked = !!inv.repas;
       
       // Stocker l'ID pour la mise à jour
       window._editingInvitId = invitId;
