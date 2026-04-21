@@ -14443,11 +14443,12 @@ function _hideTeamSelection() {
       total += val;
       const bg = idx % 2 === 0 ? '#242424' : '#1e1e1e';
       html += `<tr style="background:${bg};">
-        <td style="padding:8px 12px;color:${t.color};font-size:13px;font-weight:600;">${t.label}</td>
+        <td style="padding:8px 12px;color:${t.color};font-size:13px;font-weight:600;">${t.label} <span style="color:#888;font-size:9px;">🔄 AUTO</span></td>
         <td style="padding:4px 12px;text-align:right;">
-          <input type="number" min="0" value="${val||''}" placeholder="0"
+          <input type="number" readonly value="${val||''}" placeholder="0"
+            title="Calculé automatiquement depuis la Liste des demandes d'invitations"
             oninput="billUpdateInvit('${t.key}',this.value)"
-            style="width:90px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#c9a84c;padding:5px 8px;font-size:14px;text-align:right;font-family:'Bebas Neue',sans-serif;">
+            style="width:90px;background:#111;border:1px solid #c9a84c;border-radius:4px;color:#c9a84c;padding:5px 8px;font-size:14px;text-align:right;font-family:'Bebas Neue',sans-serif;cursor:not-allowed;">
         </td>
       </tr>`;
     });
@@ -14619,6 +14620,10 @@ function _hideTeamSelection() {
     listeContainer.parentNode.insertBefore(btn, listeContainer.nextSibling);
     // Charger et afficher les demandes
     billChargerListeInvitations();
+    // 🎯 Recalculer automatiquement les totaux TYPE INVITATIONS depuis la Liste des demandes
+    if (typeof billRecalculerTotauxParType === 'function') {
+      billRecalculerTotauxParType();
+    }
   }
 
   async function billChargerListeInvitations() {
@@ -14714,12 +14719,11 @@ function _hideTeamSelection() {
     if (!_fpDateId) return;
     
     try {
-      // Charger toutes les invitations validées pour cette date
+      // Charger TOUTES les invitations pour cette date (validées + en attente + refusées)
       const { data: invitations } = await _supabase
         .from('invitations')
         .select('*')
-        .eq('date_concert_id', _fpDateId)
-        .eq('valide', 1); // Seulement les validées
+        .eq('date_concert_id', _fpDateId);
       
       // Mapper les noms de liste vers les clés BILL_INVIT_TYPES
       const listeToKey = {
