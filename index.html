@@ -9477,7 +9477,8 @@ function _hideTeamSelection() {
               ${voyages.length} voyage(s) · ${hotels.length} hôtel(s) · ${contacts.length} contact(s) · ${docs.length} doc(s)
             </div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;">
+          <div style="display:flex;gap:8px;align-items:center;" onclick="event.stopPropagation()">
+            <button onclick="event.stopPropagation();ouvrirCarteVHRDate('${d.id}')" title="Voir la ville sur la carte" style="background:#e31e24;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:700;box-shadow:0 2px 4px rgba(227,30,36,0.3);">🗺️ PLAN</button>
             <span style="font-size:11px;color:${isPast?'#555':'#7eb8d4'};">${isPast?'✓ Passée':'→ À venir'}</span>
             <span id="arrow-${d.id}" style="color:#888;font-size:14px;">▼</span>
           </div>
@@ -12266,22 +12267,42 @@ function _hideTeamSelection() {
     return null;
   }
 
+  // 🎯 Détecte si la requête est une adresse détaillée (doit aller direct à Nominatim)
+  // Ex: "50 Rue Charles Darwin 79000 Niort" → précis ✅
+  // Ex: "Niort" → juste la ville ❌
+  function _estAdresseDetaillee(requete) {
+    if (!requete) return false;
+    var txt = requete.toLowerCase();
+    // Numéro de rue au début (ex: "50 rue...")
+    if (/^\d+\s+/.test(txt.trim())) return true;
+    // Code postal français (5 chiffres)
+    if (/\b\d{5}\b/.test(txt)) return true;
+    // Mots-clés d'adresse
+    if (/\b(rue|avenue|av\.|boulevard|bd\.|place|chemin|impasse|allée|allee|quai|route|rte\.|cours)\s+/i.test(txt)) return true;
+    return false;
+  }
+
   // Géocodage d'une adresse via Nominatim (gratuit, usage raisonnable)
   async function geoCoderAdresse(requete) {
     if (!requete) return null;
     var cle = requete.toLowerCase().trim();
     if (_geoCache[cle]) return _geoCache[cle];
 
-    // 🚀 Fast path : coordonnées préenregistrées (instantané)
-    var preCoords = _extraireVille(requete);
-    if (preCoords) {
-      var result = { lat: preCoords[0], lng: preCoords[1], display: requete, source: 'precoded' };
-      _geoCache[cle] = result;
-      _geoSaveCache();
-      return result;
+    // 🎯 Si c'est une adresse détaillée → Nominatim direct (précis à la rue)
+    var adresseDetaillee = _estAdresseDetaillee(requete);
+
+    // 🚀 Fast path : coordonnées préenregistrées (uniquement si c'est une ville simple)
+    if (!adresseDetaillee) {
+      var preCoords = _extraireVille(requete);
+      if (preCoords) {
+        var result = { lat: preCoords[0], lng: preCoords[1], display: requete, source: 'precoded' };
+        _geoCache[cle] = result;
+        _geoSaveCache();
+        return result;
+      }
     }
 
-    // Fallback Nominatim
+    // Fallback / priorité Nominatim pour les vraies adresses
     try {
       var url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(requete) + '&format=json&limit=1&countrycodes=fr,be,ch,lu';
       var r = await fetch(url, { headers: { 'Accept-Language': 'fr' } });
@@ -12293,6 +12314,18 @@ function _hideTeamSelection() {
         return result;
       }
     } catch(e) { console.warn('[GEO]', requete, e); }
+
+    // Si Nominatim a raté ET qu'on peut fallback ville → on le fait
+    if (adresseDetaillee) {
+      var villeFallback = _extraireVille(requete);
+      if (villeFallback) {
+        var result = { lat: villeFallback[0], lng: villeFallback[1], display: requete, source: 'precoded-fallback' };
+        _geoCache[cle] = result;
+        _geoSaveCache();
+        return result;
+      }
+    }
+
     return null;
   }
 
@@ -12616,6 +12649,26 @@ function _hideTeamSelection() {
     }
   }
 
+  // 🗺️ Ouvrir la carte date depuis la FICHE VHR (liste) — avec dateId en paramètre
+  async function ouvrirCarteVHRDate(dateId) {
+    if (!dateId) {
+      alert('Aucune date fournie.');
+      return;
+    }
+    // Mémoriser la page active pour le retour
+    var pageActive = document.querySelector('.page.active');
+    if (pageActive) {
+      window._carteDateRetourPage = pageActive.id.replace(/^page-/, '');
+    }
+    // Vider le DOM de la fiche prod pour forcer le rechargement Supabase
+    ['fp-ville','fp-salle','fp-adresse-salle','fp-date-concert'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    _fpDateId = dateId;
+    await carteDateOuvrir();
+  }
+
   // 🗺️ Ouvrir la carte date depuis un espace (artistique / staff / technique)
   // Utilise _dateActiveId en priorité, sinon _fpDateId
   async function ouvrirCarteDepuisEspace() {
@@ -12731,10 +12784,24 @@ function _hideTeamSelection() {
         });
       }
 
-      // Géocoder
-      var requete = adresse ? (nomSalle + ' ' + adresse) : (nomSalle ? (nomSalle + ' ' + ville + ' France') : (ville + ' France'));
-      var coords = await geoCoderAdresse(requete);
-      if (!coords && ville) coords = await geoCoderAdresse(ville + ' France');
+      // 🎯 Géocoder — priorité à l'adresse exacte pour pin précis sur la salle
+      var coords = null;
+      // 1. Adresse complète (ex: "50 Rue Charles Darwin 79000 Niort")
+      if (adresse) {
+        coords = await geoCoderAdresse(adresse);
+        console.log('[CARTE DATE] Essai adresse:', adresse, '→', coords ? '✅' : '❌');
+      }
+      // 2. Nom salle + ville (ex: "L'Acclameur Niort France")
+      if (!coords && nomSalle) {
+        var requete2 = nomSalle + ' ' + (ville || '') + ' France';
+        coords = await geoCoderAdresse(requete2);
+        console.log('[CARTE DATE] Essai salle+ville:', requete2, '→', coords ? '✅' : '❌');
+      }
+      // 3. Fallback ville seule (centre-ville)
+      if (!coords && ville) {
+        coords = await geoCoderAdresse(ville + ' France');
+        console.log('[CARTE DATE] Fallback ville:', ville, '→', coords ? '✅' : '❌');
+      }
 
       if (coords) {
         _carteDateCurrent.lat = coords.lat;
