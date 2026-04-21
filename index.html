@@ -3636,7 +3636,7 @@ function _hideTeamSelection() {
 
     <!-- 🗺️ PAGE CARTE DATE : vue zoomée sur la ville d'une date -->
     <div id="page-carte-date" class="page">
-      <button class="back-btn" onclick="showPage('fiche-prod')" style="margin-bottom:12px;">← Retour à la fiche</button>
+      <button class="back-btn" onclick="carteDateRetour()" style="margin-bottom:12px;">← Retour</button>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:12px;">
         <div>
           <div id="carte-date-ville" class="page-title" style="margin-bottom:4px;">VILLE</div>
@@ -5000,7 +5000,10 @@ function _hideTeamSelection() {
         <!-- HEADER VHR -->
         <div style="background:linear-gradient(135deg,#1e3a5f,#1565c0);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">🚌 VHR — VOYAGES · HÉBERGEMENT · RESSOURCES</div>
-          <button onclick="toggleBlocVHR()" id="btn-toggle-vhr" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:#fff;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;">▼ Réduire</button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button onclick="ouvrirCarteDepuisEspace()" title="Voir la ville sur la carte" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:#fff;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🗺️ PLAN</button>
+            <button onclick="toggleBlocVHR()" id="btn-toggle-vhr" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:#fff;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;">▼ Réduire</button>
+          </div>
         </div>
 
         <div id="contenu-vhr" style="padding:16px;background:#1a1a1a;">
@@ -5150,9 +5153,12 @@ function _hideTeamSelection() {
 
       <!-- BLOC VHR LECTURE SEULE -->
       <div style="background:#0f1923;border:2px solid #3b82f6;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-        <div style="background:linear-gradient(135deg,#1e3a5f,#1565c0);padding:12px 16px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:20px;">🚌</span>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;">VHR – VOYAGES · HÉBERGEMENT · RESSOURCES</div>
+        <div style="background:linear-gradient(135deg,#1e3a5f,#1565c0);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">🚌</span>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;">VHR – VOYAGES · HÉBERGEMENT · RESSOURCES</div>
+          </div>
+          <button onclick="ouvrirCarteDepuisEspace()" title="Voir la ville sur la carte" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:#fff;padding:5px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🗺️ PLAN</button>
         </div>
         <div style="padding:16px;" id="avhr-vhr-content">
           <div style="color:#888;text-align:center;padding:20px;">Chargement...</div>
@@ -12410,6 +12416,30 @@ function _hideTeamSelection() {
   // =========================================================
   // 🗺️ CARTE DATE : zoom sur la ville / salle d'une date
   // =========================================================
+  // 🗺️ Ouvrir la carte date depuis un espace (artistique / staff / technique)
+  // Utilise _dateActiveId si disponible, sinon _fpDateId
+  async function ouvrirCarteDepuisEspace() {
+    var dateId = _fpDateId || _dateActiveId;
+    if (!dateId) {
+      alert('Aucune date sélectionnée.');
+      return;
+    }
+    // Mémoriser la page active pour le retour
+    var pageActive = document.querySelector('.page.active');
+    if (pageActive) {
+      window._carteDateRetourPage = pageActive.id.replace(/^page-/, '');
+    }
+    _fpDateId = dateId;
+    await carteDateOuvrir();
+  }
+
+  // Retour intelligent depuis carte-date
+  function carteDateRetour() {
+    var retour = window._carteDateRetourPage || 'fiche-prod';
+    window._carteDateRetourPage = null; // reset
+    showPage(retour);
+  }
+
   async function carteDateOuvrir() {
     if (!_fpDateId) {
       alert('Aucune date ouverte.');
