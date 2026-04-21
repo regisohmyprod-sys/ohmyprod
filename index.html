@@ -12356,10 +12356,11 @@ function _hideTeamSelection() {
 
       if (!_carteDateMap) {
         _carteDateMap = L.map('carte-date-map', { zoomControl: true }).setView([46.5, 2.5], 6);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        // 🎨 Fond CartoDB Voyager : sombre mais lisible (rues, parcs, eau visibles)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
           attribution: '© OpenStreetMap · © CARTO',
           subdomains: 'abcd',
-          maxZoom: 19
+          maxZoom: 20
         }).addTo(_carteDateMap);
       } else {
         _carteDateMap.invalidateSize();
