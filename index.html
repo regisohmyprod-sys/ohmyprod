@@ -13,6 +13,9 @@
 <meta http-equiv="Expires" content="0">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/jpeg" href="assets/omp-icon-200.jpg">
+<!-- 🗺️ Leaflet pour les cartes (OpenStreetMap, gratuit, sans clé API) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <link rel="apple-touch-icon" href="assets/omp-icon-200.jpg">
 <!-- Mode fullscreen iOS + Android -->
 <meta name="theme-color" content="#0a0a0a">
@@ -2719,6 +2722,11 @@ html, body { overscroll-behavior-y: none; }
    ============ 📱 OMP MOBILE KIT — END ===================
    ========================================================== */
 </style>
+
+<!-- 🗺️ Leaflet (cartes OpenStreetMap - gratuit) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 </head>
 <body class="role-pending role-not-admin">
 
@@ -3334,6 +3342,7 @@ function _hideTeamSelection() {
           <div id="dropdown-tour" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
             <div onclick="selectDropdownItem(event, function(){ showPage('gestion-omp'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
             <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviDatesResume(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#c9a84c; font-weight:600; border-bottom:1px solid #333; background:rgba(201,168,76,0.08);" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='rgba(201,168,76,0.08)'">📊 Suivi Financier Tour</div>
+            <div onclick="selectDropdownItem(event, function(){ carteTourneeOuvrir(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🗺️ Carte Tournée</div>
             <div onclick="selectDropdownItem(event, function(){ openModal('modal-vhr-tournee'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
           </div>
         </div>
@@ -3505,8 +3514,11 @@ function _hideTeamSelection() {
 
     <div id="page-gestion-omp" class="page">
       <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
-      <div class="page-title">📋 CRÉA / SUIVI DATES</div>
-      <div style="font-size:13px;color:#888;margin-bottom:20px;margin-top:-12px;font-style:italic;">Merci de choisir votre tournée !</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="page-title" style="margin-bottom:0;">📋 CRÉA / SUIVI DATES</div>
+        <button onclick="carteTourneeOuvrir()" style="background:linear-gradient(135deg,#e31e24,#c9a84c);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:700;box-shadow:0 2px 8px rgba(227,30,36,0.3);">🗺️ VOIR SUR LA CARTE</button>
+      </div>
+      <div style="font-size:13px;color:#888;margin-bottom:20px;margin-top:8px;font-style:italic;">Merci de choisir votre tournée !</div>
 
       <!-- Filtres tournée — boutons style horizontal -->
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
@@ -3594,6 +3606,55 @@ function _hideTeamSelection() {
       </div>
     </div>
 
+    <!-- 🗺️ PAGE CARTE TOURNÉE : vue d'ensemble de toutes les dates -->
+    <div id="page-carte-tournee" class="page">
+      <button class="back-btn" onclick="showPage('gestion-omp')" style="margin-bottom:12px;">← Créa / Suivi dates</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div class="page-title" style="margin-bottom:4px;">🗺️ CARTE TOURNÉE</div>
+          <div id="carte-tournee-sous-titre" style="font-size:12px;color:#888;"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="carteTourneeFitBounds()" title="Recentrer la carte sur toutes les dates" style="background:#0a0a0a;color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🎯 RECENTRER</button>
+          <button onclick="carteTourneeRecharger()" title="Recharger les dates depuis la base" style="background:#0a0a0a;color:#888;border:1px solid #333;border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🔄 RECHARGER</button>
+        </div>
+      </div>
+      <!-- Compteur + légende -->
+      <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+          <div style="width:22px;height:22px;background:#e31e24;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;"></div>
+          <div>
+            <div style="font-size:18px;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;"><span id="carte-tournee-nb">0</span> dates</div>
+            <div style="font-size:10px;color:#888;">sur la carte</div>
+          </div>
+        </div>
+        <div id="carte-tournee-legend" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;font-size:11px;color:#888;display:flex;align-items:center;gap:16px;flex-wrap:wrap;"></div>
+      </div>
+      <!-- La carte Leaflet -->
+      <div id="carte-tournee-map" style="width:100%;height:calc(100vh - 260px);min-height:400px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;"></div>
+    </div>
+
+    <!-- 🗺️ PAGE CARTE DATE : vue zoomée sur la ville d'une date -->
+    <div id="page-carte-date" class="page">
+      <button class="back-btn" onclick="showPage('fiche-prod')" style="margin-bottom:12px;">← Retour à la fiche</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div id="carte-date-ville" class="page-title" style="margin-bottom:4px;">VILLE</div>
+          <div id="carte-date-sous-titre" style="font-size:12px;color:#c9a84c;"></div>
+        </div>
+        <button id="carte-date-gps" onclick="carteDateOuvrirGPS()" title="Ouvrir dans Maps (GPS)" style="background:#c9a84c;color:#000;border:none;border-radius:10px;width:48px;height:48px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;">➤</button>
+      </div>
+      <div id="carte-date-map" style="width:100%;height:55vh;min-height:320px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:12px;"></div>
+      <!-- Card salle -->
+      <div id="carte-date-info" style="background:#1a1a1a;border:2px solid #c9a84c;border-radius:12px;padding:16px;display:flex;align-items:flex-start;gap:14px;">
+        <div style="width:44px;height:44px;background:#e31e24;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎤</div>
+        <div style="flex:1;">
+          <div id="carte-date-salle-nom" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:#c9a84c;margin-bottom:6px;">—</div>
+          <div id="carte-date-salle-adresse" style="font-size:13px;color:#ccc;line-height:1.4;">—</div>
+        </div>
+      </div>
+    </div>
+
     <!-- PAGE FICHE PRODUCTION -->
     <div id="page-fiche-prod" class="page">
       <button class="back-btn" onclick="showPage('gestion-omp');csChargerDates()">← Créa / Suivi dates</button>
@@ -3610,6 +3671,7 @@ function _hideTeamSelection() {
           <button onclick="fpOuvrirDecla()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📋 DÉCLA DROITS</button>
           <button onclick="fpOuvrirBilanAMH()" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📊 BILAN AMH</button>
           <button onclick="if(_fpDateId){dupliquerDateOuvrir(_fpDateId)}else{alert('Aucune date ouverte.')}" title="Dupliquer cette date" style="background:#1a1a1a;color:#c9a84c;border:1px solid #c9a84c;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">📋 DUPLIQUER</button>
+          <button onclick="carteDateOuvrir()" title="Voir la ville de cette date sur une carte" style="background:#1a1a1a;color:#22c55e;border:1px solid #22c55e;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🗺️ CARTE</button>
         </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -3798,7 +3860,10 @@ function _hideTeamSelection() {
             <input id="fp-heure" type="text" readonly oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:6px;color:#c9a84c;padding:8px 10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div style="grid-column:1/-1;position:relative;">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Adresse salle <span style="color:#555;font-size:10px;">(tape le nom ou l'adresse)</span></label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
+              <span>Adresse salle <span style="color:#555;font-size:10px;">(tape le nom ou l'adresse)</span></span>
+              <button type="button" onclick="carteDateOuvrir()" title="Voir la salle sur la carte" style="background:#0a0a0a;color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🗺️ CARTE</button>
+            </label>
             <input id="fp-adresse-salle" type="text" placeholder="Ex: Zénith de Pau..." autocomplete="off" oninput="fpSearchAdresse(this.value)" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
             <div id="fp-adresse-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #3a3a3a;border-radius:6px;z-index:9999;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.5);"></div>
           </div>
@@ -11013,6 +11078,8 @@ function _hideTeamSelection() {
     'tournee-dynamic':      ['admin'],
     'date-dynamic':         ['admin'],
     'gestion-salles':       ['admin'],
+    'carte-tournee':        ['admin', 'staff_omp', 'artiste', 'technique'],
+    'carte-date':           ['admin', 'staff_omp', 'artiste', 'technique'],
     'equipe':               ['admin'],
     'contacts-promo':       ['admin'],
     // Pages espaces spécifiques
@@ -12032,6 +12099,309 @@ function _hideTeamSelection() {
   }
 
   // 🔒 Validation du bloc INFOS GÉNÉRALES — bloque les blocs suivants tant que tous les champs requis ne sont pas remplis
+  // ============================================================
+  // 🗺️ MODULE CARTES (Leaflet + OpenStreetMap, gratuit)
+  // ============================================================
+  var _carteTourneeMap = null;
+  var _carteTourneeMarkers = [];
+  var _carteDateMap = null;
+  var _carteDateCurrent = null; // { ville, salle, adresse, lat, lng, date }
+
+  // Cache coordonnées pour éviter de spammer Nominatim
+  var _geoCache = {};
+  try {
+    var cached = localStorage.getItem('omp_geo_cache');
+    if (cached) _geoCache = JSON.parse(cached);
+  } catch(e) {}
+
+  function _geoSaveCache() {
+    try { localStorage.setItem('omp_geo_cache', JSON.stringify(_geoCache)); } catch(e) {}
+  }
+
+  // Géocodage d'une adresse via Nominatim (gratuit, usage raisonnable)
+  async function geoCoderAdresse(requete) {
+    if (!requete) return null;
+    var cle = requete.toLowerCase().trim();
+    if (_geoCache[cle]) return _geoCache[cle];
+    try {
+      var url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(requete) + '&format=json&limit=1&countrycodes=fr,be,ch,lu';
+      var r = await fetch(url, { headers: { 'Accept-Language': 'fr' } });
+      var data = await r.json();
+      if (data && data[0]) {
+        var result = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), display: data[0].display_name };
+        _geoCache[cle] = result;
+        _geoSaveCache();
+        return result;
+      }
+    } catch(e) { console.warn('[GEO]', requete, e); }
+    return null;
+  }
+
+  // Créer une icône pin personnalisée (rouge avec pointe vers le bas)
+  function _creerPinIcon(color) {
+    color = color || '#e31e24';
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42"><path d="M16 0C7.2 0 0 7.2 0 16c0 11 16 26 16 26s16-15 16-26C32 7.2 24.8 0 16 0z" fill="' + color + '" stroke="#fff" stroke-width="2"/><circle cx="16" cy="16" r="6" fill="#fff"/></svg>';
+    return L.divIcon({
+      html: svg,
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+      popupAnchor: [0, -36],
+      className: 'omp-pin-icon'
+    });
+  }
+
+  // =========================================================
+  // 🗺️ CARTE TOURNÉE : toutes les dates de la tournée active
+  // =========================================================
+  async function carteTourneeOuvrir() {
+    showPage('carte-tournee');
+    // Attendre que la page soit visible pour que Leaflet mesure bien le container
+    setTimeout(carteTourneeRecharger, 100);
+  }
+
+  async function carteTourneeRecharger() {
+    var mapEl = document.getElementById('carte-tournee-map');
+    if (!mapEl) return;
+
+    // Initialiser la carte si pas encore fait
+    if (!_carteTourneeMap) {
+      _carteTourneeMap = L.map('carte-tournee-map', { zoomControl: true, attributionControl: true }).setView([46.5, 2.5], 6);
+      // Tuiles OSM en mode sombre via CartoDB Dark Matter (gratuit)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap · © CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(_carteTourneeMap);
+    } else {
+      // Invalider la taille (au cas où la page était cachée)
+      setTimeout(function() { _carteTourneeMap.invalidateSize(); }, 50);
+    }
+
+    // Nettoyer les anciens markers
+    _carteTourneeMarkers.forEach(function(m) { _carteTourneeMap.removeLayer(m); });
+    _carteTourneeMarkers = [];
+
+    // 🎯 Charger TOUTES les tournées actives (TWOQ Hommage + TWOQ Éternelle Légende)
+    var tourneesIds = [
+      '11111111-1111-1111-1111-111111111111', // TWOQ L'Hommage
+      '22222222-2222-2222-2222-222222222222'  // TWOQ Éternelle Légende
+    ];
+
+    var sousTitreEl = document.getElementById('carte-tournee-sous-titre');
+    if (sousTitreEl) sousTitreEl.textContent = 'Toutes les dates TWOQ — chargement…';
+
+    try {
+      var res = await _supabase.from('dates_concerts').select('*').in('tournee_id', tourneesIds).order('date_concert', { ascending: true });
+      var dates = res.data || [];
+
+      // Récupérer en parallèle les fiches_production pour avoir salle/adresse
+      var fichesRes = dates.length > 0
+        ? await _supabase.from('fiches_production').select('date_concert_id, nom_salle, adresse_salle, ville').in('date_concert_id', dates.map(function(d){ return d.id; }))
+        : { data: [] };
+      var fichesByDateId = {};
+      (fichesRes.data || []).forEach(function(f) { fichesByDateId[f.date_concert_id] = f; });
+
+      // Palette par statut
+      var colorParStatut = {
+        confirmee: '#22c55e',
+        option:    '#f97316',
+        reportee:  '#3b82f6',
+        annulee:   '#888888',
+        default:   '#e31e24'
+      };
+
+      // Légende dynamique
+      var legend = document.getElementById('carte-tournee-legend');
+      if (legend) {
+        legend.innerHTML =
+          '<span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#22c55e;border-radius:50%;display:inline-block;"></span>Confirmée</span>' +
+          '<span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#f97316;border-radius:50%;display:inline-block;"></span>Option</span>' +
+          '<span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#3b82f6;border-radius:50%;display:inline-block;"></span>Reportée</span>' +
+          '<span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#888;border-radius:50%;display:inline-block;"></span>Annulée</span>';
+      }
+
+      var placesTrouvees = 0;
+      var latlngs = [];
+
+      for (var i = 0; i < dates.length; i++) {
+        var d = dates[i];
+        var fiche = fichesByDateId[d.id] || {};
+        var nomSalle = fiche.nom_salle || d.nom_salle || '';
+        var adresse = fiche.adresse_salle || '';
+        var ville = fiche.ville || d.ville || '';
+
+        // Requête de géocodage : adresse > ville
+        var requete = adresse ? (nomSalle + ' ' + adresse) : (nomSalle ? (nomSalle + ' ' + ville + ' France') : (ville + ' France'));
+        var coords = await geoCoderAdresse(requete);
+        if (!coords && ville) {
+          coords = await geoCoderAdresse(ville + ' France');
+        }
+        if (!coords) continue;
+
+        placesTrouvees++;
+        latlngs.push([coords.lat, coords.lng]);
+
+        var statut = d.statut || 'default';
+        var color = colorParStatut[statut] || colorParStatut.default;
+
+        var dtFormatee = d.date_concert ? new Date(d.date_concert + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
+
+        var popup =
+          '<div style="font-family:Inter,sans-serif;min-width:200px;">' +
+            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1px;color:#c9a84c;margin-bottom:4px;">' + (ville || 'Ville').toUpperCase() + '</div>' +
+            '<div style="font-size:11px;color:#666;margin-bottom:6px;">' + dtFormatee + '</div>' +
+            (nomSalle ? '<div style="font-size:13px;color:#222;font-weight:600;margin-bottom:3px;">' + nomSalle + '</div>' : '') +
+            (adresse ? '<div style="font-size:11px;color:#555;margin-bottom:8px;">' + adresse + '</div>' : '') +
+            '<button onclick="_carteTourneePopupZoom(\'' + d.id + '\')" style="background:#c9a84c;color:#000;border:none;border-radius:4px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;width:100%;">🗺️ Voir sur carte zoomée</button>' +
+          '</div>';
+
+        var marker = L.marker([coords.lat, coords.lng], { icon: _creerPinIcon(color) })
+          .addTo(_carteTourneeMap)
+          .bindPopup(popup);
+
+        // 🎯 Click direct sur le pin = ouvrir la carte date (en plus du popup)
+        (function(dateId) {
+          marker.on('click', function() {
+            // Le popup s'ouvre automatiquement par bindPopup
+            // L'utilisateur clique sur "Voir sur carte zoomée" pour y aller
+          });
+        })(d.id);
+
+        _carteTourneeMarkers.push(marker);
+
+        // Petit délai pour respecter le rate limit de Nominatim (max 1 req/s)
+        if (i % 5 === 4) await new Promise(function(r) { setTimeout(r, 400); });
+      }
+
+      document.getElementById('carte-tournee-nb').textContent = placesTrouvees;
+      if (sousTitreEl) sousTitreEl.textContent = 'TWOQ Hommage + Éternelle Légende · ' + dates.length + ' dates au total';
+
+      // Ajuster la vue pour englober tous les pins
+      if (latlngs.length > 0) {
+        _carteTourneeMap.fitBounds(latlngs, { padding: [40, 40], maxZoom: 8 });
+      }
+    } catch(e) {
+      console.error('[CARTE TOURNEE]', e);
+      if (sousTitreEl) sousTitreEl.textContent = 'Erreur de chargement';
+    }
+  }
+
+  // 🎯 Depuis le popup carte globale → ouvrir la carte date zoomée
+  async function _carteTourneePopupZoom(dateId) {
+    _fpDateId = dateId;
+    // Charger les infos de la date pour la carte zoomée
+    if (typeof carteDateOuvrir === 'function') {
+      await carteDateOuvrir();
+    }
+  }
+
+  // Ancienne fonction (si référencée ailleurs, on la garde pour rétrocompat)
+  function _carteTourneePopupOuvrir(dateId) {
+    _carteTourneePopupZoom(dateId);
+  }
+
+  function carteTourneeFitBounds() {
+    if (!_carteTourneeMap || _carteTourneeMarkers.length === 0) return;
+    var group = L.featureGroup(_carteTourneeMarkers);
+    _carteTourneeMap.fitBounds(group.getBounds(), { padding: [40, 40], maxZoom: 8 });
+  }
+
+  // =========================================================
+  // 🗺️ CARTE DATE : zoom sur la ville / salle d'une date
+  // =========================================================
+  async function carteDateOuvrir() {
+    if (!_fpDateId) {
+      alert('Aucune date ouverte.');
+      return;
+    }
+    // Lire infos depuis la fiche (DOM) si disponible, sinon depuis Supabase
+    var ville = document.getElementById('fp-ville')?.value || '';
+    var nomSalle = document.getElementById('fp-salle')?.value || '';
+    var adresse = document.getElementById('fp-adresse-salle')?.value || '';
+    var dateStr = document.getElementById('fp-date-concert')?.value || '';
+
+    // Si pas d'info dans le DOM (ex: on vient d'un popup carte globale), charger depuis Supabase
+    if (!ville && !nomSalle) {
+      try {
+        var fpRes = await _supabase.from('fiches_production').select('ville, nom_salle, adresse_salle').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (fpRes.data) {
+          ville = fpRes.data.ville || '';
+          nomSalle = fpRes.data.nom_salle || '';
+          adresse = fpRes.data.adresse_salle || '';
+        }
+        var dcRes = await _supabase.from('dates_concerts').select('date_concert, ville, nom_salle').eq('id', _fpDateId).maybeSingle();
+        if (dcRes.data) {
+          dateStr = dcRes.data.date_concert || dateStr;
+          ville = ville || dcRes.data.ville || '';
+          nomSalle = nomSalle || dcRes.data.nom_salle || '';
+        }
+      } catch(e) { console.warn('[CARTE DATE] fallback supabase:', e); }
+    }
+
+    _carteDateCurrent = { ville: ville, salle: nomSalle, adresse: adresse, date: dateStr, lat: null, lng: null };
+
+    // Remplir les textes
+    document.getElementById('carte-date-ville').textContent = (ville || 'VILLE').toUpperCase();
+    var dtFormatee = dateStr ? new Date(dateStr + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    document.getElementById('carte-date-sous-titre').textContent = dtFormatee;
+    document.getElementById('carte-date-salle-nom').textContent = nomSalle || '—';
+    document.getElementById('carte-date-salle-adresse').textContent = adresse || (ville || '—');
+
+    showPage('carte-date');
+
+    // Init ou reset de la carte après rendu de la page
+    setTimeout(async function() {
+      var mapEl = document.getElementById('carte-date-map');
+      if (!mapEl) return;
+
+      if (!_carteDateMap) {
+        _carteDateMap = L.map('carte-date-map', { zoomControl: true }).setView([46.5, 2.5], 6);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '© OpenStreetMap · © CARTO',
+          subdomains: 'abcd',
+          maxZoom: 19
+        }).addTo(_carteDateMap);
+      } else {
+        _carteDateMap.invalidateSize();
+        // Retirer anciens marqueurs
+        _carteDateMap.eachLayer(function(layer) {
+          if (layer instanceof L.Marker) _carteDateMap.removeLayer(layer);
+        });
+      }
+
+      // Géocoder
+      var requete = adresse ? (nomSalle + ' ' + adresse) : (nomSalle ? (nomSalle + ' ' + ville + ' France') : (ville + ' France'));
+      var coords = await geoCoderAdresse(requete);
+      if (!coords && ville) coords = await geoCoderAdresse(ville + ' France');
+
+      if (coords) {
+        _carteDateCurrent.lat = coords.lat;
+        _carteDateCurrent.lng = coords.lng;
+        _carteDateMap.setView([coords.lat, coords.lng], 13);
+        L.marker([coords.lat, coords.lng], { icon: _creerPinIcon('#e31e24') })
+          .addTo(_carteDateMap)
+          .bindPopup('<b>' + (nomSalle || ville) + '</b><br>' + (adresse || ''));
+      } else {
+        document.getElementById('carte-date-salle-adresse').textContent = (adresse || ville) + '  (localisation introuvable)';
+      }
+    }, 100);
+  }
+
+  // Ouvrir Maps GPS (app native mobile ou Google Maps web)
+  function carteDateOuvrirGPS() {
+    if (!_carteDateCurrent) return;
+    var d = _carteDateCurrent;
+    var url;
+    if (d.lat && d.lng) {
+      // Lien universel : fonctionne sur iOS (Plans) / Android (Maps) / Web
+      url = 'https://www.google.com/maps/dir/?api=1&destination=' + d.lat + ',' + d.lng;
+    } else {
+      var q = encodeURIComponent((d.salle || '') + ' ' + (d.adresse || '') + ' ' + (d.ville || ''));
+      url = 'https://www.google.com/maps/search/?api=1&query=' + q;
+    }
+    window.open(url, '_blank');
+  }
+
   function fpValiderInfosGen() {
     var bloc = document.getElementById('fp-bloc-infos-gen');
     if (!bloc) return true;
