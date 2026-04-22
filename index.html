@@ -4782,8 +4782,7 @@ function _hideTeamSelection() {
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">AUTRES</td><td style="padding:8px 16px;text-align:right;"><input type="number" id="bilan-autres-input" value="0" step="0.01" oninput="bilanCalcDepenses()" style="width:100px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;color:#fff;padding:4px 8px;font-size:12px;text-align:right;font-family:Inter,sans-serif;"> €</td><td style="padding:8px 12px;color:#555;font-size:11px;">saisie manuelle</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">TOTAL VHR</td><td id="bilan-total-vhr" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">SALLE GLOBALE</td><td id="bilan-salle" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">CO-PROD FRAIS</td><td id="bilan-coprod-frais" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Salle PL + Autres PL</td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#f97316;font-weight:700;">% PROMO LOCALE</td><td id="bilan-promo-locale" style="padding:8px 16px;text-align:right;color:#f97316;font-weight:700;"></td><td id="bilan-promo-locale-detail" style="padding:8px 12px;color:#555;font-size:11px;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">Co-prod/Plocale Dépense</td><td id="bilan-coprod-frais" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Salle PL + Autres PL</td></tr>
             <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#22c55e;">TOTAL DEPENSES</td><td id="bilan-total-depenses" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;font-weight:700;"></td><td></td></tr>
           </tbody>
         </table>
@@ -4795,24 +4794,54 @@ function _hideTeamSelection() {
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <tbody>
             <tr class="show-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a1a2e;"><td style="padding:10px 16px;color:#c9a84c;font-weight:700;width:50%;">VENTE TTC</td><td id="bilan-vente-ttc-display" style="padding:10px 16px;color:#c9a84c;text-align:right;font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:16px;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;width:50%;">RECETTE TTC</td><td id="bilan-res-recette-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;width:50%;">RECETTE HT</td><td id="bilan-res-recette-ht" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">MONTANT CNM</td><td id="bilan-res-montant-cnm" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <!-- BLOC 1 : RECETTE → DROIT AU TIRAGE → RÉSULTAT BRUT -->
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;width:50%;">RECETTE TTC</td><td id="bilan-res-recette-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;width:50%;">RECETTE HT</td><td id="bilan-res-recette-ht" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">MONTANT CNM</td><td id="bilan-res-montant-cnm" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DROITS</td><td id="bilan-res-droits" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DEPENSES</td><td id="bilan-res-depenses" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a1a2e;height:8px;"><td colspan="2"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DL TTC</td><td id="bilan-res-dl-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DL HT</td><td id="bilan-res-dl-ht" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DEAL DL CO PROD</td><td id="bilan-res-deal-coprod" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DROITS OMP</td><td id="bilan-res-droits-omp" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a1a2e;height:8px;"><td colspan="2"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DROIT AU TIRAGE</td><td id="bilan-res-droit-tirage" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="background:#1a1a2e;border-top:2px solid #fbbf24;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#fbbf24;">RÉSULTAT BRUT</td><td id="bilan-resultat-brut" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#fbbf24;"></td></tr>
-            <tr id="bilan-mg-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a2a0a;display:none;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">🔒 MG GARANTI OMP</td><td id="bilan-mg-montant" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#a78bfa;" id="bilan-res-part-partenaire-label">PART PARTENAIRE</td><td id="bilan-res-part-partenaire" style="padding:8px 16px;text-align:right;color:#a78bfa;font-weight:600;"></td></tr>
-            <tr style="background:#1a1a2e;border-top:2px solid #d946ef;"><td style="padding:12px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#d946ef;" id="bilan-resultat-omp-label">RESULTAT OMP</td><td id="bilan-resultat-omp" style="padding:12px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:24px;font-weight:700;color:#d946ef;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DEPENSES</td><td id="bilan-res-depenses" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <!-- Séparation visuelle entre DÉPENSES et DL TTC GLOBALE -->
+            <tr class="hide-in-vente" style="background:#0a0a0a;"><td colspan="2" style="height:10px;border-top:2px solid #c9a84c;border-bottom:2px solid #333;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DL TTC <span style="color:#c9a84c;font-weight:700;">GLOBALE</span></td><td id="bilan-res-dl-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DL HT <span style="color:#c9a84c;font-weight:700;">GLOBALE</span></td><td id="bilan-res-dl-ht" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:2px solid #333;"><td style="padding:8px 16px;color:#888;">DROIT AU TIRAGE</td><td id="bilan-res-droit-tirage" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <!-- RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES + DL HT GLOBALE + DROIT AU TIRAGE -->
+            <tr class="hide-in-vente" style="background:#1a1a2e;border-top:2px solid #fbbf24;">
+              <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;color:#fbbf24;">RÉSULTAT BRUT</td>
+              <td id="bilan-resultat-brut" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#fbbf24;"></td>
+            </tr>
           </tbody>
         </table>
+
+        <!-- BLOC 2 : COÛT PROD-PROMO LOCALE -->
+        <div class="hide-in-vente" style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;margin-top:20px;border-radius:10px 10px 0 0;">COÛT PROD-PROMO LOCALE</div>
+        <table class="hide-in-vente" style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;">
+            <td style="padding:10px 16px;color:#f97316;">% PROMO LOCALE <span style="color:#888;font-size:11px;">(5% Recette HT HCNM)</span></td>
+            <td id="bilan-cpl-promo-locale" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #2a2a2a;">
+            <td style="padding:10px 16px;color:#f97316;">% DL DEAL <span style="color:#888;font-size:11px;">(30% promoteur local sur DL HT Globale)</span></td>
+            <td id="bilan-cpl-dl-deal" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td>
+          </tr>
+          <tr style="background:#2a1a0a;border-top:2px solid #f97316;">
+            <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;color:#f97316;">COÛT TOTAL PROMO LOCALE</td>
+            <td id="bilan-cpl-total" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#f97316;"></td>
+          </tr>
+        </table>
+
+        <!-- RÉSULTAT OMP (grossi comme sur Pilote) -->
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr id="bilan-mg-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a2a0a;display:none;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">🔒 MG GARANTI OMP</td><td id="bilan-mg-montant" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td></tr>
+          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#a78bfa;" id="bilan-res-part-partenaire-label">PART PARTENAIRE</td><td id="bilan-res-part-partenaire" style="padding:8px 16px;text-align:right;color:#a78bfa;font-weight:600;"></td></tr>
+          <tr style="background:linear-gradient(90deg, #1a1a2e 0%, #2a1a3a 100%);border-top:4px solid #d946ef;border-bottom:4px solid #d946ef;box-shadow:0 0 20px rgba(217,70,239,0.3);">
+            <td style="padding:22px 18px;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:22px;color:#d946ef;text-shadow:0 0 8px rgba(217,70,239,0.4);" id="bilan-resultat-omp-label">RÉSULTAT OMP</td>
+            <td id="bilan-resultat-omp" style="padding:22px 18px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:36px;font-weight:900;text-shadow:0 0 10px rgba(255,255,255,0.2);"></td>
+          </tr>
+        </table>
+        <!-- Éléments cachés (conservés pour compatibilité calculs internes) -->
+        <span id="bilan-res-deal-coprod" style="display:none;"></span>
+        <span id="bilan-res-droits-omp" style="display:none;"></span>
       </div>
     </div>
 
@@ -14305,6 +14334,7 @@ function _hideTeamSelection() {
     
     document.getElementById('bilan-res-recette-ttc').textContent = fmt(recTTC);
     var recHTbilan = recTTC > 0 ? recTTC / 1.021 : 0;
+    var recHTHCNMbilan = recHTbilan * (1 - 0.035);
     var elBilanRecHT = document.getElementById('bilan-res-recette-ht');
     if (elBilanRecHT) elBilanRecHT.textContent = fmt(recHTbilan);
     document.getElementById('bilan-res-montant-cnm').textContent = fmt(montantCNM);
@@ -14312,12 +14342,28 @@ function _hideTeamSelection() {
     document.getElementById('bilan-res-depenses').textContent = fmt(totalDepenses);
     document.getElementById('bilan-res-dl-ttc').textContent = fmt(dlTTC);
     document.getElementById('bilan-res-dl-ht').textContent = fmt(dlHT);
-    document.getElementById('bilan-res-deal-coprod').textContent = dealBilletterie;
-    document.getElementById('bilan-res-droits-omp').textContent = fmt(droitsOMP);
+    var elBilanDealCoprod = document.getElementById('bilan-res-deal-coprod');
+    if (elBilanDealCoprod) elBilanDealCoprod.textContent = dealBilletterie;
+    var elBilanDroitsOMP = document.getElementById('bilan-res-droits-omp');
+    if (elBilanDroitsOMP) elBilanDroitsOMP.textContent = fmt(droitsOMP);
     document.getElementById('bilan-res-droit-tirage').textContent = fmt(droitTirage);
     
-    // RESULTAT BRUT = RECETTE TTC - MONTANT CNM - DROITS - DEPENSES + DROITS OMP + DROIT AU TIRAGE
-    var resultatBrut = recTTC - montantCNM - totalDroits - totalDepenses + droitsOMP + droitTirage;
+    // 🎯 BLOC COÛT PROD-PROMO LOCALE (Bilan AMH)
+    // Si Promoteur = "PAS DE PL" → tout à 0
+    var promoteurFicheBilan = document.getElementById('fp-promoteur')?.value || '';
+    var aucunPromoteurLocalBilan = (promoteurFicheBilan === 'PAS DE PL');
+    var cplPromoLocaleBilan = aucunPromoteurLocalBilan ? 0 : recHTHCNMbilan * 0.05;
+    var cplDlDealBilan = aucunPromoteurLocalBilan ? 0 : dlHT * 0.30;
+    var cplTotalBilan = cplPromoLocaleBilan + cplDlDealBilan;
+    var elCplPL = document.getElementById('bilan-cpl-promo-locale');
+    if (elCplPL) elCplPL.textContent = fmt(cplPromoLocaleBilan);
+    var elCplDL = document.getElementById('bilan-cpl-dl-deal');
+    if (elCplDL) elCplDL.textContent = fmt(cplDlDealBilan);
+    var elCplTot = document.getElementById('bilan-cpl-total');
+    if (elCplTot) elCplTot.textContent = fmt(cplTotalBilan);
+    
+    // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES + DL HT GLOBALE + DROIT AU TIRAGE
+    var resultatBrut = recHTbilan - montantCNM - totalDroits - totalDepenses + dlHT + droitTirage;
     
     // 🎯 MODE VENTE : court-circuit
     var typeProdBilan = document.getElementById('fp-type-prod')?.value || 'PROD OMP';
