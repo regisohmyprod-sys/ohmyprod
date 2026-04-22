@@ -13707,8 +13707,8 @@ function _hideTeamSelection() {
           var cplTotal = cplPromoLocale + cplDlDeal;
           setEl('pilote-cpl-total', cplTotal > 0 ? fmt(cplTotal) : '');
           
-          // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES
-          var resultatBrut = recHTpilote - montantCNM - droitsTotal - sumFin;
+          // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES + DL HT GLOBALE + DROIT AU TIRAGE
+          var resultatBrut = recHTpilote - montantCNM - droitsTotal - sumFin + dlHT + droitTirage;
           
           // 🎯 MODE VENTE : si type de prod = VENTE, on court-circuite tout le calcul billetterie
           var typeProdFiche = document.getElementById('fp-type-prod')?.value || 'PROD OMP';
