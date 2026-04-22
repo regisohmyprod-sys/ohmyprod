@@ -4411,6 +4411,25 @@ function _hideTeamSelection() {
         </table>
       </div>
 
+      <!-- 🎯 PARTAGE DES DL selon DEAL BILLETTERIE (bloc séparé) -->
+      <div class="hide-in-vente" id="pilote-partage-dl-bloc" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#0ea5e9;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">PARTAGE DL BILLETTERIE</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;">
+            <td style="padding:10px 16px;color:#ccc;">TOTAL DL HT (base de partage)</td>
+            <td id="pilote-partage-dl-total-ht" style="padding:10px 16px;text-align:right;color:#0ea5e9;font-weight:700;"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #2a2a2a;">
+            <td style="padding:10px 16px;color:#22c55e;">PART OMP (<span id="pilote-partage-dl-omp-pct"></span>)</td>
+            <td id="pilote-partage-dl-omp-mt" style="padding:10px 16px;text-align:right;color:#22c55e;font-weight:700;font-size:16px;"></td>
+          </tr>
+          <tr style="background:#111;">
+            <td style="padding:10px 16px;color:#a78bfa;">PART PARTENAIRE (<span id="pilote-partage-dl-pl-pct"></span>)</td>
+            <td id="pilote-partage-dl-pl-mt" style="padding:10px 16px;text-align:right;color:#a78bfa;font-weight:700;font-size:16px;"></td>
+          </tr>
+        </table>
+      </div>
+
       <!-- DROITS ET TAXES -->
       <div class="hide-in-vente" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">DROITS ET TAXES</div>
@@ -4781,6 +4800,27 @@ function _hideTeamSelection() {
             <tr id="bilan-mg-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a2a0a;display:none;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">🔒 MG GARANTI OMP</td><td id="bilan-mg-montant" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#a78bfa;" id="bilan-res-part-partenaire-label">PART PARTENAIRE</td><td id="bilan-res-part-partenaire" style="padding:8px 16px;text-align:right;color:#a78bfa;font-weight:600;"></td></tr>
             <tr style="background:#1a1a2e;border-top:2px solid #d946ef;"><td style="padding:12px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#d946ef;" id="bilan-resultat-omp-label">RESULTAT OMP</td><td id="bilan-resultat-omp" style="padding:12px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:24px;font-weight:700;color:#d946ef;"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 🎯 PARTAGE DES DL selon DEAL BILLETTERIE (bloc séparé) -->
+      <div class="hide-in-vente" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <div style="background:#0ea5e9;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">PARTAGE DL BILLETTERIE</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tbody>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;">
+              <td style="padding:10px 16px;color:#ccc;width:50%;">TOTAL DL HT (base de partage)</td>
+              <td id="bilan-partage-dl-total-ht" style="padding:10px 16px;text-align:right;color:#0ea5e9;font-weight:700;"></td>
+            </tr>
+            <tr style="border-bottom:1px solid #2a2a2a;">
+              <td style="padding:10px 16px;color:#22c55e;">PART OMP (<span id="bilan-partage-dl-omp-pct"></span>)</td>
+              <td id="bilan-partage-dl-omp-mt" style="padding:10px 16px;text-align:right;color:#22c55e;font-weight:700;font-size:16px;"></td>
+            </tr>
+            <tr style="background:#111;">
+              <td style="padding:10px 16px;color:#a78bfa;">PART PARTENAIRE (<span id="bilan-partage-dl-pl-pct"></span>)</td>
+              <td id="bilan-partage-dl-pl-mt" style="padding:10px 16px;text-align:right;color:#a78bfa;font-weight:700;font-size:16px;"></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -13373,12 +13413,24 @@ function _hideTeamSelection() {
           setEl('pilote-dl-total-ttc-omp', dlTTC > 0 ? fmt(dlTTC) : '');
           setEl('pilote-dl-ht-omp', dlHT > 0 ? fmt(dlHT) : '');
           
-          // DEAL DL CO PROD = % OMP
+          // DEAL DL CO PROD = % OMP (info affichage seulement — partage des DL)
           setEl('pilote-deal-dl-coprod', pctOMP + '%');
           
-          // DROITS OMP = DL HT × % OMP / 100
-          var droitsOMP = dlHT * pctOMP / 100;
+          // 🔧 CORRECTION BUG CALCUL (avril 2026)
+          // DROITS OMP pour le RÉSULTAT BRUT = 100% des DL HT (indépendant du DEAL BILLETTERIE)
+          // Le DEAL BILLETTERIE ne sert qu'au PARTAGE des DL dans un bloc séparé affiché plus bas
+          var droitsOMP = dlHT; // 100% des DL HT entrent dans le résultat brut
           setEl('pilote-droits-omp', droitsOMP > 0 ? fmt(droitsOMP) : '');
+          
+          // 🎯 PARTAGE DL (bloc séparé) selon DEAL BILLETTERIE
+          // Part OMP = DL HT × pctOMP / 100 ; Part Partenaire = DL HT × pctPL / 100
+          var partDlOMP = dlHT * pctOMP / 100;
+          var partDlPartenaire = dlHT * pctPL / 100;
+          setEl('pilote-partage-dl-omp-pct', pctOMP + '%');
+          setEl('pilote-partage-dl-pl-pct', pctPL + '%');
+          setEl('pilote-partage-dl-omp-mt', fmt(partDlOMP));
+          setEl('pilote-partage-dl-pl-mt', fmt(partDlPartenaire));
+          setEl('pilote-partage-dl-total-ht', fmt(dlHT));
           
           // DROIT AU TIRAGE = CNM × 60%
           setEl('pilote-droit-tirage', droitTirage > 0 ? fmt(droitTirage) : '');
@@ -13980,8 +14032,25 @@ function _hideTeamSelection() {
     var dlHT = dlTTC / 1.021;
     var dealBilletterie = window._bilanDealBilletterie || '100%';
     var dealPctOMP = window._bilanDealPctOMP || 1;
-    var droitsOMP = dlHT * dealPctOMP;
+    // 🔧 CORRECTION BUG CALCUL (avril 2026)
+    // DROITS OMP pour le RÉSULTAT BRUT = 100% des DL HT (indépendant du DEAL BILLETTERIE)
+    // Le DEAL BILLETTERIE ne sert qu'au PARTAGE des DL dans un bloc séparé affiché plus bas
+    var droitsOMP = dlHT;
     var droitTirage = montantCNM * 0.60;
+    
+    // 🎯 PARTAGE DL selon DEAL BILLETTERIE (affichage bloc séparé)
+    var partDlOMP = dlHT * dealPctOMP;
+    var partDlPartenaire = dlHT * (1 - dealPctOMP);
+    var elPartDlOmp = document.getElementById('bilan-partage-dl-omp-mt');
+    var elPartDlPl = document.getElementById('bilan-partage-dl-pl-mt');
+    var elPartDlTotal = document.getElementById('bilan-partage-dl-total-ht');
+    var elPartDlOmpPct = document.getElementById('bilan-partage-dl-omp-pct');
+    var elPartDlPlPct = document.getElementById('bilan-partage-dl-pl-pct');
+    if (elPartDlTotal) elPartDlTotal.textContent = fmt(dlHT);
+    if (elPartDlOmp) elPartDlOmp.textContent = fmt(partDlOMP);
+    if (elPartDlPl) elPartDlPl.textContent = fmt(partDlPartenaire);
+    if (elPartDlOmpPct) elPartDlOmpPct.textContent = Math.round(dealPctOMP * 100) + '%';
+    if (elPartDlPlPct) elPartDlPlPct.textContent = Math.round((1 - dealPctOMP) * 100) + '%';
     
     document.getElementById('bilan-res-recette-ttc').textContent = fmt(recTTC);
     document.getElementById('bilan-res-montant-cnm').textContent = fmt(montantCNM);
