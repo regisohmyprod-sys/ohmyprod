@@ -18672,10 +18672,10 @@ function _hideTeamSelection() {
       alert('❌ Aucune date sélectionnée');
       return;
     }
-    var modal = document.getElementById('modal-import-historique');
+    var modal = document.getElementById('modal-import-ventes-proj');
     if (!modal) {
       modal = document.createElement('div');
-      modal.id = 'modal-import-historique';
+      modal.id = 'modal-import-ventes-proj';
       modal.className = 'modal-overlay';
       modal.style.display = 'none';
       // 🔧 FIX bug fermeture : clic sur l'overlay ferme la modale
@@ -18717,7 +18717,7 @@ function _hideTeamSelection() {
 
   // 🔧 FIX bug fermeture : fonction propre pour fermer la modale + restaurer le scroll
   function projFermerModalImport() {
-    var m = document.getElementById('modal-import-historique');
+    var m = document.getElementById('modal-import-ventes-proj');
     if (m) m.style.display = 'none';
     document.body.style.overflow = '';
   }
