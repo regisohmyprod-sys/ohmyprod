@@ -12162,6 +12162,9 @@ function _hideTeamSelection() {
       var allowedTypes;
       if (promo === 'PAS DE PL') {
         allowedTypes = ['PROD OMP', 'VENTE'];
+      } else if (promo === 'NDA') {
+        // 🎯 NDA force automatiquement P.LOCALE (pas d'autre choix possible)
+        allowedTypes = ['PLOCALE'];
       } else if (promo === '' ) {
         allowedTypes = []; // tant que PL pas choisi, rien de valide
       } else {
@@ -12177,6 +12180,12 @@ function _hideTeamSelection() {
       if (typeProd && allowedTypes.indexOf(typeProd) === -1) {
         selType.value = '';
         typeProd = '';
+      }
+      // 🎯 NDA : auto-sélectionne P.LOCALE si pas encore choisi
+      if (promo === 'NDA' && typeProd === '') {
+        selType.value = 'PLOCALE';
+        typeProd = 'PLOCALE';
+        window._fpPrevTypeProd = 'PLOCALE';
       }
     }
     
@@ -12205,8 +12214,8 @@ function _hideTeamSelection() {
     else if (typeProd === 'PLOCALE') {
       // --- CAS 6 : P.LOCALE ---
       regime = 'cas6';
-      descRegime = '📌 RÉGIME P.LOCALE — Deal OMP % et Deal Billetterie libres · MG = 0 · Promo locale = 5% (automatique)';
-      _fpUnlock('fp-deal-omp');
+      descRegime = '📌 RÉGIME P.LOCALE — OMP prend 100% du résultat · MG = 0 · Promo locale = 5% (automatique) · Deal Billetterie libre';
+      _fpForceVal('fp-deal-omp', '100% OMP', true);
       _fpForceVal('fp-mg', '0', true);
       _fpForceVal('fp-deal-promo', '5', true);
       _fpUnlock('fp-deal-billetterie');
@@ -12237,7 +12246,7 @@ function _hideTeamSelection() {
     }
     
     // Ajouter/retirer les 🔒 sur les labels
-    _fpUpdateLockLabel('fp-label-deal-omp',   regime === 'cas1' || regime === 'cas7', 'Deal OMP % *');
+    _fpUpdateLockLabel('fp-label-deal-omp',   regime === 'cas1' || regime === 'cas6' || regime === 'cas7', 'Deal OMP % *');
     _fpUpdateLockLabel('fp-label-mg',         regime === 'cas1' || regime === 'cas6', 'MG montant (€)');
     _fpUpdateLockLabel('fp-label-deal-promo', regime === 'cas1' || regime === 'cas-coprod' || regime === 'cas6', 'Deal Promo locale %');
     _fpUpdateLockLabel('fp-label-deal-bill',  regime === 'cas1', 'Deal billetterie *');
@@ -12313,6 +12322,7 @@ function _hideTeamSelection() {
       if (promoV && promoV !== '0') aEffacer.push('Deal Promo locale (sera forcé à 0)');
       if (dealBill && dealBill !== '100%') aEffacer.push('Deal billetterie (sera forcé à 100%)');
     } else if (nouveau === 'PLOCALE') {
+      if (dealOmp && dealOmp !== '100% OMP') aEffacer.push('Deal OMP % (sera forcé à 100% OMP)');
       if (mg && mg !== '0') aEffacer.push('MG montant (sera forcé à 0)');
       if (promoV !== '5') aEffacer.push('Deal Promo locale (sera forcé à 5%)');
     } else if (nouveau === 'CO-PROD') {
