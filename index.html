@@ -13817,7 +13817,8 @@ function _hideTeamSelection() {
             }
           }
           
-          var resultatOMP = resultatBrut * pctOMPdeal;
+          // RÉSULTAT OMP = (RÉSULTAT BRUT × %OMP) − COÛT TOTAL PROMO LOCALE
+          var resultatOMP = (resultatBrut * pctOMPdeal) - cplTotal;
           var partPartenaire = resultatBrut * pctPartenaireDeal;
           
           // 🔒 MG GARANTI : si MG > 0 et Résultat OMP calculé < MG, on applique le plancher
@@ -14446,7 +14447,8 @@ function _hideTeamSelection() {
       }
     }
     
-    var resultatOMP = resultatBrut * pctOMP;
+    // RÉSULTAT OMP = (RÉSULTAT BRUT × %OMP) − COÛT TOTAL PROMO LOCALE
+    var resultatOMP = (resultatBrut * pctOMP) - cplTotalBilan;
     var partPartenaire = resultatBrut * pctPartenaire;
     
     // 🔒 MG GARANTI : si MG > 0 et Résultat OMP calculé < MG, on applique le plancher
