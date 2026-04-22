@@ -4428,9 +4428,9 @@ function _hideTeamSelection() {
             <td style="padding:8px 16px;color:#a78bfa;" id="pilote-res-part-partenaire-label">PART PARTENAIRE</td>
             <td id="pilote-res-part-partenaire" style="padding:8px 16px;text-align:right;color:#a78bfa;font-weight:600;"></td>
           </tr>
-          <tr style="background:linear-gradient(90deg, #1a1a2e 0%, #2a1a3a 100%);border-top:2px solid #c9a84c;">
-            <td style="padding:14px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:16px;color:#c9a84c;" id="pilote-resultat-omp-label">RÉSULTAT OMP</td>
-            <td id="pilote-resultat-omp" style="padding:14px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:900;"></td>
+          <tr style="background:linear-gradient(90deg, #1a1a2e 0%, #2a1a3a 100%);border-top:4px solid #c9a84c;border-bottom:4px solid #c9a84c;box-shadow:0 0 20px rgba(201,168,76,0.3);">
+            <td style="padding:22px 18px;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:22px;color:#c9a84c;text-shadow:0 0 8px rgba(201,168,76,0.4);" id="pilote-resultat-omp-label">RÉSULTAT OMP</td>
+            <td id="pilote-resultat-omp" style="padding:22px 18px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:36px;font-weight:900;text-shadow:0 0 10px rgba(255,255,255,0.2);"></td>
           </tr>
         </table>
         <!-- Éléments cachés (conservés pour compatibilité calculs internes) -->
@@ -13697,15 +13697,19 @@ function _hideTeamSelection() {
           setEl('pilote-promo-locale-mt', montantPromoLocale > 0 ? '- ' + fmt(montantPromoLocale) : '');
           
           // 🎯 NOUVEAU BLOC COÛT PROD-PROMO LOCALE
-          // Ligne 1 : % PROMO LOCALE = 5% de Recette HT HCNM
-          var cplPromoLocale = recHTHCNMpilote * 0.05;
-          setEl('pilote-cpl-promo-locale', cplPromoLocale > 0 ? fmt(cplPromoLocale) : '');
-          // Ligne 2 : % DL DEAL = 30% du promoteur local sur DL HT Globale
-          var cplDlDeal = dlHT * 0.30;
-          setEl('pilote-cpl-dl-deal', cplDlDeal > 0 ? fmt(cplDlDeal) : '');
+          // Si Promoteur = "PAS DE PL" → tout à 0 (pas de frais à reverser)
+          var promoteurFiche = document.getElementById('fp-promoteur')?.value || '';
+          var aucunPromoteurLocal = (promoteurFiche === 'PAS DE PL');
+          
+          // Ligne 1 : % PROMO LOCALE = 5% de Recette HT HCNM (ou 0 si PAS DE PL)
+          var cplPromoLocale = aucunPromoteurLocal ? 0 : recHTHCNMpilote * 0.05;
+          setEl('pilote-cpl-promo-locale', fmt(cplPromoLocale));
+          // Ligne 2 : % DL DEAL = 30% du promoteur local sur DL HT Globale (ou 0 si PAS DE PL)
+          var cplDlDeal = aucunPromoteurLocal ? 0 : dlHT * 0.30;
+          setEl('pilote-cpl-dl-deal', fmt(cplDlDeal));
           // Total = addition des 2
           var cplTotal = cplPromoLocale + cplDlDeal;
-          setEl('pilote-cpl-total', cplTotal > 0 ? fmt(cplTotal) : '');
+          setEl('pilote-cpl-total', fmt(cplTotal));
           
           // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES + DL HT GLOBALE + DROIT AU TIRAGE
           var resultatBrut = recHTpilote - montantCNM - droitsTotal - sumFin + dlHT + droitTirage;
