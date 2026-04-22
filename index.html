@@ -3768,15 +3768,15 @@ function _hideTeamSelection() {
       <!-- BLOC 1 : Infos générales -->
       <div id="fp-bloc-infos-gen" style="background:#1a1a1a;border:2px solid #e31e24;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 0 0 1px rgba(227,30,36,0.2);">
         <div style="color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:8px;">⚠️ INFOS GÉNÉRALES (OBLIGATOIRE)</div>
-        <div style="color:#888;font-size:11px;margin-bottom:16px;font-style:italic;">Tous les champs doivent être remplis avant de continuer</div>
+        <div style="color:#888;font-size:11px;margin-bottom:16px;font-style:italic;">Les champs 🔒 sont verrouillés automatiquement selon le type de production</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Producteur *</label>
-            <input id="fp-producteur" type="text" value="OH MY PROD" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Producteur * 🔒</label>
+            <input id="fp-producteur" type="text" value="OH MY PROD" readonly data-required="1" style="width:100%;background:#0f0f0f;border:1px solid #2a2a2a;border-radius:6px;color:#888;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;cursor:not-allowed;">
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Promoteur local *</label>
-            <select id="fp-promoteur" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <select id="fp-promoteur" oninput="autoSave('fiche'); fpAppliquerRegles(); fpValiderInfosGen()" onchange="autoSave('fiche'); fpAppliquerRegles(); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="PAS DE PL">PAS DE PL</option>
               <option value="LDC">LDC</option>
@@ -3787,17 +3787,17 @@ function _hideTeamSelection() {
             </select>
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Type de prod *</label>
-            <select id="fp-type-prod" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="fpToggleModeVente(); autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-type-prod">Type de prod *</label>
+            <select id="fp-type-prod" onchange="fpOnTypeProdChange(event)" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="PROD OMP">PROD OMP</option>
               <option value="CO-PROD">CO-PROD</option>
-              <option value="PLOCALE">PLOCALE</option>
+              <option value="PLOCALE">P.LOCALE</option>
               <option value="VENTE">VENTE</option>
             </select>
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal OMP % *</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-deal-omp">Deal OMP % *</label>
             <select id="fp-deal-omp" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="50/50">50/50</option>
@@ -3808,11 +3808,11 @@ function _hideTeamSelection() {
             </select>
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">MG montant (€)</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-mg">MG montant (€)</label>
             <input id="fp-mg" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal Promo locale %</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-deal-promo">Deal Promo locale %</label>
             <input id="fp-deal-promo" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
@@ -3829,7 +3829,7 @@ function _hideTeamSelection() {
             </select>
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal billetterie *</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-deal-bill">Deal billetterie *</label>
             <select id="fp-deal-billetterie" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="100%">100%</option>
@@ -3839,6 +3839,8 @@ function _hideTeamSelection() {
             </select>
           </div>
         </div>
+        <!-- Indicateur du régime en cours -->
+        <div id="fp-regime-indic" style="display:none;margin-top:12px;padding:8px 14px;background:rgba(14,165,233,0.1);border:1px solid #0ea5e9;border-radius:6px;color:#0ea5e9;font-size:11px;font-weight:600;letter-spacing:0.5px;"></div>
         <!-- Message d'alerte si champs manquants -->
         <div id="fp-alerte-infos-gen" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(227,30,36,0.15);border:1px solid #e31e24;border-radius:6px;color:#e31e24;font-size:12px;font-weight:600;">
           ⚠️ Merci de remplir tous les champs obligatoires (*) avant de poursuivre.
@@ -4411,25 +4413,6 @@ function _hideTeamSelection() {
         </table>
       </div>
 
-      <!-- 🎯 PARTAGE DES DL selon DEAL BILLETTERIE (bloc séparé) -->
-      <div class="hide-in-vente" id="pilote-partage-dl-bloc" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-        <div style="background:#0ea5e9;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">PARTAGE DL BILLETTERIE</div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;">
-            <td style="padding:10px 16px;color:#ccc;">TOTAL DL HT (base de partage)</td>
-            <td id="pilote-partage-dl-total-ht" style="padding:10px 16px;text-align:right;color:#0ea5e9;font-weight:700;"></td>
-          </tr>
-          <tr style="border-bottom:1px solid #2a2a2a;">
-            <td style="padding:10px 16px;color:#22c55e;">PART OMP (<span id="pilote-partage-dl-omp-pct"></span>)</td>
-            <td id="pilote-partage-dl-omp-mt" style="padding:10px 16px;text-align:right;color:#22c55e;font-weight:700;font-size:16px;"></td>
-          </tr>
-          <tr style="background:#111;">
-            <td style="padding:10px 16px;color:#a78bfa;">PART PARTENAIRE (<span id="pilote-partage-dl-pl-pct"></span>)</td>
-            <td id="pilote-partage-dl-pl-mt" style="padding:10px 16px;text-align:right;color:#a78bfa;font-weight:700;font-size:16px;"></td>
-          </tr>
-        </table>
-      </div>
-
       <!-- DROITS ET TAXES -->
       <div class="hide-in-vente" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">DROITS ET TAXES</div>
@@ -4800,27 +4783,6 @@ function _hideTeamSelection() {
             <tr id="bilan-mg-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a2a0a;display:none;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">🔒 MG GARANTI OMP</td><td id="bilan-mg-montant" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#a78bfa;" id="bilan-res-part-partenaire-label">PART PARTENAIRE</td><td id="bilan-res-part-partenaire" style="padding:8px 16px;text-align:right;color:#a78bfa;font-weight:600;"></td></tr>
             <tr style="background:#1a1a2e;border-top:2px solid #d946ef;"><td style="padding:12px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#d946ef;" id="bilan-resultat-omp-label">RESULTAT OMP</td><td id="bilan-resultat-omp" style="padding:12px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:24px;font-weight:700;color:#d946ef;"></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 🎯 PARTAGE DES DL selon DEAL BILLETTERIE (bloc séparé) -->
-      <div class="hide-in-vente" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-        <div style="background:#0ea5e9;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;">PARTAGE DL BILLETTERIE</div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tbody>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;">
-              <td style="padding:10px 16px;color:#ccc;width:50%;">TOTAL DL HT (base de partage)</td>
-              <td id="bilan-partage-dl-total-ht" style="padding:10px 16px;text-align:right;color:#0ea5e9;font-weight:700;"></td>
-            </tr>
-            <tr style="border-bottom:1px solid #2a2a2a;">
-              <td style="padding:10px 16px;color:#22c55e;">PART OMP (<span id="bilan-partage-dl-omp-pct"></span>)</td>
-              <td id="bilan-partage-dl-omp-mt" style="padding:10px 16px;text-align:right;color:#22c55e;font-weight:700;font-size:16px;"></td>
-            </tr>
-            <tr style="background:#111;">
-              <td style="padding:10px 16px;color:#a78bfa;">PART PARTENAIRE (<span id="bilan-partage-dl-pl-pct"></span>)</td>
-              <td id="bilan-partage-dl-pl-mt" style="padding:10px 16px;text-align:right;color:#a78bfa;font-weight:700;font-size:16px;"></td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -11706,6 +11668,10 @@ function _hideTeamSelection() {
     // Valider le bloc infos générales (toutes les valeurs par défaut sont OK donc blocs suivants visibles)
     if (typeof fpValiderInfosGen === 'function') fpValiderInfosGen();
     if (typeof fpToggleModeVente === 'function') fpToggleModeVente();
+    if (typeof fpAppliquerRegles === 'function') {
+      window._fpPrevTypeProd = document.getElementById('fp-type-prod')?.value || '';
+      fpAppliquerRegles();
+    }
   }
 
   // ============================================================
@@ -12118,6 +12084,10 @@ function _hideTeamSelection() {
 
     // 🎯 Bascule UI selon TYPE DE PROD (VENTE vs autre)
     fpToggleModeVente();
+    
+    // 🎯 Appliquer les règles de verrouillage selon PROMOTEUR + TYPE DE PROD
+    window._fpPrevTypeProd = document.getElementById('fp-type-prod')?.value || '';
+    fpAppliquerRegles();
 
     // 🔒 Valider le bloc INFOS GÉNÉRALES (masque blocs suivants si champs vides)
     fpValiderInfosGen();
@@ -12168,6 +12138,211 @@ function _hideTeamSelection() {
     document.getElementById('fp-total-jauge').value = ventes + invits;
   }
 
+  // ============================================================
+  // 🎯 RÈGLES MÉTIER du bloc INFOS GÉNÉRALES
+  // ============================================================
+  // Tableau de règles : selon le couple (PROMOTEUR LOCAL, TYPE DE PROD)
+  // on définit quels champs sont libres / verrouillés / forcés.
+  //
+  // Cas 1 : PROD OMP sans PL      → Deal OMP 100%, MG 0, Promo 0, Deal Bill 100% (verrouillés)
+  // Cas 2-5 : CO-PROD avec PL     → Deal OMP libre, MG libre, Promo 0 (verrouillé), Deal Bill libre
+  // Cas 6 : P.LOCALE avec PL      → Deal OMP libre, MG 0 (verrouillé), Promo 5% (verrouillé), Deal Bill libre
+  // Cas 7 : VENTE sans PL         → Deals/MG/Promo/Bill masqués (mode vente)
+  // ============================================================
+  window._fpReglesLoading = false; // flag pour éviter les re-entrées pendant le chargement
+  
+  function fpAppliquerRegles() {
+    var promo    = document.getElementById('fp-promoteur')?.value || '';
+    var typeProd = document.getElementById('fp-type-prod')?.value || '';
+    var regimeEl = document.getElementById('fp-regime-indic');
+    
+    // Filtrage des options TYPE DE PROD selon PROMOTEUR LOCAL
+    var selType = document.getElementById('fp-type-prod');
+    if (selType) {
+      var allowedTypes;
+      if (promo === 'PAS DE PL') {
+        allowedTypes = ['PROD OMP', 'VENTE'];
+      } else if (promo === '' ) {
+        allowedTypes = []; // tant que PL pas choisi, rien de valide
+      } else {
+        // Tout autre promoteur → CO-PROD ou P.LOCALE
+        allowedTypes = ['CO-PROD', 'PLOCALE'];
+      }
+      // Afficher/masquer les options
+      Array.from(selType.options).forEach(function(opt){
+        if (opt.value === '') { opt.hidden = false; return; } // garder "-- Choix --"
+        opt.hidden = (allowedTypes.indexOf(opt.value) === -1);
+      });
+      // Si la valeur actuelle n'est plus permise, on la remet à vide
+      if (typeProd && allowedTypes.indexOf(typeProd) === -1) {
+        selType.value = '';
+        typeProd = '';
+      }
+    }
+    
+    // Application des règles selon le régime
+    var regime = '';
+    var descRegime = '';
+    
+    if (promo === 'PAS DE PL' && typeProd === 'PROD OMP') {
+      // --- CAS 1 : PROD OMP sans promoteur local ---
+      regime = 'cas1';
+      descRegime = '📌 RÉGIME 1 · PROD OMP sans promoteur local — OMP prend 100% du résultat et 100% des DL';
+      _fpForceVal('fp-deal-omp', '100% OMP', true);
+      _fpForceVal('fp-mg', '0', true);
+      _fpForceVal('fp-deal-promo', '0', true);
+      _fpForceVal('fp-deal-billetterie', '100%', true);
+    }
+    else if (typeProd === 'CO-PROD') {
+      // --- CAS 2-5 : CO-PROD ---
+      regime = 'cas-coprod';
+      descRegime = '📌 RÉGIME CO-PROD — Deal OMP % et Deal Billetterie libres et indépendants · MG libre · Promo locale = 0';
+      _fpUnlock('fp-deal-omp');
+      _fpUnlock('fp-mg');
+      _fpForceVal('fp-deal-promo', '0', true);
+      _fpUnlock('fp-deal-billetterie');
+    }
+    else if (typeProd === 'PLOCALE') {
+      // --- CAS 6 : P.LOCALE ---
+      regime = 'cas6';
+      descRegime = '📌 RÉGIME P.LOCALE — Deal OMP % et Deal Billetterie libres · MG = 0 · Promo locale = 5% (automatique)';
+      _fpUnlock('fp-deal-omp');
+      _fpForceVal('fp-mg', '0', true);
+      _fpForceVal('fp-deal-promo', '5', true);
+      _fpUnlock('fp-deal-billetterie');
+    }
+    else if (typeProd === 'VENTE') {
+      // --- CAS 7 : VENTE ---
+      regime = 'cas7';
+      descRegime = '📌 RÉGIME VENTE — Contrat de cession · Pas de billetterie · Résultat = Vente TTC − Dépenses';
+      _fpForceVal('fp-deal-omp', 'VENTE', true);
+      // MG / Promo / Deal Bill sont masqués via .hide-in-vente
+    }
+    else {
+      // Aucun régime encore sélectionné
+      _fpUnlock('fp-deal-omp');
+      _fpUnlock('fp-mg');
+      _fpUnlock('fp-deal-promo');
+      _fpUnlock('fp-deal-billetterie');
+    }
+    
+    // Affichage de l'indicateur de régime
+    if (regimeEl) {
+      if (descRegime) {
+        regimeEl.textContent = descRegime;
+        regimeEl.style.display = 'block';
+      } else {
+        regimeEl.style.display = 'none';
+      }
+    }
+    
+    // Ajouter/retirer les 🔒 sur les labels
+    _fpUpdateLockLabel('fp-label-deal-omp',   regime === 'cas1' || regime === 'cas7', 'Deal OMP % *');
+    _fpUpdateLockLabel('fp-label-mg',         regime === 'cas1' || regime === 'cas6', 'MG montant (€)');
+    _fpUpdateLockLabel('fp-label-deal-promo', regime === 'cas1' || regime === 'cas-coprod' || regime === 'cas6', 'Deal Promo locale %');
+    _fpUpdateLockLabel('fp-label-deal-bill',  regime === 'cas1', 'Deal billetterie *');
+    
+    // Bascule du mode VENTE (affiche/masque les blocs)
+    fpToggleModeVente();
+  }
+  
+  // Helper : forcer une valeur ET verrouiller le champ (disabled + grisé)
+  function _fpForceVal(id, value, lock) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (el.value !== value) el.value = value;
+    if (lock) {
+      el.disabled = true;
+      el.style.background = '#0f0f0f';
+      el.style.color = '#888';
+      el.style.cursor = 'not-allowed';
+      el.style.borderColor = '#2a2a2a';
+    } else {
+      _fpUnlock(id);
+    }
+  }
+  
+  // Helper : déverrouiller un champ
+  function _fpUnlock(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.disabled = false;
+    el.style.background = '#0a0a0a';
+    el.style.color = '#fff';
+    el.style.cursor = '';
+    el.style.borderColor = '#2a2a2a';
+  }
+  
+  // Helper : ajouter/retirer 🔒 dans le label
+  function _fpUpdateLockLabel(labelId, isLocked, baseText) {
+    var lbl = document.getElementById(labelId);
+    if (!lbl) return;
+    lbl.textContent = isLocked ? (baseText + ' 🔒') : baseText;
+  }
+  
+  // ============================================================
+  // 🛑 CONFIRMATION avant changement de TYPE DE PROD
+  // ============================================================
+  window._fpPrevTypeProd = ''; // mémoire de la valeur précédente
+  
+  function fpOnTypeProdChange(event) {
+    var sel = event.target;
+    var nouveau = sel.value;
+    var ancien = window._fpPrevTypeProd || '';
+    
+    // Si on n'a pas d'ancien, ou si on part de vide, pas de confirmation
+    if (!ancien || ancien === '' || ancien === nouveau) {
+      window._fpPrevTypeProd = nouveau;
+      fpAppliquerRegles();
+      autoSave('fiche');
+      fpValiderInfosGen();
+      return;
+    }
+    
+    // Déterminer quels champs vont être réinitialisés
+    var aEffacer = [];
+    // Si le nouveau régime force des valeurs, lister les champs impactés
+    var mg = document.getElementById('fp-mg')?.value || '';
+    var promoV = document.getElementById('fp-deal-promo')?.value || '';
+    var dealOmp = document.getElementById('fp-deal-omp')?.value || '';
+    var dealBill = document.getElementById('fp-deal-billetterie')?.value || '';
+    
+    if (nouveau === 'PROD OMP') {
+      if (dealOmp && dealOmp !== '100% OMP') aEffacer.push('Deal OMP % (sera forcé à 100% OMP)');
+      if (mg && mg !== '0') aEffacer.push('MG montant (sera forcé à 0)');
+      if (promoV && promoV !== '0') aEffacer.push('Deal Promo locale (sera forcé à 0)');
+      if (dealBill && dealBill !== '100%') aEffacer.push('Deal billetterie (sera forcé à 100%)');
+    } else if (nouveau === 'PLOCALE') {
+      if (mg && mg !== '0') aEffacer.push('MG montant (sera forcé à 0)');
+      if (promoV !== '5') aEffacer.push('Deal Promo locale (sera forcé à 5%)');
+    } else if (nouveau === 'CO-PROD') {
+      if (promoV && promoV !== '0') aEffacer.push('Deal Promo locale (sera forcé à 0)');
+    } else if (nouveau === 'VENTE') {
+      aEffacer.push('Tous les champs de billetterie / deal seront masqués');
+    }
+    
+    if (aEffacer.length === 0) {
+      // Pas de confirmation nécessaire
+      window._fpPrevTypeProd = nouveau;
+      fpAppliquerRegles();
+      autoSave('fiche');
+      fpValiderInfosGen();
+      return;
+    }
+    
+    // Demander confirmation
+    var msg = 'Changer le Type de prod de "' + ancien + '" vers "' + nouveau + '" va réinitialiser :\n\n• ' + aEffacer.join('\n• ') + '\n\nConfirmer ?';
+    if (confirm(msg)) {
+      window._fpPrevTypeProd = nouveau;
+      fpAppliquerRegles();
+      autoSave('fiche');
+      fpValiderInfosGen();
+    } else {
+      // Annuler : revenir à l'ancienne valeur
+      sel.value = ancien;
+    }
+  }
+  
   // 🎯 Bascule UI en mode VENTE quand TYPE DE PROD = VENTE
   function fpToggleModeVente() {
     var typeProd = document.getElementById('fp-type-prod')?.value || 'PROD OMP';
@@ -12897,9 +13072,15 @@ function _hideTeamSelection() {
         el.style.border = '2px solid #e31e24';
         el.style.background = 'rgba(227,30,36,0.08)';
       } else {
-        // Remettre le style normal
-        el.style.border = '1px solid #2a2a2a';
-        el.style.background = '#0a0a0a';
+        // Remettre le style normal — SAUF si le champ est verrouillé (style grisé conservé)
+        if (!el.disabled) {
+          el.style.border = '1px solid #2a2a2a';
+          el.style.background = '#0a0a0a';
+        } else {
+          // champ verrouillé : on garde le style grisé
+          el.style.border = '1px solid #2a2a2a';
+          el.style.background = '#0f0f0f';
+        }
       }
     });
 
@@ -13413,24 +13594,12 @@ function _hideTeamSelection() {
           setEl('pilote-dl-total-ttc-omp', dlTTC > 0 ? fmt(dlTTC) : '');
           setEl('pilote-dl-ht-omp', dlHT > 0 ? fmt(dlHT) : '');
           
-          // DEAL DL CO PROD = % OMP (info affichage seulement — partage des DL)
+          // DEAL DL CO PROD = % OMP
           setEl('pilote-deal-dl-coprod', pctOMP + '%');
           
-          // 🔧 CORRECTION BUG CALCUL (avril 2026)
-          // DROITS OMP pour le RÉSULTAT BRUT = 100% des DL HT (indépendant du DEAL BILLETTERIE)
-          // Le DEAL BILLETTERIE ne sert qu'au PARTAGE des DL dans un bloc séparé affiché plus bas
-          var droitsOMP = dlHT; // 100% des DL HT entrent dans le résultat brut
+          // DROITS OMP = DL HT × % OMP / 100
+          var droitsOMP = dlHT * pctOMP / 100;
           setEl('pilote-droits-omp', droitsOMP > 0 ? fmt(droitsOMP) : '');
-          
-          // 🎯 PARTAGE DL (bloc séparé) selon DEAL BILLETTERIE
-          // Part OMP = DL HT × pctOMP / 100 ; Part Partenaire = DL HT × pctPL / 100
-          var partDlOMP = dlHT * pctOMP / 100;
-          var partDlPartenaire = dlHT * pctPL / 100;
-          setEl('pilote-partage-dl-omp-pct', pctOMP + '%');
-          setEl('pilote-partage-dl-pl-pct', pctPL + '%');
-          setEl('pilote-partage-dl-omp-mt', fmt(partDlOMP));
-          setEl('pilote-partage-dl-pl-mt', fmt(partDlPartenaire));
-          setEl('pilote-partage-dl-total-ht', fmt(dlHT));
           
           // DROIT AU TIRAGE = CNM × 60%
           setEl('pilote-droit-tirage', droitTirage > 0 ? fmt(droitTirage) : '');
@@ -14032,25 +14201,8 @@ function _hideTeamSelection() {
     var dlHT = dlTTC / 1.021;
     var dealBilletterie = window._bilanDealBilletterie || '100%';
     var dealPctOMP = window._bilanDealPctOMP || 1;
-    // 🔧 CORRECTION BUG CALCUL (avril 2026)
-    // DROITS OMP pour le RÉSULTAT BRUT = 100% des DL HT (indépendant du DEAL BILLETTERIE)
-    // Le DEAL BILLETTERIE ne sert qu'au PARTAGE des DL dans un bloc séparé affiché plus bas
-    var droitsOMP = dlHT;
+    var droitsOMP = dlHT * dealPctOMP;
     var droitTirage = montantCNM * 0.60;
-    
-    // 🎯 PARTAGE DL selon DEAL BILLETTERIE (affichage bloc séparé)
-    var partDlOMP = dlHT * dealPctOMP;
-    var partDlPartenaire = dlHT * (1 - dealPctOMP);
-    var elPartDlOmp = document.getElementById('bilan-partage-dl-omp-mt');
-    var elPartDlPl = document.getElementById('bilan-partage-dl-pl-mt');
-    var elPartDlTotal = document.getElementById('bilan-partage-dl-total-ht');
-    var elPartDlOmpPct = document.getElementById('bilan-partage-dl-omp-pct');
-    var elPartDlPlPct = document.getElementById('bilan-partage-dl-pl-pct');
-    if (elPartDlTotal) elPartDlTotal.textContent = fmt(dlHT);
-    if (elPartDlOmp) elPartDlOmp.textContent = fmt(partDlOMP);
-    if (elPartDlPl) elPartDlPl.textContent = fmt(partDlPartenaire);
-    if (elPartDlOmpPct) elPartDlOmpPct.textContent = Math.round(dealPctOMP * 100) + '%';
-    if (elPartDlPlPct) elPartDlPlPct.textContent = Math.round((1 - dealPctOMP) * 100) + '%';
     
     document.getElementById('bilan-res-recette-ttc').textContent = fmt(recTTC);
     document.getElementById('bilan-res-montant-cnm').textContent = fmt(montantCNM);
