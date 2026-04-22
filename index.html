@@ -3780,6 +3780,7 @@ function _hideTeamSelection() {
               <option value="">-- Choix --</option>
               <option value="PAS DE PL">PAS DE PL</option>
               <option value="LDC">LDC</option>
+              <option value="LDC BILLETTERIE">LDC BILLETTERIE</option>
               <option value="NDA">NDA</option>
               <option value="BLCITRON">BLCITRON</option>
               <option value="PEELPROD">PEELPROD</option>
@@ -4391,6 +4392,7 @@ function _hideTeamSelection() {
           <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">MONTANT CNM</td><td id="pilote-montant-cnm" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
           <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DROITS</td><td id="pilote-total-droits-hcnm" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
           <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DÉPENSES</td><td id="pilote-total-dep" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr id="pilote-gestion-bill-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;display:none;"><td style="padding:10px 16px;color:#3b82f6;">GESTION BILLETTERIE <span style="color:#888;font-size:11px;">(LDC — 1€/billet)</span></td><td id="pilote-gestion-bill-mt" style="padding:10px 16px;color:#3b82f6;text-align:right;font-weight:700;"></td></tr>
           <!-- Séparation visuelle entre DÉPENSES et DL TTC GLOBALE -->
           <tr class="hide-in-vente" style="background:#0a0a0a;"><td colspan="2" style="height:10px;border-top:2px solid #c9a84c;border-bottom:2px solid #333;"></td></tr>
           <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DL TTC <span style="color:#c9a84c;font-weight:700;">GLOBALE</span></td><td id="pilote-dl-total-ttc-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
@@ -4802,6 +4804,7 @@ function _hideTeamSelection() {
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">MONTANT CNM</td><td id="bilan-res-montant-cnm" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DROITS</td><td id="bilan-res-droits" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DEPENSES</td><td id="bilan-res-depenses" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr id="bilan-gestion-bill-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;display:none;"><td style="padding:8px 16px;color:#3b82f6;">GESTION BILLETTERIE <span style="color:#888;font-size:11px;">(LDC — 1€/billet)</span></td><td id="bilan-gestion-bill-mt" style="padding:8px 16px;color:#3b82f6;text-align:right;font-weight:700;"></td></tr>
             <!-- Séparation visuelle entre DÉPENSES et DL TTC GLOBALE -->
             <tr class="hide-in-vente" style="background:#0a0a0a;"><td colspan="2" style="height:10px;border-top:2px solid #c9a84c;border-bottom:2px solid #333;"></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DL TTC <span style="color:#c9a84c;font-weight:700;">GLOBALE</span></td><td id="bilan-res-dl-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
@@ -12215,6 +12218,22 @@ function _hideTeamSelection() {
     var typeProd = document.getElementById('fp-type-prod')?.value || '';
     var regimeEl = document.getElementById('fp-regime-indic');
     
+    // 🎯 Si le promoteur a changé depuis le dernier appel, on déverrouille d'abord
+    // TOUT pour éviter que des valeurs de l'ancien cas restent collées
+    if (window._fpLastPromo !== undefined && window._fpLastPromo !== promo) {
+      _fpUnlock('fp-type-prod');
+      _fpUnlock('fp-deal-omp');
+      _fpUnlock('fp-mg');
+      _fpUnlock('fp-deal-promo');
+      _fpUnlock('fp-billetterie');
+      _fpUnlock('fp-deal-billetterie');
+      // Reset des valeurs qui doivent être saisies par l'utilisateur ou recalculées
+      var selTypeReset = document.getElementById('fp-type-prod');
+      if (selTypeReset) selTypeReset.value = '';
+      typeProd = '';
+    }
+    window._fpLastPromo = promo;
+    
     // Filtrage des options TYPE DE PROD selon PROMOTEUR LOCAL
     var selType = document.getElementById('fp-type-prod');
     if (selType) {
@@ -12224,6 +12243,8 @@ function _hideTeamSelection() {
         allowedTypes = ['PROD OMP', 'VENTE'];
       } else if (promo === 'LDC') {
         allowedTypes = ['CO-PROD'];
+      } else if (promo === 'LDC BILLETTERIE') {
+        allowedTypes = ['PROD OMP'];
       } else if (promo === 'NDA') {
         allowedTypes = ['PLOCALE'];
       } else if (promo === 'BLCITRON' || promo === 'PEELPROD') {
@@ -12331,6 +12352,16 @@ function _hideTeamSelection() {
       _fpForceVal('fp-billetterie', 'LDC', true);
       _fpForceVal('fp-deal-billetterie', '100%', true);
     }
+    else if (promo === 'LDC BILLETTERIE') {
+      // CAS 6 : LDC BILLETTERIE — Prod OMP, LDC gère la billetterie en commission (1€/billet)
+      regime = 'cas-ldcbill';
+      descRegime = '📌 CAS 6 · LDC BILLETTERIE — Prod OMP · OMP 100% · LDC gère billetterie (1€/billet)';
+      _fpForceVal('fp-deal-omp', '100% OMP', true);
+      _fpForceVal('fp-mg', '0', true);
+      _fpForceVal('fp-deal-promo', '0', true);
+      _fpForceVal('fp-billetterie', 'LDC', true);
+      _fpForceVal('fp-deal-billetterie', '100%', true);
+    }
     else if (promo === 'NDA') {
       // CAS 3 : NDA
       regime = 'cas-nda';
@@ -12399,7 +12430,8 @@ function _hideTeamSelection() {
   function _fpForceVal(id, value, lock) {
     var el = document.getElementById(id);
     if (!el) return;
-    if (el.value !== value) el.value = value;
+    var changed = (el.value !== value);
+    if (changed) el.value = value;
     if (lock) {
       el.disabled = true;
       el.style.background = '#0f0f0f';
@@ -12408,6 +12440,12 @@ function _hideTeamSelection() {
       el.style.borderColor = '#2a2a2a';
     } else {
       _fpUnlock(id);
+    }
+    // 🎯 Déclencher les events pour que autoSave + validation se mettent à jour
+    if (changed) {
+      try {
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      } catch(e) {}
     }
   }
   
@@ -13781,8 +13819,23 @@ function _hideTeamSelection() {
           var cplTotal = cplPromoLocale + cplDlDeal;
           setEl('pilote-cpl-total', fmt(cplTotal));
           
-          // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES + DL HT GLOBALE + DROIT AU TIRAGE
-          var resultatBrut = recHTpilote - montantCNM - droitsTotal - sumFin + dlHT + droitTirage;
+          // 🎯 GESTION BILLETTERIE : visible uniquement si promoteur = LDC BILLETTERIE
+          //   Montant = nb billets × 1 €
+          var promoFicheForBill = document.getElementById('fp-promoteur')?.value || '';
+          var gestionBillMontant = 0;
+          var elGestionBillRow = document.getElementById('pilote-gestion-bill-row');
+          var elGestionBillMt = document.getElementById('pilote-gestion-bill-mt');
+          if (promoFicheForBill === 'LDC BILLETTERIE') {
+            gestionBillMontant = billTotal * 1;
+            if (elGestionBillRow) elGestionBillRow.style.display = '';
+            if (elGestionBillMt) elGestionBillMt.textContent = fmt(gestionBillMontant);
+          } else {
+            if (elGestionBillRow) elGestionBillRow.style.display = 'none';
+            if (elGestionBillMt) elGestionBillMt.textContent = '';
+          }
+          
+          // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES − GESTION BILLETTERIE + DL HT GLOBALE + DROIT AU TIRAGE
+          var resultatBrut = recHTpilote - montantCNM - droitsTotal - sumFin - gestionBillMontant + dlHT + droitTirage;
           
           // 🎯 MODE VENTE : si type de prod = VENTE, on court-circuite tout le calcul billetterie
           var typeProdFiche = document.getElementById('fp-type-prod')?.value || 'PROD OMP';
@@ -14406,8 +14459,23 @@ function _hideTeamSelection() {
     var elCplTot = document.getElementById('bilan-cpl-total');
     if (elCplTot) elCplTot.textContent = fmt(cplTotalBilan);
     
-    // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES + DL HT GLOBALE + DROIT AU TIRAGE
-    var resultatBrut = recHTbilan - montantCNM - totalDroits - totalDepenses + dlHT + droitTirage;
+    // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES − GESTION BILLETTERIE + DL HT GLOBALE + DROIT AU TIRAGE
+    // 🎯 GESTION BILLETTERIE : visible uniquement si promoteur = LDC BILLETTERIE
+    var promoFicheBilanBill = document.getElementById('fp-promoteur')?.value || '';
+    var bilanBillets = window._bilanBillets || 0;
+    var bilanGestionBillMontant = 0;
+    var elBilanGestBillRow = document.getElementById('bilan-gestion-bill-row');
+    var elBilanGestBillMt = document.getElementById('bilan-gestion-bill-mt');
+    if (promoFicheBilanBill === 'LDC BILLETTERIE') {
+      bilanGestionBillMontant = bilanBillets * 1;
+      if (elBilanGestBillRow) elBilanGestBillRow.style.display = '';
+      if (elBilanGestBillMt) elBilanGestBillMt.textContent = fmt(bilanGestionBillMontant);
+    } else {
+      if (elBilanGestBillRow) elBilanGestBillRow.style.display = 'none';
+      if (elBilanGestBillMt) elBilanGestBillMt.textContent = '';
+    }
+    
+    var resultatBrut = recHTbilan - montantCNM - totalDroits - totalDepenses - bilanGestionBillMontant + dlHT + droitTirage;
     
     // 🎯 MODE VENTE : court-circuit
     var typeProdBilan = document.getElementById('fp-type-prod')?.value || 'PROD OMP';
@@ -14565,6 +14633,7 @@ function _hideTeamSelection() {
     window._bilanRecTTC = recTotal;
     window._bilanMontantCNM = montantCNM;
     window._bilanDlTTC = dlTTC;
+    window._bilanBillets = gBillets;
     
     // Récupérer DEAL BILLETTERIE depuis la fiche (ou depuis le champ directement)
     var dealBilletterie = document.getElementById('fp-deal-billetterie')?.value || '100%';
