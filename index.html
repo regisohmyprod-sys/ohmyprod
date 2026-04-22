@@ -3834,6 +3834,7 @@ function _hideTeamSelection() {
               <option value="">-- Choix --</option>
               <option value="100%">100%</option>
               <option value="50/50">50/50</option>
+              <option value="70/30">70/30</option>
               <option value="80/20">80/20</option>
               <option value="AUTRES">AUTRES</option>
             </select>
@@ -4401,14 +4402,14 @@ function _hideTeamSelection() {
         </table>
 
         <!-- BLOC 2 : COÛT PROD-PROMO LOCALE -->
-        <div class="hide-in-vente" style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;margin-top:2px;">COÛT PROD-PROMO LOCALE</div>
+        <div class="hide-in-vente" style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;margin-top:20px;border-radius:10px 10px 0 0;">COÛT PROD-PROMO LOCALE</div>
         <table class="hide-in-vente" style="width:100%;border-collapse:collapse;font-size:13px;">
           <tr style="border-bottom:1px solid #2a2a2a;background:#111;">
             <td style="padding:10px 16px;color:#f97316;">% PROMO LOCALE <span style="color:#888;font-size:11px;">(5% Recette HT HCNM)</span></td>
             <td id="pilote-cpl-promo-locale" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td>
           </tr>
           <tr style="border-bottom:1px solid #2a2a2a;">
-            <td style="padding:10px 16px;color:#f97316;">% DL DEAL <span style="color:#888;font-size:11px;">(70% OMP / 30% promoteur sur DL HT Globale)</span></td>
+            <td style="padding:10px 16px;color:#f97316;">% DL DEAL <span style="color:#888;font-size:11px;">(30% promoteur local sur DL HT Globale)</span></td>
             <td id="pilote-cpl-dl-deal" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td>
           </tr>
           <tr style="background:#2a1a0a;border-top:2px solid #f97316;">
@@ -12310,11 +12311,17 @@ function _hideTeamSelection() {
       }
     }
     
+    // 🎯 OVERRIDE NDA : quand PROMOTEUR = NDA, le deal billetterie est verrouillé à 70/30
+    // (doit s'appliquer APRÈS la logique de régime pour prendre le dessus)
+    if (promo === 'NDA') {
+      _fpForceVal('fp-deal-billetterie', '70/30', true);
+    }
+    
     // Ajouter/retirer les 🔒 sur les labels
     _fpUpdateLockLabel('fp-label-deal-omp',   regime === 'cas1' || regime === 'cas6' || regime === 'cas7', 'Deal OMP % *');
     _fpUpdateLockLabel('fp-label-mg',         regime === 'cas1' || regime === 'cas6', 'MG montant (€)');
     _fpUpdateLockLabel('fp-label-deal-promo', regime === 'cas1' || regime === 'cas-coprod' || regime === 'cas6', 'Deal Promo locale %');
-    _fpUpdateLockLabel('fp-label-deal-bill',  regime === 'cas1', 'Deal billetterie *');
+    _fpUpdateLockLabel('fp-label-deal-bill',  regime === 'cas1' || promo === 'NDA', 'Deal billetterie *');
     _fpUpdateLockLabel('fp-label-billetterie', promo === 'NDA', 'Gestion billetterie *');
     
     // Bascule du mode VENTE (affiche/masque les blocs)
@@ -13693,8 +13700,8 @@ function _hideTeamSelection() {
           // Ligne 1 : % PROMO LOCALE = 5% de Recette HT HCNM
           var cplPromoLocale = recHTHCNMpilote * 0.05;
           setEl('pilote-cpl-promo-locale', cplPromoLocale > 0 ? fmt(cplPromoLocale) : '');
-          // Ligne 2 : % DL DEAL = 70% OMP / 30% promoteur local sur DL HT Globale
-          var cplDlDeal = dlHT * 0.70;
+          // Ligne 2 : % DL DEAL = 30% du promoteur local sur DL HT Globale
+          var cplDlDeal = dlHT * 0.30;
           setEl('pilote-cpl-dl-deal', cplDlDeal > 0 ? fmt(cplDlDeal) : '');
           // Total = addition des 2
           var cplTotal = cplPromoLocale + cplDlDeal;
