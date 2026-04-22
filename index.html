@@ -3816,7 +3816,7 @@ function _hideTeamSelection() {
             <input id="fp-deal-promo" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Gestion billetterie *</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-billetterie">Gestion billetterie *</label>
             <select id="fp-billetterie" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="OMP">OMP</option>
@@ -12171,13 +12171,32 @@ function _hideTeamSelection() {
         // Tout autre promoteur → CO-PROD ou P.LOCALE
         allowedTypes = ['CO-PROD', 'PLOCALE'];
       }
-      // Afficher/masquer les options
-      Array.from(selType.options).forEach(function(opt){
-        if (opt.value === '') { opt.hidden = false; return; } // garder "-- Choix --"
-        opt.hidden = (allowedTypes.indexOf(opt.value) === -1);
+      
+      // Reconstruire la liste d'options (fix bug Safari/Firefox avec opt.hidden)
+      // Labels d'affichage (PLOCALE → "P.LOCALE" en UI)
+      var labels = {
+        'PROD OMP': 'PROD OMP',
+        'CO-PROD':  'CO-PROD',
+        'PLOCALE':  'P.LOCALE',
+        'VENTE':    'VENTE'
+      };
+      var valeurCourante = selType.value;
+      // Vider et recréer
+      selType.innerHTML = '';
+      var optEmpty = document.createElement('option');
+      optEmpty.value = ''; optEmpty.textContent = '-- Choix --';
+      selType.appendChild(optEmpty);
+      allowedTypes.forEach(function(val){
+        var o = document.createElement('option');
+        o.value = val;
+        o.textContent = labels[val] || val;
+        selType.appendChild(o);
       });
-      // Si la valeur actuelle n'est plus permise, on la remet à vide
-      if (typeProd && allowedTypes.indexOf(typeProd) === -1) {
+      // Restaurer la valeur courante si toujours permise, sinon vide
+      if (valeurCourante && allowedTypes.indexOf(valeurCourante) !== -1) {
+        selType.value = valeurCourante;
+        typeProd = valeurCourante;
+      } else {
         selType.value = '';
         typeProd = '';
       }
@@ -12186,6 +12205,17 @@ function _hideTeamSelection() {
         selType.value = 'PLOCALE';
         typeProd = 'PLOCALE';
         window._fpPrevTypeProd = 'PLOCALE';
+      }
+    }
+    
+    // 🎯 GESTION BILLETTERIE : verrouillée sur "NDA" quand PROMOTEUR = NDA
+    var selBill = document.getElementById('fp-billetterie');
+    if (selBill) {
+      if (promo === 'NDA') {
+        _fpForceVal('fp-billetterie', 'NDA', true);
+      } else {
+        // S'assurer que le select est déverrouillé pour les autres promoteurs
+        if (selBill.disabled) _fpUnlock('fp-billetterie');
       }
     }
     
@@ -12250,6 +12280,7 @@ function _hideTeamSelection() {
     _fpUpdateLockLabel('fp-label-mg',         regime === 'cas1' || regime === 'cas6', 'MG montant (€)');
     _fpUpdateLockLabel('fp-label-deal-promo', regime === 'cas1' || regime === 'cas-coprod' || regime === 'cas6', 'Deal Promo locale %');
     _fpUpdateLockLabel('fp-label-deal-bill',  regime === 'cas1', 'Deal billetterie *');
+    _fpUpdateLockLabel('fp-label-billetterie', promo === 'NDA', 'Gestion billetterie *');
     
     // Bascule du mode VENTE (affiche/masque les blocs)
     fpToggleModeVente();
