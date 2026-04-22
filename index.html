@@ -3783,7 +3783,7 @@ function _hideTeamSelection() {
               <option value="NDA">NDA</option>
               <option value="BLCITRON">BLCITRON</option>
               <option value="PEELPROD">PEELPROD</option>
-              <option value="AUTRE">AUTRE</option>
+              <option value="VENTE">VENTE</option>
             </select>
           </div>
           <div>
@@ -12217,15 +12217,21 @@ function _hideTeamSelection() {
     var selType = document.getElementById('fp-type-prod');
     if (selType) {
       var allowedTypes;
+      // 🎯 RÈGLES PAR PROMOTEUR (voir matrice ci-dessous)
       if (promo === 'PAS DE PL') {
         allowedTypes = ['PROD OMP', 'VENTE'];
+      } else if (promo === 'LDC') {
+        allowedTypes = ['CO-PROD'];
       } else if (promo === 'NDA') {
-        // 🎯 NDA force automatiquement P.LOCALE (pas d'autre choix possible)
         allowedTypes = ['PLOCALE'];
+      } else if (promo === 'BLCITRON' || promo === 'PEELPROD') {
+        allowedTypes = ['CO-PROD'];
+      } else if (promo === 'VENTE') {
+        allowedTypes = ['VENTE'];
       } else if (promo === '' ) {
         allowedTypes = []; // tant que PL pas choisi, rien de valide
       } else {
-        // Tout autre promoteur → CO-PROD ou P.LOCALE
+        // Fallback (ne devrait pas arriver)
         allowedTypes = ['CO-PROD', 'PLOCALE'];
       }
       
@@ -12265,68 +12271,94 @@ function _hideTeamSelection() {
         selType.value = '';
         typeProd = '';
       }
-      // 🎯 NDA : auto-sélectionne P.LOCALE si pas encore choisi
-      if (promo === 'NDA' && typeProd === '') {
-        selType.value = 'PLOCALE';
-        typeProd = 'PLOCALE';
-        window._fpPrevTypeProd = 'PLOCALE';
+      // 🎯 AUTO-SÉLECTION quand un seul choix possible
+      if (allowedTypes.length === 1 && typeProd === '') {
+        selType.value = allowedTypes[0];
+        typeProd = allowedTypes[0];
+        window._fpPrevTypeProd = typeProd;
       }
-    }
-    
-    // 🎯 GESTION BILLETTERIE : verrouillée sur "NDA" quand PROMOTEUR = NDA
-    var selBill = document.getElementById('fp-billetterie');
-    if (selBill) {
-      if (promo === 'NDA') {
-        _fpForceVal('fp-billetterie', 'NDA', true);
+      // 🎯 Verrouillage du select Type de prod si un seul choix possible
+      if (allowedTypes.length === 1) {
+        selType.disabled = true;
+        selType.style.opacity = '0.6';
+        selType.style.cursor = 'not-allowed';
       } else {
-        // S'assurer que le select est déverrouillé pour les autres promoteurs
-        if (selBill.disabled) _fpUnlock('fp-billetterie');
+        selType.disabled = false;
+        selType.style.opacity = '1';
+        selType.style.cursor = '';
       }
     }
     
-    // Application des règles selon le régime
+    // ============================================================
+    // 🎯 MATRICE DE RÈGLES PAR PROMOTEUR (5 cas)
+    // ============================================================
+    // Format : regles[promoteur] = { dealOmp, mg, mgLibre, promo, bill, billLibre, dealBill }
+    // - Valeur = force la valeur ET verrouille
+    // - null   = déverrouille (laisse libre)
+    // - mgLibre/billLibre : true = valeur préremplie mais modifiable
+    // ============================================================
     var regime = '';
     var descRegime = '';
     
-    if (promo === 'PAS DE PL' && typeProd === 'PROD OMP') {
-      // --- CAS 1 : PROD OMP sans promoteur local ---
-      regime = 'cas1';
-      descRegime = '📌 RÉGIME 1 · PROD OMP sans promoteur local — OMP prend 100% du résultat et 100% des DL';
+    if (promo === 'PAS DE PL') {
+      // CAS 1 : PAS DE PL
+      regime = 'cas-pasdepl';
+      descRegime = '📌 CAS 1 · PAS DE PL — Prod OMP ou Vente · OMP 100% · Gestion billetterie libre';
       _fpForceVal('fp-deal-omp', '100% OMP', true);
       _fpForceVal('fp-mg', '0', true);
       _fpForceVal('fp-deal-promo', '0', true);
+      _fpUnlock('fp-billetterie');
       _fpForceVal('fp-deal-billetterie', '100%', true);
     }
-    else if (typeProd === 'CO-PROD') {
-      // --- CAS 2-5 : CO-PROD ---
-      regime = 'cas-coprod';
-      descRegime = '📌 RÉGIME CO-PROD — Deal OMP % et Deal Billetterie libres et indépendants · MG libre · Promo locale = 0';
-      _fpUnlock('fp-deal-omp');
-      _fpUnlock('fp-mg');
+    else if (promo === 'LDC') {
+      // CAS 2 : LDC
+      regime = 'cas-ldc';
+      descRegime = '📌 CAS 2 · LDC — Co-prod · Deal OMP 60/40 · Gestion LDC · Deal billetterie 100%';
+      _fpForceVal('fp-deal-omp', '60/40', true);
+      _fpForceVal('fp-mg', '0', true);
       _fpForceVal('fp-deal-promo', '0', true);
-      _fpUnlock('fp-deal-billetterie');
+      _fpForceVal('fp-billetterie', 'LDC', true);
+      _fpForceVal('fp-deal-billetterie', '100%', true);
     }
-    else if (typeProd === 'PLOCALE') {
-      // --- CAS 6 : P.LOCALE ---
-      regime = 'cas6';
-      descRegime = '📌 RÉGIME P.LOCALE — OMP prend 100% du résultat · MG = 0 · Promo locale = 5% (automatique) · Deal Billetterie libre';
+    else if (promo === 'NDA') {
+      // CAS 3 : NDA
+      regime = 'cas-nda';
+      descRegime = '📌 CAS 3 · NDA — P.Locale · OMP 100% · Promo 5% · Gestion NDA · Deal billetterie 70/30';
       _fpForceVal('fp-deal-omp', '100% OMP', true);
       _fpForceVal('fp-mg', '0', true);
       _fpForceVal('fp-deal-promo', '5', true);
-      _fpUnlock('fp-deal-billetterie');
+      _fpForceVal('fp-billetterie', 'NDA', true);
+      _fpForceVal('fp-deal-billetterie', '70/30', true);
     }
-    else if (typeProd === 'VENTE') {
-      // --- CAS 7 : VENTE ---
-      regime = 'cas7';
-      descRegime = '📌 RÉGIME VENTE — Contrat de cession · Pas de billetterie · Résultat = Vente TTC − Dépenses';
-      _fpForceVal('fp-deal-omp', 'VENTE', true);
-      // MG / Promo / Deal Bill sont masqués via .hide-in-vente
+    else if (promo === 'BLCITRON' || promo === 'PEELPROD') {
+      // CAS 4 : BLEU CITRON ou PEEL PROD
+      regime = 'cas-bleucitron-peelprod';
+      descRegime = '📌 CAS 4 · ' + promo + ' — Co-prod · Deal OMP 50/50 · MG libre · Deal billetterie 100%';
+      _fpForceVal('fp-deal-omp', '50/50', true);
+      _fpUnlock('fp-mg'); // MG libre modifiable
+      // Pré-remplir à 0 si vide
+      var mgEl = document.getElementById('fp-mg');
+      if (mgEl && (!mgEl.value || mgEl.value === '')) mgEl.value = '0';
+      _fpForceVal('fp-deal-promo', '0', true);
+      _fpForceVal('fp-billetterie', promo, true);
+      _fpForceVal('fp-deal-billetterie', '100%', true);
+    }
+    else if (promo === 'VENTE') {
+      // CAS 5 : VENTE (ex-AUTRE)
+      regime = 'cas-vente';
+      descRegime = '📌 CAS 5 · VENTE — Contrat de cession · Tous deals/gestions fermés';
+      _fpForceVal('fp-deal-omp', '', true); // vide verrouillé
+      _fpForceVal('fp-mg', '0', true);
+      _fpForceVal('fp-deal-promo', '0', true);
+      _fpForceVal('fp-billetterie', '', true); // vide verrouillé
+      _fpForceVal('fp-deal-billetterie', '', true); // vide verrouillé
     }
     else {
-      // Aucun régime encore sélectionné
+      // Aucun promoteur sélectionné
       _fpUnlock('fp-deal-omp');
       _fpUnlock('fp-mg');
       _fpUnlock('fp-deal-promo');
+      _fpUnlock('fp-billetterie');
       _fpUnlock('fp-deal-billetterie');
     }
     
@@ -12340,18 +12372,13 @@ function _hideTeamSelection() {
       }
     }
     
-    // 🎯 OVERRIDE NDA : quand PROMOTEUR = NDA, le deal billetterie est verrouillé à 70/30
-    // (doit s'appliquer APRÈS la logique de régime pour prendre le dessus)
-    if (promo === 'NDA') {
-      _fpForceVal('fp-deal-billetterie', '70/30', true);
-    }
-    
-    // Ajouter/retirer les 🔒 sur les labels
-    _fpUpdateLockLabel('fp-label-deal-omp',   regime === 'cas1' || regime === 'cas6' || regime === 'cas7', 'Deal OMP % *');
-    _fpUpdateLockLabel('fp-label-mg',         regime === 'cas1' || regime === 'cas6', 'MG montant (€)');
-    _fpUpdateLockLabel('fp-label-deal-promo', regime === 'cas1' || regime === 'cas-coprod' || regime === 'cas6', 'Deal Promo locale %');
-    _fpUpdateLockLabel('fp-label-deal-bill',  regime === 'cas1' || promo === 'NDA', 'Deal billetterie *');
-    _fpUpdateLockLabel('fp-label-billetterie', promo === 'NDA', 'Gestion billetterie *');
+    // Ajouter/retirer les 🔒 sur les labels (verrouillés dans tous les cas sauf MG en cas 4)
+    var verrouilleTout = (regime !== '');
+    _fpUpdateLockLabel('fp-label-deal-omp',   verrouilleTout, 'Deal OMP % *');
+    _fpUpdateLockLabel('fp-label-mg',         verrouilleTout && regime !== 'cas-bleucitron-peelprod', 'MG montant (€)');
+    _fpUpdateLockLabel('fp-label-deal-promo', verrouilleTout, 'Deal Promo locale %');
+    _fpUpdateLockLabel('fp-label-deal-bill',  verrouilleTout, 'Deal billetterie *');
+    _fpUpdateLockLabel('fp-label-billetterie', regime !== 'cas-pasdepl' && verrouilleTout, 'Gestion billetterie *');
     
     // Bascule du mode VENTE (affiche/masque les blocs)
     fpToggleModeVente();
@@ -13726,15 +13753,18 @@ function _hideTeamSelection() {
           setEl('pilote-promo-locale-mt', montantPromoLocale > 0 ? '- ' + fmt(montantPromoLocale) : '');
           
           // 🎯 NOUVEAU BLOC COÛT PROD-PROMO LOCALE
-          // Si Promoteur = "PAS DE PL" → tout à 0 (pas de frais à reverser)
+          // À 0 si :
+          //  - Promoteur = "PAS DE PL"
+          //  - OU Deal Promo locale % = 0 (= tous les cas sauf NDA)
           var promoteurFiche = document.getElementById('fp-promoteur')?.value || '';
-          var aucunPromoteurLocal = (promoteurFiche === 'PAS DE PL');
+          var dealPromoLocalePct = parseFloat(document.getElementById('fp-deal-promo')?.value) || 0;
+          var aucunePromoLocale = (promoteurFiche === 'PAS DE PL') || (dealPromoLocalePct === 0);
           
-          // Ligne 1 : % PROMO LOCALE = 5% de Recette HT HCNM (ou 0 si PAS DE PL)
-          var cplPromoLocale = aucunPromoteurLocal ? 0 : recHTHCNMpilote * 0.05;
+          // Ligne 1 : % PROMO LOCALE = 5% de Recette HT HCNM (ou 0 si pas applicable)
+          var cplPromoLocale = aucunePromoLocale ? 0 : recHTHCNMpilote * 0.05;
           setEl('pilote-cpl-promo-locale', fmt(cplPromoLocale));
-          // Ligne 2 : % DL DEAL = 30% du promoteur local sur DL HT Globale (ou 0 si PAS DE PL)
-          var cplDlDeal = aucunPromoteurLocal ? 0 : dlHT * 0.30;
+          // Ligne 2 : % DL DEAL = 30% du promoteur local sur DL HT Globale (ou 0 si pas applicable)
+          var cplDlDeal = aucunePromoLocale ? 0 : dlHT * 0.30;
           setEl('pilote-cpl-dl-deal', fmt(cplDlDeal));
           // Total = addition des 2
           var cplTotal = cplPromoLocale + cplDlDeal;
@@ -14349,11 +14379,12 @@ function _hideTeamSelection() {
     document.getElementById('bilan-res-droit-tirage').textContent = fmt(droitTirage);
     
     // 🎯 BLOC COÛT PROD-PROMO LOCALE (Bilan AMH)
-    // Si Promoteur = "PAS DE PL" → tout à 0
+    // À 0 si : Promoteur = "PAS DE PL" OU Deal Promo locale % = 0 (= tous les cas sauf NDA)
     var promoteurFicheBilan = document.getElementById('fp-promoteur')?.value || '';
-    var aucunPromoteurLocalBilan = (promoteurFicheBilan === 'PAS DE PL');
-    var cplPromoLocaleBilan = aucunPromoteurLocalBilan ? 0 : recHTHCNMbilan * 0.05;
-    var cplDlDealBilan = aucunPromoteurLocalBilan ? 0 : dlHT * 0.30;
+    var dealPromoBilan = parseFloat(document.getElementById('fp-deal-promo')?.value) || 0;
+    var aucunePromoLocaleBilan = (promoteurFicheBilan === 'PAS DE PL') || (dealPromoBilan === 0);
+    var cplPromoLocaleBilan = aucunePromoLocaleBilan ? 0 : recHTHCNMbilan * 0.05;
+    var cplDlDealBilan = aucunePromoLocaleBilan ? 0 : dlHT * 0.30;
     var cplTotalBilan = cplPromoLocaleBilan + cplDlDealBilan;
     var elCplPL = document.getElementById('bilan-cpl-promo-locale');
     if (elCplPL) elCplPL.textContent = fmt(cplPromoLocaleBilan);
