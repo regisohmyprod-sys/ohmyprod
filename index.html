@@ -12510,9 +12510,9 @@ function _hideTeamSelection() {
     var blocClient = document.getElementById('fp-bloc-client');
     if (blocClient) blocClient.style.display = isVente ? 'block' : 'none';
 
-    // Masquer tous les boutons d'accès à la billetterie en mode VENTE
+    // 🎯 Boutons BILLETTERIE : toujours visibles (même en VENTE, pour gérer les invits si besoin)
     document.querySelectorAll('.btn-billetterie-nav').forEach(function(btn) {
-      btn.style.display = isVente ? 'none' : '';
+      btn.style.display = '';
     });
 
     // Auto-aligner le Deal OMP sur "VENTE" en mode vente
@@ -14347,9 +14347,10 @@ function _hideTeamSelection() {
     var promo = window._bilanPromo || 0;
     var salleGlobale = window._bilanSalleGlobale || 0;
     var coprodFrais = window._bilanCoprodFrais || 0;
-    var promoLocale = window._bilanPromoLocale || 0;
+    // ⚠️ promoLocale retiré du total (ligne supprimée de l'affichage DEPENSES)
+    // Le coût promo locale est désormais affiché dans le bloc dédié COÛT PROD-PROMO LOCALE
     
-    var totalDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais + promoLocale;
+    var totalDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais;
     document.getElementById('bilan-total-depenses').textContent = fmt(totalDepenses);
     
     // Stocker pour calcul RESULTAT OMP
@@ -14749,18 +14750,17 @@ function _hideTeamSelection() {
         window._bilanCoprodFrais = coprodFrais;
 
         // 🎯 % PROMO LOCALE = Recette HT HCNM × deal_promo_locale_pct
+        // (calcul préservé pour compat, mais n'est plus affiché dans DEPENSES
+        //  — désormais dans le bloc dédié COÛT PROD-PROMO LOCALE)
         var dealPromoPct = parseFloat(document.getElementById('fp-deal-promo')?.value) || 0;
         var recTTCbilan = window._bilanRecTTC || 0;
         var recHTbilan = recTTCbilan / 1.021;
         var recHTHCNMbilan = recHTbilan * (1 - 0.035);
         var montantPromoLocale = recHTHCNMbilan * dealPromoPct / 100;
-        setEl('bilan-promo-locale', montantPromoLocale > 0 ? fmt(montantPromoLocale) : '');
-        var elDetail = document.getElementById('bilan-promo-locale-detail');
-        if (elDetail) elDetail.textContent = dealPromoPct > 0 ? dealPromoPct + '% sur HT HCNM' : '';
         window._bilanPromoLocale = montantPromoLocale;
 
-        // Base dépenses pour recalcul dynamique (INCLUT la % promo locale)
-        var baseDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais + montantPromoLocale;
+        // Base dépenses pour recalcul dynamique (SANS la % promo locale — gérée hors DEPENSES)
+        var baseDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais;
         window._bilanBaseDepenses = baseDepenses;
 
         // TOTAL DEPENSES
@@ -19515,8 +19515,11 @@ function _hideTeamSelection() {
       console.warn('Erreur parse financier_data :', e);
     }
 
-    // === 3. RÉSULTAT OMP final (formule exacte Pilote Date) ===
-    var resultatOMP = recTotal - montantCNM - droitsTotal - sumFin + droitsOMP + droitTirage;
+    // === 3. RÉSULTAT OMP final (formule alignée avec Pilote Date / Bilan AMH) ===
+    // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES + DL HT GLOBALE + DROIT AU TIRAGE
+    var resultatBrut = recHT2 - montantCNM - droitsTotal - sumFin + dlHT + droitTirage;
+    // RÉSULTAT OMP = RÉSULTAT BRUT × % deal OMP (ici pctOMP/100)
+    var resultatOMP = resultatBrut * (pctOMP / 100);
 
     return {
       recTTC: recTotal,
