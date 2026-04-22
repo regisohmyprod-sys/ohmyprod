@@ -11641,7 +11641,7 @@ function _hideTeamSelection() {
     document.getElementById('fp-producteur').value = 'OH MY PROD';
     document.getElementById('fp-promoteur').value = 'PAS DE PL';
     document.getElementById('fp-type-prod').value = 'PROD OMP';
-    document.getElementById('fp-billetterie').value = 'OMP';
+    document.getElementById('fp-billetterie').value = '';  // -- Choix -- par défaut
     document.getElementById('fp-deal-billetterie').value = '100%';
     document.getElementById('fp-deal-omp').value = '100% OMP';
     document.getElementById('fp-mg').value = '0';
@@ -12044,7 +12044,7 @@ function _hideTeamSelection() {
       document.getElementById('fp-producteur').value = fiche.producteur || 'OH MY PROD';
       document.getElementById('fp-promoteur').value = fiche.promoteur_local || 'PAS DE PL';
       document.getElementById('fp-type-prod').value = fiche.type_prod || 'PROD OMP';
-      document.getElementById('fp-billetterie').value = fiche.gestion_billetterie || 'OMP';
+      document.getElementById('fp-billetterie').value = fiche.gestion_billetterie || '';
       document.getElementById('fp-deal-billetterie').value = fiche.deal_billetterie || '100%';
       document.getElementById('fp-mg').value = fiche.mg_montant || '';
       document.getElementById('fp-deal-omp').value = fiche.deal_omp_pct || '100% OMP';
@@ -12183,13 +12183,21 @@ function _hideTeamSelection() {
       var valeurCourante = selType.value;
       // Vider et recréer
       selType.innerHTML = '';
+      // 🎨 Forcer le style foncé du select (fix bande blanche)
+      selType.style.background = '#0a0a0a';
+      selType.style.color = '#fff';
+      selType.style.border = '1px solid #2a2a2a';
       var optEmpty = document.createElement('option');
       optEmpty.value = ''; optEmpty.textContent = '-- Choix --';
+      optEmpty.style.background = '#0a0a0a';
+      optEmpty.style.color = '#fff';
       selType.appendChild(optEmpty);
       allowedTypes.forEach(function(val){
         var o = document.createElement('option');
         o.value = val;
         o.textContent = labels[val] || val;
+        o.style.background = '#0a0a0a';
+        o.style.color = '#fff';
         selType.appendChild(o);
       });
       // Restaurer la valeur courante si toujours permise, sinon vide
@@ -13109,9 +13117,10 @@ function _hideTeamSelection() {
       var valeur = (el.value || '').trim();
       if (!valeur) {
         tousValides = false;
-        // Mettre la bordure en rouge clignotant pour signaler
+        // Bordure rouge pour signaler, MAIS fond foncé (fix bande blanche)
         el.style.border = '2px solid #e31e24';
-        el.style.background = 'rgba(227,30,36,0.08)';
+        el.style.background = '#0a0a0a';
+        el.style.color = '#fff';
       } else {
         // Remettre le style normal — SAUF si le champ est verrouillé (style grisé conservé)
         if (!el.disabled) {
