@@ -4356,7 +4356,7 @@ function _hideTeamSelection() {
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
           <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;position:relative;">
             PROJECTIONS VENTES
-            <button onclick="projOuvrirModalImport()" title="Importer l'historique des ventes depuis Excel" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#000;color:#c9a84c;border:1px solid #c9a84c;padding:3px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;font-weight:600;">📥 IMPORT</button>
+            <button onclick="projOuvrirModalImport()" title="Coller l'historique des ventes (copier/coller depuis Excel - pas besoin de fichier)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#000;color:#c9a84c;border:1px solid #c9a84c;padding:3px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;font-weight:600;">📥 IMPORT</button>
           </div>
           <div style="background:#1e3a5f;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;text-align:center;">MEV / CHIFFRES VENTES</div>
           <table style="width:100%;border-collapse:collapse;font-size:13px;">
@@ -18678,22 +18678,29 @@ function _hideTeamSelection() {
       modal.id = 'modal-import-historique';
       modal.className = 'modal-overlay';
       modal.style.display = 'none';
+      // 🔧 FIX bug fermeture : clic sur l'overlay ferme la modale
+      modal.onclick = function(e) {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+      };
       modal.innerHTML = [
         '<div class="modal-box" style="max-width:720px;">',
         '  <div class="modal-header">',
         '    <div class="modal-title">📥 IMPORTER HISTORIQUE VENTES</div>',
-        '    <button class="modal-close" onclick="document.getElementById(\'modal-import-historique\').style.display=\'none\'">✕</button>',
+        '    <button class="modal-close" onclick="projFermerModalImport()">✕</button>',
         '  </div>',
         '  <div style="padding:16px;">',
         '    <p style="margin:0 0 12px;color:#aaa;font-size:13px;">',
-        '      Copie-colle ton tableau Excel ci-dessous (Ctrl+C depuis Excel puis Ctrl+V ici).<br>',
-        '      <strong style="color:#c9a84c;">Colonnes attendues :</strong> Date du pointage · État précédent · Ventes à ce jour · Progression',
+        '      <strong style="color:#c9a84c;">✍️ Copie-colle ton tableau directement ici</strong> (pas besoin de fichier Excel !)<br>',
+        '      <span style="color:#888;">Format : 4 colonnes séparées par tabulations → Date · État précédent · Cumul · Progression</span>',
         '    </p>',
-        '    <textarea id="import-histo-data" placeholder="01/04/2025\t0\t88\t88\n01/07/2025\t0\t134\t134\n..." ',
+        '    <textarea id="import-histo-data" placeholder="10/10/2025\t0\t43\t43\n01/11/2025\t0\t65\t65\n21/11/2025\t65\t97\t32\n..." ',
         '      style="width:100%;min-height:220px;font-family:Courier New,monospace;font-size:12px;padding:10px;background:#0a0a0a;color:#fff;border:1px solid #333;border-radius:6px;box-sizing:border-box;"></textarea>',
         '    <div id="import-histo-preview" style="margin-top:14px;"></div>',
         '    <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">',
-        '      <button onclick="document.getElementById(\'modal-import-historique\').style.display=\'none\'" style="background:#333;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;">Annuler</button>',
+        '      <button onclick="projFermerModalImport()" style="background:#333;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;">Annuler</button>',
         '      <button onclick="projPreviewImport()" style="background:#3b82f6;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;">👁 Prévisualiser</button>',
         '      <button onclick="projConfirmerImport()" style="background:#22c55e;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;">✅ Importer</button>',
         '    </div>',
@@ -18703,9 +18710,18 @@ function _hideTeamSelection() {
       document.body.appendChild(modal);
     }
     modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
     document.getElementById('import-histo-data').value = '';
     document.getElementById('import-histo-preview').innerHTML = '';
   }
+
+  // 🔧 FIX bug fermeture : fonction propre pour fermer la modale + restaurer le scroll
+  function projFermerModalImport() {
+    var m = document.getElementById('modal-import-historique');
+    if (m) m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  window.projFermerModalImport = projFermerModalImport;
 
   function _projParserDateFR(dateStr) {
     if (!dateStr) return null;
@@ -18794,7 +18810,7 @@ function _hideTeamSelection() {
       var r = await _supabase.from('ventes_snapshots').upsert(rows, { onConflict: 'date_id,snapshot_date' }).select();
       if (r.error) throw r.error;
       alert('✅ ' + r.data.length + ' snapshot(s) importé(s) avec succès !');
-      document.getElementById('modal-import-historique').style.display = 'none';
+      projFermerModalImport();
       // Rafraîchir le bloc projection
       await projAfficherBlocVentes(_fpDateId);
     } catch (err) {
