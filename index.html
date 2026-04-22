@@ -3826,6 +3826,7 @@ function _hideTeamSelection() {
               <option value="PEELPROD">PEELPROD</option>
               <option value="AUTRES">AUTRES</option>
               <option value="SALLE">SALLE</option>
+              <option value="PAS DE BILLETTERIE">PAS DE BILLETTERIE</option>
             </select>
           </div>
           <div class="hide-in-vente">
@@ -3837,6 +3838,7 @@ function _hideTeamSelection() {
               <option value="70/30">70/30</option>
               <option value="80/20">80/20</option>
               <option value="AUTRES">AUTRES</option>
+              <option value="PAS DE BILLETTERIE">PAS DE BILLETTERIE</option>
             </select>
           </div>
         </div>
@@ -12307,6 +12309,15 @@ function _hideTeamSelection() {
       _fpForceVal('fp-deal-omp', '100% OMP', true);
       _fpForceVal('fp-mg', '0', true);
       _fpForceVal('fp-deal-promo', '0', true);
+      // Gestion billetterie : reset sur "-- Choix --" et déverrouillée pour laisser l'utilisateur choisir
+      var selBillPasDePL = document.getElementById('fp-billetterie');
+      if (selBillPasDePL) {
+        // Si la valeur actuelle vient d'un autre cas (LDC, NDA, BLCITRON...), on reset
+        var valBillCourante = selBillPasDePL.value;
+        if (valBillCourante === 'LDC' || valBillCourante === 'NDA' || valBillCourante === 'BLCITRON' || valBillCourante === 'PEELPROD') {
+          selBillPasDePL.value = '';
+        }
+      }
       _fpUnlock('fp-billetterie');
       _fpForceVal('fp-deal-billetterie', '100%', true);
     }
@@ -12346,12 +12357,12 @@ function _hideTeamSelection() {
     else if (promo === 'VENTE') {
       // CAS 5 : VENTE (ex-AUTRE)
       regime = 'cas-vente';
-      descRegime = '📌 CAS 5 · VENTE — Contrat de cession · Tous deals/gestions fermés';
-      _fpForceVal('fp-deal-omp', '', true); // vide verrouillé
+      descRegime = '📌 CAS 5 · VENTE — Contrat de cession · Pas de billetterie';
+      _fpForceVal('fp-deal-omp', 'VENTE', true);
       _fpForceVal('fp-mg', '0', true);
       _fpForceVal('fp-deal-promo', '0', true);
-      _fpForceVal('fp-billetterie', '', true); // vide verrouillé
-      _fpForceVal('fp-deal-billetterie', '', true); // vide verrouillé
+      _fpForceVal('fp-billetterie', 'PAS DE BILLETTERIE', true);
+      _fpForceVal('fp-deal-billetterie', 'PAS DE BILLETTERIE', true);
     }
     else {
       // Aucun promoteur sélectionné
