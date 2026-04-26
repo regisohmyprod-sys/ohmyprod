@@ -123,6 +123,21 @@
     display: none !important;
   }
 
+  /* ✨ MESSAGES INFOS IMPORTANTES :
+     - Non-admins : on masque le formulaire de publication (canal descendant) ET la ligne "✍️ De → Pour"
+       Ils voient juste le message + la date, sans qui l'a posté ni à qui
+     - Admins : tout reste visible normalement */
+  body.role-not-admin .info-new-msg {
+    display: none !important;
+  }
+  body.role-not-admin .info-from {
+    display: none !important;
+  }
+  /* Header devient juste la date alignée à droite (plus joli quand le DE/POUR disparaît) */
+  body.role-not-admin .info-message-header {
+    justify-content: flex-end !important;
+  }
+
   /* ✨ SÉCURITÉ : Masquer TOUT le dashboard admin aux non-admins, même si par erreur
      showPage('dashboard') est appelé, rien ne s'affichera. */
   body.role-not-admin #page-dashboard {
@@ -5216,7 +5231,7 @@ function _hideTeamSelection() {
         
         <!-- HEADER VHR -->
         <div style="background:linear-gradient(135deg,#1e3a5f,#1565c0);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">🚌 VHR — VOYAGES · HÉBERGEMENT · RESSOURCES</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">🚌 VHR — RESSOURCES</div>
           <div style="display:flex;align-items:center;gap:8px;">
             <button onclick="ouvrirCarteDepuisEspace()" title="Voir la ville sur la carte" style="background:#e31e24;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:5px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:700;box-shadow:0 2px 4px rgba(227,30,36,0.3);">🗺️ PLAN</button>
             <button onclick="toggleBlocVHR()" id="btn-toggle-vhr" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:#fff;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;">▼ Réduire</button>
