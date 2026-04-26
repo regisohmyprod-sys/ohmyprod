@@ -1909,78 +1909,6 @@
     }
   }
 
-  /* 🎯 FIX ANTI-DÉBORDEMENT GLOBAL pour toutes les pages mobiles */
-  @media (max-width: 768px) {
-    html, body {
-      overflow-x: hidden !important;
-      max-width: 100vw !important;
-    }
-    .page {
-      max-width: 100% !important;
-      overflow-x: hidden !important;
-      padding-left: 10px !important;
-      padding-right: 10px !important;
-      box-sizing: border-box !important;
-    }
-    /* Pour toutes les images et iframes */
-    img, iframe, video, svg, canvas {
-      max-width: 100% !important;
-      height: auto;
-    }
-    /* Tables qui débordent → scroll horizontal interne seulement */
-    .page table {
-      max-width: 100% !important;
-      font-size: 11px !important;
-    }
-    /* Cartes dates dans CS : boutons en 2 lignes si besoin */
-    .cs-date-card .cs-date-actions {
-      width: 100%;
-      justify-content: flex-end;
-      margin-top: 6px;
-    }
-  }
-
-  /* 🎯 Page Fiche Billetterie mobile */
-  @media (max-width: 768px) {
-    #page-fiche-billetterie,
-    #page-fiche-financier,
-    #page-pilote-date,
-    #page-bilan-amh {
-      padding: 10px !important;
-    }
-    #page-fiche-billetterie .page-title,
-    #page-fiche-financier .page-title,
-    #page-pilote-date .page-title,
-    #page-bilan-amh .page-title {
-      font-size: 20px !important;
-    }
-    /* Grilles de stats en fiches → 2 colonnes sur mobile */
-    .bill-stats-grid,
-    .fp-stats-grid {
-      grid-template-columns: 1fr 1fr !important;
-      gap: 8px !important;
-    }
-  }
-
-  /* 📱 Petits téléphones : cartes CS en 1 ligne par section */
-  @media (max-width: 480px) {
-    .cs-date-card {
-      padding: 10px 12px !important;
-    }
-    .cs-date-card > div:first-child {
-      flex: 1 1 100% !important;
-    }
-    .cs-date-actions {
-      width: 100%;
-      justify-content: flex-start !important;
-      gap: 4px !important;
-    }
-    .cs-date-actions button {
-      font-size: 10px !important;
-      padding: 4px 6px !important;
-    }
-  }
-
   /* 🎯 FICHE PROD — Barre menu 8 boutons : responsive grid */
   @media (max-width: 1024px) {
     .fp-menu-btns {
@@ -3840,36 +3768,37 @@ function _hideTeamSelection() {
       <!-- BLOC 1 : Infos générales -->
       <div id="fp-bloc-infos-gen" style="background:#1a1a1a;border:2px solid #e31e24;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 0 0 1px rgba(227,30,36,0.2);">
         <div style="color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:8px;">⚠️ INFOS GÉNÉRALES (OBLIGATOIRE)</div>
-        <div style="color:#888;font-size:11px;margin-bottom:16px;font-style:italic;">Tous les champs doivent être remplis avant de continuer</div>
+        <div style="color:#888;font-size:11px;margin-bottom:16px;font-style:italic;">Les champs 🔒 sont verrouillés automatiquement selon le type de production</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Producteur *</label>
-            <input id="fp-producteur" type="text" value="OH MY PROD" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Producteur * 🔒</label>
+            <input id="fp-producteur" type="text" value="OH MY PROD" readonly data-required="1" style="width:100%;background:#0f0f0f;border:1px solid #2a2a2a;border-radius:6px;color:#888;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;cursor:not-allowed;">
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Promoteur local *</label>
-            <select id="fp-promoteur" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <select id="fp-promoteur" oninput="autoSave('fiche'); fpAppliquerRegles(); fpValiderInfosGen()" onchange="autoSave('fiche'); fpAppliquerRegles(); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="PAS DE PL">PAS DE PL</option>
               <option value="LDC">LDC</option>
+              <option value="LDC BILLETTERIE">LDC BILLETTERIE</option>
               <option value="NDA">NDA</option>
               <option value="BLCITRON">BLCITRON</option>
               <option value="PEELPROD">PEELPROD</option>
-              <option value="AUTRE">AUTRE</option>
+              <option value="VENTE">VENTE</option>
             </select>
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Type de prod *</label>
-            <select id="fp-type-prod" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="fpToggleModeVente(); autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-type-prod">Type de prod *</label>
+            <select id="fp-type-prod" onchange="fpOnTypeProdChange(event)" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="PROD OMP">PROD OMP</option>
               <option value="CO-PROD">CO-PROD</option>
-              <option value="PLOCALE">PLOCALE</option>
+              <option value="PLOCALE">P.LOCALE</option>
               <option value="VENTE">VENTE</option>
             </select>
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal OMP % *</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-deal-omp">Deal OMP % *</label>
             <select id="fp-deal-omp" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="50/50">50/50</option>
@@ -3880,15 +3809,15 @@ function _hideTeamSelection() {
             </select>
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">MG montant (€)</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-mg">MG montant (€)</label>
             <input id="fp-mg" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal Promo locale %</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-deal-promo">Deal Promo locale %</label>
             <input id="fp-deal-promo" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Gestion billetterie *</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-billetterie">Gestion billetterie *</label>
             <select id="fp-billetterie" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="OMP">OMP</option>
@@ -3898,19 +3827,24 @@ function _hideTeamSelection() {
               <option value="PEELPROD">PEELPROD</option>
               <option value="AUTRES">AUTRES</option>
               <option value="SALLE">SALLE</option>
+              <option value="PAS DE BILLETTERIE">PAS DE BILLETTERIE</option>
             </select>
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Deal billetterie *</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;" id="fp-label-deal-bill">Deal billetterie *</label>
             <select id="fp-deal-billetterie" oninput="autoSave('fiche'); fpValiderInfosGen()" onchange="autoSave('fiche'); fpValiderInfosGen()" data-required="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="">-- Choix --</option>
               <option value="100%">100%</option>
               <option value="50/50">50/50</option>
+              <option value="70/30">70/30</option>
               <option value="80/20">80/20</option>
               <option value="AUTRES">AUTRES</option>
+              <option value="PAS DE BILLETTERIE">PAS DE BILLETTERIE</option>
             </select>
           </div>
         </div>
+        <!-- Indicateur du régime en cours -->
+        <div id="fp-regime-indic" style="display:none;margin-top:12px;padding:8px 14px;background:rgba(14,165,233,0.1);border:1px solid #0ea5e9;border-radius:6px;color:#0ea5e9;font-size:11px;font-weight:600;letter-spacing:0.5px;"></div>
         <!-- Message d'alerte si champs manquants -->
         <div id="fp-alerte-infos-gen" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(227,30,36,0.15);border:1px solid #e31e24;border-radius:6px;color:#e31e24;font-size:12px;font-weight:600;">
           ⚠️ Merci de remplir tous les champs obligatoires (*) avant de poursuivre.
@@ -4422,7 +4356,7 @@ function _hideTeamSelection() {
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
           <div style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;position:relative;">
             PROJECTIONS VENTES
-            <button onclick="projOuvrirModalImport()" title="Importer l'historique des ventes depuis Excel" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#000;color:#c9a84c;border:1px solid #c9a84c;padding:3px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;font-weight:600;">📥 IMPORT</button>
+            <button onclick="projOuvrirModalImport()" title="Coller l'historique des ventes (copier/coller depuis Excel - pas besoin de fichier)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#000;color:#c9a84c;border:1px solid #c9a84c;padding:3px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;font-weight:600;">📥 IMPORT</button>
           </div>
           <div style="background:#1e3a5f;padding:6px 16px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;text-align:center;">MEV / CHIFFRES VENTES</div>
           <table style="width:100%;border-collapse:collapse;font-size:13px;">
@@ -4449,25 +4383,47 @@ function _hideTeamSelection() {
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <div style="background:#c9a84c;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;color:#000;text-align:center;">RÉSULTAT OMP</div>
         <!-- Éléments cachés pour compatibilité avec autres modules -->
-        <span id="pilote-rec-ht" style="display:none;"></span>
         <span id="pilote-rec-hcnm" style="display:none;"></span>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <tr class="show-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a1a2e;"><td style="padding:10px 16px;color:#c9a84c;font-weight:700;">VENTE TTC</td><td id="pilote-vente-ttc-display" style="padding:10px 16px;color:#c9a84c;text-align:right;font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:16px;"></td></tr>
+          <!-- BLOC 1 : RECETTE → DROIT AU TIRAGE -->
           <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">RECETTE TTC</td><td id="pilote-rec-ttc" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">MONTANT CNM</td><td id="pilote-montant-cnm" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DROITS</td><td id="pilote-total-droits-hcnm" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DÉPENSES</td><td id="pilote-total-dep" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-          <tr class="hide-in-vente" style="border-bottom:2px solid #333;background:#0a0a0a;"><td colspan="2" style="height:8px;"></td></tr>
-          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DL TTC</td><td id="pilote-dl-total-ttc-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DL HT</td><td id="pilote-dl-ht-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DEAL DL CO PROD</td><td id="pilote-deal-dl-coprod" style="padding:10px 16px;color:#22c55e;text-align:right;font-weight:700;"></td></tr>
-          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DROITS OMP</td><td id="pilote-droits-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">RECETTE HT</td><td id="pilote-rec-ht" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">MONTANT CNM</td><td id="pilote-montant-cnm" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DROITS</td><td id="pilote-total-droits-hcnm" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DÉPENSES</td><td id="pilote-total-dep" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr id="pilote-gestion-bill-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;display:none;"><td style="padding:10px 16px;color:#3b82f6;">GESTION BILLETTERIE <span style="color:#888;font-size:11px;">(LDC — 1€/billet)</span></td><td id="pilote-gestion-bill-mt" style="padding:10px 16px;color:#3b82f6;text-align:right;font-weight:700;"></td></tr>
+          <!-- Séparation visuelle entre DÉPENSES et DL TTC GLOBALE -->
+          <tr class="hide-in-vente" style="background:#0a0a0a;"><td colspan="2" style="height:10px;border-top:2px solid #c9a84c;border-bottom:2px solid #333;"></td></tr>
+          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:10px 16px;color:#ccc;">DL TTC <span style="color:#c9a84c;font-weight:700;">GLOBALE</span></td><td id="pilote-dl-total-ttc-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
+          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:10px 16px;color:#ccc;">DL HT <span style="color:#c9a84c;font-weight:700;">GLOBALE</span></td><td id="pilote-dl-ht-omp" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
           <tr class="hide-in-vente" style="border-bottom:2px solid #333;"><td style="padding:10px 16px;color:#ccc;">DROIT AU TIRAGE</td><td id="pilote-droit-tirage" style="padding:10px 16px;color:#fff;text-align:right;font-weight:600;"></td></tr>
-          <tr class="hide-in-vente" style="border-bottom:2px solid #333;background:#111;"><td style="padding:10px 16px;color:#f97316;">% PROMO LOCALE <span id="pilote-promo-locale-pct" style="color:#888;font-size:11px;"></span></td><td id="pilote-promo-locale-mt" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td></tr>
+          <!-- RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES -->
           <tr class="hide-in-vente" style="background:#1a1a2e;border-top:2px solid #fbbf24;">
             <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;color:#fbbf24;">RÉSULTAT BRUT</td>
             <td id="pilote-resultat-brut" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#fbbf24;"></td>
           </tr>
+        </table>
+
+        <!-- BLOC 2 : COÛT PROD-PROMO LOCALE -->
+        <div class="hide-in-vente" style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;margin-top:20px;border-radius:10px 10px 0 0;">COÛT PROD-PROMO LOCALE</div>
+        <table class="hide-in-vente" style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;">
+            <td style="padding:10px 16px;color:#f97316;">% PROMO LOCALE <span style="color:#888;font-size:11px;">(5% Recette HT HCNM)</span></td>
+            <td id="pilote-cpl-promo-locale" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #2a2a2a;">
+            <td style="padding:10px 16px;color:#f97316;">% DL DEAL <span style="color:#888;font-size:11px;">(30% promoteur local sur DL HT Globale)</span></td>
+            <td id="pilote-cpl-dl-deal" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td>
+          </tr>
+          <tr style="background:#2a1a0a;border-top:2px solid #f97316;">
+            <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;color:#f97316;">COÛT TOTAL PROMO LOCALE</td>
+            <td id="pilote-cpl-total" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#f97316;"></td>
+          </tr>
+        </table>
+
+        <!-- RÉSULTAT OMP -->
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <tr id="pilote-mg-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a2a0a;display:none;">
             <td style="padding:8px 16px;color:#22c55e;font-weight:700;">🔒 MG GARANTI OMP</td>
             <td id="pilote-mg-montant" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td>
@@ -4476,11 +4432,16 @@ function _hideTeamSelection() {
             <td style="padding:8px 16px;color:#a78bfa;" id="pilote-res-part-partenaire-label">PART PARTENAIRE</td>
             <td id="pilote-res-part-partenaire" style="padding:8px 16px;text-align:right;color:#a78bfa;font-weight:600;"></td>
           </tr>
-          <tr style="background:linear-gradient(90deg, #1a1a2e 0%, #2a1a3a 100%);border-top:2px solid #c9a84c;">
-            <td style="padding:14px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:16px;color:#c9a84c;" id="pilote-resultat-omp-label">RÉSULTAT OMP</td>
-            <td id="pilote-resultat-omp" style="padding:14px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:900;"></td>
+          <tr style="background:linear-gradient(90deg, #1a1a2e 0%, #2a1a3a 100%);border-top:4px solid #c9a84c;border-bottom:4px solid #c9a84c;box-shadow:0 0 20px rgba(201,168,76,0.3);">
+            <td style="padding:22px 18px;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:22px;color:#c9a84c;text-shadow:0 0 8px rgba(201,168,76,0.4);" id="pilote-resultat-omp-label">RÉSULTAT OMP</td>
+            <td id="pilote-resultat-omp" style="padding:22px 18px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:36px;font-weight:900;text-shadow:0 0 10px rgba(255,255,255,0.2);"></td>
           </tr>
         </table>
+        <!-- Éléments cachés (conservés pour compatibilité calculs internes) -->
+        <span id="pilote-deal-dl-coprod" style="display:none;"></span>
+        <span id="pilote-droits-omp" style="display:none;"></span>
+        <span id="pilote-promo-locale-pct" style="display:none;"></span>
+        <span id="pilote-promo-locale-mt" style="display:none;"></span>
       </div>
 
       <!-- DROITS ET TAXES -->
@@ -4585,9 +4546,13 @@ function _hideTeamSelection() {
 
     <!-- PAGE CLÔTURE SALLE -->
     <div id="page-cloture-salle" class="page">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
         <button class="back-btn" style="margin-bottom:0;" onclick="showPage('pilote-date')">← Retour au Pilote Date</button>
-        <button onclick="imprimerPage('cloture-salle')" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="imprimerPage('cloture-salle')" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRIMER / PDF</button>
+          <button onclick="imprimerPageSalle()" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🖨️ IMPRESSION SALLE</button>
+          <button onclick="envoyerMailSalle()" style="background:#0a4a2e;color:#fff;border:1px solid #22c55e;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📧 EMAIL SALLE (Gmail)</button>
+        </div>
       </div>
         <div style="display:flex;gap:8px;flex-wrap:nowrap;margin:12px 0 12px 0;align-items:center;">
           <button onclick="fpOuvrirBilletterie()" class="btn-billetterie-nav" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:140px;text-align:center;">🎟️ BILLETTERIE</button>
@@ -4622,11 +4587,11 @@ function _hideTeamSelection() {
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <div style="background:#1e3a5f;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#7eb8d4;text-align:center;">JAUGE + INFOS DATE</div>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Etat des ventes à ce jour</td><td id="cs-ventes" style="padding:7px 16px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:900;text-align:center;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Total invitations</td><td id="cs-invitations" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Jauge totale à ce jour</td><td id="cs-jauge-total" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% de remplissage sur jauge choisie</td><td id="cs-remplissage" style="padding:7px 16px;color:#22c55e;font-weight:700;text-align:center;"></td></tr>
-          <tr><td style="padding:7px 16px;color:#888;">Prix moyen billet</td><td id="cs-prix-moyen" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Etat des ventes à ce jour</td><td id="cs-ventes" style="padding:7px 32px 7px 16px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:900;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Total invitations</td><td id="cs-invitations" style="padding:7px 32px 7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Jauge totale à ce jour</td><td id="cs-jauge-total" style="padding:7px 32px 7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% de remplissage sur jauge choisie</td><td id="cs-remplissage" style="padding:7px 32px 7px 16px;color:#22c55e;font-weight:700;text-align:right;"></td></tr>
+          <tr><td style="padding:7px 16px;color:#888;">Prix moyen billet</td><td id="cs-prix-moyen" style="padding:7px 32px 7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
         </table>
       </div>
 
@@ -4636,14 +4601,14 @@ function _hideTeamSelection() {
           <span>SALLE</span><span>RECETTES &amp; FACTURES</span>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Recette HT billetterie</td><td id="cs-rec-ht" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% Salle contrat</td><td id="cs-pct-salle" style="padding:7px 16px;color:#c9a84c;font-weight:700;text-align:center;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Facture salle prestations</td><td id="cs-fact-presta" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Location calculée MG &amp; %</td><td id="cs-loc-mg" style="padding:7px 16px;color:#fff;font-weight:600;text-align:center;"></td></tr>
-          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Acompte versé</td><td style="padding:7px 16px;text-align:center;"><input type="number" class="fin-input" id="cs-acompte" placeholder="0" oninput="csCalcTotal(); csSauvegarder()" style="width:120px;text-align:center;"></td></tr>
-          <tr style="background:#1a1a2e;border-top:2px solid #3b82f6;">
+          <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Recette HT billetterie</td><td id="cs-rec-ht" style="padding:7px 32px 7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr class="cs-confidentiel" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">% Salle contrat</td><td id="cs-pct-salle" style="padding:7px 32px 7px 16px;color:#c9a84c;font-weight:700;text-align:right;"></td></tr>
+          <tr class="cs-confidentiel" style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Facture salle prestations</td><td id="cs-fact-presta" style="padding:7px 32px 7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr class="cs-confidentiel" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Location calculée MG &amp; %</td><td id="cs-loc-mg" style="padding:7px 32px 7px 16px;color:#fff;font-weight:600;text-align:right;"></td></tr>
+          <tr class="cs-confidentiel" style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Acompte versé</td><td style="padding:7px 32px 7px 16px;text-align:right;"><input type="number" class="fin-input" id="cs-acompte" placeholder="0" oninput="csCalcTotal(); csSauvegarder()" style="width:120px;text-align:right;"></td></tr>
+          <tr class="cs-confidentiel" style="background:#1a1a2e;border-top:2px solid #3b82f6;">
             <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#fff;">FACTURE SALLE TOTAL</td>
-            <td id="cs-fact-total" style="padding:10px 16px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#3b82f6;font-weight:700;"></td>
+            <td id="cs-fact-total" style="padding:10px 32px 10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#3b82f6;font-weight:700;"></td>
           </tr>
         </table>
       </div>
@@ -4825,8 +4790,7 @@ function _hideTeamSelection() {
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">AUTRES</td><td style="padding:8px 16px;text-align:right;"><input type="number" id="bilan-autres-input" value="0" step="0.01" oninput="bilanCalcDepenses()" style="width:100px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;color:#fff;padding:4px 8px;font-size:12px;text-align:right;font-family:Inter,sans-serif;"> €</td><td style="padding:8px 12px;color:#555;font-size:11px;">saisie manuelle</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">TOTAL VHR</td><td id="bilan-total-vhr" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">SALLE GLOBALE</td><td id="bilan-salle" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">CO-PROD FRAIS</td><td id="bilan-coprod-frais" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Salle PL + Autres PL</td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#f97316;font-weight:700;">% PROMO LOCALE</td><td id="bilan-promo-locale" style="padding:8px 16px;text-align:right;color:#f97316;font-weight:700;"></td><td id="bilan-promo-locale-detail" style="padding:8px 12px;color:#555;font-size:11px;"></td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">Co-prod/Plocale Dépense</td><td id="bilan-coprod-frais" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td><td style="padding:8px 12px;color:#555;font-size:11px;">Salle PL + Autres PL</td></tr>
             <tr style="background:#1a1a2e;border-top:2px solid #22c55e;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#22c55e;">TOTAL DEPENSES</td><td id="bilan-total-depenses" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#22c55e;font-weight:700;"></td><td></td></tr>
           </tbody>
         </table>
@@ -4838,23 +4802,55 @@ function _hideTeamSelection() {
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <tbody>
             <tr class="show-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a1a2e;"><td style="padding:10px 16px;color:#c9a84c;font-weight:700;width:50%;">VENTE TTC</td><td id="bilan-vente-ttc-display" style="padding:10px 16px;color:#c9a84c;text-align:right;font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:16px;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;width:50%;">RECETTE TTC</td><td id="bilan-res-recette-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <!-- BLOC 1 : RECETTE → DROIT AU TIRAGE → RÉSULTAT BRUT -->
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;width:50%;">RECETTE TTC</td><td id="bilan-res-recette-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;width:50%;">RECETTE HT</td><td id="bilan-res-recette-ht" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">MONTANT CNM</td><td id="bilan-res-montant-cnm" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DROITS</td><td id="bilan-res-droits" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DEPENSES</td><td id="bilan-res-depenses" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a1a2e;height:8px;"><td colspan="2"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DL TTC</td><td id="bilan-res-dl-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DL HT</td><td id="bilan-res-dl-ht" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DEAL DL CO PROD</td><td id="bilan-res-deal-coprod" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DROITS OMP</td><td id="bilan-res-droits-omp" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a1a2e;height:8px;"><td colspan="2"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DROIT AU TIRAGE</td><td id="bilan-res-droit-tirage" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
-            <tr class="hide-in-vente" style="background:#1a1a2e;border-top:2px solid #fbbf24;"><td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#fbbf24;">RÉSULTAT BRUT</td><td id="bilan-resultat-brut" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#fbbf24;"></td></tr>
-            <tr id="bilan-mg-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a2a0a;display:none;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">🔒 MG GARANTI OMP</td><td id="bilan-mg-montant" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td></tr>
-            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#a78bfa;" id="bilan-res-part-partenaire-label">PART PARTENAIRE</td><td id="bilan-res-part-partenaire" style="padding:8px 16px;text-align:right;color:#a78bfa;font-weight:600;"></td></tr>
-            <tr style="background:#1a1a2e;border-top:2px solid #d946ef;"><td style="padding:12px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#d946ef;" id="bilan-resultat-omp-label">RESULTAT OMP</td><td id="bilan-resultat-omp" style="padding:12px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:24px;font-weight:700;color:#d946ef;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DEPENSES</td><td id="bilan-res-depenses" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr id="bilan-gestion-bill-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;display:none;"><td style="padding:8px 16px;color:#3b82f6;">GESTION BILLETTERIE <span style="color:#888;font-size:11px;">(LDC — 1€/billet)</span></td><td id="bilan-gestion-bill-mt" style="padding:8px 16px;color:#3b82f6;text-align:right;font-weight:700;"></td></tr>
+            <!-- Séparation visuelle entre DÉPENSES et DL TTC GLOBALE -->
+            <tr class="hide-in-vente" style="background:#0a0a0a;"><td colspan="2" style="height:10px;border-top:2px solid #c9a84c;border-bottom:2px solid #333;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:8px 16px;color:#888;">DL TTC <span style="color:#c9a84c;font-weight:700;">GLOBALE</span></td><td id="bilan-res-dl-ttc" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#888;">DL HT <span style="color:#c9a84c;font-weight:700;">GLOBALE</span></td><td id="bilan-res-dl-ht" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <tr class="hide-in-vente" style="border-bottom:2px solid #333;"><td style="padding:8px 16px;color:#888;">DROIT AU TIRAGE</td><td id="bilan-res-droit-tirage" style="padding:8px 16px;text-align:right;color:#fff;font-weight:600;"></td></tr>
+            <!-- RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES + DL HT GLOBALE + DROIT AU TIRAGE -->
+            <tr class="hide-in-vente" style="background:#1a1a2e;border-top:2px solid #fbbf24;">
+              <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;color:#fbbf24;">RÉSULTAT BRUT</td>
+              <td id="bilan-resultat-brut" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#fbbf24;"></td>
+            </tr>
           </tbody>
         </table>
+
+        <!-- BLOC 2 : COÛT PROD-PROMO LOCALE -->
+        <div class="hide-in-vente" style="background:#c9a84c;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#000;text-align:center;margin-top:20px;border-radius:10px 10px 0 0;">COÛT PROD-PROMO LOCALE</div>
+        <table class="hide-in-vente" style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #2a2a2a;background:#111;">
+            <td style="padding:10px 16px;color:#f97316;">% PROMO LOCALE <span style="color:#888;font-size:11px;">(5% Recette HT HCNM)</span></td>
+            <td id="bilan-cpl-promo-locale" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #2a2a2a;">
+            <td style="padding:10px 16px;color:#f97316;">% DL DEAL <span style="color:#888;font-size:11px;">(30% promoteur local sur DL HT Globale)</span></td>
+            <td id="bilan-cpl-dl-deal" style="padding:10px 16px;color:#f97316;text-align:right;font-weight:700;"></td>
+          </tr>
+          <tr style="background:#2a1a0a;border-top:2px solid #f97316;">
+            <td style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:14px;color:#f97316;">COÛT TOTAL PROMO LOCALE</td>
+            <td id="bilan-cpl-total" style="padding:10px 16px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;color:#f97316;"></td>
+          </tr>
+        </table>
+
+        <!-- RÉSULTAT OMP (grossi comme sur Pilote) -->
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr id="bilan-mg-row" class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#1a2a0a;display:none;"><td style="padding:8px 16px;color:#22c55e;font-weight:700;">🔒 MG GARANTI OMP</td><td id="bilan-mg-montant" style="padding:8px 16px;text-align:right;color:#22c55e;font-weight:700;"></td></tr>
+          <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:8px 16px;color:#a78bfa;" id="bilan-res-part-partenaire-label">PART PARTENAIRE</td><td id="bilan-res-part-partenaire" style="padding:8px 16px;text-align:right;color:#a78bfa;font-weight:600;"></td></tr>
+          <tr style="background:linear-gradient(90deg, #1a1a2e 0%, #2a1a3a 100%);border-top:4px solid #d946ef;border-bottom:4px solid #d946ef;box-shadow:0 0 20px rgba(217,70,239,0.3);">
+            <td style="padding:22px 18px;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:22px;color:#d946ef;text-shadow:0 0 8px rgba(217,70,239,0.4);" id="bilan-resultat-omp-label">RÉSULTAT OMP</td>
+            <td id="bilan-resultat-omp" style="padding:22px 18px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:36px;font-weight:900;text-shadow:0 0 10px rgba(255,255,255,0.2);"></td>
+          </tr>
+        </table>
+        <!-- Éléments cachés (conservés pour compatibilité calculs internes) -->
+        <span id="bilan-res-deal-coprod" style="display:none;"></span>
+        <span id="bilan-res-droits-omp" style="display:none;"></span>
       </div>
     </div>
 
@@ -11205,6 +11201,153 @@ function _hideTeamSelection() {
   }
   window.imprimerPage = imprimerPage;
 
+  // ============================================================
+  // 🏟️ IMPRESSION VERSION SALLE (épurée — sans % salle, factures, MG, acompte, total)
+  // ============================================================
+  function _genererHtmlClotureSalle(modeSalle) {
+    var pageEl = document.getElementById('page-cloture-salle');
+    if (!pageEl) {
+      alert('❌ Page Clôture Salle introuvable');
+      return null;
+    }
+
+    // Cloner la page pour ne pas modifier l'original
+    var clone = pageEl.cloneNode(true);
+
+    // Retirer les boutons (pas besoin dans le PDF)
+    clone.querySelectorAll('button, .back-btn').forEach(function(b) { b.remove(); });
+
+    // En mode salle, supprimer les lignes confidentielles
+    if (modeSalle) {
+      clone.querySelectorAll('.cs-confidentiel').forEach(function(tr) { tr.remove(); });
+    }
+
+    // Récupérer les valeurs des inputs (ils ne s'impriment pas sinon)
+    var originalInputs = pageEl.querySelectorAll('input, select, textarea');
+    var clonedInputs = clone.querySelectorAll('input, select, textarea');
+    originalInputs.forEach(function(origInput, idx) {
+      var clonedInput = clonedInputs[idx];
+      if (!clonedInput) return;
+      var val = origInput.value || '';
+      if (origInput.tagName === 'SELECT') {
+        var selOption = origInput.options[origInput.selectedIndex];
+        val = selOption ? selOption.text : '';
+      }
+      var span = document.createElement('span');
+      span.textContent = val;
+      span.style.cssText = 'display:inline-block;padding:4px 8px;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;font-weight:600;min-width:60px;';
+      clonedInput.parentNode.replaceChild(span, clonedInput);
+    });
+
+    var villeTxt = (document.getElementById('cs-ville') || {}).textContent || '';
+    var dateTxt  = (document.getElementById('cs-date')  || {}).textContent || '';
+    var titre = modeSalle
+      ? 'OH MY PROD — FACTURE SALLE — ' + villeTxt + ' — ' + dateTxt
+      : 'OH MY PROD - CLOTURE SALLE';
+    var dateImpression = new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+
+    var html = ''
+      + '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+      + '<title>' + titre + '</title>'
+      + '<style>'
+      + '* { box-sizing:border-box; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }'
+      + 'body { font-family:Arial,sans-serif; margin:0; padding:15px; background:#fff; color:#000; font-size:11px; }'
+      + '.print-header { display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #3b82f6; padding-bottom:10px; margin-bottom:15px; }'
+      + '.print-title { font-size:20px; font-weight:bold; color:#3b82f6; letter-spacing:1px; }'
+      + '.print-date { font-size:11px; color:#666; }'
+      + 'table { width:100%; border-collapse:collapse; margin-bottom:10px; page-break-inside:avoid; }'
+      + 'td, th { padding:5px 8px; border:1px solid #ddd; font-size:10px; color:#000 !important; }'
+      + 'tr { background:#fff !important; }'
+      + 'tr:nth-child(even) td { background:#f9f9f9 !important; }'
+      + 'div { background:transparent !important; }'
+      + 'div[style*="background:#3b82f6"], div[style*="background: #3b82f6"] { background:#3b82f6 !important; color:#fff !important; padding:6px 10px !important; font-weight:bold; }'
+      + 'div[style*="background:#c9a84c"], div[style*="background: #c9a84c"] { background:#c9a84c !important; color:#000 !important; padding:6px 10px !important; font-weight:bold; }'
+      + 'div[style*="background:#1e3a5f"], div[style*="background: #1e3a5f"] { background:#1e3a5f !important; color:#fff !important; padding:6px 10px !important; font-weight:bold; }'
+      + '.page { display:block !important; padding:0 !important; }'
+      + '.print-footer { margin-top:15px; padding-top:8px; border-top:1px solid #ddd; font-size:9px; color:#888; text-align:center; }'
+      + '@page { size:A4 portrait; margin:8mm; }'
+      + '</style>'
+      + '</head><body>'
+      + '<div class="print-header">'
+      + '  <div class="print-title">🏟️ ' + titre + '</div>'
+      + '  <div class="print-date">Imprimé le ' + dateImpression + '</div>'
+      + '</div>'
+      + clone.innerHTML
+      + '<div class="print-footer">OH MY PROD — APPLI OMP — Document généré automatiquement</div>'
+      + '<' + 'script>window.onload = function() { setTimeout(function() { window.print(); }, 400); };<' + '/script>'
+      + '</body></html>';
+
+    return html;
+  }
+
+  function imprimerPageSalle() {
+    try {
+      var html = _genererHtmlClotureSalle(true);
+      if (!html) return;
+      var win = window.open('', '_blank');
+      if (!win) {
+        alert('❌ La fenêtre d\'impression a été bloquée. Autorise les popups pour ce site.');
+        return;
+      }
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+    } catch(e) {
+      console.error('imprimerPageSalle error:', e);
+      alert('Erreur lors de l\'impression : ' + e.message);
+    }
+  }
+  window.imprimerPageSalle = imprimerPageSalle;
+
+  // ============================================================
+  // 📧 ENVOI EMAIL VIA GMAIL (version salle épurée)
+  // ============================================================
+  function envoyerMailSalle() {
+    try {
+      // 1. Lance la fenêtre d'impression / sauvegarde PDF
+      imprimerPageSalle();
+
+      // 2. Récupère les infos pour le sujet et le corps du mail
+      var villeTxt = (document.getElementById('cs-ville')  || {}).textContent || '';
+      var dateTxt  = (document.getElementById('cs-date')   || {}).textContent || '';
+      var salleTxt = (document.getElementById('cs-salle')  || {}).textContent || '';
+
+      var sujet = 'Facture Salle — THE WORLD OF QUEEN — ' + villeTxt + ' — ' + dateTxt;
+      var corps = 'Bonjour,\n\n'
+                + 'Veuillez trouver ci-joint la facture salle pour le concert :\n\n'
+                + '🎤 THE WORLD OF QUEEN\n'
+                + '📍 ' + salleTxt + (villeTxt ? ' — ' + villeTxt : '') + '\n'
+                + '📅 ' + dateTxt + '\n\n'
+                + 'N\'hésitez pas à revenir vers moi pour toute question.\n\n'
+                + 'Cordialement,\n'
+                + 'Régis Bleze Pascau\n'
+                + 'Président — OH MY PROD\n';
+
+      // 3. Ouvre Gmail compose dans un nouvel onglet
+      var url = 'https://mail.google.com/mail/?view=cm&fs=1'
+              + '&su=' + encodeURIComponent(sujet)
+              + '&body=' + encodeURIComponent(corps);
+
+      // Petit délai pour laisser la fenêtre d'impression se positionner
+      setTimeout(function() {
+        var winMail = window.open(url, '_blank');
+        if (!winMail) {
+          alert('❌ Gmail n\'a pas pu s\'ouvrir (popups bloqués). Autorise les popups, puis réessaie.');
+          return;
+        }
+        // Petit rappel à Régis
+        setTimeout(function() {
+          alert('📧 Gmail est ouvert dans un onglet.\n\n👉 N\'oublie pas d\'attacher le PDF que tu viens de sauvegarder via la fenêtre d\'impression.');
+        }, 800);
+      }, 600);
+
+    } catch(e) {
+      console.error('envoyerMailSalle error:', e);
+      alert('Erreur lors de l\'envoi : ' + e.message);
+    }
+  }
+  window.envoyerMailSalle = envoyerMailSalle;
+
   // ✨ SÉCURITÉ : Table de permissions par page et par rôle
   // admin = accès partout. Les autres rôles ont une whitelist stricte.
   var PAGE_PERMISSIONS = {
@@ -11711,7 +11854,7 @@ function _hideTeamSelection() {
     document.getElementById('fp-producteur').value = 'OH MY PROD';
     document.getElementById('fp-promoteur').value = 'PAS DE PL';
     document.getElementById('fp-type-prod').value = 'PROD OMP';
-    document.getElementById('fp-billetterie').value = 'OMP';
+    document.getElementById('fp-billetterie').value = '';  // -- Choix -- par défaut
     document.getElementById('fp-deal-billetterie').value = '100%';
     document.getElementById('fp-deal-omp').value = '100% OMP';
     document.getElementById('fp-mg').value = '0';
@@ -11738,6 +11881,10 @@ function _hideTeamSelection() {
     // Valider le bloc infos générales (toutes les valeurs par défaut sont OK donc blocs suivants visibles)
     if (typeof fpValiderInfosGen === 'function') fpValiderInfosGen();
     if (typeof fpToggleModeVente === 'function') fpToggleModeVente();
+    if (typeof fpAppliquerRegles === 'function') {
+      window._fpPrevTypeProd = document.getElementById('fp-type-prod')?.value || '';
+      fpAppliquerRegles();
+    }
   }
 
   // ============================================================
@@ -12035,18 +12182,18 @@ function _hideTeamSelection() {
       const dateObj = d.date_concert ? new Date(d.date_concert.substring(0,10) + 'T00:00:00') : null;
       const dateStr = dateObj ? dateObj.toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' }) : '—';
       return `
-        <div class="cs-date-card" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-          <div style="flex:1 1 160px;min-width:0;">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div style="flex:1;">
             <div style="font-weight:700;font-size:14px;color:#fff;">${d.ville || '—'}</div>
-            <div style="font-size:11px;color:#888;margin-top:2px;">${dateStr} · ${TOURNEE_NOMS[d.tournee_id] || ''}</div>
+            <div style="font-size:12px;color:#888;margin-top:2px;">${dateStr} · ${TOURNEE_NOMS[d.tournee_id] || ''}</div>
           </div>
-          <div class="cs-date-actions" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;">
             ${hasFiche
-              ? '<span style="font-size:10px;color:#4caf50;font-weight:700;background:rgba(76,175,80,0.1);border:1px solid #4caf50;border-radius:4px;padding:3px 7px;">✅</span>'
-              : '<span style="font-size:10px;color:#888;background:#111;border:1px solid #333;border-radius:4px;padding:3px 7px;">—</span>'
+              ? '<span style="font-size:11px;color:#4caf50;font-weight:700;background:rgba(76,175,80,0.1);border:1px solid #4caf50;border-radius:4px;padding:2px 8px;">✅ FICHE</span>'
+              : '<span style="font-size:11px;color:#888;background:#111;border:1px solid #333;border-radius:4px;padding:2px 8px;">— vide</span>'
             }
-            <button onclick="dupliquerDateOuvrir('${d.id}')" title="Dupliquer cette date" style="font-size:11px;color:#c9a84c;font-weight:700;background:rgba(201,168,76,0.1);border:1px solid #c9a84c;border-radius:4px;padding:4px 8px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;">📋</button>
-            <button onclick="fpOuvrir('${d.id}','${(d.ville||'').replace(/'/g,"\\'")}','${dateStr.replace(/'/g,"\\'")}')" style="background:#1a2f4a;color:#7eb8d4;border:1px solid #3b82f6;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;">
+            <button onclick="dupliquerDateOuvrir('${d.id}')" title="Dupliquer cette date" style="font-size:11px;color:#c9a84c;font-weight:700;background:rgba(201,168,76,0.1);border:1px solid #c9a84c;border-radius:4px;padding:2px 8px;cursor:pointer;font-family:'Inter',sans-serif;">📋 Dupliquer</button>
+            <button onclick="fpOuvrir('${d.id}','${(d.ville||'').replace(/'/g,"\\'")}','${dateStr.replace(/'/g,"\\'")}')" style="background:#1a2f4a;color:#7eb8d4;border:1px solid #3b82f6;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
               ${hasFiche ? '✏️ FICHE' : '📋 Suivre'}
             </button>
           </div>
@@ -12110,7 +12257,7 @@ function _hideTeamSelection() {
       document.getElementById('fp-producteur').value = fiche.producteur || 'OH MY PROD';
       document.getElementById('fp-promoteur').value = fiche.promoteur_local || 'PAS DE PL';
       document.getElementById('fp-type-prod').value = fiche.type_prod || 'PROD OMP';
-      document.getElementById('fp-billetterie').value = fiche.gestion_billetterie || 'OMP';
+      document.getElementById('fp-billetterie').value = fiche.gestion_billetterie || '';
       document.getElementById('fp-deal-billetterie').value = fiche.deal_billetterie || '100%';
       document.getElementById('fp-mg').value = fiche.mg_montant || '';
       document.getElementById('fp-deal-omp').value = fiche.deal_omp_pct || '100% OMP';
@@ -12150,6 +12297,10 @@ function _hideTeamSelection() {
 
     // 🎯 Bascule UI selon TYPE DE PROD (VENTE vs autre)
     fpToggleModeVente();
+    
+    // 🎯 Appliquer les règles de verrouillage selon PROMOTEUR + TYPE DE PROD
+    window._fpPrevTypeProd = document.getElementById('fp-type-prod')?.value || '';
+    fpAppliquerRegles();
 
     // 🔒 Valider le bloc INFOS GÉNÉRALES (masque blocs suivants si champs vides)
     fpValiderInfosGen();
@@ -12200,6 +12351,337 @@ function _hideTeamSelection() {
     document.getElementById('fp-total-jauge').value = ventes + invits;
   }
 
+  // ============================================================
+  // 🎯 RÈGLES MÉTIER du bloc INFOS GÉNÉRALES
+  // ============================================================
+  // Tableau de règles : selon le couple (PROMOTEUR LOCAL, TYPE DE PROD)
+  // on définit quels champs sont libres / verrouillés / forcés.
+  //
+  // Cas 1 : PROD OMP sans PL      → Deal OMP 100%, MG 0, Promo 0, Deal Bill 100% (verrouillés)
+  // Cas 2-5 : CO-PROD avec PL     → Deal OMP libre, MG libre, Promo 0 (verrouillé), Deal Bill libre
+  // Cas 6 : P.LOCALE avec PL      → Deal OMP libre, MG 0 (verrouillé), Promo 5% (verrouillé), Deal Bill libre
+  // Cas 7 : VENTE sans PL         → Deals/MG/Promo/Bill masqués (mode vente)
+  // ============================================================
+  window._fpReglesLoading = false; // flag pour éviter les re-entrées pendant le chargement
+  
+  function fpAppliquerRegles() {
+    var promo    = document.getElementById('fp-promoteur')?.value || '';
+    var typeProd = document.getElementById('fp-type-prod')?.value || '';
+    var regimeEl = document.getElementById('fp-regime-indic');
+    
+    // 🎯 Si le promoteur a changé depuis le dernier appel, on déverrouille d'abord
+    // TOUT pour éviter que des valeurs de l'ancien cas restent collées
+    if (window._fpLastPromo !== undefined && window._fpLastPromo !== promo) {
+      _fpUnlock('fp-type-prod');
+      _fpUnlock('fp-deal-omp');
+      _fpUnlock('fp-mg');
+      _fpUnlock('fp-deal-promo');
+      _fpUnlock('fp-billetterie');
+      _fpUnlock('fp-deal-billetterie');
+      // Reset des valeurs qui doivent être saisies par l'utilisateur ou recalculées
+      var selTypeReset = document.getElementById('fp-type-prod');
+      if (selTypeReset) selTypeReset.value = '';
+      typeProd = '';
+    }
+    window._fpLastPromo = promo;
+    
+    // Filtrage des options TYPE DE PROD selon PROMOTEUR LOCAL
+    var selType = document.getElementById('fp-type-prod');
+    if (selType) {
+      var allowedTypes;
+      // 🎯 RÈGLES PAR PROMOTEUR (voir matrice ci-dessous)
+      if (promo === 'PAS DE PL') {
+        allowedTypes = ['PROD OMP', 'VENTE'];
+      } else if (promo === 'LDC') {
+        allowedTypes = ['CO-PROD'];
+      } else if (promo === 'LDC BILLETTERIE') {
+        allowedTypes = ['PROD OMP'];
+      } else if (promo === 'NDA') {
+        allowedTypes = ['PLOCALE'];
+      } else if (promo === 'BLCITRON' || promo === 'PEELPROD') {
+        allowedTypes = ['CO-PROD'];
+      } else if (promo === 'VENTE') {
+        allowedTypes = ['VENTE'];
+      } else if (promo === '' ) {
+        allowedTypes = []; // tant que PL pas choisi, rien de valide
+      } else {
+        // Fallback (ne devrait pas arriver)
+        allowedTypes = ['CO-PROD', 'PLOCALE'];
+      }
+      
+      // Reconstruire la liste d'options (fix bug Safari/Firefox avec opt.hidden)
+      // Labels d'affichage (PLOCALE → "P.LOCALE" en UI)
+      var labels = {
+        'PROD OMP': 'PROD OMP',
+        'CO-PROD':  'CO-PROD',
+        'PLOCALE':  'P.LOCALE',
+        'VENTE':    'VENTE'
+      };
+      var valeurCourante = selType.value;
+      // Vider et recréer
+      selType.innerHTML = '';
+      // 🎨 Forcer le style foncé du select (fix bande blanche)
+      selType.style.background = '#0a0a0a';
+      selType.style.color = '#fff';
+      selType.style.border = '1px solid #2a2a2a';
+      var optEmpty = document.createElement('option');
+      optEmpty.value = ''; optEmpty.textContent = '-- Choix --';
+      optEmpty.style.background = '#0a0a0a';
+      optEmpty.style.color = '#fff';
+      selType.appendChild(optEmpty);
+      allowedTypes.forEach(function(val){
+        var o = document.createElement('option');
+        o.value = val;
+        o.textContent = labels[val] || val;
+        o.style.background = '#0a0a0a';
+        o.style.color = '#fff';
+        selType.appendChild(o);
+      });
+      // Restaurer la valeur courante si toujours permise, sinon vide
+      if (valeurCourante && allowedTypes.indexOf(valeurCourante) !== -1) {
+        selType.value = valeurCourante;
+        typeProd = valeurCourante;
+      } else {
+        selType.value = '';
+        typeProd = '';
+      }
+      // 🎯 AUTO-SÉLECTION quand un seul choix possible
+      if (allowedTypes.length === 1 && typeProd === '') {
+        selType.value = allowedTypes[0];
+        typeProd = allowedTypes[0];
+        window._fpPrevTypeProd = typeProd;
+      }
+      // 🎯 Verrouillage du select Type de prod si un seul choix possible
+      if (allowedTypes.length === 1) {
+        selType.disabled = true;
+        selType.style.opacity = '0.6';
+        selType.style.cursor = 'not-allowed';
+      } else {
+        selType.disabled = false;
+        selType.style.opacity = '1';
+        selType.style.cursor = '';
+      }
+    }
+    
+    // ============================================================
+    // 🎯 MATRICE DE RÈGLES PAR PROMOTEUR (5 cas)
+    // ============================================================
+    // Format : regles[promoteur] = { dealOmp, mg, mgLibre, promo, bill, billLibre, dealBill }
+    // - Valeur = force la valeur ET verrouille
+    // - null   = déverrouille (laisse libre)
+    // - mgLibre/billLibre : true = valeur préremplie mais modifiable
+    // ============================================================
+    var regime = '';
+    var descRegime = '';
+    
+    if (promo === 'PAS DE PL') {
+      // CAS 1 : PAS DE PL
+      regime = 'cas-pasdepl';
+      descRegime = '📌 CAS 1 · PAS DE PL — Prod OMP ou Vente · OMP 100% · Gestion billetterie libre';
+      _fpForceVal('fp-deal-omp', '100% OMP', true);
+      _fpForceVal('fp-mg', '0', true);
+      _fpForceVal('fp-deal-promo', '0', true);
+      // Gestion billetterie : reset sur "-- Choix --" et déverrouillée pour laisser l'utilisateur choisir
+      var selBillPasDePL = document.getElementById('fp-billetterie');
+      if (selBillPasDePL) {
+        // Si la valeur actuelle vient d'un autre cas (LDC, NDA, BLCITRON...), on reset
+        var valBillCourante = selBillPasDePL.value;
+        if (valBillCourante === 'LDC' || valBillCourante === 'NDA' || valBillCourante === 'BLCITRON' || valBillCourante === 'PEELPROD') {
+          selBillPasDePL.value = '';
+        }
+      }
+      _fpUnlock('fp-billetterie');
+      _fpForceVal('fp-deal-billetterie', '100%', true);
+    }
+    else if (promo === 'LDC') {
+      // CAS 2 : LDC
+      regime = 'cas-ldc';
+      descRegime = '📌 CAS 2 · LDC — Co-prod · Deal OMP 60/40 · Gestion LDC · Deal billetterie 100%';
+      _fpForceVal('fp-deal-omp', '60/40', true);
+      _fpForceVal('fp-mg', '0', true);
+      _fpForceVal('fp-deal-promo', '0', true);
+      _fpForceVal('fp-billetterie', 'LDC', true);
+      _fpForceVal('fp-deal-billetterie', '100%', true);
+    }
+    else if (promo === 'LDC BILLETTERIE') {
+      // CAS 6 : LDC BILLETTERIE — Prod OMP, LDC gère la billetterie en commission (1€/billet)
+      regime = 'cas-ldcbill';
+      descRegime = '📌 CAS 6 · LDC BILLETTERIE — Prod OMP · OMP 100% · LDC gère billetterie (1€/billet)';
+      _fpForceVal('fp-deal-omp', '100% OMP', true);
+      _fpForceVal('fp-mg', '0', true);
+      _fpForceVal('fp-deal-promo', '0', true);
+      _fpForceVal('fp-billetterie', 'LDC', true);
+      _fpForceVal('fp-deal-billetterie', '100%', true);
+    }
+    else if (promo === 'NDA') {
+      // CAS 3 : NDA
+      regime = 'cas-nda';
+      descRegime = '📌 CAS 3 · NDA — P.Locale · OMP 100% · Promo 5% · Gestion NDA · Deal billetterie 70/30';
+      _fpForceVal('fp-deal-omp', '100% OMP', true);
+      _fpForceVal('fp-mg', '0', true);
+      _fpForceVal('fp-deal-promo', '5', true);
+      _fpForceVal('fp-billetterie', 'NDA', true);
+      _fpForceVal('fp-deal-billetterie', '70/30', true);
+    }
+    else if (promo === 'BLCITRON' || promo === 'PEELPROD') {
+      // CAS 4 : BLEU CITRON ou PEEL PROD
+      regime = 'cas-bleucitron-peelprod';
+      descRegime = '📌 CAS 4 · ' + promo + ' — Co-prod · Deal OMP 50/50 · MG libre · Deal billetterie 100%';
+      _fpForceVal('fp-deal-omp', '50/50', true);
+      _fpUnlock('fp-mg'); // MG libre modifiable
+      // Pré-remplir à 0 si vide
+      var mgEl = document.getElementById('fp-mg');
+      if (mgEl && (!mgEl.value || mgEl.value === '')) mgEl.value = '0';
+      _fpForceVal('fp-deal-promo', '0', true);
+      _fpForceVal('fp-billetterie', promo, true);
+      _fpForceVal('fp-deal-billetterie', '100%', true);
+    }
+    else if (promo === 'VENTE') {
+      // CAS 5 : VENTE (ex-AUTRE)
+      regime = 'cas-vente';
+      descRegime = '📌 CAS 5 · VENTE — Contrat de cession · Pas de billetterie';
+      _fpForceVal('fp-deal-omp', 'VENTE', true);
+      _fpForceVal('fp-mg', '0', true);
+      _fpForceVal('fp-deal-promo', '0', true);
+      _fpForceVal('fp-billetterie', 'PAS DE BILLETTERIE', true);
+      _fpForceVal('fp-deal-billetterie', 'PAS DE BILLETTERIE', true);
+    }
+    else {
+      // Aucun promoteur sélectionné
+      _fpUnlock('fp-deal-omp');
+      _fpUnlock('fp-mg');
+      _fpUnlock('fp-deal-promo');
+      _fpUnlock('fp-billetterie');
+      _fpUnlock('fp-deal-billetterie');
+    }
+    
+    // Affichage de l'indicateur de régime
+    if (regimeEl) {
+      if (descRegime) {
+        regimeEl.textContent = descRegime;
+        regimeEl.style.display = 'block';
+      } else {
+        regimeEl.style.display = 'none';
+      }
+    }
+    
+    // Ajouter/retirer les 🔒 sur les labels (verrouillés dans tous les cas sauf MG en cas 4)
+    var verrouilleTout = (regime !== '');
+    _fpUpdateLockLabel('fp-label-deal-omp',   verrouilleTout, 'Deal OMP % *');
+    _fpUpdateLockLabel('fp-label-mg',         verrouilleTout && regime !== 'cas-bleucitron-peelprod', 'MG montant (€)');
+    _fpUpdateLockLabel('fp-label-deal-promo', verrouilleTout, 'Deal Promo locale %');
+    _fpUpdateLockLabel('fp-label-deal-bill',  verrouilleTout, 'Deal billetterie *');
+    _fpUpdateLockLabel('fp-label-billetterie', regime !== 'cas-pasdepl' && verrouilleTout, 'Gestion billetterie *');
+    
+    // Bascule du mode VENTE (affiche/masque les blocs)
+    fpToggleModeVente();
+  }
+  
+  // Helper : forcer une valeur ET verrouiller le champ (disabled + grisé)
+  function _fpForceVal(id, value, lock) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var changed = (el.value !== value);
+    if (changed) el.value = value;
+    if (lock) {
+      el.disabled = true;
+      el.style.background = '#0f0f0f';
+      el.style.color = '#888';
+      el.style.cursor = 'not-allowed';
+      el.style.borderColor = '#2a2a2a';
+    } else {
+      _fpUnlock(id);
+    }
+    // 🎯 Déclencher les events pour que autoSave + validation se mettent à jour
+    if (changed) {
+      try {
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      } catch(e) {}
+    }
+  }
+  
+  // Helper : déverrouiller un champ
+  function _fpUnlock(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.disabled = false;
+    el.style.background = '#0a0a0a';
+    el.style.color = '#fff';
+    el.style.cursor = '';
+    el.style.borderColor = '#2a2a2a';
+  }
+  
+  // Helper : ajouter/retirer 🔒 dans le label
+  function _fpUpdateLockLabel(labelId, isLocked, baseText) {
+    var lbl = document.getElementById(labelId);
+    if (!lbl) return;
+    lbl.textContent = isLocked ? (baseText + ' 🔒') : baseText;
+  }
+  
+  // ============================================================
+  // 🛑 CONFIRMATION avant changement de TYPE DE PROD
+  // ============================================================
+  window._fpPrevTypeProd = ''; // mémoire de la valeur précédente
+  
+  function fpOnTypeProdChange(event) {
+    var sel = event.target;
+    var nouveau = sel.value;
+    var ancien = window._fpPrevTypeProd || '';
+    
+    // Si on n'a pas d'ancien, ou si on part de vide, pas de confirmation
+    if (!ancien || ancien === '' || ancien === nouveau) {
+      window._fpPrevTypeProd = nouveau;
+      fpAppliquerRegles();
+      autoSave('fiche');
+      fpValiderInfosGen();
+      return;
+    }
+    
+    // Déterminer quels champs vont être réinitialisés
+    var aEffacer = [];
+    // Si le nouveau régime force des valeurs, lister les champs impactés
+    var mg = document.getElementById('fp-mg')?.value || '';
+    var promoV = document.getElementById('fp-deal-promo')?.value || '';
+    var dealOmp = document.getElementById('fp-deal-omp')?.value || '';
+    var dealBill = document.getElementById('fp-deal-billetterie')?.value || '';
+    
+    if (nouveau === 'PROD OMP') {
+      if (dealOmp && dealOmp !== '100% OMP') aEffacer.push('Deal OMP % (sera forcé à 100% OMP)');
+      if (mg && mg !== '0') aEffacer.push('MG montant (sera forcé à 0)');
+      if (promoV && promoV !== '0') aEffacer.push('Deal Promo locale (sera forcé à 0)');
+      if (dealBill && dealBill !== '100%') aEffacer.push('Deal billetterie (sera forcé à 100%)');
+    } else if (nouveau === 'PLOCALE') {
+      if (dealOmp && dealOmp !== '100% OMP') aEffacer.push('Deal OMP % (sera forcé à 100% OMP)');
+      if (mg && mg !== '0') aEffacer.push('MG montant (sera forcé à 0)');
+      if (promoV !== '5') aEffacer.push('Deal Promo locale (sera forcé à 5%)');
+    } else if (nouveau === 'CO-PROD') {
+      if (promoV && promoV !== '0') aEffacer.push('Deal Promo locale (sera forcé à 0)');
+    } else if (nouveau === 'VENTE') {
+      aEffacer.push('Tous les champs de billetterie / deal seront masqués');
+    }
+    
+    if (aEffacer.length === 0) {
+      // Pas de confirmation nécessaire
+      window._fpPrevTypeProd = nouveau;
+      fpAppliquerRegles();
+      autoSave('fiche');
+      fpValiderInfosGen();
+      return;
+    }
+    
+    // Demander confirmation
+    var msg = 'Changer le Type de prod de "' + ancien + '" vers "' + nouveau + '" va réinitialiser :\n\n• ' + aEffacer.join('\n• ') + '\n\nConfirmer ?';
+    if (confirm(msg)) {
+      window._fpPrevTypeProd = nouveau;
+      fpAppliquerRegles();
+      autoSave('fiche');
+      fpValiderInfosGen();
+    } else {
+      // Annuler : revenir à l'ancienne valeur
+      sel.value = ancien;
+    }
+  }
+  
   // 🎯 Bascule UI en mode VENTE quand TYPE DE PROD = VENTE
   function fpToggleModeVente() {
     var typeProd = document.getElementById('fp-type-prod')?.value || 'PROD OMP';
@@ -12217,9 +12699,9 @@ function _hideTeamSelection() {
     var blocClient = document.getElementById('fp-bloc-client');
     if (blocClient) blocClient.style.display = isVente ? 'block' : 'none';
 
-    // Masquer tous les boutons d'accès à la billetterie en mode VENTE
+    // 🎯 Boutons BILLETTERIE : toujours visibles (même en VENTE, pour gérer les invits si besoin)
     document.querySelectorAll('.btn-billetterie-nav').forEach(function(btn) {
-      btn.style.display = isVente ? 'none' : '';
+      btn.style.display = '';
     });
 
     // Auto-aligner le Deal OMP sur "VENTE" en mode vente
@@ -12925,13 +13407,20 @@ function _hideTeamSelection() {
       var valeur = (el.value || '').trim();
       if (!valeur) {
         tousValides = false;
-        // Mettre la bordure en rouge clignotant pour signaler
+        // Bordure rouge pour signaler, MAIS fond foncé (fix bande blanche)
         el.style.border = '2px solid #e31e24';
-        el.style.background = 'rgba(227,30,36,0.08)';
-      } else {
-        // Remettre le style normal
-        el.style.border = '1px solid #2a2a2a';
         el.style.background = '#0a0a0a';
+        el.style.color = '#fff';
+      } else {
+        // Remettre le style normal — SAUF si le champ est verrouillé (style grisé conservé)
+        if (!el.disabled) {
+          el.style.border = '1px solid #2a2a2a';
+          el.style.background = '#0a0a0a';
+        } else {
+          // champ verrouillé : on garde le style grisé
+          el.style.border = '1px solid #2a2a2a';
+          el.style.background = '#0f0f0f';
+        }
       }
     });
 
@@ -13463,8 +13952,41 @@ function _hideTeamSelection() {
           setEl('pilote-promo-locale-pct', dealPromoPct > 0 ? '(' + dealPromoPct + '% sur HT HCNM)' : '');
           setEl('pilote-promo-locale-mt', montantPromoLocale > 0 ? '- ' + fmt(montantPromoLocale) : '');
           
-          // RÉSULTAT BRUT = Recette TTC - Montant CNM - Droits - Dépenses + Droits OMP + Droit au Tirage - % Promo Locale
-          var resultatBrut = recTotal - montantCNM - droitsTotal - sumFin + droitsOMP + droitTirage - montantPromoLocale;
+          // 🎯 NOUVEAU BLOC COÛT PROD-PROMO LOCALE
+          // À 0 si :
+          //  - Promoteur = "PAS DE PL"
+          //  - OU Deal Promo locale % = 0 (= tous les cas sauf NDA)
+          var promoteurFiche = document.getElementById('fp-promoteur')?.value || '';
+          var dealPromoLocalePct = parseFloat(document.getElementById('fp-deal-promo')?.value) || 0;
+          var aucunePromoLocale = (promoteurFiche === 'PAS DE PL') || (dealPromoLocalePct === 0);
+          
+          // Ligne 1 : % PROMO LOCALE = 5% de Recette HT HCNM (ou 0 si pas applicable)
+          var cplPromoLocale = aucunePromoLocale ? 0 : recHTHCNMpilote * 0.05;
+          setEl('pilote-cpl-promo-locale', fmt(cplPromoLocale));
+          // Ligne 2 : % DL DEAL = 30% du promoteur local sur DL HT Globale (ou 0 si pas applicable)
+          var cplDlDeal = aucunePromoLocale ? 0 : dlHT * 0.30;
+          setEl('pilote-cpl-dl-deal', fmt(cplDlDeal));
+          // Total = addition des 2
+          var cplTotal = cplPromoLocale + cplDlDeal;
+          setEl('pilote-cpl-total', fmt(cplTotal));
+          
+          // 🎯 GESTION BILLETTERIE : visible uniquement si promoteur = LDC BILLETTERIE
+          //   Montant = nb billets × 1 €
+          var promoFicheForBill = document.getElementById('fp-promoteur')?.value || '';
+          var gestionBillMontant = 0;
+          var elGestionBillRow = document.getElementById('pilote-gestion-bill-row');
+          var elGestionBillMt = document.getElementById('pilote-gestion-bill-mt');
+          if (promoFicheForBill === 'LDC BILLETTERIE') {
+            gestionBillMontant = billTotal * 1;
+            if (elGestionBillRow) elGestionBillRow.style.display = '';
+            if (elGestionBillMt) elGestionBillMt.textContent = fmt(gestionBillMontant);
+          } else {
+            if (elGestionBillRow) elGestionBillRow.style.display = 'none';
+            if (elGestionBillMt) elGestionBillMt.textContent = '';
+          }
+          
+          // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES − GESTION BILLETTERIE + DL HT GLOBALE + DROIT AU TIRAGE
+          var resultatBrut = recHTpilote - montantCNM - droitsTotal - sumFin - gestionBillMontant + dlHT + droitTirage;
           
           // 🎯 MODE VENTE : si type de prod = VENTE, on court-circuite tout le calcul billetterie
           var typeProdFiche = document.getElementById('fp-type-prod')?.value || 'PROD OMP';
@@ -13499,7 +14021,8 @@ function _hideTeamSelection() {
             }
           }
           
-          var resultatOMP = resultatBrut * pctOMPdeal;
+          // RÉSULTAT OMP = (RÉSULTAT BRUT × %OMP) − COÛT TOTAL PROMO LOCALE
+          var resultatOMP = (resultatBrut * pctOMPdeal) - cplTotal;
           var partPartenaire = resultatBrut * pctPartenaireDeal;
           
           // 🔒 MG GARANTI : si MG > 0 et Résultat OMP calculé < MG, on applique le plancher
@@ -14029,9 +14552,10 @@ function _hideTeamSelection() {
     var promo = window._bilanPromo || 0;
     var salleGlobale = window._bilanSalleGlobale || 0;
     var coprodFrais = window._bilanCoprodFrais || 0;
-    var promoLocale = window._bilanPromoLocale || 0;
+    // ⚠️ promoLocale retiré du total (ligne supprimée de l'affichage DEPENSES)
+    // Le coût promo locale est désormais affiché dans le bloc dédié COÛT PROD-PROMO LOCALE
     
-    var totalDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais + promoLocale;
+    var totalDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais;
     document.getElementById('bilan-total-depenses').textContent = fmt(totalDepenses);
     
     // Stocker pour calcul RESULTAT OMP
@@ -14056,17 +14580,53 @@ function _hideTeamSelection() {
     var droitTirage = montantCNM * 0.60;
     
     document.getElementById('bilan-res-recette-ttc').textContent = fmt(recTTC);
+    var recHTbilan = recTTC > 0 ? recTTC / 1.021 : 0;
+    var recHTHCNMbilan = recHTbilan * (1 - 0.035);
+    var elBilanRecHT = document.getElementById('bilan-res-recette-ht');
+    if (elBilanRecHT) elBilanRecHT.textContent = fmt(recHTbilan);
     document.getElementById('bilan-res-montant-cnm').textContent = fmt(montantCNM);
     document.getElementById('bilan-res-droits').textContent = fmt(totalDroits);
     document.getElementById('bilan-res-depenses').textContent = fmt(totalDepenses);
     document.getElementById('bilan-res-dl-ttc').textContent = fmt(dlTTC);
     document.getElementById('bilan-res-dl-ht').textContent = fmt(dlHT);
-    document.getElementById('bilan-res-deal-coprod').textContent = dealBilletterie;
-    document.getElementById('bilan-res-droits-omp').textContent = fmt(droitsOMP);
+    var elBilanDealCoprod = document.getElementById('bilan-res-deal-coprod');
+    if (elBilanDealCoprod) elBilanDealCoprod.textContent = dealBilletterie;
+    var elBilanDroitsOMP = document.getElementById('bilan-res-droits-omp');
+    if (elBilanDroitsOMP) elBilanDroitsOMP.textContent = fmt(droitsOMP);
     document.getElementById('bilan-res-droit-tirage').textContent = fmt(droitTirage);
     
-    // RESULTAT BRUT = RECETTE TTC - MONTANT CNM - DROITS - DEPENSES + DROITS OMP + DROIT AU TIRAGE
-    var resultatBrut = recTTC - montantCNM - totalDroits - totalDepenses + droitsOMP + droitTirage;
+    // 🎯 BLOC COÛT PROD-PROMO LOCALE (Bilan AMH)
+    // À 0 si : Promoteur = "PAS DE PL" OU Deal Promo locale % = 0 (= tous les cas sauf NDA)
+    var promoteurFicheBilan = document.getElementById('fp-promoteur')?.value || '';
+    var dealPromoBilan = parseFloat(document.getElementById('fp-deal-promo')?.value) || 0;
+    var aucunePromoLocaleBilan = (promoteurFicheBilan === 'PAS DE PL') || (dealPromoBilan === 0);
+    var cplPromoLocaleBilan = aucunePromoLocaleBilan ? 0 : recHTHCNMbilan * 0.05;
+    var cplDlDealBilan = aucunePromoLocaleBilan ? 0 : dlHT * 0.30;
+    var cplTotalBilan = cplPromoLocaleBilan + cplDlDealBilan;
+    var elCplPL = document.getElementById('bilan-cpl-promo-locale');
+    if (elCplPL) elCplPL.textContent = fmt(cplPromoLocaleBilan);
+    var elCplDL = document.getElementById('bilan-cpl-dl-deal');
+    if (elCplDL) elCplDL.textContent = fmt(cplDlDealBilan);
+    var elCplTot = document.getElementById('bilan-cpl-total');
+    if (elCplTot) elCplTot.textContent = fmt(cplTotalBilan);
+    
+    // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES − GESTION BILLETTERIE + DL HT GLOBALE + DROIT AU TIRAGE
+    // 🎯 GESTION BILLETTERIE : visible uniquement si promoteur = LDC BILLETTERIE
+    var promoFicheBilanBill = document.getElementById('fp-promoteur')?.value || '';
+    var bilanBillets = window._bilanBillets || 0;
+    var bilanGestionBillMontant = 0;
+    var elBilanGestBillRow = document.getElementById('bilan-gestion-bill-row');
+    var elBilanGestBillMt = document.getElementById('bilan-gestion-bill-mt');
+    if (promoFicheBilanBill === 'LDC BILLETTERIE') {
+      bilanGestionBillMontant = bilanBillets * 1;
+      if (elBilanGestBillRow) elBilanGestBillRow.style.display = '';
+      if (elBilanGestBillMt) elBilanGestBillMt.textContent = fmt(bilanGestionBillMontant);
+    } else {
+      if (elBilanGestBillRow) elBilanGestBillRow.style.display = 'none';
+      if (elBilanGestBillMt) elBilanGestBillMt.textContent = '';
+    }
+    
+    var resultatBrut = recHTbilan - montantCNM - totalDroits - totalDepenses - bilanGestionBillMontant + dlHT + droitTirage;
     
     // 🎯 MODE VENTE : court-circuit
     var typeProdBilan = document.getElementById('fp-type-prod')?.value || 'PROD OMP';
@@ -14106,7 +14666,8 @@ function _hideTeamSelection() {
       }
     }
     
-    var resultatOMP = resultatBrut * pctOMP;
+    // RÉSULTAT OMP = (RÉSULTAT BRUT × %OMP) − COÛT TOTAL PROMO LOCALE
+    var resultatOMP = (resultatBrut * pctOMP) - cplTotalBilan;
     var partPartenaire = resultatBrut * pctPartenaire;
     
     // 🔒 MG GARANTI : si MG > 0 et Résultat OMP calculé < MG, on applique le plancher
@@ -14223,6 +14784,7 @@ function _hideTeamSelection() {
     window._bilanRecTTC = recTotal;
     window._bilanMontantCNM = montantCNM;
     window._bilanDlTTC = dlTTC;
+    window._bilanBillets = gBillets;
     
     // Récupérer DEAL BILLETTERIE depuis la fiche (ou depuis le champ directement)
     var dealBilletterie = document.getElementById('fp-deal-billetterie')?.value || '100%';
@@ -14410,18 +14972,17 @@ function _hideTeamSelection() {
         window._bilanCoprodFrais = coprodFrais;
 
         // 🎯 % PROMO LOCALE = Recette HT HCNM × deal_promo_locale_pct
+        // (calcul préservé pour compat, mais n'est plus affiché dans DEPENSES
+        //  — désormais dans le bloc dédié COÛT PROD-PROMO LOCALE)
         var dealPromoPct = parseFloat(document.getElementById('fp-deal-promo')?.value) || 0;
         var recTTCbilan = window._bilanRecTTC || 0;
         var recHTbilan = recTTCbilan / 1.021;
         var recHTHCNMbilan = recHTbilan * (1 - 0.035);
         var montantPromoLocale = recHTHCNMbilan * dealPromoPct / 100;
-        setEl('bilan-promo-locale', montantPromoLocale > 0 ? fmt(montantPromoLocale) : '');
-        var elDetail = document.getElementById('bilan-promo-locale-detail');
-        if (elDetail) elDetail.textContent = dealPromoPct > 0 ? dealPromoPct + '% sur HT HCNM' : '';
         window._bilanPromoLocale = montantPromoLocale;
 
-        // Base dépenses pour recalcul dynamique (INCLUT la % promo locale)
-        var baseDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais + montantPromoLocale;
+        // Base dépenses pour recalcul dynamique (SANS la % promo locale — gérée hors DEPENSES)
+        var baseDepenses = coutPlateau + totalExterne + promo + totalVHR + salleGlobale + coprodFrais;
         window._bilanBaseDepenses = baseDepenses;
 
         // TOTAL DEPENSES
@@ -18262,28 +18823,35 @@ function _hideTeamSelection() {
       alert('❌ Aucune date sélectionnée');
       return;
     }
-    var modal = document.getElementById('modal-import-historique');
+    var modal = document.getElementById('modal-import-ventes-proj');
     if (!modal) {
       modal = document.createElement('div');
-      modal.id = 'modal-import-historique';
+      modal.id = 'modal-import-ventes-proj';
       modal.className = 'modal-overlay';
       modal.style.display = 'none';
+      // 🔧 FIX bug fermeture : clic sur l'overlay ferme la modale
+      modal.onclick = function(e) {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+      };
       modal.innerHTML = [
         '<div class="modal-box" style="max-width:720px;">',
         '  <div class="modal-header">',
         '    <div class="modal-title">📥 IMPORTER HISTORIQUE VENTES</div>',
-        '    <button class="modal-close" onclick="document.getElementById(\'modal-import-historique\').style.display=\'none\'">✕</button>',
+        '    <button class="modal-close" onclick="projFermerModalImport()">✕</button>',
         '  </div>',
         '  <div style="padding:16px;">',
         '    <p style="margin:0 0 12px;color:#aaa;font-size:13px;">',
-        '      Copie-colle ton tableau Excel ci-dessous (Ctrl+C depuis Excel puis Ctrl+V ici).<br>',
-        '      <strong style="color:#c9a84c;">Colonnes attendues :</strong> Date du pointage · État précédent · Ventes à ce jour · Progression',
+        '      <strong style="color:#c9a84c;">✍️ Copie-colle ton tableau directement ici</strong> (pas besoin de fichier Excel !)<br>',
+        '      <span style="color:#888;">Format : 4 colonnes séparées par tabulations → Date · État précédent · Cumul · Progression</span>',
         '    </p>',
-        '    <textarea id="import-histo-data" placeholder="01/04/2025\t0\t88\t88\n01/07/2025\t0\t134\t134\n..." ',
+        '    <textarea id="import-histo-data" placeholder="10/10/2025\t0\t43\t43\n01/11/2025\t0\t65\t65\n21/11/2025\t65\t97\t32\n..." ',
         '      style="width:100%;min-height:220px;font-family:Courier New,monospace;font-size:12px;padding:10px;background:#0a0a0a;color:#fff;border:1px solid #333;border-radius:6px;box-sizing:border-box;"></textarea>',
         '    <div id="import-histo-preview" style="margin-top:14px;"></div>',
         '    <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">',
-        '      <button onclick="document.getElementById(\'modal-import-historique\').style.display=\'none\'" style="background:#333;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;">Annuler</button>',
+        '      <button onclick="projFermerModalImport()" style="background:#333;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;">Annuler</button>',
         '      <button onclick="projPreviewImport()" style="background:#3b82f6;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;">👁 Prévisualiser</button>',
         '      <button onclick="projConfirmerImport()" style="background:#22c55e;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;">✅ Importer</button>',
         '    </div>',
@@ -18293,9 +18861,18 @@ function _hideTeamSelection() {
       document.body.appendChild(modal);
     }
     modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
     document.getElementById('import-histo-data').value = '';
     document.getElementById('import-histo-preview').innerHTML = '';
   }
+
+  // 🔧 FIX bug fermeture : fonction propre pour fermer la modale + restaurer le scroll
+  function projFermerModalImport() {
+    var m = document.getElementById('modal-import-ventes-proj');
+    if (m) m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  window.projFermerModalImport = projFermerModalImport;
 
   function _projParserDateFR(dateStr) {
     if (!dateStr) return null;
@@ -18384,7 +18961,7 @@ function _hideTeamSelection() {
       var r = await _supabase.from('ventes_snapshots').upsert(rows, { onConflict: 'date_id,snapshot_date' }).select();
       if (r.error) throw r.error;
       alert('✅ ' + r.data.length + ' snapshot(s) importé(s) avec succès !');
-      document.getElementById('modal-import-historique').style.display = 'none';
+      projFermerModalImport();
       // Rafraîchir le bloc projection
       await projAfficherBlocVentes(_fpDateId);
     } catch (err) {
@@ -19176,8 +19753,11 @@ function _hideTeamSelection() {
       console.warn('Erreur parse financier_data :', e);
     }
 
-    // === 3. RÉSULTAT OMP final (formule exacte Pilote Date) ===
-    var resultatOMP = recTotal - montantCNM - droitsTotal - sumFin + droitsOMP + droitTirage;
+    // === 3. RÉSULTAT OMP final (formule alignée avec Pilote Date / Bilan AMH) ===
+    // RÉSULTAT BRUT = RECETTE HT − MONTANT CNM − DROITS − DÉPENSES + DL HT GLOBALE + DROIT AU TIRAGE
+    var resultatBrut = recHT2 - montantCNM - droitsTotal - sumFin + dlHT + droitTirage;
+    // RÉSULTAT OMP = RÉSULTAT BRUT × % deal OMP (ici pctOMP/100)
+    var resultatOMP = resultatBrut * (pctOMP / 100);
 
     return {
       recTTC: recTotal,
