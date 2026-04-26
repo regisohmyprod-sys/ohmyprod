@@ -140,7 +140,6 @@
   body.role-not-admin #page-bilan-amh,
   body.role-not-admin #page-fiche-billetterie,
   body.role-not-admin #page-tournees,
-  body.role-not-admin #page-date-dynamic,
   body.role-not-admin #page-gestion-salles,
   body.role-not-admin #page-equipe,
   body.role-not-admin #page-contacts-promo,
@@ -5099,7 +5098,7 @@ function _hideTeamSelection() {
         </label>
       </div>
 
-      <div id="dyn-date-admin-actions" style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px;">
+      <div id="dyn-date-admin-actions" class="vhr-admin-action" style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px;">
         <button class="btn" id="dyn-modifier-btn" style="background:var(--card); color:var(--white); font-size:12px; border:1px solid var(--border);" onclick="ouvrirModifierDate()">✏️ Modifier la fiche</button>
         <button class="btn" id="dyn-delete-btn" style="background:#7f1d1d; color:#fff; font-size:12px; border:1px solid #ef4444;" onclick="supprimerDate()">🗑️ Supprimer cette date</button>
       </div>
