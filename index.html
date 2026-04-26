@@ -2506,6 +2506,118 @@
 html, body { overscroll-behavior-y: none; }
 
 /* ==========================================================
+   📱 FIX MOBILE — SAMSUNG ANDROID & autres
+   But : régler le bug "scroll qui scrolle puis fige"
+         Cause = débordement horizontal d'éléments qui transforme
+         le geste vertical en pan horizontal et bloque le scroll natif.
+   ========================================================== */
+@media (max-width: 768px) {
+  /* 1. Tuer tout débordement horizontal au niveau document */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+  }
+  .main, .content {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  .page {
+    max-width: 100% !important;
+  }
+
+  /* 2. Tableaux qui débordent (Fiche Dépenses OMP/Promoteur, Invitations…)
+        → scroll horizontal LOCAL au tableau, pas au document */
+  .page table {
+    max-width: 100% !important;
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  /* Exception : tables structurelles qui ne doivent surtout pas devenir block */
+  .page table.no-mobile-block,
+  .billetterie-table {
+    display: table !important;
+    overflow: visible !important;
+  }
+
+  /* 3. Titres FICHE XXX (Bebas Neue) trop grands sur mobile */
+  .page-title-bebas,
+  div[style*="font-family:'Bebas Neue'"][style*="font-size:32px"],
+  div[style*="font-family:'Bebas Neue'"][style*="font-size: 32px"] {
+    font-size: 22px !important;
+    line-height: 1.05 !important;
+  }
+
+  /* 4. Cartes statistiques (BILLETS VENDUS, INVITATIONS, TOTAL JAUGE) trop hautes
+        → grille 3 colonnes serrées pour voir les 3 d'un coup */
+  .billet-stats-grid,
+  .stats-3-cards {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+  }
+  .billet-stats-grid > div,
+  .stats-3-cards > div {
+    padding: 8px 4px !important;
+  }
+  .billet-stats-grid > div > div:first-child,
+  .stats-3-cards > div > div:first-child {
+    font-size: 9px !important;
+  }
+  .billet-stats-grid > div > div:last-child,
+  .stats-3-cards > div > div:last-child {
+    font-size: 22px !important;
+  }
+
+  /* 5. Boutons header de fiche (BILLETTERIE / DÉPENSES / CLÔTURE / DÉCLA / BILAN)
+        → scroll horizontal propre, plus serrés */
+  .modules-buttons-row,
+  .fiche-modules-row {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 4px !important;
+  }
+  .modules-buttons-row > *,
+  .fiche-modules-row > * {
+    flex-shrink: 0 !important;
+    scroll-snap-align: start;
+  }
+
+  /* 6. Cartes du Planning Tour (AIX EN PROVENCE, etc.) qui débordent à droite */
+  .dates-scroll {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .tournee-item, .date-card {
+    max-width: 100% !important;
+  }
+
+  /* 7. Boutons filtres "À venir / Toutes / Passées" — fix style fond blanc */
+  .filter-btns button,
+  .filter-btns > button {
+    background: #1a1a1a !important;
+    color: #c9a84c !important;
+    border: 1px solid #c9a84c !important;
+    font-family: 'Bebas Neue', sans-serif !important;
+    letter-spacing: 0.5px !important;
+  }
+  .filter-btns button.active,
+  .filter-btns > button.active {
+    background: #c9a84c !important;
+    color: #000 !important;
+  }
+
+  /* 8. Tout div/section qui pourrait dépasser la largeur viewport */
+  .page > div,
+  .page > section {
+    max-width: 100% !important;
+  }
+}
+
+/* ==========================================================
    BLOC D — TOASTS (remplace alert)
    ========================================================== */
 .omp-toast-container {
