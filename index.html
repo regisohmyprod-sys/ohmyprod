@@ -2538,6 +2538,55 @@ html, body { overscroll-behavior-y: none; }
     font-size: 22px !important;
     line-height: 1.05 !important;
   }
+
+  /* 4. Header VHR — VOYAGES · HÉBERGEMENT · RESSOURCES
+        → titre plus petit, boutons compacts pour qu'ils tiennent sur la ligne */
+  #page-date-dynamic [style*="background:linear-gradient(135deg,#1e3a5f"] > div:first-child,
+  #page-date-dynamic [style*="linear-gradient(135deg,#1e3a5f,#1565c0)"] > div:first-child {
+    font-size: 13px !important;
+    letter-spacing: 1px !important;
+    line-height: 1.15 !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  #page-date-dynamic button[onclick="ouvrirCarteDepuisEspace()"],
+  #page-date-dynamic #btn-toggle-vhr {
+    font-size: 9px !important;
+    padding: 4px 8px !important;
+    letter-spacing: 0.5px !important;
+    flex-shrink: 0 !important;
+  }
+  /* Le conteneur des boutons aussi : gap réduit */
+  #page-date-dynamic [style*="linear-gradient(135deg,#1e3a5f,#1565c0)"] > div:last-child {
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 5. Textarea + boutons formulaire INFOS IMPORTANTES qui débordent */
+  #page-date-dynamic .info-new-msg-textarea,
+  #page-date-dynamic .info-new-msg textarea,
+  #page-date-dynamic .info-new-msg input,
+  #page-date-dynamic .info-new-msg select,
+  #page-date-dynamic .info-new-msg button {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  #page-date-dynamic .info-new-msg-row {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  #dyn-infos-container,
+  #dyn-commentaire-container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 6. Sécurité globale : tous les textareas/inputs/selects respectent leur parent */
+  textarea, input, select {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }
 
 /* ==========================================================
