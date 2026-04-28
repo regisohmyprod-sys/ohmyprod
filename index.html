@@ -18911,21 +18911,41 @@ function _hideTeamSelection() {
    * Retourne un objet : { jourBucket: pctMedian } pour les buckets J-90, J-60, J-30, J-15, J-7, J-3, J-0
    * Plus le nombre de dates utilisées dans la calibration (pour transparence).
    */
+  // ============================================================
+  // 🎯 FAMILLES DE TOURNÉES — agrégation de l'historique pour calibration
+  // TWOQ original + Éternelle Légende = même famille (même show, même fanbase)
+  // Greg Petras = famille distincte
+  // ============================================================
+  var TWOQ_ID = '11111111-1111-1111-1111-111111111111';
+  var ETERNELLE_ID = '22222222-2222-2222-2222-222222222222';
+  var GREG_ID = '33333333-3333-3333-3333-333333333333';
+  
+  function _projObtenirFamilleTournees(tourneeId) {
+    // Pour TWOQ ou Éternelle Légende → on agrège les 2 (même show, même artiste)
+    if (tourneeId === TWOQ_ID || tourneeId === ETERNELLE_ID) {
+      return [TWOQ_ID, ETERNELLE_ID];
+    }
+    // Greg Petras → seul (show différent, public différent)
+    return [tourneeId];
+  }
+
   async function _projCalculerCourbeTypeTournee(tourneeId) {
     if (!tourneeId) return null;
-    if (_projCacheCourbe[tourneeId]) return _projCacheCourbe[tourneeId];
+    // Cache basé sur la famille (TWOQ et Éternelle partagent le même cache)
+    var familleKey = _projObtenirFamilleTournees(tourneeId).join('|');
+    if (_projCacheCourbe[familleKey]) return _projCacheCourbe[familleKey];
 
     try {
-      // 1. Charger les dates ÉLIGIBLES de la tournée (passées, en partage, pas import_historique)
+      // 1. Charger les dates ÉLIGIBLES de la FAMILLE de tournées
       var todayISO = new Date().toISOString().split('T')[0];
-      console.log('🤖 DEBUG - Tournée recherchée:', tourneeId, '| Date pivot:', todayISO);
+      var famille = _projObtenirFamilleTournees(tourneeId);
+      console.log('🤖 DEBUG - Tournée recherchée:', tourneeId, '| Famille:', famille, '| Date pivot:', todayISO);
       
-      // ⚠️ DEBUG : on charge d'abord SANS filtre pour comprendre
       var rDatesAll = await _supabase
         .from('dates_concert')
         .select('id, date_concert, ville, import_historique, import_billets, tournee_id')
-        .eq('tournee_id', tourneeId);
-      console.log('🤖 DEBUG - Total dates tournée (tous statuts confondus):', (rDatesAll.data || []).length);
+        .in('tournee_id', famille);
+      console.log('🤖 DEBUG - Total dates famille (tous statuts confondus):', (rDatesAll.data || []).length);
       if (rDatesAll.error) console.error('🤖 DEBUG - Erreur requête dates:', rDatesAll.error);
       
       // Filtrage manuel pour traquer ce qui se passe
@@ -19058,7 +19078,7 @@ function _hideTeamSelection() {
         nbDatesUtilisees: nbDatesUtilisees,
         nbDatesTotales: datesEligibles.length
       };
-      _projCacheCourbe[tourneeId] = resultat;
+      _projCacheCourbe[familleKey] = resultat;
       console.log('🤖 Courbe-type calibrée pour tournée', tourneeId, ':', resultat);
       return resultat;
     } catch (err) {
