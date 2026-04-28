@@ -18923,7 +18923,7 @@ function _hideTeamSelection() {
       // ⚠️ DEBUG : on charge d'abord SANS filtre pour comprendre
       var rDatesAll = await _supabase
         .from('dates_concert')
-        .select('id, date_concert, ville, import_historique, tournee_id')
+        .select('id, date_concert, ville, import_historique, import_billets, tournee_id')
         .eq('tournee_id', tourneeId);
       console.log('🤖 DEBUG - Total dates tournée (tous statuts confondus):', (rDatesAll.data || []).length);
       if (rDatesAll.error) console.error('🤖 DEBUG - Erreur requête dates:', rDatesAll.error);
@@ -18936,10 +18936,13 @@ function _hideTeamSelection() {
       });
       console.log('🤖 DEBUG - Dates passées:', datesPassees.length);
       
+      // ✨ FILTRE CORRIGÉ : on exclut UNIQUEMENT les dates en vente (= avec import_billets rempli).
+      // Les dates en partage back-fillées via le bouton "Import historique" ont import_historique=true
+      // mais import_billets=null → elles sont ÉLIGIBLES pour la calibration.
       var datesEligibles = datesPassees.filter(function(d) {
-        return d.import_historique !== true;
+        return d.import_billets === null || d.import_billets === undefined;
       });
-      console.log('🤖 DEBUG - Dates éligibles (passées + pas import_historique):', datesEligibles.length);
+      console.log('🤖 DEBUG - Dates éligibles (passées + pas en vente):', datesEligibles.length);
       
       var rDates = { data: datesEligibles, error: null };
 
@@ -19107,10 +19110,10 @@ function _hideTeamSelection() {
 
     try {
       // Récupérer la tournée de la date ouverte
-      var rD = await _supabase.from('dates_concert').select('tournee_id, import_historique').eq('id', dateId).single();
+      var rD = await _supabase.from('dates_concert').select('tournee_id, import_billets').eq('id', dateId).single();
       if (rD.error || !rD.data) { rowEl.style.display = 'none'; return; }
-      // Si la date courante est elle-même import_historique=true, le boost auto ne s'applique pas
-      if (rD.data.import_historique === true) { rowEl.style.display = 'none'; return; }
+      // Si la date courante est une date EN VENTE (import_billets rempli), boost auto inutile
+      if (rD.data.import_billets !== null && rD.data.import_billets !== undefined) { rowEl.style.display = 'none'; return; }
 
       var resultat = await _projCalculerCourbeTypeTournee(rD.data.tournee_id);
       if (!resultat || !resultat.courbe || Object.keys(resultat.courbe).length < 2) {
