@@ -10,7 +10,7 @@
 <!-- Désactiver le cache navigateur -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0"> 
+<meta http-equiv="Expires" content="0">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/jpeg" href="assets/omp-icon-200.jpg">
 <!-- 🗺️ Leaflet pour les cartes (OpenStreetMap, gratuit, sans clé API) -->
@@ -18774,7 +18774,7 @@ function _hideTeamSelection() {
 
         // 🤖 Boost Auto : marche même sans snapshot sur la date courante,
         // tant qu'il y a déjà des ventes en billetterie + un historique tournée
-        var dateConcertStr2 = document.getElementById('fp-date')?.value || document.getElementById('pilote-date')?.getAttribute('data-date');
+        var dateConcertStr2 = document.getElementById('fp-date-concert')?.value || document.getElementById('pilote-date')?.getAttribute('data-date');
         var joursRestants2 = 0;
         if (dateConcertStr2) {
           var dC2 = new Date(dateConcertStr2 + (dateConcertStr2.includes('T') ? '' : 'T00:00:00'));
@@ -18821,7 +18821,7 @@ function _hideTeamSelection() {
       var tendance = moy7j * 0.7 + moy30j * 0.3;
 
       // 3. Jours restants jusqu'au concert
-      var dateConcertStr = document.getElementById('fp-date')?.value || document.getElementById('pilote-date')?.getAttribute('data-date');
+      var dateConcertStr = document.getElementById('fp-date-concert')?.value || document.getElementById('pilote-date')?.getAttribute('data-date');
       var joursRestants = 0;
       if (dateConcertStr) {
         var dConcert = new Date(dateConcertStr + (dateConcertStr.includes('T') ? '' : 'T00:00:00'));
@@ -19546,7 +19546,7 @@ function _hideTeamSelection() {
       }
 
       var projectionTotal = _projParseNombre(document.getElementById('pilote-proj-total')?.textContent || '');
-      var dateConcertStr = document.getElementById('fp-date')?.value || '';
+      var dateConcertStr = document.getElementById('fp-date-concert')?.value || '';
       var dConcert = dateConcertStr ? new Date(dateConcertStr + 'T00:00:00') : null;
       var jauge = parseInt(document.getElementById('fp-jauge-finale')?.value) || 0;
 
