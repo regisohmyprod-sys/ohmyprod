@@ -1,4 +1,3 @@
- <!-- v2 boost auto -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -18969,7 +18968,7 @@ function _hideTeamSelection() {
 
       datesEligibles.forEach(function(d) {
         var snaps = snapsParDate[d.id];
-        if (!snaps || snaps.length < 3) return;
+        if (!snaps || snaps.length < 2) return;
 
         // Le total final = max des cumuls (sécurité au cas où le dernier snapshot ne soit pas le max)
         var totalFinal = 0;
@@ -18988,8 +18987,8 @@ function _hideTeamSelection() {
             var joursAvant = Math.round((dateConcert - dSnap) / 86400000);
             if (joursAvant < 0) return; // snapshot après concert (ne devrait pas arriver, sécurité)
             var ecart = Math.abs(joursAvant - joursCible);
-            // Tolérance : ±5j pour les buckets ≥30, ±2j pour les courts
-            var tolerance = joursCible >= 30 ? 5 : 2;
+            // Tolérance large pour absorber les bordereaux à fréquence irrégulière
+            var tolerance = joursCible >= 60 ? 15 : (joursCible >= 30 ? 10 : (joursCible >= 7 ? 4 : 2));
             if (ecart <= tolerance && ecart < meilleurEcart) {
               meilleurEcart = ecart;
               meilleurSnap = s;
@@ -19011,13 +19010,16 @@ function _hideTeamSelection() {
       }
 
       var courbe = {};
+      var diagnostic = {};
       buckets.forEach(function(j) {
         var med = mediane(pctParBucket[j]);
-        // Garde-fou : ne retient que si on a au moins 5 dates dans le bucket
-        if (med !== null && pctParBucket[j].length >= 5) {
+        diagnostic['J-' + j] = pctParBucket[j].length + ' dates';
+        // Garde-fou : ne retient que si on a au moins 3 dates dans le bucket
+        if (med !== null && pctParBucket[j].length >= 3) {
           courbe[j] = med;
         }
       });
+      console.log('🤖 Diagnostic buckets pour tournée', tourneeId, ':', diagnostic);
 
       // J-0 doit être 100% par définition (sinon c'est qu'on a peu de derniers snapshots)
       if (!courbe[0] || courbe[0] < 0.95) courbe[0] = 1.0;
