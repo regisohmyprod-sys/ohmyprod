@@ -4470,6 +4470,7 @@ function _hideTeamSelection() {
               <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:700;">TENDANCE</td><td id="pilote-tendance" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">N° Jours restants</td><td id="pilote-jours-restants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Projection payants</td><td id="pilote-proj-payants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+              <tr id="pilote-boost-auto-row" style="border-bottom:1px solid #2a2a2a;background:rgba(34,197,94,0.08);display:none;"><td style="padding:7px 16px;color:#22c55e;font-weight:600;">🤖 BOOST AUTO (suggéré) <span id="pilote-boost-auto-info" style="font-size:10px;color:#888;font-weight:400;"></span></td><td style="padding:4px 16px;text-align:right;"><span id="pilote-boost-auto-val" style="color:#22c55e;font-weight:700;font-size:13px;margin-right:8px;">—</span><button id="pilote-btn-appliquer-boost" onclick="projAppliquerBoostAuto()" style="background:#22c55e;color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Appliquer</button></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);"><td style="padding:7px 16px;color:#c9a84c;font-weight:600;">🎯 BOOST BONUS (manuel)</td><td style="padding:4px 16px;text-align:right;"><input id="pilote-boost-bonus" type="number" placeholder="0" oninput="projChangeBoost()" onchange="projChangeBoost()" style="width:80px;background:#0a0a0a;border:1px solid #c9a84c;border-radius:6px;color:#c9a84c;padding:4px 8px;font-size:13px;font-weight:600;text-align:right;font-family:'Inter',sans-serif;"></td></tr>
               <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:7px 16px;color:#c9a84c;">% de remplissage (projection)</td><td id="pilote-remplissage-projection" style="padding:7px 16px;color:#c9a84c;font-weight:700;text-align:right;"></td></tr>
               <tr style="background:rgba(239,68,68,0.15);"><td style="padding:7px 16px;color:#fff;font-weight:700;">Projection total</td><td id="pilote-proj-total" style="padding:7px 16px;color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:900;text-align:right;"></td></tr>
@@ -18865,10 +18866,250 @@ function _hideTeamSelection() {
       setTimeout(function(){ projAfficherBlocFinancier(); }, 100);
       // 📈 Déclencher le graphique une fois la projection calculée
       setTimeout(function(){ projAfficherGraphique(dateId); }, 200);
+      // 🤖 Déclencher le calcul du Boost Auto (V1)
+      setTimeout(function(){ projCalculerEtAfficherBoostAuto(dateId, totalActuel, projectionPayants, joursRestants); }, 300);
     } catch (err) {
       console.error('❌ Erreur affichage projection :', err);
     }
   }
+
+  // ============================================================
+  // 🤖 BOOST AUTO V1 — courbe-type calibrée sur historique tournée
+  // Filtre : import_historique != true, date passée, ≥ 3 snapshots
+  // ============================================================
+
+  // Cache courbe-type par tournee_id (évite recalcul à chaque ouverture de fiche)
+  var _projCacheCourbe = {};
+
+  /**
+   * Calcule la courbe-type d'une tournée à partir de toutes ses dates passées éligibles.
+   * Retourne un objet : { jourBucket: pctMedian } pour les buckets J-90, J-60, J-30, J-15, J-7, J-3, J-0
+   * Plus le nombre de dates utilisées dans la calibration (pour transparence).
+   */
+  async function _projCalculerCourbeTypeTournee(tourneeId) {
+    if (!tourneeId) return null;
+    if (_projCacheCourbe[tourneeId]) return _projCacheCourbe[tourneeId];
+
+    try {
+      // 1. Charger les dates ÉLIGIBLES de la tournée (passées, en partage, pas import_historique)
+      var todayISO = new Date().toISOString().split('T')[0];
+      var rDates = await _supabase
+        .from('dates_concert')
+        .select('id, date_concert, ville, import_historique')
+        .eq('tournee_id', tourneeId)
+        .lt('date_concert', todayISO);
+
+      if (rDates.error || !rDates.data) {
+        console.warn('⚠️ Boost auto : impossible de charger les dates :', rDates.error);
+        return null;
+      }
+
+      // Filtrer : exclure les dates en vente (import_historique = true)
+      var datesEligibles = rDates.data.filter(function(d) {
+        return d.import_historique !== true;
+      });
+
+      if (datesEligibles.length === 0) {
+        console.log('🤖 Boost auto : aucune date éligible pour la tournée', tourneeId);
+        return null;
+      }
+
+      // 2. Charger les snapshots de chaque date éligible
+      var dateIds = datesEligibles.map(function(d) { return d.id; });
+      var rSnaps = await _supabase
+        .from('ventes_snapshots')
+        .select('date_id, snapshot_date, total_cumul')
+        .in('date_id', dateIds)
+        .order('snapshot_date', { ascending: true });
+
+      if (rSnaps.error || !rSnaps.data) {
+        console.warn('⚠️ Boost auto : impossible de charger snapshots :', rSnaps.error);
+        return null;
+      }
+
+      // 3. Grouper par date_id
+      var snapsParDate = {};
+      rSnaps.data.forEach(function(s) {
+        if (!snapsParDate[s.date_id]) snapsParDate[s.date_id] = [];
+        snapsParDate[s.date_id].push(s);
+      });
+
+      // 4. Pour chaque date avec au moins 3 snapshots, normaliser en (jour_avant, % du final)
+      // Buckets : J-90, J-60, J-30, J-15, J-7, J-3, J-0
+      var buckets = [90, 60, 30, 15, 7, 3, 0];
+      var pctParBucket = {}; // { 90: [pct1, pct2, ...], 60: [...], ... }
+      buckets.forEach(function(j) { pctParBucket[j] = []; });
+      var nbDatesUtilisees = 0;
+
+      datesEligibles.forEach(function(d) {
+        var snaps = snapsParDate[d.id];
+        if (!snaps || snaps.length < 3) return;
+
+        // Le total final = max des cumuls (sécurité au cas où le dernier snapshot ne soit pas le max)
+        var totalFinal = 0;
+        snaps.forEach(function(s) { if (s.total_cumul > totalFinal) totalFinal = s.total_cumul; });
+        if (totalFinal <= 0) return;
+
+        nbDatesUtilisees++;
+        var dateConcert = new Date(d.date_concert + 'T00:00:00');
+
+        // Pour chaque bucket, chercher le snapshot le plus proche en jours_avant
+        buckets.forEach(function(joursCible) {
+          var meilleurSnap = null;
+          var meilleurEcart = 999;
+          snaps.forEach(function(s) {
+            var dSnap = new Date(s.snapshot_date + 'T00:00:00');
+            var joursAvant = Math.round((dateConcert - dSnap) / 86400000);
+            if (joursAvant < 0) return; // snapshot après concert (ne devrait pas arriver, sécurité)
+            var ecart = Math.abs(joursAvant - joursCible);
+            // Tolérance : ±5j pour les buckets ≥30, ±2j pour les courts
+            var tolerance = joursCible >= 30 ? 5 : 2;
+            if (ecart <= tolerance && ecart < meilleurEcart) {
+              meilleurEcart = ecart;
+              meilleurSnap = s;
+            }
+          });
+          if (meilleurSnap) {
+            var pct = meilleurSnap.total_cumul / totalFinal;
+            pctParBucket[joursCible].push(pct);
+          }
+        });
+      });
+
+      // 5. Médiane par bucket (plus robuste que moyenne aux valeurs aberrantes)
+      function mediane(arr) {
+        if (arr.length === 0) return null;
+        var s = arr.slice().sort(function(a,b){ return a-b; });
+        var m = Math.floor(s.length / 2);
+        return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2;
+      }
+
+      var courbe = {};
+      buckets.forEach(function(j) {
+        var med = mediane(pctParBucket[j]);
+        // Garde-fou : ne retient que si on a au moins 5 dates dans le bucket
+        if (med !== null && pctParBucket[j].length >= 5) {
+          courbe[j] = med;
+        }
+      });
+
+      // J-0 doit être 100% par définition (sinon c'est qu'on a peu de derniers snapshots)
+      if (!courbe[0] || courbe[0] < 0.95) courbe[0] = 1.0;
+
+      var resultat = {
+        courbe: courbe,
+        nbDatesUtilisees: nbDatesUtilisees,
+        nbDatesTotales: datesEligibles.length
+      };
+      _projCacheCourbe[tourneeId] = resultat;
+      console.log('🤖 Courbe-type calibrée pour tournée', tourneeId, ':', resultat);
+      return resultat;
+    } catch (err) {
+      console.error('❌ Erreur calcul courbe-type :', err);
+      return null;
+    }
+  }
+
+  /**
+   * Interpole la courbe-type pour un nombre de jours restants donné.
+   * Retourne le % du final attendu (entre 0 et 1).
+   */
+  function _projInterpolerCourbe(courbe, joursRestants) {
+    var buckets = Object.keys(courbe).map(Number).sort(function(a,b){ return b-a; }); // [90,60,30,15,7,3,0]
+    if (buckets.length < 2) return null;
+    if (joursRestants >= buckets[0]) return courbe[buckets[0]]; // au-delà du plus grand bucket
+    if (joursRestants <= 0) return courbe[0] || 1.0;
+
+    // Trouver l'encadrement
+    for (var i = 0; i < buckets.length - 1; i++) {
+      var jHaut = buckets[i];   // ex 30
+      var jBas = buckets[i+1];  // ex 15
+      if (joursRestants <= jHaut && joursRestants >= jBas) {
+        var pHaut = courbe[jHaut];
+        var pBas = courbe[jBas];
+        // Interpolation linéaire (jHaut → pHaut, jBas → pBas)
+        var ratio = (jHaut - joursRestants) / (jHaut - jBas);
+        return pHaut + (pBas - pHaut) * ratio;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Affiche le BOOST AUTO suggéré dans Pilote Date.
+   * Calculé via : courbe-type tournée → projection-cible → écart vs projection linéaire.
+   */
+  async function projCalculerEtAfficherBoostAuto(dateId, totalActuel, projectionPayants, joursRestants) {
+    var rowEl = document.getElementById('pilote-boost-auto-row');
+    var valEl = document.getElementById('pilote-boost-auto-val');
+    var infoEl = document.getElementById('pilote-boost-auto-info');
+    if (!rowEl || !valEl) return;
+
+    // Date passée → masquer
+    if (joursRestants <= 0 || totalActuel <= 0) {
+      rowEl.style.display = 'none';
+      return;
+    }
+
+    try {
+      // Récupérer la tournée de la date ouverte
+      var rD = await _supabase.from('dates_concert').select('tournee_id, import_historique').eq('id', dateId).single();
+      if (rD.error || !rD.data) { rowEl.style.display = 'none'; return; }
+      // Si la date courante est elle-même import_historique=true, le boost auto ne s'applique pas
+      if (rD.data.import_historique === true) { rowEl.style.display = 'none'; return; }
+
+      var resultat = await _projCalculerCourbeTypeTournee(rD.data.tournee_id);
+      if (!resultat || !resultat.courbe || Object.keys(resultat.courbe).length < 2) {
+        valEl.textContent = '—';
+        infoEl.textContent = '(historique tournée insuffisant)';
+        rowEl.style.display = 'table-row';
+        return;
+      }
+
+      var pctAttendu = _projInterpolerCourbe(resultat.courbe, joursRestants);
+      if (!pctAttendu || pctAttendu <= 0) {
+        valEl.textContent = '—';
+        infoEl.textContent = '(impossible d\'interpoler)';
+        rowEl.style.display = 'table-row';
+        return;
+      }
+
+      var projectionCible = totalActuel / pctAttendu;
+      var boostAuto = Math.round(projectionCible - projectionPayants);
+
+      // On limite : le boost auto ne peut pas être négatif (sécurité)
+      if (boostAuto < 0) boostAuto = 0;
+
+      // Stocker pour le bouton "Appliquer"
+      window._projBoostAutoSuggere = boostAuto;
+
+      valEl.textContent = boostAuto.toLocaleString('fr-FR');
+      infoEl.textContent = '(calibré sur ' + resultat.nbDatesUtilisees + ' dates · J-' + joursRestants + ' = ' + Math.round(pctAttendu * 100) + '% du final attendu)';
+      rowEl.style.display = 'table-row';
+    } catch (err) {
+      console.error('❌ Erreur affichage boost auto :', err);
+      rowEl.style.display = 'none';
+    }
+  }
+
+  /**
+   * Bouton "Appliquer" : copie la valeur du boost auto dans le champ manuel.
+   */
+  function projAppliquerBoostAuto() {
+    var val = window._projBoostAutoSuggere;
+    if (val === null || val === undefined) return;
+    var input = document.getElementById('pilote-boost-bonus');
+    if (input) {
+      input.value = val;
+      // Déclencher le recalcul + sauvegarde
+      projChangeBoost();
+    }
+  }
+
+  // Exposition globale
+  window._projCalculerCourbeTypeTournee = _projCalculerCourbeTypeTournee;
+  window.projCalculerEtAfficherBoostAuto = projCalculerEtAfficherBoostAuto;
+  window.projAppliquerBoostAuto = projAppliquerBoostAuto;
 
   // ============================================================
   // 📥 IMPORT HISTORIQUE EXCEL
