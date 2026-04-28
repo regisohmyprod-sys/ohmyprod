@@ -18956,13 +18956,12 @@ function _hideTeamSelection() {
       });
       console.log('🤖 DEBUG - Dates passées:', datesPassees.length);
       
-      // ✨ FILTRE CORRIGÉ : on exclut UNIQUEMENT les dates en vente (= avec import_billets rempli).
-      // Les dates en partage back-fillées via le bouton "Import historique" ont import_historique=true
-      // mais import_billets=null → elles sont ÉLIGIBLES pour la calibration.
-      var datesEligibles = datesPassees.filter(function(d) {
-        return d.import_billets === null || d.import_billets === undefined;
-      });
-      console.log('🤖 DEBUG - Dates éligibles (passées + pas en vente):', datesEligibles.length);
+      // ✨ FILTRE FINAL : on prend TOUTES les dates passées.
+      // Le vrai filtre se fait plus bas via la présence de snapshots dans ventes_snapshots.
+      // Une date sans snapshot est exclue automatiquement (rien à calibrer).
+      // Les dates en vente sans snapshots seront naturellement écartées.
+      var datesEligibles = datesPassees;
+      console.log('🤖 DEBUG - Dates éligibles (toutes passées, filtrage par snapshots):', datesEligibles.length);
       
       var rDates = { data: datesEligibles, error: null };
 
@@ -19129,11 +19128,9 @@ function _hideTeamSelection() {
     }
 
     try {
-      // Récupérer la tournée de la date ouverte
-      var rD = await _supabase.from('dates_concert').select('tournee_id, import_billets').eq('id', dateId).single();
+      // Récupérer la tournée de la date ouverte (pas de filtre d'exclusion ici, on affiche le boost partout)
+      var rD = await _supabase.from('dates_concert').select('tournee_id').eq('id', dateId).single();
       if (rD.error || !rD.data) { rowEl.style.display = 'none'; return; }
-      // Si la date courante est une date EN VENTE (import_billets rempli), boost auto inutile
-      if (rD.data.import_billets !== null && rD.data.import_billets !== undefined) { rowEl.style.display = 'none'; return; }
 
       var resultat = await _projCalculerCourbeTypeTournee(rD.data.tournee_id);
       if (!resultat || !resultat.courbe || Object.keys(resultat.courbe).length < 2) {
