@@ -18918,21 +18918,37 @@ function _hideTeamSelection() {
     try {
       // 1. Charger les dates ÉLIGIBLES de la tournée (passées, en partage, pas import_historique)
       var todayISO = new Date().toISOString().split('T')[0];
-      var rDates = await _supabase
+      console.log('🤖 DEBUG - Tournée recherchée:', tourneeId, '| Date pivot:', todayISO);
+      
+      // ⚠️ DEBUG : on charge d'abord SANS filtre pour comprendre
+      var rDatesAll = await _supabase
         .from('dates_concert')
-        .select('id, date_concert, ville, import_historique')
-        .eq('tournee_id', tourneeId)
-        .lt('date_concert', todayISO);
+        .select('id, date_concert, ville, import_historique, tournee_id')
+        .eq('tournee_id', tourneeId);
+      console.log('🤖 DEBUG - Total dates tournée (tous statuts confondus):', (rDatesAll.data || []).length);
+      if (rDatesAll.error) console.error('🤖 DEBUG - Erreur requête dates:', rDatesAll.error);
+      
+      // Filtrage manuel pour traquer ce qui se passe
+      var allDates = rDatesAll.data || [];
+      var datesPassees = allDates.filter(function(d) {
+        var dStr = (d.date_concert || '').substring(0, 10);
+        return dStr < todayISO;
+      });
+      console.log('🤖 DEBUG - Dates passées:', datesPassees.length);
+      
+      var datesEligibles = datesPassees.filter(function(d) {
+        return d.import_historique !== true;
+      });
+      console.log('🤖 DEBUG - Dates éligibles (passées + pas import_historique):', datesEligibles.length);
+      
+      var rDates = { data: datesEligibles, error: null };
 
       if (rDates.error || !rDates.data) {
         console.warn('⚠️ Boost auto : impossible de charger les dates :', rDates.error);
         return null;
       }
 
-      // Filtrer : exclure les dates en vente (import_historique = true)
-      var datesEligibles = rDates.data.filter(function(d) {
-        return d.import_historique !== true;
-      });
+      // (Filtrage déjà fait ci-dessus, on reprend datesEligibles directement)
 
       if (datesEligibles.length === 0) {
         console.log('🤖 Boost auto : aucune date éligible pour la tournée', tourneeId);
@@ -18941,11 +18957,13 @@ function _hideTeamSelection() {
 
       // 2. Charger les snapshots de chaque date éligible
       var dateIds = datesEligibles.map(function(d) { return d.id; });
+      console.log('🤖 DEBUG - Tentative chargement snapshots pour', dateIds.length, 'dates');
       var rSnaps = await _supabase
         .from('ventes_snapshots')
         .select('date_id, snapshot_date, total_cumul')
         .in('date_id', dateIds)
         .order('snapshot_date', { ascending: true });
+      console.log('🤖 DEBUG - Snapshots reçus:', (rSnaps.data || []).length);
 
       if (rSnaps.error || !rSnaps.data) {
         console.warn('⚠️ Boost auto : impossible de charger snapshots :', rSnaps.error);
@@ -18958,6 +18976,14 @@ function _hideTeamSelection() {
         if (!snapsParDate[s.date_id]) snapsParDate[s.date_id] = [];
         snapsParDate[s.date_id].push(s);
       });
+      console.log('🤖 DEBUG - Dates avec au moins 1 snapshot:', Object.keys(snapsParDate).length);
+      
+      // Combien ont >= 2 snapshots
+      var datesAvecAssezSnaps = 0;
+      Object.keys(snapsParDate).forEach(function(k) {
+        if (snapsParDate[k].length >= 2) datesAvecAssezSnaps++;
+      });
+      console.log('🤖 DEBUG - Dates avec ≥2 snapshots (seuil min):', datesAvecAssezSnaps);
 
       // 4. Pour chaque date avec au moins 3 snapshots, normaliser en (jour_avant, % du final)
       // Buckets : J-90, J-60, J-30, J-15, J-7, J-3, J-0
