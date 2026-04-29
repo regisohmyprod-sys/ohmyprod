@@ -19800,6 +19800,12 @@ function _hideTeamSelection() {
     if (!texte || !texte.trim()) return { lignes: [], erreurs: ['Aucune donnée'] };
     var lignes = [];
     var erreurs = [];
+    // Nettoyer les espaces insécables (Excel les utilise parfois pour les milliers : "1 781" ≠ espace normal)
+    function nettoyerNombre(txt) {
+      if (!txt) return '';
+      // Replace tous types d'espaces (normal, insécable, fine, etc.) par rien
+      return String(txt).replace(/[\s\u00A0\u202F\u2007\u2009]/g, '').replace(/[+]/g, '');
+    }
     var lignesTexte = texte.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
     lignesTexte.forEach(function(ligne, idx) {
       if (/date.*pointage|état.*précédent|ventes.*ce.*jour|progression/i.test(ligne)) return;
@@ -19807,10 +19813,14 @@ function _hideTeamSelection() {
       if (cols.length < 3) { erreurs.push('Ligne ' + (idx+1) + ' ignorée : pas assez de colonnes'); return; }
       var dateParsed = _projParserDateFR(cols[0]);
       if (!dateParsed) { erreurs.push('Ligne ' + (idx+1) + ' : date invalide "' + cols[0] + '"'); return; }
-      var etatPrec = parseInt((cols[1] || '0').replace(/\s/g, '')) || 0;
-      var totalCumul = parseInt((cols[2] || '0').replace(/\s/g, '')) || 0;
-      var progression = cols[3] ? parseInt((cols[3] || '0').replace(/[\s+]/g, '')) : (totalCumul - etatPrec);
-      if (isNaN(totalCumul)) { erreurs.push('Ligne ' + (idx+1) + ' : total cumul invalide'); return; }
+      var etatPrec = parseInt(nettoyerNombre(cols[1] || '0')) || 0;
+      var totalCumul = parseInt(nettoyerNombre(cols[2] || '0'));
+      var progression = cols[3] ? parseInt(nettoyerNombre(cols[3])) : (totalCumul - etatPrec);
+      if (isNaN(totalCumul)) {
+        erreurs.push('Ligne ' + (idx+1) + ' : total cumul invalide "' + cols[2] + '"');
+        totalCumul = 0;
+      }
+      if (isNaN(progression)) progression = 0;
       lignes.push({
         snapshot_date: dateParsed,
         etat_precedent: etatPrec,
@@ -19818,6 +19828,14 @@ function _hideTeamSelection() {
         progression: progression
       });
     });
+
+    // ⚠️ DÉTECTION CRITIQUE : si tous les cumuls sont à 0, c'est probablement un mauvais ordre de colonnes
+    if (lignes.length >= 3) {
+      var cumulMax = Math.max.apply(null, lignes.map(function(l) { return l.total_cumul; }));
+      if (cumulMax === 0) {
+        erreurs.push('🚨 ALERTE : tous les cumuls sont à 0 ! Vérifie l\'ordre des colonnes : Date | État précédent | CUMUL | Progression. Le cumul (col 3) doit monter de 0 à plusieurs milliers.');
+      }
+    }
     return { lignes: lignes, erreurs: erreurs };
   }
 
@@ -19856,7 +19874,15 @@ function _hideTeamSelection() {
     var texte = document.getElementById('import-histo-data').value;
     var parsed = _projParserHisto(texte);
     if (parsed.lignes.length === 0) { alert('❌ Aucune ligne valide. Vérifie le format.'); return; }
-    if (!confirm('Importer ' + parsed.lignes.length + ' snapshot(s) pour cette date ?\n\nLes snapshots existants sur les mêmes dates seront écrasés.')) return;
+
+    // 🛡️ SÉCURITÉ : refuser l'import si tous les cumuls sont à 0
+    var cumulMax = Math.max.apply(null, parsed.lignes.map(function(l) { return l.total_cumul; }));
+    if (cumulMax === 0) {
+      alert('🚨 IMPORT BLOQUÉ\n\nTous les cumuls sont à 0 dans tes données.\n\nCela signifie que la 3ème colonne (CUMUL) est mal placée ou vide.\n\nFormat attendu : Date | État précédent | CUMUL | Progression\n\nLa colonne CUMUL doit monter progressivement (ex: 50, 180, 580, ...) jusqu\'au total final.\n\nVérifie ton Excel et réessaie.');
+      return;
+    }
+
+    if (!confirm('Importer ' + parsed.lignes.length + ' snapshot(s) pour cette date ?\n\nCumul max détecté : ' + cumulMax + ' billets.\nLes snapshots existants sur les mêmes dates seront écrasés.')) return;
 
     var rows = parsed.lignes.map(function(l) {
       return {
