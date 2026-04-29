@@ -18925,7 +18925,7 @@ function _hideTeamSelection() {
       // 3. Récupérer toutes les dates passées de la famille pour chercher la même ville
       var todayISO = new Date().toISOString().split('T')[0];
       var rDates = await _supabase.from('dates_concert')
-        .select('id, ville, date_concert, nom_salle, jauge_choisie')
+        .select('id, ville, date_concert, nom_salle, jauge_choisie, import_billets')
         .in('tournee_id', famille)
         .lt('date_concert', todayISO)
         .neq('id', dateId);
@@ -18969,7 +18969,15 @@ function _hideTeamSelection() {
       datesVille.forEach(function(d, idx) {
         if (idx >= maxAffichees) return;
         var fiche = fichesParDate[d.id];
-        var totalFinal = fiche && fiche.etat_ventes ? parseInt(fiche.etat_ventes) : null;
+        // Total final : on regarde dans cet ordre :
+        // 1. import_billets sur dates_concert (back-fill historique)
+        // 2. etat_ventes sur fiches_production (billetterie remplie normalement)
+        var totalFinal = null;
+        if (d.import_billets && parseInt(d.import_billets) > 0) {
+          totalFinal = parseInt(d.import_billets);
+        } else if (fiche && fiche.etat_ventes && parseInt(fiche.etat_ventes) > 0) {
+          totalFinal = parseInt(fiche.etat_ventes);
+        }
         var jaugeRef = (fiche && (fiche.jauge_finale || fiche.jauge_depart)) || d.jauge_choisie || 0;
         var dateAff = d.date_concert ? d.date_concert.substring(0, 10).split('-').reverse().join('/') : '';
         var salleAff = d.nom_salle || '';
