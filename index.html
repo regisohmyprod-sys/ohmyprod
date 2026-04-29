@@ -4522,6 +4522,16 @@ function _hideTeamSelection() {
                   <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:700;">TENDANCE</td><td id="pilote-tendance" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
                   <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">N° Jours restants</td><td id="pilote-jours-restants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
                   <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Projection payants</td><td id="pilote-proj-payants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+                  <tr id="pilote-boost-auto-row" style="border-bottom:1px solid #2a2a2a;background:rgba(34,197,94,0.06);display:none;">
+                    <td style="padding:6px 16px;color:#22c55e;font-weight:600;vertical-align:top;">
+                      🤖 BOOST AUTO (suggéré)
+                      <div id="pilote-boost-auto-detail" style="font-size:10px;color:#888;font-weight:400;margin-top:3px;line-height:1.4;"></div>
+                    </td>
+                    <td style="padding:4px 16px;text-align:right;vertical-align:top;">
+                      <span id="pilote-boost-auto-val" style="color:#22c55e;font-weight:700;font-size:13px;margin-right:6px;">—</span>
+                      <button id="pilote-btn-appliquer-boost" onclick="projAppliquerBoostAutoV2()" style="background:#22c55e;color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Appliquer</button>
+                    </td>
+                  </tr>
                   <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.08);"><td style="padding:7px 16px;color:#c9a84c;font-weight:600;">🎯 BOOST BONUS (manuel)</td><td style="padding:4px 16px;text-align:right;"><input id="pilote-boost-bonus" type="number" placeholder="0" oninput="projChangeBoost()" onchange="projChangeBoost()" style="width:80px;background:#0a0a0a;border:1px solid #c9a84c;border-radius:6px;color:#c9a84c;padding:4px 8px;font-size:13px;font-weight:600;text-align:right;font-family:'Inter',sans-serif;"></td></tr>
                   <tr style="border-bottom:1px solid #2a2a2a;background:rgba(201,168,76,0.05);"><td style="padding:7px 16px;color:#c9a84c;">% de remplissage (projection)</td><td id="pilote-remplissage-projection" style="padding:7px 16px;color:#c9a84c;font-weight:700;text-align:right;"></td></tr>
                   <tr style="background:rgba(239,68,68,0.15);"><td style="padding:7px 16px;color:#fff;font-weight:700;">Projection total</td><td id="pilote-proj-total" style="padding:7px 16px;color:#e31e24;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:900;text-align:right;"></td></tr>
@@ -18971,6 +18981,8 @@ function _hideTeamSelection() {
       setTimeout(function(){ projAfficherSimilaires(dateId); }, 350);
       // 🌤️ Déclencher l'affichage de la saisonnalité
       setTimeout(function(){ projAfficherSaisonnalite(dateId); }, 400);
+      // 🤖 Déclencher le calcul du Boost Auto V2 (après que les autres blocs aient peuplé leurs données)
+      setTimeout(function(){ projCalculerBoostAutoV2(dateId, totalActuel, joursRestants, jaugeFinale); }, 500);
     } catch (err) {
       console.error('❌ Erreur affichage projection :', err);
     }
@@ -19580,6 +19592,268 @@ function _hideTeamSelection() {
     }
   }
   window.projAfficherSaisonnalite = projAfficherSaisonnalite;
+
+  // ============================================================
+  // 🤖 BOOST AUTO V2 — basé sur les 4 blocs analytiques
+  // Cible = moyenne pondérée (historique ville + dates similaires + saisonnalité)
+  // Projection réaliste = ventes actuelles / pct_jalon_atteint (stats rush)
+  // Boost auto = Cible - Projection réaliste
+  // ============================================================
+
+  // Stats rush mesurées sur tes 74 dates valides (% du final atteint à chaque jalon)
+  // J-30 : 88.6% / J-15 : 94.5% / J-7 : 94.8% / J-2 : 98.8%
+  // J-90 et J-60 estimés par interpolation prudente (75% à J-90, 82% à J-60)
+  var BOOST_PCT_RUSH = {
+    90: 0.75,  // J-90 : 75% du final déjà fait (estimé)
+    60: 0.82,  // J-60 : 82% du final déjà fait (estimé)
+    30: 0.886, // J-30 : 88.6% (mesuré)
+    15: 0.945, // J-15 : 94.5% (mesuré)
+    7:  0.948, // J-7 : 94.8% (mesuré)
+    2:  0.988  // J-2 : 98.8% (mesuré)
+  };
+
+  /**
+   * Retourne le % du final attendu à un jour J-X donné (interpolation linéaire entre jalons connus)
+   */
+  function _projPctFinalAJoursAvant(joursAvant) {
+    if (joursAvant <= 0) return 1.0; // après le concert
+    if (joursAvant <= 2) return BOOST_PCT_RUSH[2];
+    if (joursAvant <= 7) {
+      // entre J-7 et J-2
+      var t = (joursAvant - 2) / 5;
+      return BOOST_PCT_RUSH[2] + t * (BOOST_PCT_RUSH[7] - BOOST_PCT_RUSH[2]);
+    }
+    if (joursAvant <= 15) {
+      var t = (joursAvant - 7) / 8;
+      return BOOST_PCT_RUSH[7] + t * (BOOST_PCT_RUSH[15] - BOOST_PCT_RUSH[7]);
+    }
+    if (joursAvant <= 30) {
+      var t = (joursAvant - 15) / 15;
+      return BOOST_PCT_RUSH[15] + t * (BOOST_PCT_RUSH[30] - BOOST_PCT_RUSH[15]);
+    }
+    if (joursAvant <= 60) {
+      var t = (joursAvant - 30) / 30;
+      return BOOST_PCT_RUSH[30] + t * (BOOST_PCT_RUSH[60] - BOOST_PCT_RUSH[30]);
+    }
+    if (joursAvant <= 90) {
+      var t = (joursAvant - 60) / 30;
+      return BOOST_PCT_RUSH[60] + t * (BOOST_PCT_RUSH[90] - BOOST_PCT_RUSH[60]);
+    }
+    // > 90 jours : extrapolation prudente (40% à 180j, 60% à 120j, etc)
+    if (joursAvant <= 180) {
+      var t = (joursAvant - 90) / 90;
+      return BOOST_PCT_RUSH[90] - t * 0.35; // 75% → 40%
+    }
+    return 0.30; // très loin du concert
+  }
+
+  /**
+   * Détecte si une date est à Paris (Dôme / Palais des Sports / Bercy / Zénith Paris...)
+   * Critère : ville = PARIS + grosse salle parisienne
+   * On EXCLUT le Parc des Princes (festival ponctuel) et "GRAND PARIS Arena" (Tremblay).
+   */
+  function _projEstDateParis(d) {
+    if (!d) return false;
+    var ville = (d.ville || '').toUpperCase().trim();
+    var salle = (d.nom_salle || '').toUpperCase().trim();
+    if (ville !== 'PARIS') return false;
+    // On veut le Dôme ou Palais (gros venues parisiens), pas le Parc des Princes (festival)
+    if (salle.indexOf('PARC DES PRINCES') >= 0) return false;
+    if (salle.indexOf('DOME') >= 0 || salle.indexOf('DÔME') >= 0) return true;
+    if (salle.indexOf('PALAIS') >= 0) return true;
+    if (salle.indexOf('BERCY') >= 0 || salle.indexOf('ACCOR') >= 0) return true;
+    if (salle.indexOf('ZENITH') >= 0 || salle.indexOf('ZÉNITH') >= 0) return true;
+    return false;
+  }
+
+  /**
+   * Calcule et affiche le Boost Auto V2 dans la ligne UI dédiée.
+   * Appelé après chaque calcul de projection.
+   */
+  async function projCalculerBoostAutoV2(dateId, totalActuel, joursRestants, jaugeFinale) {
+    var rowEl = document.getElementById('pilote-boost-auto-row');
+    var valEl = document.getElementById('pilote-boost-auto-val');
+    var detailEl = document.getElementById('pilote-boost-auto-detail');
+    if (!rowEl || !valEl || !detailEl) return;
+
+    if (!dateId || !joursRestants || joursRestants <= 0 || !totalActuel || totalActuel <= 0) {
+      rowEl.style.display = 'none';
+      return;
+    }
+
+    try {
+      // 1. Récupérer la fiche courante
+      var rD = await _supabase.from('dates_concert')
+        .select('id, ville, nom_salle, date_concert, tournee_id, jauge_choisie')
+        .eq('id', dateId).single();
+      if (rD.error || !rD.data) { rowEl.style.display = 'none'; return; }
+
+      var villeCourante = (rD.data.ville || '').toUpperCase().trim();
+      function normalizeVille(v) { return (v || '').toUpperCase().trim().replace(/[\s\-_]+/g, ''); }
+      var villeNorm = normalizeVille(villeCourante);
+      var dateConcertStr = rD.data.date_concert.substring(0, 10);
+      var moisConcert = parseInt(dateConcertStr.substring(5, 7));
+      var jaugeRef = parseInt(rD.data.jauge_choisie) || jaugeFinale || 0;
+
+      // 🗼 EXCEPTION PARIS : la date courante est-elle à Paris ?
+      var estParis = _projEstDateParis(rD.data);
+
+      // 2. Charger les dates passées de la famille TWOQ
+      var datesFamille = await _projChargerDatesFamille();
+
+      // ====== MODE PARIS : calibration uniquement sur les dates Paris ======
+      if (estParis) {
+        var datesParis = datesFamille.filter(function(d) {
+          return _projEstDateParis(d) && d.id !== dateId && d.total_final && d.total_final > 0;
+        });
+        if (datesParis.length === 0) {
+          // Aucune référence Paris → on cache et on indique
+          valEl.textContent = '—';
+          detailEl.innerHTML = '🗼 Pas de référence Paris dans l\'historique. Utilise le boost manuel selon ton flair métier.';
+          rowEl.style.display = '';
+          window._boostAutoSuggere = 0;
+          return;
+        }
+        // Moyenne des dates Paris (généralement 1 ou 2 dates seulement)
+        var sumParis = datesParis.reduce(function(a, b) { return a + b.total_final; }, 0);
+        var ciblePari = Math.round(sumParis / datesParis.length);
+
+        // Stats rush appliquées
+        var pctAtteintP = _projPctFinalAJoursAvant(joursRestants);
+        var projLineaireP = parseInt((document.getElementById('pilote-proj-payants') || {}).textContent) || totalActuel;
+        var boostP = ciblePari - projLineaireP;
+        if (boostP < 0) boostP = 0;
+        if (boostP > ciblePari * 0.5) boostP = Math.round(ciblePari * 0.5);
+        if (jaugeRef > 0 && (projLineaireP + boostP) > jaugeRef) {
+          boostP = Math.max(0, jaugeRef - projLineaireP);
+        }
+
+        valEl.textContent = boostP.toLocaleString('fr-FR');
+        var detailP = ['🗼 Calibration Paris uniquement'];
+        var nbAff = datesParis.length;
+        if (nbAff === 1) {
+          var d0 = datesParis[0];
+          var dateStr = d0.date_concert ? d0.date_concert.substring(0, 10).split('-').reverse().join('/') : '';
+          detailP.push('Réf : ' + (d0.nom_salle || 'Paris') + ' ' + dateStr + ' = ' + d0.total_final.toLocaleString('fr-FR') + ' billets');
+          detailP.push('⚠️ Une seule référence — chiffre à prendre avec prudence');
+        } else {
+          detailP.push('Cible : ' + ciblePari.toLocaleString('fr-FR') + ' (moyenne ' + nbAff + ' dates Paris)');
+        }
+        detailP.push('Stats rush J-' + joursRestants + ' : ' + Math.round(pctAtteintP * 100) + '% atteint');
+        detailEl.innerHTML = detailP.join(' · ');
+        rowEl.style.display = '';
+        window._boostAutoSuggere = boostP;
+        return;
+      }
+
+      // ====== MODE PROVINCE : calcul normal en EXCLUANT les dates Paris ======
+      // (les chiffres Paris fausseraient les médianes/moyennes des petites villes)
+
+      // ====== SOURCE 1 : Moyenne historique de la ville ======
+      var datesVille = datesFamille.filter(function(d) {
+        return normalizeVille(d.ville) === villeNorm && d.id !== dateId && d.total_final && d.total_final > 0
+               && !_projEstDateParis(d);
+      });
+      var moyenneVille = null;
+      if (datesVille.length > 0) {
+        var sum = datesVille.reduce(function(a, b) { return a + b.total_final; }, 0);
+        moyenneVille = sum / datesVille.length;
+      }
+
+      // ====== SOURCE 2 : Médiane des dates similaires (hors Paris) ======
+      var candidats = datesFamille.filter(function(d) {
+        if (!d.total_final || d.total_final <= 0) return false;
+        if (normalizeVille(d.ville) === villeNorm) return false;
+        if (_projEstDateParis(d)) return false; // 🗼 exclure les dates Paris des comparaisons province
+        var moisD = parseInt((d.date_concert || '').substring(5, 7));
+        var diffMois = Math.min(Math.abs(moisD - moisConcert), 12 - Math.abs(moisD - moisConcert));
+        if (diffMois > 1) return false;
+        if (jaugeRef > 0 && d.jauge_ref > 0) {
+          var ratio = d.jauge_ref / jaugeRef;
+          if (ratio < 0.7 || ratio > 1.3) return false;
+        }
+        return true;
+      });
+      var medianeSimilaires = null;
+      if (candidats.length > 0) {
+        var sorted = candidats.map(function(d) { return d.total_final; }).sort(function(a, b) { return a - b; });
+        medianeSimilaires = (sorted.length % 2 === 1) ? sorted[Math.floor(sorted.length / 2)]
+                                                      : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+      }
+
+      // ====== CIBLE = moyenne pondérée ======
+      var sumP = 0, sumW = 0;
+      var sourcesUsed = [];
+      if (moyenneVille !== null) {
+        // Plus on a de dates ville, plus le poids est élevé (max 3)
+        var poidsVille = Math.min(3, datesVille.length);
+        sumP += moyenneVille * poidsVille;
+        sumW += poidsVille;
+        sourcesUsed.push('ville × ' + poidsVille);
+      }
+      if (medianeSimilaires !== null) {
+        var poidsSim = Math.min(2, candidats.length);
+        sumP += medianeSimilaires * poidsSim;
+        sumW += poidsSim;
+        sourcesUsed.push('similaires × ' + poidsSim);
+      }
+
+      if (sumW === 0) {
+        // Aucune source disponible → on cache
+        rowEl.style.display = 'none';
+        return;
+      }
+
+      var cible = Math.round(sumP / sumW);
+
+      // ====== PROJECTION RÉALISTE basée sur stats rush ======
+      var pctAtteint = _projPctFinalAJoursAvant(joursRestants);
+      var projectionRealiste = Math.round(totalActuel / pctAtteint);
+
+      // ====== BOOST AUTO ======
+      var projLineaire = parseInt((document.getElementById('pilote-proj-payants') || {}).textContent) || totalActuel;
+      var boost = cible - projLineaire;
+      // Sécurité : pas négatif, pas plus que 50% de la cible
+      if (boost < 0) boost = 0;
+      if (boost > cible * 0.5) boost = Math.round(cible * 0.5);
+      if (jaugeRef > 0 && (projLineaire + boost) > jaugeRef) {
+        boost = Math.max(0, jaugeRef - projLineaire);
+      }
+
+      // ====== AFFICHAGE ======
+      valEl.textContent = boost.toLocaleString('fr-FR');
+      var detailParts = [];
+      detailParts.push('Cible : ' + cible.toLocaleString('fr-FR') + ' (' + sourcesUsed.join(' + ') + ')');
+      detailParts.push('Stats rush J-' + joursRestants + ' : ' + Math.round(pctAtteint * 100) + '% atteint');
+      detailParts.push('Boost = Cible ' + cible.toLocaleString('fr-FR') + ' − Projection ' + projLineaire.toLocaleString('fr-FR'));
+      detailEl.innerHTML = detailParts.join(' · ');
+      rowEl.style.display = '';
+
+      // Stocker pour bouton Appliquer
+      window._boostAutoSuggere = boost;
+    } catch (err) {
+      console.error('❌ Erreur Boost Auto V2 :', err);
+      rowEl.style.display = 'none';
+    }
+  }
+
+  function projAppliquerBoostAutoV2() {
+    if (typeof window._boostAutoSuggere === 'undefined') return;
+    var input = document.getElementById('pilote-boost-bonus');
+    if (!input) return;
+    input.value = window._boostAutoSuggere;
+    if (typeof projChangeBoost === 'function') projChangeBoost();
+    // Petit feedback visuel
+    var btn = document.getElementById('pilote-btn-appliquer-boost');
+    if (btn) {
+      var oldText = btn.textContent;
+      btn.textContent = '✓ Appliqué';
+      btn.style.background = '#16a34a';
+      setTimeout(function() { btn.textContent = oldText; btn.style.background = '#22c55e'; }, 1500);
+    }
+  }
+  window.projCalculerBoostAutoV2 = projCalculerBoostAutoV2;
+  window.projAppliquerBoostAutoV2 = projAppliquerBoostAutoV2;
 
   // ============================================================
   // 📈 TABLEAU DE BORD HISTORIQUE — synthèse 80 dates TWOQ
