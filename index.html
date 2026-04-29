@@ -4487,6 +4487,33 @@ function _hideTeamSelection() {
         </div>
       </div>
 
+      <!-- ⏱️ PACING N-1 (où en étaient les dates passées au même stade) -->
+      <div id="pilote-bloc-pacing" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;display:none;">
+        <div id="pilote-pacing-titre" style="background:#7c3aed;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#fff;text-align:center;">⏱️ PACING N-1 (au même stade)</div>
+        <div style="padding:14px 18px;">
+          <div id="pilote-pacing-lignes" style="font-size:13px;color:#e8e8e8;"></div>
+          <div id="pilote-pacing-resume" style="margin-top:14px;padding-top:12px;border-top:1px solid #2a2a2a;font-size:13px;"></div>
+        </div>
+      </div>
+
+      <!-- 🔍 TOP 3 DATES SIMILAIRES (même mois + jauge similaire) -->
+      <div id="pilote-bloc-similaires" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;display:none;">
+        <div id="pilote-similaires-titre" style="background:#0891b2;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#fff;text-align:center;">🔍 DATES SIMILAIRES</div>
+        <div style="padding:14px 18px;">
+          <div id="pilote-similaires-lignes" style="font-size:13px;color:#e8e8e8;"></div>
+          <div id="pilote-similaires-resume" style="margin-top:14px;padding-top:12px;border-top:1px solid #2a2a2a;font-size:13px;"></div>
+        </div>
+      </div>
+
+      <!-- 🌤️ SAISONNALITÉ (coefs d'achat par mois) -->
+      <div id="pilote-bloc-saison" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;display:none;">
+        <div style="background:#f59e0b;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;text-align:center;">🌤️ SAISONNALITÉ ACHAT</div>
+        <div style="padding:14px 18px;">
+          <div id="pilote-saison-actuel" style="margin-bottom:14px;font-size:13px;color:#e8e8e8;"></div>
+          <div id="pilote-saison-prochains" style="font-size:12px;color:#aab4be;"></div>
+        </div>
+      </div>
+
       <!-- RÉSULTAT OMP -->
       <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:16px;">
         <div style="background:#c9a84c;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;color:#000;text-align:center;">RÉSULTAT OMP</div>
@@ -6436,6 +6463,44 @@ function _hideTeamSelection() {
   <div id="liste-fichiers-justificatifs" style="display:flex;flex-direction:column;gap:8px;">
     <div style="text-align:center;padding:40px;color:#666;">Chargement des fichiers...</div>
   </div>
+</div>
+
+<!-- 📈 PAGE TABLEAU DE BORD HISTORIQUE TWOQ -->
+<div id="page-tdb-historique" class="page">
+  <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
+
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;flex-wrap:wrap;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">📈 TABLEAU DE BORD HISTORIQUE</div>
+  </div>
+  <div style="font-size:13px;color:#888;margin-bottom:24px;font-style:italic;">Synthèse des tournées passées TWOQ + Éternelle Légende</div>
+
+  <!-- KPI principaux -->
+  <div id="tdb-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:24px;"></div>
+
+  <!-- Bloc Saisonnalité -->
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+    <div style="background:#f59e0b;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#000;">🌤️ SAISONNALITÉ ACHAT (coefs par mois)</div>
+    <div id="tdb-saison-content" style="padding:18px 20px;">
+      <div style="text-align:center;padding:30px;color:#666;">Chargement...</div>
+    </div>
+  </div>
+
+  <!-- Bloc Top villes -->
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+    <div style="background:#3b82f6;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#fff;">🏆 TOP VILLES (par moyenne de billets vendus)</div>
+    <div id="tdb-villes-content" style="padding:18px 20px;">
+      <div style="text-align:center;padding:30px;color:#666;">Chargement...</div>
+    </div>
+  </div>
+
+  <!-- Bloc Évolution annuelle -->
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+    <div style="background:#22c55e;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#fff;">📊 ÉVOLUTION ANNUELLE</div>
+    <div id="tdb-annees-content" style="padding:18px 20px;">
+      <div style="text-align:center;padding:30px;color:#666;">Chargement...</div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -11420,6 +11485,7 @@ function _hideTeamSelection() {
     'decla-droits':         ['admin'],
     'bilan-amh':            ['admin'],
     'fiche-billetterie':    ['admin'],
+    'tdb-historique':       ['admin'],
     'tournees':             ['admin'],
     'tournee-dynamic':      ['admin'],
     'date-dynamic':         ['admin'],
@@ -18880,6 +18946,12 @@ function _hideTeamSelection() {
       setTimeout(function(){ projAfficherGraphique(dateId); }, 200);
       // 📍 Déclencher l'affichage de l'historique de la ville (N-1)
       setTimeout(function(){ projAfficherHistoriqueVille(dateId); }, 250);
+      // ⏱️ Déclencher l'affichage du pacing N-1 (au même stade)
+      setTimeout(function(){ projAfficherPacing(dateId, joursRestants, totalActuel); }, 300);
+      // 🔍 Déclencher l'affichage des dates similaires
+      setTimeout(function(){ projAfficherSimilaires(dateId); }, 350);
+      // 🌤️ Déclencher l'affichage de la saisonnalité
+      setTimeout(function(){ projAfficherSaisonnalite(dateId); }, 400);
     } catch (err) {
       console.error('❌ Erreur affichage projection :', err);
     }
@@ -19045,6 +19117,612 @@ function _hideTeamSelection() {
 
   // Exposition globale
   window.projAfficherHistoriqueVille = projAfficherHistoriqueVille;
+
+  // ============================================================
+  // 🛠️ HELPER COMMUN — Récupère les dates passées éligibles d'une famille
+  // (TWOQ + Éternelle Légende = même show, même fanbase)
+  // ============================================================
+  var _projCacheDatesFamille = null;
+  var _projCacheTotalSnapshots = null;
+
+  async function _projChargerDatesFamille() {
+    if (_projCacheDatesFamille) return _projCacheDatesFamille;
+    var TWOQ = '11111111-1111-1111-1111-111111111111';
+    var ETERNELLE = '22222222-2222-2222-2222-222222222222';
+    var todayISO = new Date().toISOString().split('T')[0];
+
+    var rDates = await _supabase.from('dates_concert')
+      .select('id, ville, date_concert, nom_salle, jauge_choisie, import_billets, tournee_id')
+      .in('tournee_id', [TWOQ, ETERNELLE])
+      .lt('date_concert', todayISO);
+    if (rDates.error || !rDates.data) return [];
+
+    // Récupérer les fiches_production (etat_ventes en fallback de import_billets)
+    var ids = rDates.data.map(function(d) { return d.id; });
+    var rFiches = await _supabase.from('fiches_production')
+      .select('date_concert_id, etat_ventes, jauge_finale, jauge_depart')
+      .in('date_concert_id', ids);
+    var fichesParDate = {};
+    (rFiches.data || []).forEach(function(f) { fichesParDate[f.date_concert_id] = f; });
+
+    // Enrichir chaque date avec son total final
+    var enrichies = rDates.data.map(function(d) {
+      var f = fichesParDate[d.id];
+      var totalFinal = null;
+      if (d.import_billets && parseInt(d.import_billets) > 0) totalFinal = parseInt(d.import_billets);
+      else if (f && f.etat_ventes && parseInt(f.etat_ventes) > 0) totalFinal = parseInt(f.etat_ventes);
+      var jauge = (f && (f.jauge_finale || f.jauge_depart)) || d.jauge_choisie || 0;
+      return Object.assign({}, d, { total_final: totalFinal, jauge_ref: jauge });
+    });
+    _projCacheDatesFamille = enrichies;
+    return enrichies;
+  }
+
+  // ============================================================
+  // ⏱️ PACING N-1 — où en étaient les dates passées au même stade
+  // Pour la ville courante, on cherche les dates passées dans la même ville,
+  // et on lit leur snapshot le plus proche de J-X (= ton stade actuel).
+  // ============================================================
+
+  async function projAfficherPacing(dateId, joursRestants, totalActuel) {
+    var bloc = document.getElementById('pilote-bloc-pacing');
+    var lignesEl = document.getElementById('pilote-pacing-lignes');
+    var resumeEl = document.getElementById('pilote-pacing-resume');
+    var titreEl = document.getElementById('pilote-pacing-titre');
+    if (!bloc || !lignesEl || !resumeEl) return;
+
+    if (!joursRestants || joursRestants <= 0) { bloc.style.display = 'none'; return; }
+
+    try {
+      var rD = await _supabase.from('dates_concert').select('ville').eq('id', dateId).single();
+      if (rD.error || !rD.data || !rD.data.ville) { bloc.style.display = 'none'; return; }
+      var villeCourante = (rD.data.ville || '').toUpperCase().trim();
+
+      // Récupérer les dates passées de la famille dans la même ville
+      function normalizeVille(v) { return (v || '').toUpperCase().trim().replace(/[\s\-_]+/g, ''); }
+      var villeNorm = normalizeVille(villeCourante);
+      var datesFamille = await _projChargerDatesFamille();
+      var datesVille = datesFamille.filter(function(d) {
+        return normalizeVille(d.ville) === villeNorm && d.id !== dateId;
+      });
+      if (datesVille.length === 0) { bloc.style.display = 'none'; return; }
+
+      // Trier de la plus récente à la plus ancienne, limiter à 5
+      datesVille.sort(function(a, b) { return (b.date_concert || '').localeCompare(a.date_concert || ''); });
+      datesVille = datesVille.slice(0, 5);
+
+      // Charger les snapshots de ces dates
+      var ids = datesVille.map(function(d) { return d.id; });
+      var rSnaps = await _supabase.from('ventes_snapshots')
+        .select('date_id, snapshot_date, total_cumul')
+        .in('date_id', ids);
+      if (rSnaps.error) { bloc.style.display = 'none'; return; }
+
+      var snapsParDate = {};
+      (rSnaps.data || []).forEach(function(s) {
+        if (!snapsParDate[s.date_id]) snapsParDate[s.date_id] = [];
+        snapsParDate[s.date_id].push(s);
+      });
+
+      // Pour chaque date passée, trouver le snapshot le plus proche de J-joursRestants
+      var html = '';
+      var pacings = []; // pour la moyenne
+      var hasData = false;
+      datesVille.forEach(function(d) {
+        var snaps = snapsParDate[d.id] || [];
+        if (snaps.length === 0) {
+          var dAff = d.date_concert ? d.date_concert.substring(0, 10).split('-').reverse().join('/') : '';
+          html += '<div style="padding:6px 0;border-bottom:1px solid #1a1a1a;color:#666;font-size:12px;">'
+            + dAff + ' — <i>pas d\'historique de ventes</i></div>';
+          return;
+        }
+        var dateConcert = new Date(d.date_concert + 'T00:00:00');
+        var meilleurSnap = null;
+        var meilleurEcart = 9999;
+        snaps.forEach(function(s) {
+          var dSnap = new Date(s.snapshot_date + 'T00:00:00');
+          var ja = Math.round((dateConcert - dSnap) / 86400000);
+          if (ja < 0) return;
+          var ecart = Math.abs(ja - joursRestants);
+          if (ecart < meilleurEcart) { meilleurEcart = ecart; meilleurSnap = Object.assign({}, s, { jours_avant: ja }); }
+        });
+
+        var dAff = d.date_concert ? d.date_concert.substring(0, 10).split('-').reverse().join('/') : '';
+        if (!meilleurSnap || meilleurEcart > 30) {
+          html += '<div style="padding:6px 0;border-bottom:1px solid #1a1a1a;color:#666;font-size:12px;">'
+            + dAff + ' — <i>pas de relevé proche de J-' + joursRestants + '</i></div>';
+          return;
+        }
+        hasData = true;
+        var pctTotalFinal = (d.total_final && d.total_final > 0) ? Math.round((meilleurSnap.total_cumul / d.total_final) * 100) : null;
+        if (pctTotalFinal !== null) pacings.push({ cumul: meilleurSnap.total_cumul, total: d.total_final, pct: pctTotalFinal });
+        var precision = (meilleurEcart === 0) ? '' : ' <span style="color:#888;font-size:10px;">(à J-' + meilleurSnap.jours_avant + ')</span>';
+        html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1a;">'
+          + '<div style="color:#aab4be;">' + dAff + precision + '</div>'
+          + '<div style="color:#fff;font-weight:600;">' + meilleurSnap.total_cumul.toLocaleString('fr-FR') + ' billets'
+          + (pctTotalFinal !== null ? ' <span style="color:#7c3aed;">(' + pctTotalFinal + '% du final)</span>' : '')
+          + '</div></div>';
+      });
+      lignesEl.innerHTML = html;
+
+      // Résumé : ta position vs moyenne du pacing au même stade
+      if (!hasData) {
+        resumeEl.innerHTML = '<div style="color:#888;font-style:italic;font-size:12px;">Pas assez de données de pacing pour comparer.</div>';
+      } else if (pacings.length > 0) {
+        var moyCumul = Math.round(pacings.reduce(function(a, b) { return a + b.cumul; }, 0) / pacings.length);
+        var moyPct = Math.round(pacings.reduce(function(a, b) { return a + b.pct; }, 0) / pacings.length);
+        var resHtml = '<div style="display:flex;justify-content:space-between;align-items:center;">'
+          + '<span style="color:#7c3aed;font-weight:700;">📊 MOYENNE PACING à J-' + joursRestants + '</span>'
+          + '<span style="color:#fff;font-family:Bebas Neue,sans-serif;font-size:18px;font-weight:900;">' + moyCumul.toLocaleString('fr-FR') + ' billets</span>'
+          + '</div>'
+          + '<div style="font-size:11px;color:#888;margin-top:4px;">Soit ' + moyPct + '% du total final atteint en moyenne à ce stade</div>';
+
+        if (totalActuel && totalActuel > 0) {
+          var ecart = totalActuel - moyCumul;
+          var pctVsMoy = Math.round((totalActuel / moyCumul) * 100);
+          var couleur, emoji, label;
+          if (pctVsMoy >= 110) { couleur = '#22c55e'; emoji = '🟢'; label = 'tu es en avance'; }
+          else if (pctVsMoy >= 90) { couleur = '#22c55e'; emoji = '🟢'; label = 'tu es au pacing'; }
+          else if (pctVsMoy >= 75) { couleur = '#facc15'; emoji = '🟡'; label = 'pacing l\u00e9g\u00e8rement en retrait'; }
+          else if (pctVsMoy >= 50) { couleur = '#f97316'; emoji = '🟠'; label = 'pacing en retrait'; }
+          else { couleur = '#ef4444'; emoji = '🔴'; label = 'pacing tr\u00e8s en retrait'; }
+          resHtml += '<div style="margin-top:8px;font-size:12px;color:' + couleur + ';">'
+            + emoji + ' Toi à J-' + joursRestants + ' : ' + totalActuel.toLocaleString('fr-FR')
+            + ' (' + (ecart >= 0 ? '+' : '') + ecart.toLocaleString('fr-FR') + ' vs moy) — ' + label + '</div>';
+        }
+        resumeEl.innerHTML = resHtml;
+      } else {
+        resumeEl.innerHTML = '<div style="color:#888;font-style:italic;font-size:12px;">Donn\u00e9es de pacing partielles.</div>';
+      }
+
+      titreEl.textContent = '⏱️ PACING N-1 ' + villeCourante + ' (à J-' + joursRestants + ')';
+      bloc.style.display = 'block';
+    } catch (err) {
+      console.error('❌ Erreur pacing :', err);
+      bloc.style.display = 'none';
+    }
+  }
+  window.projAfficherPacing = projAfficherPacing;
+
+  // ============================================================
+  // 🔍 DATES SIMILAIRES — même mois + jauge proche
+  // ============================================================
+
+  async function projAfficherSimilaires(dateId) {
+    var bloc = document.getElementById('pilote-bloc-similaires');
+    var lignesEl = document.getElementById('pilote-similaires-lignes');
+    var resumeEl = document.getElementById('pilote-similaires-resume');
+    var titreEl = document.getElementById('pilote-similaires-titre');
+    if (!bloc || !lignesEl || !resumeEl) return;
+
+    try {
+      var rD = await _supabase.from('dates_concert').select('ville, date_concert, jauge_choisie').eq('id', dateId).single();
+      if (rD.error || !rD.data || !rD.data.date_concert) { bloc.style.display = 'none'; return; }
+
+      var moisCible = parseInt(rD.data.date_concert.substring(5, 7));
+      var jaugeCible = parseInt(rD.data.jauge_choisie) || 0;
+
+      function normalizeVille(v) { return (v || '').toUpperCase().trim().replace(/[\s\-_]+/g, ''); }
+      var villeCouranteNorm = normalizeVille(rD.data.ville);
+
+      var datesFamille = await _projChargerDatesFamille();
+      // Filtrer : même mois (±1) + jauge similaire (±30%) + ville différente + total connu
+      var candidats = datesFamille.filter(function(d) {
+        if (!d.total_final || d.total_final <= 0) return false;
+        if (normalizeVille(d.ville) === villeCouranteNorm) return false;
+        var moisD = parseInt((d.date_concert || '').substring(5, 7));
+        var diffMois = Math.min(Math.abs(moisD - moisCible), 12 - Math.abs(moisD - moisCible));
+        if (diffMois > 1) return false;
+        if (jaugeCible > 0 && d.jauge_ref > 0) {
+          var ratio = d.jauge_ref / jaugeCible;
+          if (ratio < 0.7 || ratio > 1.3) return false;
+        }
+        return true;
+      });
+
+      if (candidats.length === 0) { bloc.style.display = 'none'; return; }
+
+      // Score = écart en mois + écart relatif de jauge → trier par score croissant
+      candidats.forEach(function(d) {
+        var moisD = parseInt((d.date_concert || '').substring(5, 7));
+        var diffMois = Math.min(Math.abs(moisD - moisCible), 12 - Math.abs(moisD - moisCible));
+        var diffJauge = (jaugeCible > 0 && d.jauge_ref > 0) ? Math.abs(1 - d.jauge_ref / jaugeCible) : 0.5;
+        d._score = diffMois + diffJauge;
+      });
+      candidats.sort(function(a, b) { return a._score - b._score; });
+      candidats = candidats.slice(0, 3);
+
+      var html = '';
+      var totaux = [];
+      candidats.forEach(function(d) {
+        var dAff = d.date_concert ? d.date_concert.substring(0, 10).split('-').reverse().join('/') : '';
+        var pctRempl = (d.jauge_ref > 0) ? Math.round((d.total_final / d.jauge_ref) * 100) : null;
+        totaux.push(d.total_final);
+        html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1a;">'
+          + '<div style="color:#aab4be;">' + (d.ville || '') + ' ' + dAff
+          + (d.nom_salle ? ' <span style="color:#666;font-size:11px;">— ' + d.nom_salle + '</span>' : '')
+          + (d.jauge_ref > 0 ? ' <span style="color:#666;font-size:11px;">(' + d.jauge_ref.toLocaleString('fr-FR') + ' pl.)</span>' : '')
+          + '</div>'
+          + '<div style="color:#fff;font-weight:600;">' + d.total_final.toLocaleString('fr-FR') + ' billets'
+          + (pctRempl !== null ? ' <span style="color:#0891b2;">(' + pctRempl + '%)</span>' : '')
+          + '</div></div>';
+      });
+      lignesEl.innerHTML = html;
+
+      var med;
+      if (totaux.length > 0) {
+        var sorted = totaux.slice().sort(function(a, b) { return a - b; });
+        med = (sorted.length % 2 === 1) ? sorted[Math.floor(sorted.length / 2)]
+                                        : Math.round((sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2);
+        resumeEl.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;">'
+          + '<span style="color:#0891b2;font-weight:700;">📊 MÉDIANE DATES SIMILAIRES</span>'
+          + '<span style="color:#fff;font-family:Bebas Neue,sans-serif;font-size:18px;font-weight:900;">' + med.toLocaleString('fr-FR') + ' billets</span>'
+          + '</div>'
+          + '<div style="font-size:11px;color:#888;margin-top:4px;">Crit\u00e8res : m\u00eame mois (\u00b11) + jauge proche (\u00b130%)</div>';
+      }
+
+      var nomsMois = ['Janv','Fevr','Mars','Avril','Mai','Juin','Juil','Aout','Sept','Oct','Nov','Dec'];
+      titreEl.textContent = '🔍 DATES SIMILAIRES (' + nomsMois[moisCible-1] + (jaugeCible > 0 ? ', ~' + jaugeCible.toLocaleString('fr-FR') + ' pl.' : '') + ')';
+      bloc.style.display = 'block';
+    } catch (err) {
+      console.error('❌ Erreur dates similaires :', err);
+      bloc.style.display = 'none';
+    }
+  }
+  window.projAfficherSimilaires = projAfficherSimilaires;
+
+  // ============================================================
+  // 🌤️ SAISONNALITÉ — coefs d'achat par mois (calcul depuis snapshots)
+  // ============================================================
+  var _projCacheSaisonnalite = null;
+
+  async function _projCalculerSaisonnalite() {
+    if (_projCacheSaisonnalite) return _projCacheSaisonnalite;
+    try {
+      var TWOQ = '11111111-1111-1111-1111-111111111111';
+      var ETERNELLE = '22222222-2222-2222-2222-222222222222';
+      var todayISO = new Date().toISOString().split('T')[0];
+
+      // Récupérer toutes les dates passées de la famille
+      var rD = await _supabase.from('dates_concert')
+        .select('id, date_concert')
+        .in('tournee_id', [TWOQ, ETERNELLE])
+        .lt('date_concert', todayISO);
+      if (rD.error || !rD.data) return null;
+      var datesValides = {};
+      rD.data.forEach(function(d) { datesValides[d.id] = d.date_concert; });
+
+      // Récupérer tous les snapshots de ces dates (paginé pour éviter limite 1000)
+      var idsList = Object.keys(datesValides);
+      if (idsList.length === 0) return null;
+
+      var allSnaps = [];
+      var pageSize = 1000;
+      var offset = 0;
+      while (true) {
+        var rS = await _supabase.from('ventes_snapshots')
+          .select('date_id, snapshot_date, total_cumul')
+          .in('date_id', idsList)
+          .order('date_id', { ascending: true })
+          .order('snapshot_date', { ascending: true })
+          .range(offset, offset + pageSize - 1);
+        if (rS.error) break;
+        if (!rS.data || rS.data.length === 0) break;
+        allSnaps = allSnaps.concat(rS.data);
+        if (rS.data.length < pageSize) break;
+        offset += pageSize;
+        if (offset > 20000) break; // sécurité
+      }
+
+      // Pour chaque date, trouver le cumul de fin de chaque mois
+      var snapsParDate = {};
+      allSnaps.forEach(function(s) {
+        var dateConcert = datesValides[s.date_id];
+        if (!dateConcert || !s.snapshot_date) return;
+        // Ignorer snapshots après la date du concert
+        if (s.snapshot_date > dateConcert) return;
+        if (!snapsParDate[s.date_id]) snapsParDate[s.date_id] = [];
+        snapsParDate[s.date_id].push(s);
+      });
+
+      // Pour chaque date, calculer ventes par mois (= delta cumul fin de mois)
+      var ventesParMois = {}; // { '2024-09': [340, 580, ...], '2024-10': [...] }
+      Object.keys(snapsParDate).forEach(function(did) {
+        var snaps = snapsParDate[did].slice().sort(function(a, b) { return (a.snapshot_date || '').localeCompare(b.snapshot_date || ''); });
+        // Cumul max par mois
+        var cumulFinMois = {}; // { '2024-09': 340, ... }
+        snaps.forEach(function(s) {
+          var ym = s.snapshot_date.substring(0, 7);
+          if (!cumulFinMois[ym] || s.total_cumul > cumulFinMois[ym]) cumulFinMois[ym] = s.total_cumul;
+        });
+        // Trier par YM et calculer le delta (= ventes du mois)
+        var ymsTriees = Object.keys(cumulFinMois).sort();
+        var prev = 0;
+        ymsTriees.forEach(function(ym) {
+          var delta = cumulFinMois[ym] - prev;
+          if (delta > 0) {
+            var moisStr = ym.substring(5, 7); // ex '09'
+            if (!ventesParMois[moisStr]) ventesParMois[moisStr] = [];
+            ventesParMois[moisStr].push(delta);
+          }
+          prev = cumulFinMois[ym];
+        });
+      });
+
+      // Calcul moyenne par mois + moyenne globale
+      var moyennesParMois = {};
+      var allDeltas = [];
+      Object.keys(ventesParMois).forEach(function(m) {
+        var arr = ventesParMois[m];
+        if (arr.length === 0) return;
+        moyennesParMois[m] = {
+          nb: arr.length,
+          moy: arr.reduce(function(a, b) { return a + b; }, 0) / arr.length
+        };
+        allDeltas = allDeltas.concat(arr);
+      });
+      if (allDeltas.length === 0) return null;
+      var moyenneGlobale = allDeltas.reduce(function(a, b) { return a + b; }, 0) / allDeltas.length;
+
+      // Construire les coefs
+      var coefs = {};
+      Object.keys(moyennesParMois).forEach(function(m) {
+        coefs[m] = {
+          coef: moyennesParMois[m].moy / moyenneGlobale,
+          moy: Math.round(moyennesParMois[m].moy),
+          nb: moyennesParMois[m].nb
+        };
+      });
+
+      _projCacheSaisonnalite = coefs;
+      return coefs;
+    } catch (err) {
+      console.error('❌ Erreur calcul saisonnalité :', err);
+      return null;
+    }
+  }
+
+  function _projLabelMois(coef) {
+    if (coef >= 2.0) return { emoji: '🔥', label: 'PIC EXCEPTIONNEL', couleur: '#dc2626' };
+    if (coef >= 1.4) return { emoji: '🟢', label: 'pic de saison', couleur: '#22c55e' };
+    if (coef >= 1.1) return { emoji: '🟢', label: 'au-dessus moyenne', couleur: '#16a34a' };
+    if (coef >= 0.9) return { emoji: '🟡', label: 'conforme moyenne', couleur: '#eab308' };
+    if (coef >= 0.6) return { emoji: '🟠', label: 'mou', couleur: '#f97316' };
+    return { emoji: '🔴', label: 'tr\u00e8s mou / trou', couleur: '#ef4444' };
+  }
+
+  async function projAfficherSaisonnalite(dateId) {
+    var bloc = document.getElementById('pilote-bloc-saison');
+    var actuelEl = document.getElementById('pilote-saison-actuel');
+    var prochainsEl = document.getElementById('pilote-saison-prochains');
+    if (!bloc || !actuelEl || !prochainsEl) return;
+
+    try {
+      var coefs = await _projCalculerSaisonnalite();
+      if (!coefs) { bloc.style.display = 'none'; return; }
+
+      var nomsMois = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      var moisActuel = new Date().getMonth() + 1;
+      var moisActuelStr = (moisActuel < 10 ? '0' : '') + moisActuel;
+
+      var rD = await _supabase.from('dates_concert').select('date_concert').eq('id', dateId).single();
+      if (rD.error || !rD.data) { bloc.style.display = 'none'; return; }
+      var dateConcert = new Date(rD.data.date_concert + 'T00:00:00');
+
+      // Bloc "mois actuel"
+      var ca = coefs[moisActuelStr];
+      if (ca) {
+        var lab = _projLabelMois(ca.coef);
+        var pct = Math.round((ca.coef - 1) * 100);
+        var pctStr = (pct >= 0 ? '+' : '') + pct + '%';
+        actuelEl.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(245,158,11,0.08);padding:10px 14px;border-radius:6px;border-left:3px solid #f59e0b;">'
+          + '<div><div style="color:#f59e0b;font-weight:700;font-size:14px;">' + lab.emoji + ' Mois en cours : ' + nomsMois[moisActuel - 1] + '</div>'
+          + '<div style="color:#aab4be;font-size:11px;margin-top:2px;">Coef d\'achat ' + ca.coef.toFixed(2) + ' (' + pctStr + ' vs moy) — ' + lab.label + '</div></div>'
+          + '<div style="color:' + lab.couleur + ';font-family:Bebas Neue,sans-serif;font-size:24px;font-weight:900;">' + ca.coef.toFixed(2) + '</div>'
+          + '</div>';
+      }
+
+      // Bloc "prochains mois jusqu'au concert"
+      var moisJusquConcert = [];
+      var aujH = new Date(); aujH.setHours(0,0,0,0);
+      var moisCursor = new Date(aujH.getFullYear(), aujH.getMonth() + 1, 1);
+      var maxIter = 24;
+      while (moisCursor <= dateConcert && maxIter > 0) {
+        moisJusquConcert.push(moisCursor.getMonth() + 1);
+        moisCursor = new Date(moisCursor.getFullYear(), moisCursor.getMonth() + 1, 1);
+        maxIter--;
+      }
+      if (moisJusquConcert.length === 0) {
+        prochainsEl.innerHTML = '';
+      } else {
+        var prochainsHtml = '<div style="font-weight:700;color:#aab4be;margin-bottom:6px;">📈 Prochains mois jusqu\'au concert :</div>';
+        moisJusquConcert.forEach(function(m) {
+          var ms = (m < 10 ? '0' : '') + m;
+          var c = coefs[ms];
+          if (!c) {
+            prochainsHtml += '<div style="display:flex;justify-content:space-between;padding:3px 0;color:#666;font-size:12px;"><span>' + nomsMois[m-1] + '</span><span><i>donn\u00e9es insuffisantes</i></span></div>';
+            return;
+          }
+          var lab = _projLabelMois(c.coef);
+          var pct = Math.round((c.coef - 1) * 100);
+          var pctStr = (pct >= 0 ? '+' : '') + pct + '%';
+          prochainsHtml += '<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;">'
+            + '<span style="color:#e8e8e8;">' + lab.emoji + ' ' + nomsMois[m-1] + '</span>'
+            + '<span style="color:' + lab.couleur + ';font-weight:600;">' + c.coef.toFixed(2) + ' (' + pctStr + ') — ' + lab.label + '</span>'
+            + '</div>';
+        });
+        prochainsEl.innerHTML = prochainsHtml;
+      }
+
+      bloc.style.display = 'block';
+    } catch (err) {
+      console.error('❌ Erreur saisonnalité :', err);
+      bloc.style.display = 'none';
+    }
+  }
+  window.projAfficherSaisonnalite = projAfficherSaisonnalite;
+
+  // ============================================================
+  // 📈 TABLEAU DE BORD HISTORIQUE — synthèse 80 dates TWOQ
+  // ============================================================
+  async function tdbCharger() {
+    var kpisEl = document.getElementById('tdb-kpis');
+    var saisonEl = document.getElementById('tdb-saison-content');
+    var villesEl = document.getElementById('tdb-villes-content');
+    var anneesEl = document.getElementById('tdb-annees-content');
+    if (!kpisEl) return;
+
+    kpisEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#666;padding:30px;">Chargement des données...</div>';
+
+    try {
+      var dates = await _projChargerDatesFamille();
+      var datesAvecTotal = dates.filter(function(d) { return d.total_final && d.total_final > 0; });
+
+      // === KPIS ===
+      var totalBillets = datesAvecTotal.reduce(function(a, b) { return a + b.total_final; }, 0);
+      var moyenneBillets = Math.round(totalBillets / Math.max(1, datesAvecTotal.length));
+      var pctRempls = datesAvecTotal.filter(function(d) { return d.jauge_ref > 0; }).map(function(d) { return d.total_final / d.jauge_ref * 100; });
+      var moyRempl = pctRempls.length > 0 ? Math.round(pctRempls.reduce(function(a, b) { return a + b; }, 0) / pctRempls.length) : 0;
+
+      var meilleure = null, pire = null;
+      datesAvecTotal.forEach(function(d) {
+        if (d.jauge_ref > 0) {
+          var pct = d.total_final / d.jauge_ref;
+          if (!meilleure || pct > meilleure.pct) meilleure = { ville: d.ville, date: d.date_concert, pct: pct, total: d.total_final };
+          if (!pire || pct < pire.pct) pire = { ville: d.ville, date: d.date_concert, pct: pct, total: d.total_final };
+        }
+      });
+
+      function kpi(titre, valeur, sub, couleur) {
+        return '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-left:3px solid ' + couleur + ';border-radius:8px;padding:14px 16px;">'
+          + '<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;">' + titre + '</div>'
+          + '<div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:' + couleur + ';font-weight:900;margin-top:4px;">' + valeur + '</div>'
+          + (sub ? '<div style="font-size:11px;color:#aab4be;margin-top:2px;">' + sub + '</div>' : '')
+          + '</div>';
+      }
+
+      var kpisHtml = '';
+      kpisHtml += kpi('TOTAL BILLETS VENDUS', totalBillets.toLocaleString('fr-FR'), datesAvecTotal.length + ' dates analysées', '#c9a84c');
+      kpisHtml += kpi('MOYENNE PAR DATE', moyenneBillets.toLocaleString('fr-FR'), 'billets / concert', '#3b82f6');
+      kpisHtml += kpi('% REMPLISSAGE MOYEN', moyRempl + '%', 'sur jauge configurée', '#22c55e');
+      if (meilleure) {
+        var dM = meilleure.date ? meilleure.date.substring(0, 10).split('-').reverse().join('/') : '';
+        kpisHtml += kpi('MEILLEUR REMPLISSAGE', Math.round(meilleure.pct * 100) + '%', meilleure.ville + ' ' + dM, '#22c55e');
+      }
+      if (pire) {
+        var dP = pire.date ? pire.date.substring(0, 10).split('-').reverse().join('/') : '';
+        kpisHtml += kpi('PIRE REMPLISSAGE', Math.round(pire.pct * 100) + '%', pire.ville + ' ' + dP, '#ef4444');
+      }
+      kpisEl.innerHTML = kpisHtml;
+
+      // === SAISONNALITÉ ===
+      var coefs = await _projCalculerSaisonnalite();
+      if (coefs) {
+        var nomsMois = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+        var maxCoef = 0;
+        Object.keys(coefs).forEach(function(m) { if (coefs[m].coef > maxCoef) maxCoef = coefs[m].coef; });
+
+        var saisonHtml = '<div style="font-size:11px;color:#888;margin-bottom:12px;font-style:italic;">Coef = part du mois dans les ventes (1.0 = moyenne, &gt;1 = mois fort, &lt;1 = mois faible)</div>';
+        saisonHtml += '<div style="display:flex;flex-direction:column;gap:6px;">';
+        for (var m = 1; m <= 12; m++) {
+          var ms = (m < 10 ? '0' : '') + m;
+          var c = coefs[ms];
+          if (!c) {
+            saisonHtml += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;">'
+              + '<div style="width:90px;color:#666;font-size:12px;">' + nomsMois[m-1] + '</div>'
+              + '<div style="flex:1;color:#666;font-size:11px;font-style:italic;">données insuffisantes</div></div>';
+            continue;
+          }
+          var lab = _projLabelMois(c.coef);
+          var widthPct = Math.min(100, (c.coef / maxCoef) * 100);
+          var pct = Math.round((c.coef - 1) * 100);
+          var pctStr = (pct >= 0 ? '+' : '') + pct + '%';
+          saisonHtml += '<div style="display:flex;align-items:center;gap:10px;">'
+            + '<div style="width:90px;color:#e8e8e8;font-size:12px;">' + lab.emoji + ' ' + nomsMois[m-1] + '</div>'
+            + '<div style="flex:1;background:#0a0a0a;height:22px;border-radius:4px;overflow:hidden;position:relative;">'
+            + '<div style="background:' + lab.couleur + ';height:100%;width:' + widthPct + '%;"></div>'
+            + '<div style="position:absolute;top:0;left:8px;line-height:22px;font-size:11px;color:#fff;font-weight:600;text-shadow:0 0 4px rgba(0,0,0,0.8);">' + c.coef.toFixed(2) + ' (' + pctStr + ')</div></div>'
+            + '<div style="width:120px;text-align:right;font-size:11px;color:' + lab.couleur + ';">' + lab.label + '</div>'
+            + '<div style="width:60px;text-align:right;font-size:10px;color:#666;">(n=' + c.nb + ')</div>'
+            + '</div>';
+        }
+        saisonHtml += '</div>';
+        saisonEl.innerHTML = saisonHtml;
+      } else {
+        saisonEl.innerHTML = '<div style="color:#666;text-align:center;padding:20px;">Pas assez de données snapshots pour calculer la saisonnalité.</div>';
+      }
+
+      // === TOP VILLES ===
+      var villes = {};
+      datesAvecTotal.forEach(function(d) {
+        var v = (d.ville || '').toUpperCase().trim();
+        if (!v) return;
+        if (!villes[v]) villes[v] = { totals: [], jauges: [] };
+        villes[v].totals.push(d.total_final);
+        if (d.jauge_ref > 0) villes[v].jauges.push(d.total_final / d.jauge_ref);
+      });
+      var topVilles = Object.keys(villes).map(function(v) {
+        var totals = villes[v].totals;
+        return {
+          ville: v,
+          nb: totals.length,
+          moy: Math.round(totals.reduce(function(a, b) { return a + b; }, 0) / totals.length),
+          moyRempl: villes[v].jauges.length > 0 ? Math.round(villes[v].jauges.reduce(function(a, b) { return a + b; }, 0) / villes[v].jauges.length * 100) : null
+        };
+      }).filter(function(v) { return v.nb >= 1; }).sort(function(a, b) { return b.moy - a.moy; }).slice(0, 15);
+
+      var villesHtml = '<div style="font-size:11px;color:#888;margin-bottom:12px;font-style:italic;">Top 15 villes par moyenne de billets vendus</div>';
+      villesHtml += '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+      villesHtml += '<thead><tr style="border-bottom:1px solid #2a2a2a;"><th style="text-align:left;padding:8px 4px;color:#3b82f6;">Ville</th><th style="text-align:right;padding:8px 4px;color:#3b82f6;">Moy. billets</th><th style="text-align:right;padding:8px 4px;color:#3b82f6;">% rempl. moy.</th><th style="text-align:right;padding:8px 4px;color:#3b82f6;">Nb dates</th></tr></thead><tbody>';
+      topVilles.forEach(function(v, idx) {
+        villesHtml += '<tr style="border-bottom:1px solid #1a1a1a;' + (idx % 2 ? 'background:#0e0e0e;' : '') + '">'
+          + '<td style="padding:7px 4px;color:#fff;">' + (idx + 1) + '. ' + v.ville + '</td>'
+          + '<td style="padding:7px 4px;text-align:right;color:#c9a84c;font-weight:600;">' + v.moy.toLocaleString('fr-FR') + '</td>'
+          + '<td style="padding:7px 4px;text-align:right;color:' + (v.moyRempl >= 90 ? '#22c55e' : v.moyRempl >= 70 ? '#facc15' : '#f97316') + ';">' + (v.moyRempl !== null ? v.moyRempl + '%' : '—') + '</td>'
+          + '<td style="padding:7px 4px;text-align:right;color:#888;">' + v.nb + '</td></tr>';
+      });
+      villesHtml += '</tbody></table>';
+      villesEl.innerHTML = villesHtml;
+
+      // === ÉVOLUTION ANNUELLE ===
+      var annees = {};
+      datesAvecTotal.forEach(function(d) {
+        var an = (d.date_concert || '').substring(0, 4);
+        if (!an) return;
+        if (!annees[an]) annees[an] = [];
+        annees[an].push(d.total_final);
+      });
+      var ansTriees = Object.keys(annees).sort();
+      var anneesHtml = '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+      anneesHtml += '<thead><tr style="border-bottom:1px solid #2a2a2a;"><th style="text-align:left;padding:8px 4px;color:#22c55e;">Année</th><th style="text-align:right;padding:8px 4px;color:#22c55e;">Nb dates</th><th style="text-align:right;padding:8px 4px;color:#22c55e;">Total billets</th><th style="text-align:right;padding:8px 4px;color:#22c55e;">Moy. par date</th><th style="text-align:right;padding:8px 4px;color:#22c55e;">Évolution</th></tr></thead><tbody>';
+      var prevMoy = null;
+      ansTriees.forEach(function(an) {
+        var arr = annees[an];
+        var total = arr.reduce(function(a, b) { return a + b; }, 0);
+        var moy = Math.round(total / arr.length);
+        var evol = '';
+        if (prevMoy !== null && prevMoy > 0) {
+          var ev = Math.round(((moy / prevMoy) - 1) * 100);
+          var couleur = ev > 0 ? '#22c55e' : (ev < 0 ? '#ef4444' : '#888');
+          evol = '<span style="color:' + couleur + ';">' + (ev > 0 ? '+' : '') + ev + '%</span>';
+        }
+        anneesHtml += '<tr style="border-bottom:1px solid #1a1a1a;">'
+          + '<td style="padding:7px 4px;color:#fff;font-weight:600;">' + an + '</td>'
+          + '<td style="padding:7px 4px;text-align:right;color:#888;">' + arr.length + '</td>'
+          + '<td style="padding:7px 4px;text-align:right;color:#aab4be;">' + total.toLocaleString('fr-FR') + '</td>'
+          + '<td style="padding:7px 4px;text-align:right;color:#c9a84c;font-weight:600;">' + moy.toLocaleString('fr-FR') + '</td>'
+          + '<td style="padding:7px 4px;text-align:right;">' + evol + '</td>'
+          + '</tr>';
+        prevMoy = moy;
+      });
+      anneesHtml += '</tbody></table>';
+      anneesEl.innerHTML = anneesHtml;
+    } catch (err) {
+      console.error('❌ Erreur tdbCharger :', err);
+      kpisEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ef4444;padding:30px;">Erreur lors du chargement des données.</div>';
+    }
+  }
+  window.tdbCharger = tdbCharger;
 
 
   // ============================================================
@@ -22715,6 +23393,15 @@ function _hideTeamSelection() {
           <div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#c9a84c;">DÉCLA DROITS</div>
             <div style="font-size:11px;color:#555;">Déclarations SACEM / SACD / CNV</div>
+          </div>
+          <span style="margin-left:auto;color:#555;font-size:18px;">→</span>
+        </button>
+
+        <button onclick="closeModal('modal-gestion-regis'); showPage('tdb-historique'); tdbCharger();" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:14px 18px;color:#fff;cursor:pointer;width:100%;text-align:left;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
+          <span style="font-size:24px;">📈</span>
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#c9a84c;">TABLEAU DE BORD HISTORIQUE</div>
+            <div style="font-size:11px;color:#555;">Synthèse 80 dates passées TWOQ + Éternelle</div>
           </div>
           <span style="margin-left:auto;color:#555;font-size:18px;">→</span>
         </button>
