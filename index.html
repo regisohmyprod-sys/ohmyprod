@@ -19162,7 +19162,7 @@ function _hideTeamSelection() {
       // 🌤️ Déclencher l'affichage de la saisonnalité
       setTimeout(function(){ projAfficherSaisonnalite(dateId); }, 400);
       // 🤖 Déclencher le calcul du Boost Auto V2 (après que les autres blocs aient peuplé leurs données)
-      setTimeout(function(){ projCalculerBoostAutoV2(dateId, totalActuel, joursRestants, jaugeFinale); }, 500);
+      setTimeout(function(){ projCalculerBoostAutoV2(dateId, totalActuel, joursRestants, jauge); }, 500);
     } catch (err) {
       console.error('❌ Erreur affichage projection :', err);
     }
