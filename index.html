@@ -21427,13 +21427,20 @@ function _hideTeamSelection() {
         + '<td style="padding:8px 6px;text-align:right;color:#fff;">' + fmtEur(d.recetteTTC) + '</td>'
         + '<td style="padding:8px 6px;text-align:right;color:#fff;">' + fmtEur(d.recetteHT) + '</td>'
         + '<td style="padding:8px 6px;text-align:right;color:' + colorEuros(d.resultatOMP) + ';border-right:2px solid #c9a84c;font-weight:600;">' + fmtEur(d.resultatOMP) + '</td>'
-        // Bloc projection
-        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? '#c9a84c' : '#555') + ';">' + (d.aSnapshots ? fmtNb(d.projBillets) : '—') + '</td>'
-        + '<td style="padding:8px 6px;text-align:right;color:#888;">' + fmtNb(d.jauge) + '</td>'
-        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? colorPct(d.projPctRempl) : '#555') + ';font-weight:600;">' + (d.aSnapshots ? fmtPct(d.projPctRempl) : '—') + '</td>'
-        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? '#c9a84c' : '#555') + ';">' + (d.aSnapshots ? fmtEur(d.projCA) : '—') + '</td>'
-        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? '#c9a84c' : '#555') + ';">' + (d.aSnapshots ? fmtEur(d.projCAHT) : '—') + '</td>'
-        + '<td style="padding:8px 6px;text-align:right;color:' + (d.aSnapshots ? colorEuros(d.projResultatOMP) : '#555') + ';font-weight:600;">' + (d.aSnapshots ? fmtEur(d.projResultatOMP) : '—') + '</td>'
+        // ✨ Bloc projection — Affichée dès que la date est à venir/en cours ET qu'il y a des ventes ou une projection
+        // (peu importe si on a des snapshots ou non — on a toujours au minimum ventes + boost manuel)
+        + (function(){
+            var hasProj = (d.categorie !== 'passees') && (d.projBillets > 0 || d.billets > 0);
+            // Couleur dorée pleine si projection avec snapshots (calcul tendance), grise plus claire sinon (proj simple)
+            var couleur = d.aSnapshots ? '#c9a84c' : (hasProj ? '#8b6f1a' : '#555');
+            return ''
+              + '<td style="padding:8px 6px;text-align:right;color:' + couleur + ';">' + (hasProj ? fmtNb(d.projBillets) : '—') + '</td>'
+              + '<td style="padding:8px 6px;text-align:right;color:#888;">' + fmtNb(d.jauge) + '</td>'
+              + '<td style="padding:8px 6px;text-align:right;color:' + (hasProj ? colorPct(d.projPctRempl) : '#555') + ';font-weight:600;">' + (hasProj ? fmtPct(d.projPctRempl) : '—') + '</td>'
+              + '<td style="padding:8px 6px;text-align:right;color:' + couleur + ';">' + (hasProj ? fmtEur(d.projCA) : '—') + '</td>'
+              + '<td style="padding:8px 6px;text-align:right;color:' + couleur + ';">' + (hasProj ? fmtEur(d.projCAHT) : '—') + '</td>'
+              + '<td style="padding:8px 6px;text-align:right;color:' + (hasProj ? colorEuros(d.projResultatOMP) : '#555') + ';font-weight:600;">' + (hasProj ? fmtEur(d.projResultatOMP) : '—') + '</td>';
+          })()
         + '</tr>';
     }).join('');
 
@@ -21448,10 +21455,11 @@ function _hideTeamSelection() {
       tot.recetteTTC += d.recetteTTC;
       tot.recetteHT += d.recetteHT;
       tot.resultatOMP += d.resultatOMP;
-      tot.projBillets += d.aSnapshots ? d.projBillets : d.billets;
-      tot.projCA += d.aSnapshots ? d.projCA : d.recetteTTC;
-      tot.projCAHT += d.aSnapshots ? d.projCAHT : d.recetteHT;
-      tot.projResultatOMP += d.aSnapshots ? d.projResultatOMP : d.resultatOMP;
+      var hasProjTot = (d.categorie !== 'passees') && (d.projBillets > 0 || d.billets > 0);
+      tot.projBillets += hasProjTot ? d.projBillets : d.billets;
+      tot.projCA += hasProjTot ? d.projCA : d.recetteTTC;
+      tot.projCAHT += hasProjTot ? d.projCAHT : d.recetteHT;
+      tot.projResultatOMP += hasProjTot ? d.projResultatOMP : d.resultatOMP;
     });
     var totPctRempl = tot.jauge > 0 ? (tot.billets / tot.jauge) * 100 : 0;
     var totProjPctRempl = tot.jauge > 0 ? (tot.projBillets / tot.jauge) * 100 : 0;
@@ -21704,10 +21712,11 @@ function _hideTeamSelection() {
       tot.recetteTTC += d.recetteTTC;
       tot.recetteHT += d.recetteHT;
       tot.resultatOMP += d.resultatOMP;
-      tot.projBillets += d.aSnapshots ? d.projBillets : d.billets;
-      tot.projCA += d.aSnapshots ? d.projCA : d.recetteTTC;
-      tot.projCAHT += d.aSnapshots ? d.projCAHT : d.recetteHT;
-      tot.projResultatOMP += d.aSnapshots ? d.projResultatOMP : d.resultatOMP;
+      var hasProjTot = (d.categorie !== 'passees') && (d.projBillets > 0 || d.billets > 0);
+      tot.projBillets += hasProjTot ? d.projBillets : d.billets;
+      tot.projCA += hasProjTot ? d.projCA : d.recetteTTC;
+      tot.projCAHT += hasProjTot ? d.projCAHT : d.recetteHT;
+      tot.projResultatOMP += hasProjTot ? d.projResultatOMP : d.resultatOMP;
     });
     var totPctRempl = tot.jauge > 0 ? (tot.billets / tot.jauge) * 100 : 0;
     var totProjPctRempl = tot.jauge > 0 ? (tot.projBillets / tot.jauge) * 100 : 0;
@@ -21718,6 +21727,8 @@ function _hideTeamSelection() {
       var dateStr = '';
       try { dateStr = new Date(d.date + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' }); } catch(e) { dateStr = d.date; }
 
+      var hasProj = (d.categorie !== 'passees') && (d.projBillets > 0 || d.billets > 0);
+      var couleurProj = d.aSnapshots ? '#8b6f1a' : (hasProj ? '#a89060' : '#aaa');
       return '<tr style="' + altBg + '">'
         + '<td style="padding:6px 8px;border-bottom:1px solid #ddd;border-right:2px solid #c9a84c;font-weight:600;white-space:nowrap;">' + dateStr + '</td>'
         + '<td style="padding:6px 8px;border-bottom:1px solid #ddd;border-right:2px solid #c9a84c;"><strong>' + (d.ville || '—') + '</strong>' + (d.salle ? '<br><span style="color:#666;font-size:9px;">' + d.salle + '</span>' : '') + '</td>'
@@ -21727,12 +21738,12 @@ function _hideTeamSelection() {
         + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;">' + fmtEur(d.recetteTTC) + '</td>'
         + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;">' + fmtEur(d.recetteHT) + '</td>'
         + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;border-right:2px solid #c9a84c;font-weight:600;color:' + colorEuros(d.resultatOMP) + ';">' + fmtEur(d.resultatOMP) + '</td>'
-        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:' + (d.aSnapshots ? '#8b6f1a' : '#aaa') + ';">' + (d.aSnapshots ? fmtNb(d.projBillets) : '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:' + couleurProj + ';">' + (hasProj ? fmtNb(d.projBillets) : '—') + '</td>'
         + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:#666;">' + fmtNb(d.jauge) + '</td>'
-        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;font-weight:600;color:' + (d.aSnapshots ? '#8b6f1a' : '#aaa') + ';">' + (d.aSnapshots ? fmtPct(d.projPctRempl) : '—') + '</td>'
-        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:' + (d.aSnapshots ? '#8b6f1a' : '#aaa') + ';">' + (d.aSnapshots ? fmtEur(d.projCA) : '—') + '</td>'
-        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:' + (d.aSnapshots ? '#8b6f1a' : '#aaa') + ';">' + (d.aSnapshots ? fmtEur(d.projCAHT) : '—') + '</td>'
-        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;font-weight:600;color:' + (d.aSnapshots ? colorEuros(d.projResultatOMP) : '#aaa') + ';">' + (d.aSnapshots ? fmtEur(d.projResultatOMP) : '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;font-weight:600;color:' + couleurProj + ';">' + (hasProj ? fmtPct(d.projPctRempl) : '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:' + couleurProj + ';">' + (hasProj ? fmtEur(d.projCA) : '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;color:' + couleurProj + ';">' + (hasProj ? fmtEur(d.projCAHT) : '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:right;border-bottom:1px solid #ddd;font-weight:600;color:' + (hasProj ? colorEuros(d.projResultatOMP) : '#aaa') + ';">' + (hasProj ? fmtEur(d.projResultatOMP) : '—') + '</td>'
         + '</tr>';
     }).join('');
 
