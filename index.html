@@ -19934,7 +19934,10 @@ function _hideTeamSelection() {
       var jaugeRef = parseInt(rD.data.jauge_choisie) || jaugeFinale || 0;
 
       // 2. Lire la projection linéaire ACTUELLE (= ventes + tendance × jours)
-      var projLineaire = parseInt((document.getElementById('pilote-proj-payants') || {}).textContent) || totalActuel;
+      // ⚠️ IMPORTANT : nettoyer les espaces (séparateur milliers fr-FR utilise espace insécable U+00A0)
+      // sinon parseInt("1 537") = 1
+      var projLineaireTxt = (document.getElementById('pilote-proj-payants') || {}).textContent || '';
+      var projLineaire = parseInt(projLineaireTxt.replace(/[\s\u00A0\u202F]/g, '')) || totalActuel;
       
       // 3. Lire la tendance affichée (en bil/j)
       var tendanceTxt = (document.getElementById('pilote-tendance') || {}).textContent || '';
