@@ -21188,9 +21188,19 @@ function _hideTeamSelection() {
       });
 
       // 5. Pour chaque date : calcul exact du Résultat OMP via la formule Pilote
+      // ✨ Date du jour ISO pour filtrer les snapshots futurs (BUG FIX #1)
+      var todayISO_suivi = new Date().toISOString().split('T')[0];
+      
       _suiviDonnees = dates.map(function(d) {
         var fiche = fichesByDateId[d.id] || {};
-        var snapshots = snapshotsByDateId[d.id] || [];
+        var rawSnapshots = snapshotsByDateId[d.id] || [];
+
+        // ✨ BUG FIX #1 : Filtrer les snapshots avec date future (erreur de saisie 2027/2028)
+        // Aligné sur la logique du Pilote Date (ligne 18960)
+        var snapshots = rawSnapshots.filter(function(snap) {
+          if (snap.snapshot_date > todayISO_suivi) return false;
+          return true;
+        });
 
         // Calcul financier VRAI avec la formule exacte
         var calc = _suiviCalculerResultatOMP(fiche);
@@ -21212,19 +21222,46 @@ function _hideTeamSelection() {
         var pctRempl = jauge > 0 ? (calc.billets / jauge) * 100 : 0;
         var prixMoyen = calc.billets > 0 ? calc.recTTC / calc.billets : 0;
 
-        // === PROJECTION ===
-        var projectionBillets = calc.billets;
-        if (snapshots.length >= 2) {
-          var today = new Date(); today.setHours(0,0,0,0);
-          var moy7j = _suiviMoyennePeriode(snapshots, today, 7);
-          var moy30j = _suiviMoyennePeriode(snapshots, today, 30);
-          var tendance = moy7j * 0.7 + moy30j * 0.3;
+        // ✨ Catégorie (calculée AVANT projection pour skip dates passées)
+        var today = new Date(); today.setHours(0,0,0,0);
+        var dConcert = new Date(d.date_concert + 'T00:00:00');
+        var diffDays = Math.ceil((dConcert - today) / 86400000);
+        var categorie = 'avenir';
+        if (diffDays < 0) categorie = 'passees';
+        else if (diffDays <= 7) categorie = 'encours';
 
-          var dConcert = new Date(d.date_concert + 'T00:00:00');
-          var joursRestants = Math.max(0, Math.ceil((dConcert - today) / 86400000));
-          var totalActuel = snapshots[snapshots.length - 1].total_cumul;
-          projectionBillets = Math.round(totalActuel + tendance * joursRestants + (parseInt(fiche.boost_bonus) || 0));
+        // === PROJECTION ===
+        // ✨ BUG FIX #2 : totalActuel = ventes RÉELLES depuis billetterie (pas snapshot périmé)
+        // Source de vérité = calc.billets (issu de billetterie_data, idem Pilote Date)
+        var totalActuel = calc.billets;
+        var projectionBillets = totalActuel;
+        var joursRestants = Math.max(0, diffDays);
+        var boost = parseInt(fiche.boost_bonus) || 0;
+
+        // ✨ BUG FIX #4 : Affiche TOUJOURS une projection (pas de — vide)
+        // Si pas assez de snapshots, projection = ventes actuelles + boost
+        if (categorie !== 'passees' && joursRestants > 0) {
+          if (snapshots.length >= 2) {
+            // Cas idéal : on a un historique → calcul de tendance
+            var moy7j = _suiviMoyennePeriode(snapshots, today, 7);
+            var moy30j = _suiviMoyennePeriode(snapshots, today, 30);
+            var tendance = moy7j * 0.7 + moy30j * 0.3;
+            projectionBillets = Math.round(totalActuel + tendance * joursRestants + boost);
+          } else {
+            // Pas d'historique : projection = ventes actuelles + boost manuel uniquement
+            projectionBillets = totalActuel + boost;
+          }
+        } else {
+          // Date passée ou jour J : projection = ventes actuelles
+          projectionBillets = totalActuel;
         }
+
+        // ✨ BUG FIX #3 : Garde-fou — projection NE PEUT PAS être < ventes actuelles
+        // (mathématiquement impossible : on ne dévend pas des billets)
+        if (projectionBillets < totalActuel) projectionBillets = totalActuel;
+        
+        // Garde-fou bonus : projection ne peut pas dépasser la jauge (sauf si jauge inconnue)
+        if (jauge > 0 && projectionBillets > jauge) projectionBillets = jauge;
 
         // Projection CA = Recette TTC + (Diff billets × Prix moyen)
         var diffBillets = projectionBillets - calc.billets;
@@ -21232,16 +21269,18 @@ function _hideTeamSelection() {
         var projectionCAHT = projectionCA / 1.021;
         var projectionPctRempl = jauge > 0 ? (projectionBillets / jauge) * 100 : 0;
 
-        // Projection Résultat OMP = (Diff × Prix moyen + Résultat OMP) × (1 - 31%)
-        var projectionResultatOMP = (diffBillets * prixMoyen + calc.resultatOMP) * (1 - 0.31);
-
-        // Catégorie
-        var today2 = new Date(); today2.setHours(0,0,0,0);
-        var dConcert2 = new Date(d.date_concert + 'T00:00:00');
-        var diffDays = Math.ceil((dConcert2 - today2) / 86400000);
-        var categorie = 'avenir';
-        if (diffDays < 0) categorie = 'passees';
-        else if (diffDays <= 7) categorie = 'encours';
+        // ✨ BUG FIX #5 : Projection Résultat OMP cohérente
+        // Si diffBillets = 0 (date passée ou pas de progression), projection = résultat actuel
+        // Sinon : on rajoute la marge nette des billets futurs (prix moyen × 69% après charges variables)
+        var projectionResultatOMP;
+        if (diffBillets <= 0) {
+          // Pas de billets supplémentaires attendus → projection = résultat actuel
+          projectionResultatOMP = calc.resultatOMP;
+        } else {
+          // Marge nette par billet supplémentaire = prix moyen × (1 - 31% charges variables)
+          var margeAdditionnelle = diffBillets * prixMoyen * (1 - 0.31);
+          projectionResultatOMP = calc.resultatOMP + margeAdditionnelle;
+        }
 
         return {
           id: d.id,
