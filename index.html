@@ -11,7 +11,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="manifest" href="manifest.json"> 
+<link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/jpeg" href="assets/omp-icon-200.jpg">
 <!-- 🗺️ Leaflet pour les cartes (OpenStreetMap, gratuit, sans clé API) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -12616,32 +12616,34 @@ function _hideTeamSelection() {
     if (selType) {
       var allowedTypes;
       // 🎯 RÈGLES PAR PROMOTEUR (voir matrice ci-dessous)
+      // 🏠 RESIDENCE est toujours disponible (mode hors-billetterie, indépendant du PL)
       if (promo === 'PAS DE PL') {
-        allowedTypes = ['PROD OMP', 'VENTE'];
+        allowedTypes = ['PROD OMP', 'VENTE', 'RESIDENCE'];
       } else if (promo === 'LDC') {
-        allowedTypes = ['CO-PROD'];
+        allowedTypes = ['CO-PROD', 'RESIDENCE'];
       } else if (promo === 'LDC BILLETTERIE') {
-        allowedTypes = ['PROD OMP'];
+        allowedTypes = ['PROD OMP', 'RESIDENCE'];
       } else if (promo === 'NDA') {
-        allowedTypes = ['PLOCALE'];
+        allowedTypes = ['PLOCALE', 'RESIDENCE'];
       } else if (promo === 'BLCITRON' || promo === 'PEELPROD') {
-        allowedTypes = ['CO-PROD'];
+        allowedTypes = ['CO-PROD', 'RESIDENCE'];
       } else if (promo === 'VENTE') {
-        allowedTypes = ['VENTE'];
+        allowedTypes = ['VENTE', 'RESIDENCE'];
       } else if (promo === '' ) {
-        allowedTypes = []; // tant que PL pas choisi, rien de valide
+        allowedTypes = ['RESIDENCE']; // même sans PL choisi, RESIDENCE reste possible
       } else {
         // Fallback (ne devrait pas arriver)
-        allowedTypes = ['CO-PROD', 'PLOCALE'];
+        allowedTypes = ['CO-PROD', 'PLOCALE', 'RESIDENCE'];
       }
       
       // Reconstruire la liste d'options (fix bug Safari/Firefox avec opt.hidden)
       // Labels d'affichage (PLOCALE → "P.LOCALE" en UI)
       var labels = {
-        'PROD OMP': 'PROD OMP',
-        'CO-PROD':  'CO-PROD',
-        'PLOCALE':  'P.LOCALE',
-        'VENTE':    'VENTE'
+        'PROD OMP':  'PROD OMP',
+        'CO-PROD':   'CO-PROD',
+        'PLOCALE':   'P.LOCALE',
+        'VENTE':     'VENTE',
+        'RESIDENCE': '🏠 RÉSIDENCE'
       };
       var valeurCourante = selType.value;
       // Vider et recréer
