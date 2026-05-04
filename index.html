@@ -4415,7 +4415,7 @@ function _hideTeamSelection() {
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;width:40%;">Date</td><td id="pilote-date" style="padding:7px 16px;color:#7eb8d4;font-weight:600;"></td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Producteur</td><td style="padding:7px 16px;color:#fff;font-weight:600;">OH MY PROD</td></tr>
             <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Promoteur local</td><td id="pilote-promo-local" style="padding:7px 16px;color:#e31e24;font-weight:700;">PAS DE PL</td></tr>
-            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Type de prod</td><td style="padding:7px 16px;color:#fff;font-weight:600;">Prod OMP</td></tr>
+            <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Type de prod</td><td id="pilote-type-prod" style="padding:7px 16px;color:#fff;font-weight:600;">Prod OMP</td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">MG montant</td><td id="pilote-mg" style="padding:7px 16px;color:#fff;font-weight:600;">0 €</td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Deal OMP</td><td id="pilote-deal-omp" style="padding:7px 16px;color:#22c55e;font-weight:700;">100%</td></tr>
             <tr class="hide-in-vente" style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Deal Promo locale</td><td id="pilote-deal-pl" style="padding:7px 16px;color:#fff;font-weight:600;">0%</td></tr>
@@ -13991,6 +13991,21 @@ function _hideTeamSelection() {
     set('pilote-mg', mg + ' €');
     set('pilote-deal-omp', dealOmp);
     set('pilote-bill-gest', document.getElementById('fp-billetterie').value || 'OMP');
+
+    // ✨ FIX : Lecture des champs manquants depuis la fiche d'identification
+    // (avant cette correction, ces 3 champs restaient sur leurs valeurs HTML par défaut)
+    var promoLocal = document.getElementById('fp-promoteur')?.value || 'PAS DE PL';
+    var typeProd = document.getElementById('fp-type-prod')?.value || 'Prod OMP';
+    var dealPromoLocale = document.getElementById('fp-deal-promo-locale')?.value 
+                       || document.getElementById('fp-deal-pl')?.value 
+                       || '0%';
+    var elPromo = document.getElementById('pilote-promo-local');
+    if (elPromo) elPromo.textContent = promoLocal;
+    var elType = document.getElementById('pilote-type-prod');
+    if (elType) elType.textContent = typeProd;
+    var elDealPL = document.getElementById('pilote-deal-pl');
+    if (elDealPL) elDealPL.textContent = dealPromoLocale;
+
     set('pilote-etat-ventes2', ventesAffichees);
     // N° jours depuis ouverture = aujourd'hui - date MEV
     var dateMev = document.getElementById('fp-date-mev').value;
