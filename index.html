@@ -12410,9 +12410,11 @@ function _hideTeamSelection() {
    * Masque/réaffiche les boutons d'accès aux blocs financiers (Billetterie, Pilote, Bilan AMH, Décla Droits, Clôture salle).
    */
   function _fpMasquerBoutonsFinanciers(masquer) {
+    // 🏠 RÉSIDENCE : on masque les blocs liés à la billetterie / projection / résultat OMP financier
+    // MAIS on GARDE 📊 DÉPENSES (= fpOuvrirFinancier) car les dépenses sont essentielles en résidence
     var fonctionsFinancieres = [
       'fpOuvrirBilletterie', 'fpOuvrirPilote', 'fpOuvrirBilanAMH',
-      'fpOuvrirDecla', 'fpOuvrirClotureSalle', 'fpOuvrirFinancier'
+      'fpOuvrirDecla', 'fpOuvrirClotureSalle'
     ];
     var boutons = document.querySelectorAll('#page-fiche-prod button, #page-fiche-prod a, #page-fiche-prod [onclick]');
     boutons.forEach(function(btn) {
@@ -13862,7 +13864,7 @@ function _hideTeamSelection() {
       try {
         var rGuard = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
         if (rGuard && rGuard.data && _fpEstResidence(rGuard.data.type_prod)) {
-          if (!silent) alert('⚠️ Pilote Date n\'est pas applicable pour ce type de date (' + rGuard.data.type_date + ').\nLes blocs financiers sont désactivés pour les Résidences, Promo, Voyages, Répétitions, etc.');
+          if (!silent) alert('⚠️ Pilote Date n\'est pas applicable en mode RÉSIDENCE.');
           return;
         }
       } catch(e) { /* ignore */ }
@@ -14959,7 +14961,7 @@ function _hideTeamSelection() {
       try {
         var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
         if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
-          alert('⚠️ Bilan AMH n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
+          alert('⚠️ Bilan AMH n\'est pas applicable en mode RÉSIDENCE.');
           return;
         }
       } catch(e) {}
@@ -15331,7 +15333,7 @@ function _hideTeamSelection() {
       try {
         var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
         if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
-          alert('⚠️ Décla Droits n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
+          alert('⚠️ Décla Droits n\'est pas applicable en mode RÉSIDENCE.');
           return;
         }
       } catch(e) {}
@@ -15498,7 +15500,7 @@ function _hideTeamSelection() {
       try {
         var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
         if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
-          alert('⚠️ Clôture Salle n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
+          alert('⚠️ Clôture Salle n\'est pas applicable en mode RÉSIDENCE.');
           return;
         }
       } catch(e) {}
@@ -15585,16 +15587,8 @@ function _hideTeamSelection() {
   }
 
   async function fpOuvrirFinancier() {
-    // 🎯 Garde non-concert
-    if (_fpDateId) {
-      try {
-        var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
-        if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
-          alert('⚠️ Bloc Financier n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
-          return;
-        }
-      } catch(e) {}
-    }
+    // 📊 DÉPENSES : accessible TOUJOURS, y compris en mode RÉSIDENCE
+    // (les dépenses sont essentielles pour les résidences : studio, défraiements, etc.)
     const ville = document.getElementById('fp-ville').value || '';
     const date = document.getElementById('fp-date-concert').value || '';
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
@@ -15844,7 +15838,7 @@ function _hideTeamSelection() {
       try {
         var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
         if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
-          alert('⚠️ Billetterie n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
+          alert('⚠️ Billetterie n\'est pas applicable en mode RÉSIDENCE.');
           return;
         }
       } catch(e) {}
