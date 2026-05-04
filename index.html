@@ -12355,6 +12355,77 @@ function _hideTeamSelection() {
   }
 
   var _fpOuvrirEnCours = false;
+  /**
+   * 🎯 Détecte si une date est NON-CONCERT (Résidence, Promo, Voyage, Jour off, Répétition, Trajet, Studio, Autre).
+   * Ces types ne génèrent pas de billetterie, deal financier, projection, ou résultat OMP — uniquement des dépenses.
+   */
+  function _fpEstNonConcert(typeDate) {
+    if (!typeDate) return false;
+    var t = String(typeDate).trim().toLowerCase();
+    // Le seul type qui DÉCLENCHE les calculs financiers complets, c'est Concert/Spectacle
+    return t !== 'concert/spectacle' && t !== 'concert' && t !== 'spectacle';
+  }
+
+  /**
+   * 🎯 Masque ou affiche les blocs financiers de la fiche-prod selon type_date.
+   * Si type_date = Résidence/Promo/Voyage/etc → masque billetterie, pilote, bilan AMH, décla droits.
+   * Affiche un bandeau d'info expliquant pourquoi.
+   */
+  function _fpAppliquerModeNonConcert(typeDate) {
+    var estNonConcert = _fpEstNonConcert(typeDate);
+    var libelle = (typeDate || 'NON-CONCERT').toUpperCase();
+    var bandeauId = 'fp-bandeau-non-concert';
+    var bandeau = document.getElementById(bandeauId);
+
+    // Si non-concert : créer (ou afficher) le bandeau d'info
+    if (estNonConcert) {
+      if (!bandeau) {
+        bandeau = document.createElement('div');
+        bandeau.id = bandeauId;
+        bandeau.style.cssText = 'background:linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%); color:#000; padding:14px 20px; border-radius:10px; margin-bottom:16px; font-family:Inter,sans-serif; font-size:13px; font-weight:600; box-shadow:0 4px 12px rgba(245,158,11,0.3);';
+        // Insérer en haut de la page-fiche-prod, juste après le bouton Retour
+        var pageFiche = document.getElementById('page-fiche-prod');
+        if (pageFiche) {
+          var firstChild = pageFiche.querySelector('.back-btn') || pageFiche.firstElementChild;
+          if (firstChild && firstChild.nextSibling) {
+            pageFiche.insertBefore(bandeau, firstChild.nextSibling);
+          } else {
+            pageFiche.insertBefore(bandeau, pageFiche.firstChild);
+          }
+        }
+      }
+      bandeau.innerHTML = '🏠 <strong>Mode ' + libelle + '</strong> — Les blocs financiers (Billetterie, Pilote Date, Bilan AMH, Décla Droits) sont désactivés. Seules les dépenses et coûts réels sont applicables. Le résultat OMP affichera uniquement le coût opérationnel (négatif).';
+      bandeau.style.display = 'block';
+
+      // Masquer les boutons d'accès aux blocs financiers (par data-attr ou onclick contenant)
+      _fpMasquerBoutonsFinanciers(true);
+    } else {
+      // Mode concert normal : masquer le bandeau et réafficher les boutons
+      if (bandeau) bandeau.style.display = 'none';
+      _fpMasquerBoutonsFinanciers(false);
+    }
+  }
+
+  /**
+   * Masque/réaffiche les boutons d'accès aux blocs financiers (Billetterie, Pilote, Bilan AMH, Décla Droits, Clôture salle).
+   */
+  function _fpMasquerBoutonsFinanciers(masquer) {
+    var fonctionsFinancieres = [
+      'fpOuvrirBilletterie', 'fpOuvrirPilote', 'fpOuvrirBilanAMH',
+      'fpOuvrirDecla', 'fpOuvrirClotureSalle', 'fpOuvrirFinancier'
+    ];
+    var boutons = document.querySelectorAll('#page-fiche-prod button, #page-fiche-prod a, #page-fiche-prod [onclick]');
+    boutons.forEach(function(btn) {
+      var onclickStr = (btn.getAttribute('onclick') || '') + ' ' + (btn.onclick ? btn.onclick.toString() : '');
+      var concerne = fonctionsFinancieres.some(function(fn) { return onclickStr.indexOf(fn) >= 0; });
+      if (concerne) {
+        btn.style.display = masquer ? 'none' : '';
+      }
+    });
+  }
+  window._fpEstNonConcert = _fpEstNonConcert;
+  window._fpAppliquerModeNonConcert = _fpAppliquerModeNonConcert;
+
   async function fpOuvrir(dateConcertId, ville, dateStr) {
     if (_fpOuvrirEnCours) { console.log('fpOuvrir déjà en cours, ignoré'); return; }
     _fpOuvrirEnCours = true;
@@ -12389,7 +12460,7 @@ function _hideTeamSelection() {
 
     // Charger la date depuis dates_concert pour pré-remplir date + heure
     console.log('Chargement date_concert...');
-    const { data: dc } = await _supabase.from('dates_concert').select('date_concert, heure_show, nom_salle, statut').eq('id', dateConcertId).single();
+    const { data: dc } = await _supabase.from('dates_concert').select('date_concert, heure_show, nom_salle, statut, type_date').eq('id', dateConcertId).single();
     console.log('date_concert chargée:', dc);
     if (dc) {
       if (dc.date_concert) document.getElementById('fp-date-concert').value = dc.date_concert;
@@ -12400,6 +12471,9 @@ function _hideTeamSelection() {
       if (dc.nom_salle) document.getElementById('fp-salle').value = dc.nom_salle;
       if (dc.statut) document.getElementById('fp-statut').value = dc.statut;
     }
+
+    // 🎯 Mode NON-CONCERT : masquer/afficher les blocs financiers selon le type_date
+    _fpAppliquerModeNonConcert(dc ? dc.type_date : null);
 
     // Charger fiche existante
     console.log('Chargement fiche_production...');
@@ -13779,6 +13853,16 @@ function _hideTeamSelection() {
   }
 
   async function fpOuvrirPilote(silent) {
+    // 🎯 Garde non-concert : on bloque l'ouverture si type_date n'est pas Concert
+    if (_fpDateId) {
+      try {
+        var rGuard = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
+        if (rGuard && rGuard.data && _fpEstNonConcert(rGuard.data.type_date)) {
+          if (!silent) alert('⚠️ Pilote Date n\'est pas applicable pour ce type de date (' + rGuard.data.type_date + ').\nLes blocs financiers sont désactivés pour les Résidences, Promo, Voyages, Répétitions, etc.');
+          return;
+        }
+      } catch(e) { /* ignore */ }
+    }
     const ville = document.getElementById('fp-ville').value || '';
     const date = document.getElementById('fp-date-concert').value || '';
     const salle = document.getElementById('fp-salle').value || '';
@@ -14866,6 +14950,16 @@ function _hideTeamSelection() {
   }
 
   async function fpOuvrirBilanAMH() {
+    // 🎯 Garde non-concert
+    if (_fpDateId) {
+      try {
+        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
+        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+          alert('⚠️ Bilan AMH n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
+          return;
+        }
+      } catch(e) {}
+    }
     var setEl = function(id, v) { var e = document.getElementById(id); if(e) e.textContent = v; };
     var fmt = function(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
     var pct = function(v, base){ return base > 0 ? (v/base*100).toFixed(2)+'%' : ''; };
@@ -15227,7 +15321,17 @@ function _hideTeamSelection() {
     }, 800);
   }
 
-  function fpOuvrirDecla() {
+  async function fpOuvrirDecla() {
+    // 🎯 Garde non-concert
+    if (_fpDateId) {
+      try {
+        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
+        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+          alert('⚠️ Décla Droits n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
+          return;
+        }
+      } catch(e) {}
+    }
     var setEl = function(id, v) { var e = document.getElementById(id); if(e) e.textContent = v; };
     var getEl = function(id) { var e = document.getElementById(id); return e ? e.textContent || '' : ''; };
 
@@ -15385,6 +15489,16 @@ function _hideTeamSelection() {
   }
 
   async function fpOuvrirClotureSalle() {
+    // 🎯 Garde non-concert
+    if (_fpDateId) {
+      try {
+        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
+        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+          alert('⚠️ Clôture Salle n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
+          return;
+        }
+      } catch(e) {}
+    }
     var setEl = function(id, v) { var e = document.getElementById(id); if(e) e.textContent = v; };
     var getVal = function(id) { var e = document.getElementById(id); return e ? e.value || e.textContent || '' : ''; };
 
@@ -15466,7 +15580,17 @@ function _hideTeamSelection() {
     showPage('cloture-salle');
   }
 
-  function fpOuvrirFinancier() {
+  async function fpOuvrirFinancier() {
+    // 🎯 Garde non-concert
+    if (_fpDateId) {
+      try {
+        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
+        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+          alert('⚠️ Bloc Financier n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
+          return;
+        }
+      } catch(e) {}
+    }
     const ville = document.getElementById('fp-ville').value || '';
     const date = document.getElementById('fp-date-concert').value || '';
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
@@ -15710,7 +15834,17 @@ function _hideTeamSelection() {
   }
   billInitData();
 
-  function fpOuvrirBilletterie() {
+  async function fpOuvrirBilletterie() {
+    // 🎯 Garde non-concert
+    if (_fpDateId) {
+      try {
+        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
+        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+          alert('⚠️ Billetterie n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
+          return;
+        }
+      } catch(e) {}
+    }
     const ville = document.getElementById('fp-ville').value || '';
     const date = document.getElementById('fp-date-concert').value || '';
     const label = ville + (date ? ' · ' + new Date(date + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '');
