@@ -18877,6 +18877,39 @@ function _hideTeamSelection() {
       var calc = _projCalculerTotalBilletterie(billetterieData);
       var today = new Date().toISOString().split('T')[0];
 
+      // ✨ GARDE-FOUS ANTI-POLLUTION (3 vérifications avant insertion)
+      // Empêche la création de snapshots foireux quand on ouvre/édite des fiches passées
+      
+      // 1. Vérifier le cumul : si 0, on n'enregistre RIEN (snapshot vide inutile)
+      if (!calc.total || calc.total === 0) {
+        console.log('⏭️ Snapshot ignoré : cumul à 0 (aucune vente saisie)');
+        return null;
+      }
+      
+      // 2. Vérifier la date du concert et le statut import_historique
+      var rDate = await _supabase
+        .from('dates_concert')
+        .select('date_concert, import_historique')
+        .eq('id', dateId)
+        .maybeSingle();
+      
+      if (rDate.data) {
+        // 2a. Date passée : pas de snapshot (le concert a déjà eu lieu)
+        if (rDate.data.date_concert && rDate.data.date_concert < today) {
+          console.log('⏭️ Snapshot ignoré : concert déjà passé (' + rDate.data.date_concert + ')');
+          return null;
+        }
+        // 2b. Date marquée import historique : pas de snapshot (résultat figé)
+        if (rDate.data.import_historique === true) {
+          console.log('⏭️ Snapshot ignoré : date en import historique (résultat figé)');
+          return null;
+        }
+      }
+      
+      // 3. Sécurité supplémentaire : si snapshot_date serait > date_concert, on bloque
+      // (cas où la date du concert serait aujourd'hui ou demain mais qu'on saisit pour test)
+      // → Ce cas est déjà couvert par la vérif 2a, c'est juste de la double sécu.
+
       // Récupérer le dernier snapshot antérieur pour calculer la progression
       var r1 = await _supabase
         .from('ventes_snapshots')
