@@ -3894,6 +3894,7 @@ function _hideTeamSelection() {
               <option value="CO-PROD">CO-PROD</option>
               <option value="PLOCALE">P.LOCALE</option>
               <option value="VENTE">VENTE</option>
+              <option value="RESIDENCE">🏠 RÉSIDENCE</option>
             </select>
           </div>
           <div class="hide-in-vente">
@@ -12356,29 +12357,28 @@ function _hideTeamSelection() {
 
   var _fpOuvrirEnCours = false;
   /**
-   * 🎯 Détecte si une date est NON-CONCERT (Résidence, Promo, Voyage, Jour off, Répétition, Trajet, Studio, Autre).
-   * Ces types ne génèrent pas de billetterie, deal financier, projection, ou résultat OMP — uniquement des dépenses.
+   * 🎯 Détecte si la fiche est en mode RÉSIDENCE.
+   * En résidence : pas de billetterie, pas de deal financier, pas de projection, pas de résultat OMP financier.
+   * Uniquement les dépenses/coûts opérationnels.
    */
-  function _fpEstNonConcert(typeDate) {
-    if (!typeDate) return false;
-    var t = String(typeDate).trim().toLowerCase();
-    // Le seul type qui DÉCLENCHE les calculs financiers complets, c'est Concert/Spectacle
-    return t !== 'concert/spectacle' && t !== 'concert' && t !== 'spectacle';
+  function _fpEstResidence(typeProd) {
+    if (!typeProd) return false;
+    var t = String(typeProd).trim().toUpperCase();
+    return t === 'RESIDENCE' || t === 'RÉSIDENCE';
   }
 
   /**
-   * 🎯 Masque ou affiche les blocs financiers de la fiche-prod selon type_date.
-   * Si type_date = Résidence/Promo/Voyage/etc → masque billetterie, pilote, bilan AMH, décla droits.
+   * 🎯 Masque ou affiche les blocs financiers de la fiche-prod selon type_prod.
+   * Si RESIDENCE → masque billetterie, pilote, bilan AMH, décla droits.
    * Affiche un bandeau d'info expliquant pourquoi.
    */
-  function _fpAppliquerModeNonConcert(typeDate) {
-    var estNonConcert = _fpEstNonConcert(typeDate);
-    var libelle = (typeDate || 'NON-CONCERT').toUpperCase();
-    var bandeauId = 'fp-bandeau-non-concert';
+  function _fpAppliquerModeResidence(typeProd) {
+    var estResidence = _fpEstResidence(typeProd);
+    var bandeauId = 'fp-bandeau-residence';
     var bandeau = document.getElementById(bandeauId);
 
-    // Si non-concert : créer (ou afficher) le bandeau d'info
-    if (estNonConcert) {
+    // Si résidence : créer (ou afficher) le bandeau d'info
+    if (estResidence) {
       if (!bandeau) {
         bandeau = document.createElement('div');
         bandeau.id = bandeauId;
@@ -12394,13 +12394,13 @@ function _hideTeamSelection() {
           }
         }
       }
-      bandeau.innerHTML = '🏠 <strong>Mode ' + libelle + '</strong> — Les blocs financiers (Billetterie, Pilote Date, Bilan AMH, Décla Droits) sont désactivés. Seules les dépenses et coûts réels sont applicables. Le résultat OMP affichera uniquement le coût opérationnel (négatif).';
+      bandeau.innerHTML = '🏠 <strong>Mode RÉSIDENCE</strong> — Pas de billetterie, pas de PL, pas de Deal OMP, pas de MG, pas de Deal Promo Locale, pas de Deal Billetterie. Les blocs financiers (Pilote Date, Bilan AMH, Décla Droits, Clôture Salle) sont désactivés. Seules les dépenses et coûts réels sont applicables.';
       bandeau.style.display = 'block';
 
-      // Masquer les boutons d'accès aux blocs financiers (par data-attr ou onclick contenant)
+      // Masquer les boutons d'accès aux blocs financiers
       _fpMasquerBoutonsFinanciers(true);
     } else {
-      // Mode concert normal : masquer le bandeau et réafficher les boutons
+      // Mode normal : masquer le bandeau et réafficher les boutons
       if (bandeau) bandeau.style.display = 'none';
       _fpMasquerBoutonsFinanciers(false);
     }
@@ -12423,8 +12423,8 @@ function _hideTeamSelection() {
       }
     });
   }
-  window._fpEstNonConcert = _fpEstNonConcert;
-  window._fpAppliquerModeNonConcert = _fpAppliquerModeNonConcert;
+  window._fpEstResidence = _fpEstResidence;
+  window._fpAppliquerModeResidence = _fpAppliquerModeResidence;
 
   async function fpOuvrir(dateConcertId, ville, dateStr) {
     if (_fpOuvrirEnCours) { console.log('fpOuvrir déjà en cours, ignoré'); return; }
@@ -12472,9 +12472,6 @@ function _hideTeamSelection() {
       if (dc.statut) document.getElementById('fp-statut').value = dc.statut;
     }
 
-    // 🎯 Mode NON-CONCERT : masquer/afficher les blocs financiers selon le type_date
-    _fpAppliquerModeNonConcert(dc ? dc.type_date : null);
-
     // Charger fiche existante
     console.log('Chargement fiche_production...');
     const { data: ficheData } = await _supabase.from('fiches_production').select('*').eq('date_concert_id', dateConcertId);
@@ -12484,6 +12481,8 @@ function _hideTeamSelection() {
       document.getElementById('fp-producteur').value = fiche.producteur || 'OH MY PROD';
       document.getElementById('fp-promoteur').value = fiche.promoteur_local || 'PAS DE PL';
       document.getElementById('fp-type-prod').value = fiche.type_prod || 'PROD OMP';
+      // 🏠 Mode RÉSIDENCE : masquer/afficher les blocs financiers selon type_prod
+      _fpAppliquerModeResidence(fiche.type_prod);
       document.getElementById('fp-billetterie').value = fiche.gestion_billetterie || '';
       document.getElementById('fp-deal-billetterie').value = fiche.deal_billetterie || '100%';
       document.getElementById('fp-mg').value = fiche.mg_montant || '';
@@ -12854,7 +12853,10 @@ function _hideTeamSelection() {
     var sel = event.target;
     var nouveau = sel.value;
     var ancien = window._fpPrevTypeProd || '';
-    
+
+    // 🏠 Toujours appliquer le mode RESIDENCE (masquer/afficher blocs)
+    _fpAppliquerModeResidence(nouveau);
+
     // Si on n'a pas d'ancien, ou si on part de vide, pas de confirmation
     if (!ancien || ancien === '' || ancien === nouveau) {
       window._fpPrevTypeProd = nouveau;
@@ -13856,8 +13858,8 @@ function _hideTeamSelection() {
     // 🎯 Garde non-concert : on bloque l'ouverture si type_date n'est pas Concert
     if (_fpDateId) {
       try {
-        var rGuard = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
-        if (rGuard && rGuard.data && _fpEstNonConcert(rGuard.data.type_date)) {
+        var rGuard = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (rGuard && rGuard.data && _fpEstResidence(rGuard.data.type_prod)) {
           if (!silent) alert('⚠️ Pilote Date n\'est pas applicable pour ce type de date (' + rGuard.data.type_date + ').\nLes blocs financiers sont désactivés pour les Résidences, Promo, Voyages, Répétitions, etc.');
           return;
         }
@@ -14953,8 +14955,8 @@ function _hideTeamSelection() {
     // 🎯 Garde non-concert
     if (_fpDateId) {
       try {
-        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
-        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+        var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
           alert('⚠️ Bilan AMH n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
           return;
         }
@@ -15325,8 +15327,8 @@ function _hideTeamSelection() {
     // 🎯 Garde non-concert
     if (_fpDateId) {
       try {
-        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
-        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+        var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
           alert('⚠️ Décla Droits n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
           return;
         }
@@ -15492,8 +15494,8 @@ function _hideTeamSelection() {
     // 🎯 Garde non-concert
     if (_fpDateId) {
       try {
-        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
-        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+        var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
           alert('⚠️ Clôture Salle n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
           return;
         }
@@ -15584,8 +15586,8 @@ function _hideTeamSelection() {
     // 🎯 Garde non-concert
     if (_fpDateId) {
       try {
-        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
-        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+        var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
           alert('⚠️ Bloc Financier n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
           return;
         }
@@ -15838,8 +15840,8 @@ function _hideTeamSelection() {
     // 🎯 Garde non-concert
     if (_fpDateId) {
       try {
-        var rG = await _supabase.from('dates_concert').select('type_date').eq('id', _fpDateId).single();
-        if (rG && rG.data && _fpEstNonConcert(rG.data.type_date)) {
+        var rG = await _supabase.from('fiches_production').select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (rG && rG.data && _fpEstResidence(rG.data.type_prod)) {
           alert('⚠️ Billetterie n\'est pas applicable pour ce type de date (' + rG.data.type_date + ').');
           return;
         }
