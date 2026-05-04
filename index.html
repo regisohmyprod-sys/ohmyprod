@@ -4522,10 +4522,10 @@ function _hideTeamSelection() {
                   <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">Moyenne 7 derniers jours</td><td id="pilote-moy-7j" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
                   <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:700;">TENDANCE</td><td id="pilote-tendance" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
                   <tr style="border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#888;">N° Jours restants</td><td id="pilote-jours-restants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
-                  <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Projection payants</td><td id="pilote-proj-payants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
+                  <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;">Projection payants (sans boost)</td><td id="pilote-proj-payants" style="padding:7px 16px;color:#fff;text-align:right;"></td></tr>
                   <tr id="pilote-boost-auto-row" style="border-bottom:1px solid #2a2a2a;background:rgba(34,197,94,0.06);display:none;">
                     <td style="padding:6px 16px;color:#22c55e;font-weight:600;vertical-align:top;">
-                      🤖 BOOST AUTO (suggéré)
+                      🤖 BOOST AUTO (saisonnalité)
                       <div id="pilote-boost-auto-detail" style="font-size:10px;color:#888;font-weight:400;margin-top:3px;line-height:1.4;"></div>
                     </td>
                     <td style="padding:4px 16px;text-align:right;vertical-align:top;">
@@ -19846,6 +19846,68 @@ function _hideTeamSelection() {
     return false;
   }
 
+  // ============================================================
+  // 📅 SAISONNALITÉ RÉGIS — Coefs métier par période (en dur)
+  // Calibrés par le producteur sur 5+ ans d'expérience tournées
+  // ============================================================
+  /**
+   * Retourne le coef de saisonnalité pour une date donnée.
+   * @param {Date} d - objet Date JavaScript
+   * @returns {object} { coef, label, periode }
+   */
+  function _projCoefSaisonRegis(d) {
+    if (!d || !(d instanceof Date) || isNaN(d.getTime())) return { coef: 1.0, label: 'Inconnu', periode: '' };
+    var m = d.getMonth() + 1;   // 1-12
+    var j = d.getDate();         // 1-31
+    var mj = m * 100 + j;        // ex: 0520 = 20 mai
+
+    // 14 périodes définies par Régis
+    if (mj >= 101 && mj <= 120)  return { coef: 0.30, label: '🔴 Trou',   periode: '01-20 janv' };
+    if (mj >= 121 && mj <= 210)  return { coef: 1.10, label: '🟢 Bons',   periode: '21 janv – 10 fév' };
+    if (mj >= 211 && mj <= 228)  return { coef: 0.55, label: '🟠 Mou',    periode: '11-28 fév' };
+    if (mj >= 301 && mj <= 405)  return { coef: 1.30, label: '🟢 Bons+',  periode: '01 mars – 05 avril' };
+    if (mj >= 406 && mj <= 430)  return { coef: 0.55, label: '🟠 Mou',    periode: '06-30 avril' };
+    if (mj >= 501 && mj <= 531)  return { coef: 0.85, label: '🟡 Moyen',  periode: '01-31 mai' };
+    if (mj >= 601 && mj <= 630)  return { coef: 0.85, label: '🟡 Moyen',  periode: '01-30 juin' };
+    if (mj >= 701 && mj <= 822)  return { coef: 0.30, label: '🔴 Trou',   periode: '01 juil – 22 août' };
+    if (mj >= 823 && mj <= 915)  return { coef: 0.55, label: '🟠 Mou',    periode: '23 août – 15 sept' };
+    if (mj >= 916 && mj <= 930)  return { coef: 0.55, label: '🟠 Mou',    periode: '16-30 sept' };
+    if (mj >= 1001 && mj <= 1031)return { coef: 0.85, label: '🟡 Moyen',  periode: '01-31 oct' };
+    if (mj >= 1101 && mj <= 1119)return { coef: 1.10, label: '🟢 Bons',   periode: '01-19 nov' };
+    if (mj >= 1120 && mj <= 1224)return { coef: 3.00, label: '🔥 Pic',    periode: '20 nov – 24 déc' };
+    if (mj >= 1225 && mj <= 1231)return { coef: 1.10, label: '🟢 Bons',   periode: '25-31 déc' };
+    // Cas 29 fév (année bissextile) : on l'agrège au "Mou 11-28 fév"
+    if (m === 2 && j === 29) return { coef: 0.55, label: '🟠 Mou', periode: '29 fév (bissextile)' };
+    return { coef: 1.0, label: 'Moyen', periode: 'défaut' };
+  }
+  
+  /**
+   * Calcule la somme des coefs saisonnalité entre aujourd'hui (exclu) et la date du concert (incluse).
+   * Sert à pondérer la projection des ventes restantes par les périodes traversées.
+   * @returns {object} { sommeCoefs, joursTotal, detailMois }
+   */
+  function _projSommeCoefsSaisonnalite(dateConcert) {
+    var today = new Date(); today.setHours(0,0,0,0);
+    var dC = new Date(dateConcert); dC.setHours(0,0,0,0);
+    if (dC <= today) return { sommeCoefs: 0, joursTotal: 0, detailMois: [] };
+
+    var sommeCoefs = 0;
+    var joursTotal = 0;
+    var detailParPeriode = {}; // { 'periode' : { jours, coef, total } }
+    var d = new Date(today);
+    d.setDate(d.getDate() + 1); // démarrer demain (ne pas compter aujourd'hui)
+    while (d <= dC) {
+      var info = _projCoefSaisonRegis(d);
+      sommeCoefs += info.coef;
+      joursTotal += 1;
+      var key = info.periode;
+      if (!detailParPeriode[key]) detailParPeriode[key] = { jours: 0, coef: info.coef, label: info.label };
+      detailParPeriode[key].jours += 1;
+      d.setDate(d.getDate() + 1);
+    }
+    return { sommeCoefs: sommeCoefs, joursTotal: joursTotal, detailParPeriode: detailParPeriode };
+  }
+
   /**
    * Calcule et affiche le Boost Auto V2 dans la ligne UI dédiée.
    * Appelé après chaque calcul de projection.
@@ -19862,157 +19924,81 @@ function _hideTeamSelection() {
     }
 
     try {
-      // 1. Récupérer la fiche courante
+      // 1. Récupérer la date du concert
       var rD = await _supabase.from('dates_concert')
-        .select('id, ville, nom_salle, date_concert, tournee_id, jauge_choisie')
+        .select('date_concert, jauge_choisie')
         .eq('id', dateId).single();
-      if (rD.error || !rD.data) { rowEl.style.display = 'none'; return; }
+      if (rD.error || !rD.data || !rD.data.date_concert) { rowEl.style.display = 'none'; return; }
 
-      var villeCourante = (rD.data.ville || '').toUpperCase().trim();
-      function normalizeVille(v) { return (v || '').toUpperCase().trim().replace(/[\s\-_]+/g, ''); }
-      var villeNorm = normalizeVille(villeCourante);
-      var dateConcertStr = rD.data.date_concert.substring(0, 10);
-      var moisConcert = parseInt(dateConcertStr.substring(5, 7));
+      var dateConcertObj = new Date(rD.data.date_concert + 'T00:00:00');
       var jaugeRef = parseInt(rD.data.jauge_choisie) || jaugeFinale || 0;
 
-      // 🗼 EXCEPTION PARIS : la date courante est-elle à Paris ?
-      var estParis = _projEstDateParis(rD.data);
-
-      // 2. Charger les dates passées de la famille TWOQ
-      var datesFamille = await _projChargerDatesFamille();
-
-      // ====== MODE PARIS : calibration uniquement sur les dates Paris ======
-      if (estParis) {
-        var datesParis = datesFamille.filter(function(d) {
-          return _projEstDateParis(d) && d.id !== dateId && d.total_final && d.total_final > 0;
-        });
-        if (datesParis.length === 0) {
-          // Aucune référence Paris → on cache et on indique
-          valEl.textContent = '—';
-          detailEl.innerHTML = '🗼 Pas de référence Paris dans l\'historique. Utilise le boost manuel selon ton flair métier.';
-          rowEl.style.display = '';
-          window._boostAutoSuggere = 0;
-          return;
-        }
-        // Moyenne des dates Paris (généralement 1 ou 2 dates seulement)
-        var sumParis = datesParis.reduce(function(a, b) { return a + b.total_final; }, 0);
-        var ciblePari = Math.round(sumParis / datesParis.length);
-
-        // Stats rush appliquées
-        var pctAtteintP = _projPctFinalAJoursAvant(joursRestants);
-        var projLineaireP = parseInt((document.getElementById('pilote-proj-payants') || {}).textContent) || totalActuel;
-        var boostP = ciblePari - projLineaireP;
-        if (boostP < 0) boostP = 0;
-        if (boostP > ciblePari * 0.5) boostP = Math.round(ciblePari * 0.5);
-        if (jaugeRef > 0 && (projLineaireP + boostP) > jaugeRef) {
-          boostP = Math.max(0, jaugeRef - projLineaireP);
-        }
-
-        valEl.textContent = boostP.toLocaleString('fr-FR');
-        var detailP = ['🗼 Calibration Paris uniquement'];
-        var nbAff = datesParis.length;
-        if (nbAff === 1) {
-          var d0 = datesParis[0];
-          var dateStr = d0.date_concert ? d0.date_concert.substring(0, 10).split('-').reverse().join('/') : '';
-          detailP.push('Réf : ' + (d0.nom_salle || 'Paris') + ' ' + dateStr + ' = ' + d0.total_final.toLocaleString('fr-FR') + ' billets');
-          detailP.push('⚠️ Une seule référence — chiffre à prendre avec prudence');
-        } else {
-          detailP.push('Cible : ' + ciblePari.toLocaleString('fr-FR') + ' (moyenne ' + nbAff + ' dates Paris)');
-        }
-        detailP.push('Stats rush J-' + joursRestants + ' : ' + Math.round(pctAtteintP * 100) + '% atteint');
-        detailEl.innerHTML = detailP.join(' · ');
+      // 2. Lire la projection linéaire ACTUELLE (= ventes + tendance × jours)
+      var projLineaire = parseInt((document.getElementById('pilote-proj-payants') || {}).textContent) || totalActuel;
+      
+      // 3. Lire la tendance affichée (en bil/j)
+      var tendanceTxt = (document.getElementById('pilote-tendance') || {}).textContent || '';
+      var tendance = parseFloat(tendanceTxt.replace(',', '.')) || 0;
+      if (tendance <= 0) {
+        // Pas de tendance → on ne peut pas projeter par saisonnalité
+        valEl.textContent = '—';
+        detailEl.innerHTML = 'Tendance non disponible. Pas assez d\'historique de ventes pour calculer.';
         rowEl.style.display = '';
-        window._boostAutoSuggere = boostP;
+        window._boostAutoSuggere = 0;
         return;
       }
 
-      // ====== MODE PROVINCE : calcul normal en EXCLUANT les dates Paris ======
-      // (les chiffres Paris fausseraient les médianes/moyennes des petites villes)
-
-      // ====== SOURCE 1 : Moyenne historique de la ville ======
-      var datesVille = datesFamille.filter(function(d) {
-        return normalizeVille(d.ville) === villeNorm && d.id !== dateId && d.total_final && d.total_final > 0
-               && !_projEstDateParis(d);
-      });
-      var moyenneVille = null;
-      if (datesVille.length > 0) {
-        var sum = datesVille.reduce(function(a, b) { return a + b.total_final; }, 0);
-        moyenneVille = sum / datesVille.length;
-      }
-
-      // ====== SOURCE 2 : Médiane des dates similaires (hors Paris) ======
-      var candidats = datesFamille.filter(function(d) {
-        if (!d.total_final || d.total_final <= 0) return false;
-        if (normalizeVille(d.ville) === villeNorm) return false;
-        if (_projEstDateParis(d)) return false; // 🗼 exclure les dates Paris des comparaisons province
-        var moisD = parseInt((d.date_concert || '').substring(5, 7));
-        var diffMois = Math.min(Math.abs(moisD - moisConcert), 12 - Math.abs(moisD - moisConcert));
-        if (diffMois > 1) return false;
-        if (jaugeRef > 0 && d.jauge_ref > 0) {
-          var ratio = d.jauge_ref / jaugeRef;
-          if (ratio < 0.7 || ratio > 1.3) return false;
-        }
-        return true;
-      });
-      var medianeSimilaires = null;
-      if (candidats.length > 0) {
-        var sorted = candidats.map(function(d) { return d.total_final; }).sort(function(a, b) { return a - b; });
-        medianeSimilaires = (sorted.length % 2 === 1) ? sorted[Math.floor(sorted.length / 2)]
-                                                      : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
-      }
-
-      // ====== CIBLE = moyenne pondérée ======
-      var sumP = 0, sumW = 0;
-      var sourcesUsed = [];
-      if (moyenneVille !== null) {
-        // Plus on a de dates ville, plus le poids est élevé (max 3)
-        var poidsVille = Math.min(3, datesVille.length);
-        sumP += moyenneVille * poidsVille;
-        sumW += poidsVille;
-        sourcesUsed.push('ville × ' + poidsVille);
-      }
-      if (medianeSimilaires !== null) {
-        var poidsSim = Math.min(2, candidats.length);
-        sumP += medianeSimilaires * poidsSim;
-        sumW += poidsSim;
-        sourcesUsed.push('similaires × ' + poidsSim);
-      }
-
-      if (sumW === 0) {
-        // Aucune source disponible → on cache
+      // 4. Calcul saisonnalité Régis : somme des coefs sur la période restante
+      var saison = _projSommeCoefsSaisonnalite(dateConcertObj);
+      if (!saison || saison.joursTotal === 0) {
         rowEl.style.display = 'none';
         return;
       }
 
-      var cible = Math.round(sumP / sumW);
+      // 5. Coef du mois en cours (= tendance actuelle = base de référence)
+      var today = new Date(); today.setHours(0,0,0,0);
+      var coefAujourdhui = _projCoefSaisonRegis(today).coef;
+      if (coefAujourdhui <= 0) coefAujourdhui = 1.0; // sécurité
 
-      // ====== PROJECTION RÉALISTE basée sur stats rush ======
-      var pctAtteint = _projPctFinalAJoursAvant(joursRestants);
-      var projectionRealiste = Math.round(totalActuel / pctAtteint);
+      // 6. Projection ventes restantes ajustée par saisonnalité
+      // Logique : la tendance est mesurée en période actuelle (coef X). 
+      // Pour chaque jour à venir, on ajuste : ventes_jour = tendance × (coef_jour / coef_aujourdhui)
+      // Donc total = tendance × somme(coef_jour) / coef_aujourdhui
+      var ventesRestantesAjustees = tendance * saison.sommeCoefs / coefAujourdhui;
+      var projectionAjustee = totalActuel + ventesRestantesAjustees;
+      
+      // 7. Boost auto = différence entre projection saisonnalité et projection linéaire
+      var boost = Math.round(projectionAjustee - projLineaire);
 
-      // ====== BOOST AUTO ======
-      var projLineaire = parseInt((document.getElementById('pilote-proj-payants') || {}).textContent) || totalActuel;
-      var boost = cible - projLineaire;
-      // Sécurité : pas négatif, pas plus que 50% de la cible
-      if (boost < 0) boost = 0;
-      if (boost > cible * 0.5) boost = Math.round(cible * 0.5);
+      // Sécurité : cap à la jauge
       if (jaugeRef > 0 && (projLineaire + boost) > jaugeRef) {
         boost = Math.max(0, jaugeRef - projLineaire);
       }
 
       // ====== AFFICHAGE ======
-      valEl.textContent = boost.toLocaleString('fr-FR');
+      var signe = boost >= 0 ? '+' : '';
+      valEl.textContent = signe + boost.toLocaleString('fr-FR');
+      
+      // Détail : montrer les périodes traversées
       var detailParts = [];
-      detailParts.push('Cible : ' + cible.toLocaleString('fr-FR') + ' (' + sourcesUsed.join(' + ') + ')');
-      detailParts.push('Stats rush J-' + joursRestants + ' : ' + Math.round(pctAtteint * 100) + '% atteint');
-      detailParts.push('Boost = Cible ' + cible.toLocaleString('fr-FR') + ' − Projection ' + projLineaire.toLocaleString('fr-FR'));
+      detailParts.push('Tendance actuelle : ' + tendance.toFixed(2) + ' bil/j (' + _projCoefSaisonRegis(today).label + ')');
+      
+      // Lister les périodes traversées avec leur impact
+      var periodesArr = [];
+      Object.keys(saison.detailParPeriode).forEach(function(p) {
+        var info = saison.detailParPeriode[p];
+        periodesArr.push(info.jours + 'j ' + info.label + ' (' + p + ', coef ' + info.coef + ')');
+      });
+      detailParts.push('Périodes restantes : ' + periodesArr.join(' • '));
+      detailParts.push('Projection saisonnalité : ' + Math.round(projectionAjustee).toLocaleString('fr-FR') + 
+                       ' = projection linéaire ' + projLineaire.toLocaleString('fr-FR') + (boost >= 0 ? ' + ' : ' ') + boost.toLocaleString('fr-FR'));
       detailEl.innerHTML = detailParts.join(' · ');
       rowEl.style.display = '';
 
       // Stocker pour bouton Appliquer
       window._boostAutoSuggere = boost;
     } catch (err) {
-      console.error('❌ Erreur Boost Auto V2 :', err);
+      console.error('❌ Erreur Boost Auto saisonnalité :', err);
       rowEl.style.display = 'none';
     }
   }
