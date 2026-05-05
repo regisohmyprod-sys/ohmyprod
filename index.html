@@ -16702,13 +16702,46 @@ function _hideTeamSelection() {
 
     const heure = document.getElementById('fp-horaire').value || document.getElementById('fp-heure').value;
 
+    // 🛡️ GARDE-FOU ANTI-ÉCRASEMENT TYPE_PROD
+    // Si le <select> affiche "" (CHOIX) mais que la base a déjà une valeur valide,
+    // on RÉCUPÈRE la valeur de la base pour ne pas l'écraser.
+    var typeProdEcran = document.getElementById('fp-type-prod').value;
+    if (!typeProdEcran || typeProdEcran === '') {
+      try {
+        var rGuardTP = await _supabase.from('fiches_production')
+          .select('type_prod').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (rGuardTP && rGuardTP.data && rGuardTP.data.type_prod && rGuardTP.data.type_prod !== '') {
+          // ⚠️ La base a une valeur valide, l'écran a "CHOIX" → on garde celle de la base
+          typeProdEcran = rGuardTP.data.type_prod;
+          // On remet aussi le <select> à la bonne valeur pour cohérence visuelle
+          var elSel = document.getElementById('fp-type-prod');
+          if (elSel) elSel.value = rGuardTP.data.type_prod;
+          console.log('🛡️ Type_prod protégé : refus d\'écraser "' + rGuardTP.data.type_prod + '" par vide');
+        }
+      } catch(e) { console.warn('Garde-fou type_prod : erreur lecture base', e); }
+    }
+    // Idem pour promoteur_local (même problème potentiel)
+    var promoLocalEcran = document.getElementById('fp-promoteur').value;
+    if (!promoLocalEcran || promoLocalEcran === '') {
+      try {
+        var rGuardPL = await _supabase.from('fiches_production')
+          .select('promoteur_local').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (rGuardPL && rGuardPL.data && rGuardPL.data.promoteur_local && rGuardPL.data.promoteur_local !== '') {
+          promoLocalEcran = rGuardPL.data.promoteur_local;
+          var elPromo = document.getElementById('fp-promoteur');
+          if (elPromo) elPromo.value = rGuardPL.data.promoteur_local;
+          console.log('🛡️ Promoteur_local protégé : refus d\'écraser "' + rGuardPL.data.promoteur_local + '" par vide');
+        }
+      } catch(e) {}
+    }
+
     const payload = {
       date_concert_id: _fpDateId,
       ville: document.getElementById('fp-ville').value,
       statut_date: document.getElementById('fp-statut').value,
       producteur: document.getElementById('fp-producteur').value,
-      promoteur_local: document.getElementById('fp-promoteur').value,
-      type_prod: document.getElementById('fp-type-prod').value,
+      promoteur_local: promoLocalEcran,
+      type_prod: typeProdEcran,
       gestion_billetterie: document.getElementById('fp-billetterie').value,
       deal_billetterie: document.getElementById('fp-deal-billetterie').value,
       mg_montant: parseFloat(document.getElementById('fp-mg').value) || 0,
