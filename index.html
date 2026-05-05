@@ -12533,6 +12533,17 @@ function _hideTeamSelection() {
     // 🔒 Valider le bloc INFOS GÉNÉRALES (masque blocs suivants si champs vides)
     fpValiderInfosGen();
 
+    // 🛡️ FIX BUG INITIAL : revalidation différée après stabilisation du DOM
+    // Sur certaines fiches (CAS 6 LDC BILLETTERIE notamment), les valeurs sélectionnées
+    // ne sont pas correctement appliquées aux <select> au premier passage de validation.
+    // Une revalidation différée corrige le bandeau rouge "champs obligatoires" affiché à tort.
+    setTimeout(function(){ 
+      try { fpValiderInfosGen(); } catch(e) {} 
+    }, 300);
+    setTimeout(function(){ 
+      try { fpValiderInfosGen(); } catch(e) {} 
+    }, 1000);
+
     // 🎯 Auto-calcul "État des ventes" depuis billetterie_data
     await fpChargerEtatVentesAuto();
 
