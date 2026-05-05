@@ -12828,6 +12828,11 @@ function _hideTeamSelection() {
         el.dispatchEvent(new Event('change', { bubbles: true }));
       } catch(e) {}
     }
+    // 🛡️ FIX validation : même si la valeur n'a pas changé, on force la revalidation
+    // (sinon le bandeau "champs obligatoires" reste affiché à tort à l'ouverture)
+    if (typeof fpValiderInfosGen === 'function') {
+      try { fpValiderInfosGen(); } catch(e) {}
+    }
   }
   
   // Helper : déverrouiller un champ
@@ -19917,24 +19922,45 @@ function _hideTeamSelection() {
   /**
    * Calcule la somme des coefs saisonnalité entre aujourd'hui (exclu) et la date du concert (incluse).
    * Sert à pondérer la projection des ventes restantes par les périodes traversées.
-   * @returns {object} { sommeCoefs, joursTotal, detailMois }
+   * 
+   * 🚀 FACTEUR RUSH : sur les 30 derniers jours avant le concert, les coefs sont multipliés par 1.7
+   * Ce facteur est calibré sur l'observation réelle de 18 dates passées TWOQ
+   * (rush moyen mesuré ≈ 153 billets/30j vs tendance hors rush ≈ 90 billets/30j).
+   * 
+   * @returns {object} { sommeCoefs, joursTotal, detailParPeriode }
    */
   function _projSommeCoefsSaisonnalite(dateConcert) {
+    var FACTEUR_RUSH = 1.7;          // multiplicateur appliqué dans la fenêtre rush
+    var JOURS_RUSH = 30;             // nb de jours avant le concert où le rush s'applique
+    
     var today = new Date(); today.setHours(0,0,0,0);
     var dC = new Date(dateConcert); dC.setHours(0,0,0,0);
-    if (dC <= today) return { sommeCoefs: 0, joursTotal: 0, detailMois: [] };
+    if (dC <= today) return { sommeCoefs: 0, joursTotal: 0, detailParPeriode: {} };
+
+    // Date de début du rush = concert moins JOURS_RUSH jours
+    var dRushStart = new Date(dC); 
+    dRushStart.setDate(dRushStart.getDate() - JOURS_RUSH);
 
     var sommeCoefs = 0;
     var joursTotal = 0;
-    var detailParPeriode = {}; // { 'periode' : { jours, coef, total } }
+    var detailParPeriode = {}; // { 'periode' : { jours, coef, label, joursRush } }
     var d = new Date(today);
     d.setDate(d.getDate() + 1); // démarrer demain (ne pas compter aujourd'hui)
     while (d <= dC) {
       var info = _projCoefSaisonRegis(d);
-      sommeCoefs += info.coef;
+      // Application du facteur rush si on est dans les 30 derniers jours
+      var enRush = (d > dRushStart);
+      var coefEffectif = enRush ? info.coef * FACTEUR_RUSH : info.coef;
+      sommeCoefs += coefEffectif;
       joursTotal += 1;
-      var key = info.periode;
-      if (!detailParPeriode[key]) detailParPeriode[key] = { jours: 0, coef: info.coef, label: info.label };
+      var key = info.periode + (enRush ? ' 🚀' : '');
+      if (!detailParPeriode[key]) detailParPeriode[key] = { 
+        jours: 0, 
+        coef: info.coef, 
+        coefEffectif: coefEffectif, 
+        label: info.label, 
+        rush: enRush 
+      };
       detailParPeriode[key].jours += 1;
       d.setDate(d.getDate() + 1);
     }
@@ -20023,7 +20049,10 @@ function _hideTeamSelection() {
       var periodesArr = [];
       Object.keys(saison.detailParPeriode).forEach(function(p) {
         var info = saison.detailParPeriode[p];
-        periodesArr.push(info.jours + 'j ' + info.label + ' (' + p + ', coef ' + info.coef + ')');
+        var coefStr = info.rush 
+          ? info.coef + ' ×1.7 rush'
+          : 'coef ' + info.coef;
+        periodesArr.push(info.jours + 'j ' + info.label + ' (' + coefStr + ')');
       });
       detailParts.push('Périodes restantes : ' + periodesArr.join(' • '));
       detailParts.push('Projection saisonnalité : ' + Math.round(projectionAjustee).toLocaleString('fr-FR') + 
