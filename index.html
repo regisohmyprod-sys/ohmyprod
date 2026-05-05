@@ -4014,15 +4014,20 @@ function _hideTeamSelection() {
       </div>
 
       <!-- BLOC 2 : Infos salle & ventes -->
-      <div class="fp-bloc-apres-infos" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
-        <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:16px;">🏟️ SALLE & VENTES</div>
+      <div id="fp-bloc-salle-ventes" class="fp-bloc-apres-infos" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
+        <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:16px;">🏟️ SALLE & VENTES <span style="color:#e31e24;font-size:14px;">(OBLIGATOIRE)</span></div>
+        <div id="fp-alerte-salle-ventes" style="display:none;background:rgba(227,30,36,0.12);border:1px solid #e31e24;border-radius:6px;padding:10px 14px;margin-bottom:14px;color:#e31e24;font-size:13px;font-weight:600;">
+          ⚠️ Merci de remplir tous les champs obligatoires (*) avant de sauvegarder.
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Salle</label>
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Salle <span style="color:#e31e24;">*</span></label>
             <div style="position:relative;">
               <input id="fp-salle" type="text" autocomplete="off" placeholder="🔍 Rechercher une salle..." 
-                     oninput="fpAutocompleteSalle(this.value)"
+                     oninput="fpAutocompleteSalle(this.value); fpValiderSalleVentes();"
+                     onchange="fpValiderSalleVentes();"
                      onblur="setTimeout(()=>{const d=document.getElementById('fp-salle-dropdown');if(d)d.style.display='none';},200)"
+                     data-required-sv="1"
                      style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <div id="fp-salle-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #3b82f6;border-radius:6px;z-index:999;max-height:220px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.5);"></div>
             </div>
@@ -4033,15 +4038,15 @@ function _hideTeamSelection() {
           </div>
           <div style="grid-column:1/-1;position:relative;">
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
-              <span>Adresse salle <span style="color:#555;font-size:10px;">(tape le nom ou l'adresse)</span></span>
+              <span>Adresse salle <span style="color:#e31e24;">*</span> <span style="color:#555;font-size:10px;">(tape le nom ou l'adresse)</span></span>
               <button type="button" onclick="carteDateOuvrir()" title="Voir la salle sur la carte" style="background:#0a0a0a;color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🗺️ CARTE</button>
             </label>
-            <input id="fp-adresse-salle" type="text" placeholder="Ex: Zénith de Pau..." autocomplete="off" oninput="fpSearchAdresse(this.value)" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <input id="fp-adresse-salle" type="text" placeholder="Ex: Zénith de Pau..." autocomplete="off" oninput="fpSearchAdresse(this.value); fpValiderSalleVentes();" onchange="fpValiderSalleVentes();" data-required-sv="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
             <div id="fp-adresse-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #3a3a3a;border-radius:6px;z-index:9999;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.5);"></div>
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Jauge de départ</label>
-            <input id="fp-jauge-depart" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Jauge de départ <span style="color:#e31e24;">*</span></label>
+            <input id="fp-jauge-depart" type="number" placeholder="0" oninput="autoSave('fiche'); fpValiderSalleVentes();" onchange="autoSave('fiche'); fpValiderSalleVentes();" data-required-sv="1" style="width:100%;background:#0a0a0a;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div class="hide-in-vente">
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">État des ventes <span style="color:#c9a84c;font-size:9px;">🔄 AUTO</span></label>
@@ -4056,12 +4061,12 @@ function _hideTeamSelection() {
             <input id="fp-total-jauge" type="number" placeholder="0" readonly oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:6px;color:#c9a84c;padding:8px 10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Date MEV</label>
-            <input id="fp-date-mev" type="date" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Date MEV <span style="color:#e31e24;">*</span></label>
+            <input id="fp-date-mev" type="date" oninput="autoSave('fiche'); fpValiderSalleVentes();" onchange="autoSave('fiche'); fpValiderSalleVentes();" data-required-sv="1" style="width:100%;background:#0a0a0a;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Jauge finale choisie</label>
-            <input id="fp-jauge-finale" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Jauge finale choisie <span style="color:#e31e24;">*</span></label>
+            <input id="fp-jauge-finale" type="number" placeholder="0" oninput="autoSave('fiche'); fpValiderSalleVentes();" onchange="autoSave('fiche'); fpValiderSalleVentes();" data-required-sv="1" style="width:100%;background:#0a0a0a;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <!-- Champs DL OMP % et DL PROD LOCALE % cachés (doublon avec DEAL BILLETTERIE dans INFOS GÉNÉRALES) -->
           <input id="fp-dl-omp" type="hidden" value="">
@@ -4100,7 +4105,7 @@ function _hideTeamSelection() {
       <!-- Bouton sauvegarder -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:10px 14px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;">
         <span id="fp-autosave-ind" style="font-size:12px;color:#888;">⏳ Auto-save actif</span>
-        <button onclick="fpSauvegarder()" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;" id="fp-save-btn">💾 Sauvegarder</button>
+        <button onclick="fpSauvegarderManuel()" style="background:#1e3a5f;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;" id="fp-save-btn">💾 Sauvegarder</button>
       </div>
       <button onclick="fpSupprimer()" style="width:100%;background:transparent;color:#555;border:1px solid #333;border-radius:8px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:40px;">🗑️ Supprimer la fiche de production</button>
     </div>
@@ -12532,6 +12537,8 @@ function _hideTeamSelection() {
 
     // 🔒 Valider le bloc INFOS GÉNÉRALES (masque blocs suivants si champs vides)
     fpValiderInfosGen();
+    // 🔒 Valider également le bloc SALLE & VENTES
+    if (typeof fpValiderSalleVentes === 'function') fpValiderSalleVentes();
 
     // 🛡️ FIX BUG INITIAL : revalidation différée après stabilisation du DOM
     // Sur certaines fiches (CAS 6 LDC BILLETTERIE notamment), les valeurs sélectionnées
@@ -12539,9 +12546,11 @@ function _hideTeamSelection() {
     // Une revalidation différée corrige le bandeau rouge "champs obligatoires" affiché à tort.
     setTimeout(function(){ 
       try { fpValiderInfosGen(); } catch(e) {} 
+      try { fpValiderSalleVentes(); } catch(e) {} 
     }, 300);
     setTimeout(function(){ 
       try { fpValiderInfosGen(); } catch(e) {} 
+      try { fpValiderSalleVentes(); } catch(e) {} 
     }, 1000);
 
     // 🎯 Auto-calcul "État des ventes" depuis billetterie_data
@@ -13634,9 +13643,10 @@ function _hideTeamSelection() {
     window.open(url, '_blank');
   }
 
-  function fpValiderInfosGen() {
+  function fpValiderInfosGen(afficherErreurs) {
     var bloc = document.getElementById('fp-bloc-infos-gen');
     if (!bloc) return true;
+    if (afficherErreurs === undefined) afficherErreurs = false;
 
     // Liste des champs obligatoires, avec gestion du mode VENTE
     var typeProd = document.getElementById('fp-type-prod')?.value || '';
@@ -13656,10 +13666,13 @@ function _hideTeamSelection() {
       var valeur = (el.value || '').trim();
       if (!valeur) {
         tousValides = false;
-        // Bordure rouge pour signaler, MAIS fond foncé (fix bande blanche)
-        el.style.border = '2px solid #e31e24';
-        el.style.background = '#0a0a0a';
-        el.style.color = '#fff';
+        if (afficherErreurs) {
+          // Mode "alerter" : bordure rouge
+          el.style.border = '2px solid #e31e24';
+          el.style.background = '#0a0a0a';
+          el.style.color = '#fff';
+        }
+        // Sinon on ne touche pas (gris par défaut)
       } else {
         // Remettre le style normal — SAUF si le champ est verrouillé (style grisé conservé)
         if (!el.disabled) {
@@ -13673,9 +13686,16 @@ function _hideTeamSelection() {
       }
     });
 
-    // Afficher/masquer l'alerte
+    // Afficher/masquer l'alerte (uniquement en mode "afficher erreurs")
     var alerte = document.getElementById('fp-alerte-infos-gen');
-    if (alerte) alerte.style.display = tousValides ? 'none' : 'block';
+    if (alerte) {
+      if (afficherErreurs && !tousValides) {
+        alerte.style.display = 'block';
+      } else if (tousValides) {
+        alerte.style.display = 'none';
+      }
+      // sinon (silencieux + invalide) : on ne touche pas au bandeau
+    }
 
     // Masquer/afficher TOUS les blocs qui suivent INFOS GÉNÉRALES
     var blocsSuivants = [
@@ -13718,7 +13738,91 @@ function _hideTeamSelection() {
     return tousValides;
   }
 
-  // 🎯 Auto-calcul "État des ventes" et "Invitations" depuis Supabase
+  /**
+   * 🛡️ Validation FERME du bloc SALLE & VENTES
+   * 5 champs obligatoires : Salle, Adresse, Jauge départ, Date MEV, Jauge finale
+   * Met une bordure rouge sur les champs vides + affiche un bandeau d'alerte.
+   * Retourne true si tous les champs sont remplis, false sinon.
+   * 
+   * @param {boolean} afficherErreurs - Si true, applique les bordures rouges + bandeau.
+   *                                    Si false (défaut), ne fait que valider silencieusement
+   *                                    et nettoyer les bordures rouges existantes des champs maintenant remplis.
+   */
+  function fpValiderSalleVentes(afficherErreurs) {
+    var bloc = document.getElementById('fp-bloc-salle-ventes');
+    if (!bloc) return true;
+    if (afficherErreurs === undefined) afficherErreurs = false;
+
+    var champsRequisSV = ['fp-salle', 'fp-adresse-salle', 'fp-jauge-depart', 'fp-date-mev', 'fp-jauge-finale'];
+    
+    var tousValides = true;
+    
+    champsRequisSV.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var valeur = (el.value || '').toString().trim();
+      var estVide = !valeur || (id.includes('jauge') && parseInt(valeur) === 0);
+      
+      if (estVide) {
+        tousValides = false;
+        if (afficherErreurs) {
+          // Mode "alerter" : on met les bordures rouges
+          el.style.border = '2px solid #e31e24';
+          el.style.background = '#0a0a0a';
+          el.style.boxShadow = '0 0 0 1px rgba(227,30,36,0.3)';
+        }
+        // Sinon on ne touche pas à la bordure (gris par défaut)
+      } else {
+        // Le champ est rempli → toujours nettoyer une éventuelle bordure rouge précédente
+        if (!el.disabled) {
+          el.style.border = '1px solid #2a2a2a';
+          el.style.background = '#0a0a0a';
+        } else {
+          el.style.border = '1px solid #2a2a2a';
+          el.style.background = '#0f0f0f';
+        }
+        el.style.boxShadow = '';
+      }
+    });
+
+    // Le bandeau d'alerte n'apparaît QUE si on est en mode "afficher erreurs" ET il y a des erreurs
+    var alerte = document.getElementById('fp-alerte-salle-ventes');
+    if (alerte) {
+      if (afficherErreurs && !tousValides) {
+        alerte.style.display = 'block';
+      } else if (tousValides) {
+        // Si tout est OK, on cache toujours
+        alerte.style.display = 'none';
+      }
+      // Sinon (silencieux + invalide) : on ne touche pas à l'état du bandeau
+    }
+
+    return tousValides;
+  }
+  
+  /**
+   * 🚀 Auto-scroll vers le premier champ obligatoire vide (INFOS GÉN ou SALLE & VENTES)
+   * Utilisé quand l'utilisateur essaie de sauvegarder une fiche incomplète.
+   */
+  function fpScrollVersPremierChampVide() {
+    // Liste exhaustive des champs obligatoires des 2 blocs
+    var champs = [
+      'fp-producteur', 'fp-promoteur', 'fp-type-prod', 'fp-billetterie', 'fp-deal-omp', 'fp-deal-billetterie',
+      'fp-salle', 'fp-adresse-salle', 'fp-jauge-depart', 'fp-date-mev', 'fp-jauge-finale'
+    ];
+    for (var i = 0; i < champs.length; i++) {
+      var el = document.getElementById(champs[i]);
+      if (!el) continue;
+      var v = (el.value || '').toString().trim();
+      var estVide = !v || (champs[i].includes('jauge') && parseInt(v) === 0);
+      if (estVide) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(function(){ try { el.focus(); } catch(e) {} }, 400);
+        return el;
+      }
+    }
+    return null;
+  }
   async function fpChargerEtatVentesAuto() {
     var dateId = _fpDateId || _dateActiveId;
     if (!dateId) return;
@@ -16710,6 +16814,41 @@ function _hideTeamSelection() {
     showPage('fiche-prod');
   }
 
+  /**
+   * 🛡️ Wrapper de sauvegarde MANUELLE (clic sur bouton "Sauvegarder")
+   * Valide les blocs INFOS GÉNÉRALES + SALLE & VENTES avant d'autoriser la sauvegarde.
+   * En cas d'invalidité : scroll vers le 1er champ vide + bandeau d'alerte.
+   * 
+   * Note : l'autosave (tape automatiquement) appelle directement fpSauvegarder() sans validation,
+   * grâce aux garde-fous anti-écrasement déjà en place dans fpSauvegarder().
+   */
+  async function fpSauvegarderManuel() {
+    // 🚨 Mode "afficher erreurs" : on passe TRUE pour activer bordures rouges + bandeau
+    var infosGenOK = (typeof fpValiderInfosGen === 'function') ? fpValiderInfosGen(true) : true;
+    var salleVentesOK = (typeof fpValiderSalleVentes === 'function') ? fpValiderSalleVentes(true) : true;
+
+    if (!infosGenOK || !salleVentesOK) {
+      // Scroll vers le premier champ vide
+      fpScrollVersPremierChampVide();
+      // Mini feedback sur le bouton
+      var btn = document.getElementById('fp-save-btn');
+      if (btn) {
+        var orig = btn.textContent;
+        btn.textContent = '❌ Champs obligatoires manquants';
+        btn.style.background = '#e31e24';
+        setTimeout(function(){
+          if (btn) {
+            btn.textContent = '💾 Sauvegarder';
+            btn.style.background = '#1e3a5f';
+          }
+        }, 2500);
+      }
+      return; // ❌ Sauvegarde bloquée
+    }
+
+    // ✅ Tous les champs sont OK → sauvegarde réelle
+    return fpSauvegarder();
+  }
 
   async function fpSauvegarder() {
     const btn = document.getElementById('fp-save-btn');
