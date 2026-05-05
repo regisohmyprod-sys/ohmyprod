@@ -4031,6 +4031,11 @@ function _hideTeamSelection() {
                      style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <div id="fp-salle-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #3b82f6;border-radius:6px;z-index:999;max-height:220px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.5);"></div>
             </div>
+            <!-- ✨ Avertissement salle inconnue -->
+            <div id="fp-warn-salle-inconnue" style="display:none;background:rgba(245,158,11,0.12);border:1px solid #f59e0b;border-radius:6px;padding:8px 12px;margin-top:6px;color:#f59e0b;font-size:12px;">
+              ⚠️ Cette salle n'existe pas dans la base. 
+              <a onclick="event.preventDefault(); showPage('gestion-salles');" style="color:#f59e0b;font-weight:700;text-decoration:underline;cursor:pointer;">Créez-la dans Gestion Salles</a> avant de continuer.
+            </div>
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Heure <span style="color:#555;">(depuis horaire)</span></label>
@@ -4075,10 +4080,9 @@ function _hideTeamSelection() {
             <input id="fp-cout-plateau-mg" type="checkbox" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:16px;height:16px;accent-color:#e31e24;">
             <label for="fp-cout-plateau-mg" style="font-size:13px;color:#fff;">Coût plateau sur MG ?</label>
           </div>
-          <div class="hide-in-vente">
-            <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Boost bonus (€)</label>
-            <input id="fp-boost" type="number" placeholder="0" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-          </div>
+          <!-- 🗑️ Champ "Boost bonus" supprimé du bloc SALLE & VENTES (doublon avec celui du Pilote Date) -->
+          <!-- Input gardé caché pour compatibilité avec fpSauvegarder() qui le lit toujours -->
+          <input id="fp-boost" type="hidden" value="0">
         </div>
       </div>
 
@@ -12141,14 +12145,27 @@ function _hideTeamSelection() {
   // Autocomplete salle avec dropdown custom depuis Supabase
   async function fpAutocompleteSalle(val) {
     const dropdown = document.getElementById('fp-salle-dropdown');
+    const warn = document.getElementById('fp-warn-salle-inconnue');
     if (!dropdown) return;
-    if (!val || val.length < 2) { dropdown.style.display = 'none'; return; }
+    if (!val || val.length < 2) { 
+      dropdown.style.display = 'none'; 
+      if (warn) warn.style.display = 'none';
+      return; 
+    }
     const { data, error } = await _supabase
       .from('salles')
       .select('id, ville_nom, zone_geo, capacite_max, adresse, contact_principal, telephone, email, photo_url')
       .ilike('ville_nom', '%' + val + '%')
       .limit(8);
-    if (error || !data || data.length === 0) { dropdown.style.display = 'none'; return; }
+    
+    // ✨ Si aucune salle trouvée → afficher message "salle inconnue"
+    if (error || !data || data.length === 0) { 
+      dropdown.style.display = 'none'; 
+      if (warn) warn.style.display = 'block';
+      return; 
+    }
+    // Salles trouvées → afficher dropdown + cacher warning
+    if (warn) warn.style.display = 'none';
     dropdown.innerHTML = data.map(s => `
       <div onclick="fpSelectionnerSalle(${JSON.stringify(s).replace(/"/g, '&quot;')})"
            style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #2a2a2a;"
@@ -12169,9 +12186,24 @@ function _hideTeamSelection() {
       const ville = salle.ville_nom.split(' ')[0];
       villeEl.value = ville;
     }
+    // ✨ Auto-remplir l'adresse depuis la table salles (uniquement si champ vide)
+    const adresseEl = document.getElementById('fp-adresse-salle');
+    if (adresseEl && !adresseEl.value && salle.adresse) {
+      adresseEl.value = salle.adresse;
+    }
+    // ✨ Auto-remplir la jauge de départ si vide (capacité max de la salle)
+    const jaugeEl = document.getElementById('fp-jauge-depart');
+    if (jaugeEl && (!jaugeEl.value || parseInt(jaugeEl.value) === 0) && salle.capacite_max) {
+      jaugeEl.value = salle.capacite_max;
+    }
     // Charger photo de la salle
     fpAfficherPhotoSalle(salle);
+    // Cacher le warning "salle inconnue" si présent
+    var warn = document.getElementById('fp-warn-salle-inconnue');
+    if (warn) warn.style.display = 'none';
     autoSave('fiche');
+    // Revalider après auto-fill
+    if (typeof fpValiderSalleVentes === 'function') fpValiderSalleVentes();
   }
 
   function fpAfficherPhotoSalle(salle) {
