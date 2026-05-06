@@ -21769,18 +21769,53 @@ function _hideTeamSelection() {
   async function suiviOuvrirDate(dateId) {
     if (!dateId) return;
     try {
-      // On réutilise la fonction existante qui ouvre Pilote Date
-      if (typeof fpOuvrirDateById === 'function') {
-        await fpOuvrirDateById(dateId);
+      // 🔧 FIX : on retrouve la date dans le cache _suiviDonnees
+      // pour récupérer ville + date_concert (3 params requis par fpOuvrir)
+      var dateObj = null;
+      if (Array.isArray(_suiviDonnees)) {
+        for (var i = 0; i < _suiviDonnees.length; i++) {
+          if (_suiviDonnees[i] && _suiviDonnees[i].id === dateId) {
+            dateObj = _suiviDonnees[i];
+            break;
+          }
+        }
+      }
+
+      // Si pas trouvé en cache, on récupère depuis Supabase
+      if (!dateObj) {
+        try {
+          var res = await _supabase
+            .from('dates_concert')
+            .select('id, ville, date_concert')
+            .eq('id', dateId)
+            .maybeSingle();
+          if (res && res.data) dateObj = res.data;
+        } catch(e) {
+          console.warn('Récupération date Supabase impossible :', e);
+        }
+      }
+
+      if (!dateObj) {
+        alert('❌ Impossible de retrouver cette date.');
+        return;
+      }
+
+      var ville = dateObj.ville || '';
+      var dateStr = dateObj.date_concert || '';
+
+      // On appelle fpOuvrir avec les 3 params nécessaires (la vraie fonction)
+      if (typeof fpOuvrir === 'function') {
+        await fpOuvrir(dateId, ville, dateStr);
       } else {
-        // Fallback : on met l'ID actif et on ouvre la page
         window._fpDateId = dateId;
         showPage('pilote-date');
       }
     } catch(err) {
       console.warn('Impossible d\'ouvrir la date :', err);
+      alert('❌ Erreur à l\'ouverture de la fiche : ' + (err && err.message ? err.message : err));
     }
   }
+  window.suiviOuvrirDate = suiviOuvrirDate;
 
   /**
    * Ouvre la modale de choix de période pour l'impression.
