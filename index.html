@@ -19523,14 +19523,18 @@ function _hideTeamSelection() {
         if (pctMoyenne !== null) {
           // Indicateur visuel selon le %
           var couleur, emoji, label;
-          if (pctMoyenne >= 90) { couleur = '#22c55e'; emoji = '🟢'; label = 'tu es au niveau (ou au-dessus) de la moyenne'; }
-          else if (pctMoyenne >= 70) { couleur = '#facc15'; emoji = '🟡'; label = 'tu es proche de la moyenne'; }
-          else if (pctMoyenne >= 40) { couleur = '#f97316'; emoji = '🟠'; label = 'tu es en retrait vs moyenne'; }
-          else { couleur = '#ef4444'; emoji = '🔴'; label = 'tu es très en retrait vs moyenne'; }
+          var nbDates = datesAvecTotal.length;
+          var refTexte = nbDates > 1 ? 'des précédentes dates dans cette ville' : 'de la précédente date dans cette ville';
+          if (pctMoyenne >= 90) { couleur = '#22c55e'; emoji = '🟢'; label = 'tu as déjà atteint le niveau final ' + refTexte; }
+          else if (pctMoyenne >= 70) { couleur = '#facc15'; emoji = '🟡'; label = 'tu approches du niveau final ' + refTexte; }
+          else if (pctMoyenne >= 40) { couleur = '#f97316'; emoji = '🟠'; label = 'il reste du chemin pour atteindre le niveau final ' + refTexte; }
+          else { couleur = '#ef4444'; emoji = '🔴'; label = 'tu es loin du niveau final ' + refTexte + ' — surveille bien le pacing'; }
 
           resHtml += '<div style="margin-top:8px;font-size:12px;color:' + couleur + ';">'
-            + emoji + ' À ce jour : ' + ventesAuj.toLocaleString('fr-FR') + '/' + moyenne.toLocaleString('fr-FR')
-            + ' = <b>' + pctMoyenne + '% de la moyenne</b> — ' + label + '</div>';
+            + emoji + ' Ventes actuelles : ' + ventesAuj.toLocaleString('fr-FR') + ' billets · Moyenne finale historique : ' + moyenne.toLocaleString('fr-FR') + ' billets'
+            + ' → tu es à <b>' + pctMoyenne + '%</b> — ' + label + '.'
+            + '<div style="margin-top:4px;font-size:11px;color:#888;font-style:italic;">À pondérer selon les jours restants avant la date (voir PACING N-1).</div>'
+            + '</div>';
         }
         resumeEl.innerHTML = resHtml;
       }
@@ -19682,24 +19686,28 @@ function _hideTeamSelection() {
       } else if (pacings.length > 0) {
         var moyCumul = Math.round(pacings.reduce(function(a, b) { return a + b.cumul; }, 0) / pacings.length);
         var moyPct = Math.round(pacings.reduce(function(a, b) { return a + b.pct; }, 0) / pacings.length);
+        var nbDatesPacing = pacings.length;
+        var refTexte = nbDatesPacing > 1 ? 'des précédentes dates dans cette ville' : 'de la précédente date dans cette ville';
         var resHtml = '<div style="display:flex;justify-content:space-between;align-items:center;">'
           + '<span style="color:#7c3aed;font-weight:700;">📊 MOYENNE PACING à J-' + joursRestants + '</span>'
           + '<span style="color:#fff;font-family:Bebas Neue,sans-serif;font-size:18px;font-weight:900;">' + moyCumul.toLocaleString('fr-FR') + ' billets</span>'
           + '</div>'
-          + '<div style="font-size:11px;color:#888;margin-top:4px;">Soit ' + moyPct + '% du total final atteint en moyenne à ce stade</div>';
+          + '<div style="font-size:11px;color:#888;margin-top:4px;">Au même stade (J-' + joursRestants + '), ' + refTexte + ' avai' + (nbDatesPacing > 1 ? 'ent' : 't') + ' déjà ' + moyPct + '% de leur total final.</div>';
 
         if (totalActuel && totalActuel > 0) {
           var ecart = totalActuel - moyCumul;
           var pctVsMoy = Math.round((totalActuel / moyCumul) * 100);
           var couleur, emoji, label;
-          if (pctVsMoy >= 110) { couleur = '#22c55e'; emoji = '🟢'; label = 'tu es en avance'; }
-          else if (pctVsMoy >= 90) { couleur = '#22c55e'; emoji = '🟢'; label = 'tu es au pacing'; }
-          else if (pctVsMoy >= 75) { couleur = '#facc15'; emoji = '🟡'; label = 'pacing l\u00e9g\u00e8rement en retrait'; }
-          else if (pctVsMoy >= 50) { couleur = '#f97316'; emoji = '🟠'; label = 'pacing en retrait'; }
-          else { couleur = '#ef4444'; emoji = '🔴'; label = 'pacing tr\u00e8s en retrait'; }
+          if (pctVsMoy >= 110) { couleur = '#22c55e'; emoji = '🟢'; label = 'tu es en avance sur le rythme habituel'; }
+          else if (pctVsMoy >= 90) { couleur = '#22c55e'; emoji = '🟢'; label = 'tu es dans le rythme habituel'; }
+          else if (pctVsMoy >= 75) { couleur = '#facc15'; emoji = '🟡'; label = 'tu es légèrement en retard sur le rythme habituel'; }
+          else if (pctVsMoy >= 50) { couleur = '#f97316'; emoji = '🟠'; label = 'tu es en retard sur le rythme habituel'; }
+          else { couleur = '#ef4444'; emoji = '🔴'; label = 'tu es très en retard sur le rythme habituel'; }
           resHtml += '<div style="margin-top:8px;font-size:12px;color:' + couleur + ';">'
-            + emoji + ' Toi à J-' + joursRestants + ' : ' + totalActuel.toLocaleString('fr-FR')
-            + ' (' + (ecart >= 0 ? '+' : '') + ecart.toLocaleString('fr-FR') + ' vs moy) — ' + label + '</div>';
+            + emoji + ' Toi à J-' + joursRestants + ' : <b>' + totalActuel.toLocaleString('fr-FR') + ' billets</b>'
+            + ' vs <b>' + moyCumul.toLocaleString('fr-FR') + ' billets</b> en moyenne au même stade '
+            + '(' + (ecart >= 0 ? '+' : '') + ecart.toLocaleString('fr-FR') + ' billets) — ' + label + '.'
+            + '</div>';
         }
         resumeEl.innerHTML = resHtml;
       } else {
@@ -19929,57 +19937,100 @@ function _hideTeamSelection() {
     if (!bloc || !actuelEl || !prochainsEl) return;
 
     try {
-      var coefs = await _projCalculerSaisonnalite();
-      if (!coefs) { bloc.style.display = 'none'; return; }
-
-      var nomsMois = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-      var moisActuel = new Date().getMonth() + 1;
-      var moisActuelStr = (moisActuel < 10 ? '0' : '') + moisActuel;
+      // 🎯 SOURCE = COEFS MÉTIER RÉGIS (14 périodes validées)
+      // (la fonction _projCoefSaisonRegis() est définie plus bas dans ce fichier)
+      if (typeof _projCoefSaisonRegis !== 'function') {
+        bloc.style.display = 'none';
+        return;
+      }
 
       var rD = await _supabase.from('dates_concert').select('date_concert').eq('id', dateId).single();
       if (rD.error || !rD.data) { bloc.style.display = 'none'; return; }
       var dateConcert = new Date(rD.data.date_concert + 'T00:00:00');
 
-      // Bloc "mois actuel"
-      var ca = coefs[moisActuelStr];
-      if (ca) {
-        var lab = _projLabelMois(ca.coef);
-        var pct = Math.round((ca.coef - 1) * 100);
-        var pctStr = (pct >= 0 ? '+' : '') + pct + '%';
-        actuelEl.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(245,158,11,0.08);padding:10px 14px;border-radius:6px;border-left:3px solid #f59e0b;">'
-          + '<div><div style="color:#f59e0b;font-weight:700;font-size:14px;">' + lab.emoji + ' Mois en cours : ' + nomsMois[moisActuel - 1] + '</div>'
-          + '<div style="color:#aab4be;font-size:11px;margin-top:2px;">Coef d\'achat ' + ca.coef.toFixed(2) + ' (' + pctStr + ' vs moy) — ' + lab.label + '</div></div>'
-          + '<div style="color:' + lab.couleur + ';font-family:Bebas Neue,sans-serif;font-size:24px;font-weight:900;">' + ca.coef.toFixed(2) + '</div>'
-          + '</div>';
-      }
+      var today = new Date(); today.setHours(0,0,0,0);
 
-      // Bloc "prochains mois jusqu'au concert"
-      var moisJusquConcert = [];
-      var aujH = new Date(); aujH.setHours(0,0,0,0);
-      var moisCursor = new Date(aujH.getFullYear(), aujH.getMonth() + 1, 1);
-      var maxIter = 24;
-      while (moisCursor <= dateConcert && maxIter > 0) {
-        moisJusquConcert.push(moisCursor.getMonth() + 1);
-        moisCursor = new Date(moisCursor.getFullYear(), moisCursor.getMonth() + 1, 1);
+      // 📌 Header explicatif (transparent sur la source)
+      var headerHtml = '<div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:#aab4be;line-height:1.5;">'
+        + '<b style="color:#f59e0b;">📅 Coefficients métier Régis</b> — 14 périodes calibrées par le producteur sur 5+ ans d\'expérience tournées (validées sur 80 dates back-fillées). '
+        + '<b>1.00 = période moyenne</b>, &gt;1 = période forte, &lt;1 = période molle.'
+        + '</div>';
+
+      // ============ Bloc "AUJOURD'HUI" ============
+      var coefToday = _projCoefSaisonRegis(today);
+      var pctToday = Math.round((coefToday.coef - 1) * 100);
+      var pctTodayStr = (pctToday >= 0 ? '+' : '') + pctToday + '%';
+      var couleurToday = '#eab308';
+      if (coefToday.coef >= 2.0) couleurToday = '#dc2626';
+      else if (coefToday.coef >= 1.2) couleurToday = '#22c55e';
+      else if (coefToday.coef >= 0.9) couleurToday = '#16a34a';
+      else if (coefToday.coef >= 0.6) couleurToday = '#f97316';
+      else couleurToday = '#ef4444';
+
+      actuelEl.innerHTML = headerHtml
+        + '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(245,158,11,0.08);padding:10px 14px;border-radius:6px;border-left:3px solid #f59e0b;">'
+        + '<div style="flex:1;"><div style="color:#f59e0b;font-weight:700;font-size:14px;">' + coefToday.label + ' Période actuelle</div>'
+        + '<div style="color:#aab4be;font-size:11px;margin-top:2px;">' + coefToday.periode + '</div>'
+        + '<div style="color:' + couleurToday + ';font-size:11px;margin-top:2px;font-weight:600;">→ ' + pctTodayStr + ' vs période moyenne</div></div>'
+        + '<div style="color:' + couleurToday + ';font-family:Bebas Neue,sans-serif;font-size:24px;font-weight:900;margin-left:12px;">' + coefToday.coef.toFixed(2) + '</div>'
+        + '</div>';
+
+      // ============ Bloc "PROCHAINES PÉRIODES jusqu'au concert" ============
+      // On parcourt jour par jour de demain → date du concert, en groupant par période continue
+      var periodesTraversees = []; // [{ label, coef, periode, dateDebut, dateFin, jours }]
+      var d = new Date(today);
+      d.setDate(d.getDate() + 1); // démarrer demain
+      var maxIter = 800; // ~2 ans
+      var courant = null;
+      while (d <= dateConcert && maxIter > 0) {
+        var info = _projCoefSaisonRegis(d);
+        if (!courant || courant.periode !== info.periode) {
+          // Nouvelle période
+          if (courant) periodesTraversees.push(courant);
+          courant = {
+            periode: info.periode,
+            coef: info.coef,
+            label: info.label,
+            dateDebut: new Date(d),
+            dateFin: new Date(d),
+            jours: 1
+          };
+        } else {
+          courant.dateFin = new Date(d);
+          courant.jours += 1;
+        }
+        d.setDate(d.getDate() + 1);
         maxIter--;
       }
-      if (moisJusquConcert.length === 0) {
+      if (courant) periodesTraversees.push(courant);
+
+      if (periodesTraversees.length === 0) {
         prochainsEl.innerHTML = '';
       } else {
-        var prochainsHtml = '<div style="font-weight:700;color:#aab4be;margin-bottom:6px;">📈 Prochains mois jusqu\'au concert :</div>';
-        moisJusquConcert.forEach(function(m) {
-          var ms = (m < 10 ? '0' : '') + m;
-          var c = coefs[ms];
-          if (!c) {
-            prochainsHtml += '<div style="display:flex;justify-content:space-between;padding:3px 0;color:#666;font-size:12px;"><span>' + nomsMois[m-1] + '</span><span><i>donn\u00e9es insuffisantes</i></span></div>';
-            return;
-          }
-          var lab = _projLabelMois(c.coef);
-          var pct = Math.round((c.coef - 1) * 100);
+        var prochainsHtml = '<div style="font-weight:700;color:#aab4be;margin-bottom:6px;">📈 Périodes jusqu\'au concert :</div>';
+        var formatDate = function(dt) {
+          return dt.getDate().toString().padStart(2, '0') + '/' + (dt.getMonth() + 1).toString().padStart(2, '0');
+        };
+        periodesTraversees.forEach(function(p) {
+          var pct = Math.round((p.coef - 1) * 100);
           var pctStr = (pct >= 0 ? '+' : '') + pct + '%';
-          prochainsHtml += '<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;">'
-            + '<span style="color:#e8e8e8;">' + lab.emoji + ' ' + nomsMois[m-1] + '</span>'
-            + '<span style="color:' + lab.couleur + ';font-weight:600;">' + c.coef.toFixed(2) + ' (' + pctStr + ') — ' + lab.label + '</span>'
+          var couleur = '#eab308';
+          if (p.coef >= 2.0) couleur = '#dc2626';
+          else if (p.coef >= 1.2) couleur = '#22c55e';
+          else if (p.coef >= 0.9) couleur = '#16a34a';
+          else if (p.coef >= 0.6) couleur = '#f97316';
+          else couleur = '#ef4444';
+
+          var libelleDates = formatDate(p.dateDebut) + (p.jours > 1 ? ' → ' + formatDate(p.dateFin) : '');
+          prochainsHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;font-size:12px;background:#0a0a0a;border-radius:4px;margin-bottom:3px;border-left:2px solid ' + couleur + ';">'
+            + '<div style="flex:1;">'
+            + '<div style="color:#e8e8e8;font-weight:600;">' + p.label + ' ' + p.periode + '</div>'
+            + '<div style="color:#888;font-size:10px;margin-top:1px;">' + libelleDates + ' · <b style="color:#aab4be;">' + p.jours + ' jour' + (p.jours > 1 ? 's' : '') + '</b></div>'
+            + '</div>'
+            + '<div style="text-align:right;">'
+            + '<div style="color:' + couleur + ';font-weight:700;font-family:Bebas Neue,sans-serif;font-size:16px;">' + p.coef.toFixed(2) + '</div>'
+            + '<div style="color:' + couleur + ';font-size:10px;font-weight:600;">' + pctStr + '</div>'
+            + '</div>'
             + '</div>';
         });
         prochainsEl.innerHTML = prochainsHtml;
