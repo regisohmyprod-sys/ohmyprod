@@ -3473,6 +3473,7 @@ function _hideTeamSelection() {
             <div onclick="selectDropdownItem(event, function(){ showPage('gestion-omp'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
             <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviDatesResume(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#c9a84c; font-weight:600; border-bottom:1px solid #333; background:rgba(201,168,76,0.08);" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='rgba(201,168,76,0.08)'">📊 Suivi Financier Tour</div>
             <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviMEV(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#22c55e; font-weight:600; border-bottom:1px solid #333; background:rgba(34,197,94,0.08);" onmouseover="this.style.background='rgba(34,197,94,0.15)'" onmouseout="this.style.background='rgba(34,197,94,0.08)'">🎫 Suivi MEV</div>
+            <div onclick="selectDropdownItem(event, function(){ ouvrirAnalyseGeneraleTour(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#a855f7; font-weight:600; border-bottom:1px solid #333; background:rgba(168,85,247,0.08);" onmouseover="this.style.background='rgba(168,85,247,0.15)'" onmouseout="this.style.background='rgba(168,85,247,0.08)'">📈 Analyse Générale</div>
             <div onclick="selectDropdownItem(event, function(){ carteTourneeOuvrir(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🗺️ Carte Tournée</div>
             <div onclick="selectDropdownItem(event, function(){ openModal('modal-vhr-tournee'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
           </div>
@@ -3677,6 +3678,68 @@ function _hideTeamSelection() {
           </thead>
           <tbody id="suivi-mev-tbody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- ========== PAGE ANALYSE GÉNÉRALE TOUR ========== -->
+    <div id="page-analyse-generale-tour" class="page">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+        <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:0;">← Retour au Tableau de bord</button>
+        <button onclick="analyseGeneraleImprimerPDF()" style="background:#a855f7;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;">🖨️ IMPRIMER / PDF</button>
+      </div>
+      <div class="page-title">📈 ANALYSE GÉNÉRALE TOUR</div>
+      <div style="font-size:13px;color:#888;margin-bottom:16px;margin-top:-12px;font-style:italic;">Tournée TWOQ — L'Hommage à la Légende + L'Éternelle Légende</div>
+
+      <!-- Sélecteur de critère de classement -->
+      <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;margin-bottom:20px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">📊 Critère de classement</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="ag-crit-billets" onclick="analyseGeneraleSetCritere('billets')" class="ag-crit-btn" style="background:#a855f7;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">🎫 BILLETS</button>
+          <button id="ag-crit-pct" onclick="analyseGeneraleSetCritere('pct')" class="ag-crit-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">📊 % REMPLISSAGE</button>
+          <button id="ag-crit-resultat" onclick="analyseGeneraleSetCritere('resultat')" class="ag-crit-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">💰 RÉSULTAT OMP</button>
+          <button id="ag-crit-ca" onclick="analyseGeneraleSetCritere('ca')" class="ag-crit-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">💵 CA TTC</button>
+        </div>
+      </div>
+
+      <!-- Loader -->
+      <div id="ag-loading" style="text-align:center;padding:40px 20px;color:#888;font-size:13px;">Chargement des analyses...</div>
+
+      <!-- Contenu -->
+      <div id="ag-content" style="display:none;">
+
+        <!-- BLOC 1 : 2 tableaux côte à côte (Top Villes + Top Régions) -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+          <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
+            <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">🏆 TOP 20 VILLES</div>
+            <div id="ag-top-villes" style="padding:0;"></div>
+          </div>
+          <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
+            <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">🗺️ TOP RÉGIONS</div>
+            <div id="ag-top-regions" style="padding:0;"></div>
+          </div>
+        </div>
+
+        <!-- BLOC 2 : Classement par mois -->
+        <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+          <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">📅 CLASSEMENT PAR MOIS</div>
+          <div id="ag-top-mois" style="padding:0;"></div>
+        </div>
+
+        <!-- BLOC 3 : Graphique scores par mois -->
+        <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+          <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">📊 GRAPHIQUE — SCORES MENSUELS</div>
+          <div id="ag-graph-mois" style="padding:20px;"></div>
+        </div>
+
+        <!-- BLOC 4 : Tableau passages villes/salles -->
+        <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
+          <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+            <span>🎯 PASSAGES PAR VILLE / SALLE — RECOMMANDATIONS BOOKING</span>
+            <input id="ag-search-ville-salle" type="text" placeholder="🔍 Filtrer ville ou salle..." oninput="analyseGeneraleFiltrerPassages()" style="background:#fff;color:#000;border:none;border-radius:5px;padding:5px 10px;font-size:11px;width:200px;">
+          </div>
+          <div id="ag-passages" style="padding:0;overflow-x:auto;"></div>
+        </div>
+
       </div>
     </div>
 
@@ -11555,6 +11618,7 @@ function _hideTeamSelection() {
     'dashboard':            ['admin'],
     'suivi-resume':         ['admin'],
     'suivi-mev':            ['admin'],
+    'analyse-generale-tour': ['admin'],
     'gestion-omp':          ['admin'],
     'fiche-prod':           ['admin'],
     'fiche-financier':      ['admin'],
@@ -12694,6 +12758,11 @@ function _hideTeamSelection() {
       try { fpValiderInfosGen(); } catch(e) {} 
       try { fpValiderSalleVentes(); } catch(e) {} 
     }, 1000);
+    // 🛡️ Revalidation finale tardive pour les fiches lourdes (CAS 6 / Nantes-like)
+    setTimeout(function(){ 
+      try { fpValiderInfosGen(); } catch(e) {} 
+      try { fpValiderSalleVentes(); } catch(e) {} 
+    }, 2500);
 
     // 🎯 Auto-calcul "État des ventes" depuis billetterie_data
     await fpChargerEtatVentesAuto();
@@ -13839,7 +13908,8 @@ function _hideTeamSelection() {
       // sinon (silencieux + invalide) : on ne touche pas au bandeau
     }
 
-    // Masquer/afficher TOUS les blocs qui suivent INFOS GÉNÉRALES
+    // 🟡 BLOCS SUIVANTS : on retire tout le grisage/flou
+    // Garde la cohérence métier sans bloquer la saisie : juste un bandeau d'info en haut de SALLE & VENTES
     var blocsSuivants = [
       'fp-bloc-vente',      // Mode vente
       'fp-bloc-client',     // Infos client
@@ -13847,34 +13917,47 @@ function _hideTeamSelection() {
     blocsSuivants.forEach(function(bid) {
       var el = document.getElementById(bid);
       if (!el) return;
-      // Ne rien faire si déjà caché par le mode (ex: fp-bloc-vente caché en non-vente)
-      // On stocke l'état "should be shown" dans data-should-show si besoin
-      // Ici on utilise opacity + pointer-events pour griser sans casser la structure
-      if (!tousValides) {
-        el.style.opacity = '0.3';
-        el.style.pointerEvents = 'none';
-      } else {
-        el.style.opacity = '';
-        el.style.pointerEvents = '';
-      }
+      // Reset complet du grisage potentiellement appliqué auparavant
+      el.style.opacity = '';
+      el.style.pointerEvents = '';
+      el.style.filter = '';
     });
 
-    // Masquer/afficher le reste de la fiche (bloc SALLE & VENTES + PHOTO + sections financières)
-    // On cible tous les blocs de la page fp après INFOS GÉNÉRALES
+    // 🟡 Bloc SALLE & VENTES + autres blocs après : on retire aussi le grisage
     var page = document.getElementById('page-fiche-prod');
     if (page) {
       var blocsApres = page.querySelectorAll('.fp-bloc-apres-infos');
       blocsApres.forEach(function(b) {
-        if (!tousValides) {
-          b.style.opacity = '0.3';
-          b.style.pointerEvents = 'none';
-          b.style.filter = 'blur(1px)';
-        } else {
-          b.style.opacity = '';
-          b.style.pointerEvents = '';
-          b.style.filter = '';
-        }
+        // Reset complet du grisage potentiellement appliqué auparavant
+        b.style.opacity = '';
+        b.style.pointerEvents = '';
+        b.style.filter = '';
       });
+    }
+
+    // 💡 Bandeau d'info discret en haut de SALLE & VENTES
+    // Visible UNIQUEMENT si INFOS GÉNÉRALES n'est pas complet — disparaît automatiquement sinon
+    var blocSV = document.getElementById('fp-bloc-salle-ventes');
+    if (blocSV) {
+      var bandeauInfo = document.getElementById('fp-info-ordre-saisie');
+      if (!tousValides) {
+        if (!bandeauInfo) {
+          bandeauInfo = document.createElement('div');
+          bandeauInfo.id = 'fp-info-ordre-saisie';
+          bandeauInfo.style.cssText = 'background:rgba(245,158,11,0.10);border:1px solid #f59e0b;border-radius:6px;padding:10px 14px;margin-bottom:14px;color:#f59e0b;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;';
+          bandeauInfo.innerHTML = '<span style="font-size:16px;">💡</span><span>Pense à compléter d\'abord le bloc <b>INFOS GÉNÉRALES</b> ci-dessus pour que les champs verrouillés se configurent automatiquement selon le type de production.</span>';
+          var firstChild = blocSV.firstElementChild;
+          if (firstChild && firstChild.nextElementSibling) {
+            blocSV.insertBefore(bandeauInfo, firstChild.nextElementSibling);
+          } else {
+            blocSV.insertBefore(bandeauInfo, firstChild);
+          }
+        } else {
+          bandeauInfo.style.display = 'flex';
+        }
+      } else {
+        if (bandeauInfo) bandeauInfo.style.display = 'none';
+      }
     }
 
     return tousValides;
@@ -22273,14 +22356,31 @@ function _hideTeamSelection() {
     containerEl.style.display = 'block';
 
     // === RENDU TABLEAU ===
+    // 🎯 Liste des dates marquées "NO TICKETS" (résidences, showcases privés, etc.)
+    // Format : "YYYY-MM-DD|VILLE_NORMALISÉE_UPPER"
+    var DATES_NO_TICKETS = [
+      '2025-06-01|PARIS',     // Paris Parc des Princes — 01/06/2025
+      '2026-09-15|NARBONNE',  // Narbonne — 15/09/2026
+      '2026-09-16|NARBONNE',  // Narbonne — 16/09/2026
+      '2026-09-17|NARBONNE',  // Narbonne — 17/09/2026
+      '2026-09-18|NARBONNE'   // Narbonne — 18/09/2026
+    ];
+
     tbody.innerHTML = dates.map(function(d, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
       var dateStr = '';
       try { dateStr = new Date(d.date + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' }); } catch(e) { dateStr = d.date; }
 
-      // 1️⃣ ÉTAT MEV : si billets > 0 → EN VENTE (vert), sinon À FAIRE (rouge)
+      // 🎫 Vérifier si c'est une date NO TICKETS
+      var villeNorm = (d.ville || '').toUpperCase().trim();
+      var cleNoTickets = (d.date || '') + '|' + villeNorm;
+      var isNoTickets = DATES_NO_TICKETS.indexOf(cleNoTickets) !== -1;
+
+      // 1️⃣ ÉTAT MEV : NO TICKETS (vert) > EN VENTE (vert) > À FAIRE (rouge)
       var etatMevHtml;
-      if (d.billets > 0) {
+      if (isNoTickets) {
+        etatMevHtml = '<span style="display:inline-block;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid #22c55e;border-radius:5px;padding:3px 10px;font-weight:700;font-size:11px;letter-spacing:0.5px;">🎟️ NO TICKETS</span>';
+      } else if (d.billets > 0) {
         etatMevHtml = '<span style="display:inline-block;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid #22c55e;border-radius:5px;padding:3px 10px;font-weight:700;font-size:11px;letter-spacing:0.5px;">✅ EN VENTE</span>';
       } else {
         etatMevHtml = '<span style="display:inline-block;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;border-radius:5px;padding:3px 10px;font-weight:700;font-size:11px;letter-spacing:0.5px;">⚠️ À FAIRE</span>';
@@ -22330,7 +22430,17 @@ function _hideTeamSelection() {
       if (d.dateMev) {
         try { dateMevStr = new Date(d.dateMev + 'T00:00:00').toLocaleDateString('fr-FR'); } catch(e) { dateMevStr = d.dateMev; }
       }
-      var etat = d.billets > 0 ? '<span style="color:#22c55e;font-weight:700;">EN VENTE</span>' : '<span style="color:#ef4444;font-weight:700;">A FAIRE</span>';
+      // 🎫 Détection NO TICKETS (mêmes dates que le tableau)
+      var DATES_NO_TICKETS_PDF = [
+        '2025-06-01|PARIS', '2026-09-15|NARBONNE', '2026-09-16|NARBONNE',
+        '2026-09-17|NARBONNE', '2026-09-18|NARBONNE'
+      ];
+      var villeNorm = (d.ville || '').toUpperCase().trim();
+      var isNoTickets = DATES_NO_TICKETS_PDF.indexOf((d.date || '') + '|' + villeNorm) !== -1;
+      var etat;
+      if (isNoTickets) etat = '<span style="color:#22c55e;font-weight:700;">NO TICKETS</span>';
+      else if (d.billets > 0) etat = '<span style="color:#22c55e;font-weight:700;">EN VENTE</span>';
+      else etat = '<span style="color:#ef4444;font-weight:700;">A FAIRE</span>';
       return '<tr>'
         + '<td>' + dateStr + '</td>'
         + '<td><b>' + (d.ville || '—') + '</b>' + (d.salle ? '<br><small>' + d.salle + '</small>' : '') + '</td>'
@@ -22359,6 +22469,547 @@ function _hideTeamSelection() {
     w.document.close();
   }
   window.suiviMevImprimerPDF = suiviMevImprimerPDF;
+
+  // ============================================================================
+  // 📈 ANALYSE GÉNÉRALE TOUR
+  // ============================================================================
+  // Réutilise _suiviDonnees (chargé par suiviChargerDonnees) pour ne pas refaire des requêtes.
+  // 4 blocs : Top Villes/Régions, Classement Mois, Graphique Mois, Passages Villes/Salles
+  // ============================================================================
+
+  // Mapping ville → région (basé sur les principales villes des tournées TWOQ)
+  var AG_VILLE_REGION = {
+    // Île-de-France
+    'PARIS': 'Île-de-France', 'TREMBLAY EN FRANCE': 'Île-de-France',
+    // Hauts-de-France
+    'LILLE': 'Hauts-de-France', 'AMIENS': 'Hauts-de-France', 'BEAUVAIS': 'Hauts-de-France',
+    'COMPIEGNE': 'Hauts-de-France', 'DUNKERQUE': 'Hauts-de-France', 'LIEVIN': 'Hauts-de-France',
+    'LONGUENESSE': 'Hauts-de-France', 'BOULOGNE SUR MER': 'Hauts-de-France', 'ST QUENTIN': 'Hauts-de-France',
+    // Normandie
+    'CAEN': 'Normandie', 'ROUEN': 'Normandie', 'LE HAVRE': 'Normandie',
+    'ALENCON': 'Normandie',
+    // Bretagne
+    'BREST': 'Bretagne', 'RENNES': 'Bretagne', 'QUIMPER': 'Bretagne', 'FOUGERES': 'Bretagne',
+    // Pays de la Loire
+    'NANTES': 'Pays de la Loire', 'ANGERS': 'Pays de la Loire', 'LE MANS': 'Pays de la Loire',
+    'LAVAL': 'Pays de la Loire', 'MOUILLERON LE CAPTIF': 'Pays de la Loire', 'TRELAZE': 'Pays de la Loire',
+    'SABLES D\'OLONNES': 'Pays de la Loire',
+    // Centre-Val de Loire
+    'CHARTRES': 'Centre-Val de Loire', 'ORLEANS': 'Centre-Val de Loire', 'BOURGES': 'Centre-Val de Loire',
+    'JOUE LES TOURS': 'Centre-Val de Loire', 'DREUX': 'Centre-Val de Loire', 'DEOLS': 'Centre-Val de Loire',
+    // Grand Est
+    'STRASBOURG': 'Grand Est', 'METZ': 'Grand Est', 'NANCY': 'Grand Est',
+    'TROYES': 'Grand Est', 'EPERNAY': 'Grand Est', 'REIMS': 'Grand Est',
+    'BAR LE DUC': 'Grand Est',
+    // Bourgogne-Franche-Comté
+    'DIJON': 'Bourgogne-Franche-Comté', 'CHAMBERY': 'Bourgogne-Franche-Comté',
+    'DOLE': 'Bourgogne-Franche-Comté', 'MACON': 'Bourgogne-Franche-Comté',
+    'MONTBELIARD': 'Bourgogne-Franche-Comté',
+    // Auvergne-Rhône-Alpes
+    'LYON': 'Auvergne-Rhône-Alpes', 'GRENOBLE': 'Auvergne-Rhône-Alpes',
+    'CLERMONT FERRAND': 'Auvergne-Rhône-Alpes', 'AURILLAC': 'Auvergne-Rhône-Alpes',
+    'MONTLUCON': 'Auvergne-Rhône-Alpes', 'SAINT ETIENNE': 'Auvergne-Rhône-Alpes',
+    'BOURG EN BRESSE': 'Auvergne-Rhône-Alpes', 'ROANNE': 'Auvergne-Rhône-Alpes',
+    'ANNECY': 'Auvergne-Rhône-Alpes', 'CHAMONIX': 'Auvergne-Rhône-Alpes',
+    'MONTELIMAR': 'Auvergne-Rhône-Alpes',
+    // Nouvelle-Aquitaine
+    'BORDEAUX': 'Nouvelle-Aquitaine', 'BAYONNE': 'Nouvelle-Aquitaine',
+    'PAU': 'Nouvelle-Aquitaine', 'LIMOGES': 'Nouvelle-Aquitaine',
+    'POITIERS': 'Nouvelle-Aquitaine', 'BIARRITZ': 'Nouvelle-Aquitaine',
+    'AGEN': 'Nouvelle-Aquitaine', 'ANGOULEME': 'Nouvelle-Aquitaine',
+    'NIORT': 'Nouvelle-Aquitaine', 'BOULAZAC': 'Nouvelle-Aquitaine',
+    // Occitanie
+    'TOULOUSE': 'Occitanie', 'MONTPELLIER': 'Occitanie',
+    'NARBONNE': 'Occitanie', 'ALBI': 'Occitanie', 'CARCASSONNE': 'Occitanie',
+    'RODEZ': 'Occitanie',
+    // Provence-Alpes-Côte d'Azur
+    'MARSEILLE': 'Provence-Alpes-Côte d\'Azur', 'NICE': 'Provence-Alpes-Côte d\'Azur',
+    'AVIGNON': 'Provence-Alpes-Côte d\'Azur', 'AIX EN PROVENCE': 'Provence-Alpes-Côte d\'Azur',
+    'TOULON': 'Provence-Alpes-Côte d\'Azur', 'ROGNAC': 'Provence-Alpes-Côte d\'Azur',
+    // Belgique (Liège)
+    'LIEGE': 'Belgique'
+  };
+
+  function _agRegion(ville) {
+    var v = (ville || '').toUpperCase().trim();
+    return AG_VILLE_REGION[v] || 'Autre / Non classée';
+  }
+
+  var _agCritere = 'billets'; // 'billets' | 'pct' | 'resultat' | 'ca'
+
+  // Récupère la valeur du critère pour une date donnée
+  function _agValeurCritere(d) {
+    if (_agCritere === 'billets') return d.billets || 0;
+    if (_agCritere === 'pct') return d.pctRempl || 0;
+    if (_agCritere === 'resultat') return d.resultatOMP || 0;
+    if (_agCritere === 'ca') return d.recetteTTC || 0;
+    return 0;
+  }
+
+  function _agFormatValeur(v) {
+    if (_agCritere === 'billets') return Math.round(v).toLocaleString('fr-FR') + ' bil.';
+    if (_agCritere === 'pct') return v.toFixed(1) + '%';
+    if (_agCritere === 'resultat' || _agCritere === 'ca') return Math.round(v).toLocaleString('fr-FR') + ' €';
+    return String(v);
+  }
+
+  function _agLibelleCritere() {
+    return ({ billets: 'Billets', pct: '% Rempl.', resultat: 'Résultat OMP', ca: 'CA TTC' })[_agCritere] || '';
+  }
+
+  /**
+   * Ouvre la page Analyse Générale Tour.
+   * Charge _suiviDonnees si nécessaire (réutilise le cache).
+   */
+  async function ouvrirAnalyseGeneraleTour() {
+    showPage('analyse-generale-tour');
+    var loadingEl = document.getElementById('ag-loading');
+    var contentEl = document.getElementById('ag-content');
+    if (loadingEl) loadingEl.style.display = 'block';
+    if (contentEl) contentEl.style.display = 'none';
+    try {
+      if (!_suiviDonnees || _suiviDonnees.length === 0) {
+        await suiviChargerDonnees();
+      }
+      analyseGeneraleAfficherTout();
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (contentEl) contentEl.style.display = 'block';
+    } catch (err) {
+      console.error('❌ Erreur ANALYSE GÉNÉRALE TOUR :', err);
+      if (loadingEl) loadingEl.textContent = '❌ Erreur de chargement.';
+    }
+  }
+  window.ouvrirAnalyseGeneraleTour = ouvrirAnalyseGeneraleTour;
+
+  function analyseGeneraleSetCritere(c) {
+    _agCritere = c;
+    // Mise à jour des styles boutons
+    ['billets', 'pct', 'resultat', 'ca'].forEach(function(k) {
+      var btn = document.getElementById('ag-crit-' + k);
+      if (btn) {
+        if (k === c) {
+          btn.style.background = '#a855f7';
+          btn.style.color = '#fff';
+          btn.style.border = 'none';
+        } else {
+          btn.style.background = '#1a1a1a';
+          btn.style.color = '#888';
+          btn.style.border = '1px solid #333';
+        }
+      }
+    });
+    analyseGeneraleAfficherTout();
+  }
+  window.analyseGeneraleSetCritere = analyseGeneraleSetCritere;
+
+  function analyseGeneraleAfficherTout() {
+    // ⚠️ On ne prend QUE les dates passées avec données réelles, sur les 2 tournées TWOQ
+    var TOURNEES_TWOQ = ['L\'Hommage à la Légende', 'L\'Éternelle Légende', 'L\'Hommage à la Legende', 'L\'Eternelle Legende'];
+    var datesTwoq = (_suiviDonnees || []).filter(function(d) {
+      // On garde toutes les dates des tournées TWOQ (passées ET à venir pour le bloc 4)
+      var t = (d.tournee || '').toLowerCase();
+      var isTwoq = t.indexOf('queen') !== -1 || t.indexOf('hommage') !== -1 || t.indexOf('éternelle') !== -1 || t.indexOf('eternelle') !== -1 || t.indexOf('twoq') !== -1;
+      return isTwoq;
+    });
+    var datesPassees = datesTwoq.filter(function(d) { return d.categorie === 'passees' && d.billets > 0; });
+
+    _agAfficherTopVilles(datesPassees);
+    _agAfficherTopRegions(datesPassees);
+    _agAfficherTopMois(datesPassees);
+    _agAfficherGraphMois(datesPassees);
+    _agAfficherPassages(datesTwoq);
+  }
+  window.analyseGeneraleAfficherTout = analyseGeneraleAfficherTout;
+
+  // ===== BLOC 1A : Top 20 Villes =====
+  function _agAfficherTopVilles(dates) {
+    var el = document.getElementById('ag-top-villes');
+    if (!el) return;
+
+    // Pour chaque ville, prendre la MEILLEURE date (selon critère actif)
+    var bestByVille = {};
+    dates.forEach(function(d) {
+      var v = (d.ville || '').toUpperCase().trim();
+      if (!v) return;
+      var val = _agValeurCritere(d);
+      if (!bestByVille[v] || val > bestByVille[v].val) {
+        bestByVille[v] = { ville: v, val: val, date: d.date, salle: d.salle, jauge: d.jauge, pctRempl: d.pctRempl, billets: d.billets };
+      }
+    });
+
+    var tri = Object.values(bestByVille).sort(function(a, b) { return b.val - a.val; }).slice(0, 20);
+
+    if (tri.length === 0) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:#666;font-size:12px;font-style:italic;">Aucune donnée disponible</div>';
+      return;
+    }
+
+    var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
+      + '<thead><tr style="background:#1a1a1a;">'
+      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Ville</th>'
+      + '<th style="padding:7px 10px;text-align:right;color:#a855f7;border-bottom:1px solid #2a2a2a;">' + _agLibelleCritere() + '</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Date</th>'
+      + '</tr></thead><tbody>';
+    tri.forEach(function(item, idx) {
+      var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
+      var rang = idx + 1;
+      var couleurRang = rang === 1 ? '#fbbf24' : (rang === 2 ? '#cbd5e1' : (rang === 3 ? '#d97706' : '#666'));
+      var emoji = rang === 1 ? '🥇' : (rang === 2 ? '🥈' : (rang === 3 ? '🥉' : ''));
+      var dateStr = '';
+      try { dateStr = new Date(item.date + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit' }); } catch(e) { dateStr = item.date; }
+      html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
+        + '<td style="padding:6px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
+        + '<td style="padding:6px 10px;color:#fff;font-weight:600;">' + item.ville + '</td>'
+        + '<td style="padding:6px 10px;text-align:right;color:#a855f7;font-weight:700;">' + _agFormatValeur(item.val) + '</td>'
+        + '<td style="padding:6px 10px;color:#aab4be;font-size:10px;">' + dateStr + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  // ===== BLOC 1B : Top Régions =====
+  function _agAfficherTopRegions(dates) {
+    var el = document.getElementById('ag-top-regions');
+    if (!el) return;
+
+    // Pour chaque région : MEILLEURE date (= meilleure ville performante de la région)
+    // Mais on agrège aussi le total et la moyenne pour avoir le contexte
+    var byRegion = {};
+    dates.forEach(function(d) {
+      var r = _agRegion(d.ville);
+      if (!byRegion[r]) byRegion[r] = { region: r, dates: [], best: 0, bestVille: '', total: 0, count: 0 };
+      var val = _agValeurCritere(d);
+      byRegion[r].dates.push({ ville: d.ville, val: val });
+      byRegion[r].total += val;
+      byRegion[r].count++;
+      if (val > byRegion[r].best) {
+        byRegion[r].best = val;
+        byRegion[r].bestVille = d.ville;
+      }
+    });
+
+    // Tri par MEILLEUR score régional (= meilleur ville de la région)
+    var tri = Object.values(byRegion).sort(function(a, b) { return b.best - a.best; });
+
+    if (tri.length === 0) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:#666;font-size:12px;font-style:italic;">Aucune donnée disponible</div>';
+      return;
+    }
+
+    var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
+      + '<thead><tr style="background:#1a1a1a;">'
+      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Région</th>'
+      + '<th style="padding:7px 10px;text-align:right;color:#a855f7;border-bottom:1px solid #2a2a2a;">Meilleur</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Top ville</th>'
+      + '<th style="padding:7px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Nb</th>'
+      + '</tr></thead><tbody>';
+    tri.forEach(function(item, idx) {
+      var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
+      var rang = idx + 1;
+      var emoji = rang === 1 ? '🥇' : (rang === 2 ? '🥈' : (rang === 3 ? '🥉' : ''));
+      var couleurRang = rang === 1 ? '#fbbf24' : (rang === 2 ? '#cbd5e1' : (rang === 3 ? '#d97706' : '#666'));
+      html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
+        + '<td style="padding:6px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
+        + '<td style="padding:6px 10px;color:#fff;font-weight:600;">' + item.region + '</td>'
+        + '<td style="padding:6px 10px;text-align:right;color:#a855f7;font-weight:700;">' + _agFormatValeur(item.best) + '</td>'
+        + '<td style="padding:6px 10px;color:#aab4be;font-size:10px;">' + (item.bestVille || '—') + '</td>'
+        + '<td style="padding:6px 6px;text-align:center;color:#888;font-size:10px;">' + item.count + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  // ===== BLOC 2 : Classement par mois =====
+  function _agAfficherTopMois(dates) {
+    var el = document.getElementById('ag-top-mois');
+    if (!el) return;
+
+    var NOMS_MOIS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    var byMois = {};
+    for (var m = 1; m <= 12; m++) byMois[m] = { mois: m, dates: [], total: 0, count: 0, best: 0, bestVille: '', bestDate: '' };
+
+    dates.forEach(function(d) {
+      try {
+        var dt = new Date(d.date + 'T00:00:00');
+        var m = dt.getMonth() + 1;
+        var val = _agValeurCritere(d);
+        byMois[m].dates.push({ ville: d.ville, val: val, date: d.date });
+        byMois[m].total += val;
+        byMois[m].count++;
+        if (val > byMois[m].best) {
+          byMois[m].best = val;
+          byMois[m].bestVille = d.ville;
+          byMois[m].bestDate = d.date;
+        }
+      } catch(e) {}
+    });
+
+    // Tri par moyenne décroissante (mois les plus performants en premier)
+    var tri = Object.values(byMois).filter(function(m) { return m.count > 0; }).sort(function(a, b) {
+      var moyA = a.count > 0 ? a.total / a.count : 0;
+      var moyB = b.count > 0 ? b.total / b.count : 0;
+      return moyB - moyA;
+    });
+
+    if (tri.length === 0) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:#666;font-size:12px;font-style:italic;">Aucune donnée disponible</div>';
+      return;
+    }
+
+    var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
+      + '<thead><tr style="background:#1a1a1a;">'
+      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Mois</th>'
+      + '<th style="padding:8px 10px;text-align:right;color:#a855f7;border-bottom:1px solid #2a2a2a;">Moyenne ' + _agLibelleCritere() + '</th>'
+      + '<th style="padding:8px 10px;text-align:right;color:#a855f7;border-bottom:1px solid #2a2a2a;">Meilleur</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Top ville</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Nb dates</th>'
+      + '</tr></thead><tbody>';
+    tri.forEach(function(item, idx) {
+      var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
+      var rang = idx + 1;
+      var emoji = rang === 1 ? '🥇' : (rang === 2 ? '🥈' : (rang === 3 ? '🥉' : ''));
+      var couleurRang = rang === 1 ? '#fbbf24' : (rang === 2 ? '#cbd5e1' : (rang === 3 ? '#d97706' : '#666'));
+      var moy = item.count > 0 ? item.total / item.count : 0;
+      html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
+        + '<td style="padding:7px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
+        + '<td style="padding:7px 10px;color:#fff;font-weight:600;">' + NOMS_MOIS[item.mois - 1] + '</td>'
+        + '<td style="padding:7px 10px;text-align:right;color:#a855f7;font-weight:700;">' + _agFormatValeur(moy) + '</td>'
+        + '<td style="padding:7px 10px;text-align:right;color:#aab4be;">' + _agFormatValeur(item.best) + '</td>'
+        + '<td style="padding:7px 10px;color:#aab4be;font-size:10px;">' + (item.bestVille || '—') + '</td>'
+        + '<td style="padding:7px 6px;text-align:center;color:#888;font-size:10px;">' + item.count + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  // ===== BLOC 3 : Graphique scores par mois =====
+  function _agAfficherGraphMois(dates) {
+    var el = document.getElementById('ag-graph-mois');
+    if (!el) return;
+
+    var NOMS_MOIS_COURT = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+    var byMois = {};
+    for (var m = 1; m <= 12; m++) byMois[m] = { total: 0, count: 0 };
+
+    dates.forEach(function(d) {
+      try {
+        var dt = new Date(d.date + 'T00:00:00');
+        var m = dt.getMonth() + 1;
+        byMois[m].total += _agValeurCritere(d);
+        byMois[m].count++;
+      } catch(e) {}
+    });
+
+    // Calcul moyenne par mois
+    var moyennes = [];
+    for (var m = 1; m <= 12; m++) {
+      moyennes.push(byMois[m].count > 0 ? byMois[m].total / byMois[m].count : 0);
+    }
+
+    var maxVal = Math.max.apply(null, moyennes);
+    if (maxVal === 0) {
+      el.innerHTML = '<div style="text-align:center;color:#666;font-size:12px;font-style:italic;">Aucune donnée disponible</div>';
+      return;
+    }
+
+    // SVG bar chart
+    var width = 800, height = 300, padTop = 30, padBottom = 50, padLeft = 60, padRight = 20;
+    var chartW = width - padLeft - padRight;
+    var chartH = height - padTop - padBottom;
+    var barW = chartW / 12 - 6;
+
+    var svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" style="width:100%;height:auto;max-height:350px;font-family:\'Inter\',sans-serif;">';
+    // Titre
+    svg += '<text x="' + (width / 2) + '" y="20" text-anchor="middle" fill="#a855f7" font-size="13" font-weight="700">Moyenne ' + _agLibelleCritere() + ' par mois</text>';
+
+    // Axe Y (valeurs)
+    var nbTicks = 5;
+    for (var i = 0; i <= nbTicks; i++) {
+      var y = padTop + chartH - (chartH * i / nbTicks);
+      var v = (maxVal * i / nbTicks);
+      svg += '<line x1="' + padLeft + '" y1="' + y + '" x2="' + (width - padRight) + '" y2="' + y + '" stroke="#222" stroke-width="1"/>';
+      svg += '<text x="' + (padLeft - 8) + '" y="' + (y + 4) + '" text-anchor="end" fill="#666" font-size="10">' + _agFormatValeur(v) + '</text>';
+    }
+
+    // Barres
+    moyennes.forEach(function(v, idx) {
+      var x = padLeft + (chartW / 12) * idx + 3;
+      var h = (v / maxVal) * chartH;
+      var y = padTop + chartH - h;
+      var couleur = v === maxVal ? '#fbbf24' : '#a855f7';
+      if (v > 0) {
+        svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + h + '" fill="' + couleur + '" opacity="0.8" rx="2"/>';
+        // Valeur au-dessus
+        svg += '<text x="' + (x + barW / 2) + '" y="' + (y - 5) + '" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">' + _agFormatValeur(v) + '</text>';
+      }
+      // Label mois
+      svg += '<text x="' + (x + barW / 2) + '" y="' + (height - padBottom + 18) + '" text-anchor="middle" fill="#aab4be" font-size="11" font-weight="600">' + NOMS_MOIS_COURT[idx] + '</text>';
+    });
+
+    svg += '</svg>';
+    el.innerHTML = svg;
+  }
+
+  // ===== BLOC 4 : Tableau passages villes/salles =====
+  var _agPassagesData = []; // cache pour le filtrage
+
+  function _agAfficherPassages(datesTwoq) {
+    var el = document.getElementById('ag-passages');
+    if (!el) return;
+
+    var today = new Date(); today.setHours(0,0,0,0);
+
+    // Grouper par couple ville+salle
+    var byKey = {};
+    datesTwoq.forEach(function(d) {
+      var ville = (d.ville || '').toUpperCase().trim();
+      var salle = (d.salle || '').trim();
+      if (!ville) return;
+      var key = ville + ' || ' + salle;
+      if (!byKey[key]) byKey[key] = { ville: ville, salle: salle || '(salle non renseignée)', dates: [] };
+      byKey[key].dates.push({ date: d.date, billets: d.billets, categorie: d.categorie });
+    });
+
+    // Pour chaque couple, calculer dernière passée + prochaine à venir + écart
+    _agPassagesData = Object.values(byKey).map(function(grp) {
+      // Tri par date
+      grp.dates.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+      var datesPassees = grp.dates.filter(function(d) {
+        try { return new Date(d.date + 'T00:00:00') < today; } catch(e) { return false; }
+      });
+      var datesAvenir = grp.dates.filter(function(d) {
+        try { return new Date(d.date + 'T00:00:00') >= today; } catch(e) { return false; }
+      });
+
+      var derniere = datesPassees.length > 0 ? datesPassees[datesPassees.length - 1] : null;
+      var prochaine = datesAvenir.length > 0 ? datesAvenir[0] : null;
+
+      var ecartJours = null, ecartMois = null;
+      if (derniere && prochaine) {
+        var d1 = new Date(derniere.date + 'T00:00:00');
+        var d2 = new Date(prochaine.date + 'T00:00:00');
+        ecartJours = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+        ecartMois = (ecartJours / 30.44).toFixed(1);
+      }
+
+      // Recommandation booking
+      var reco = '';
+      if (!derniere && prochaine) {
+        reco = '🆕 Première date prévue';
+      } else if (derniere && !prochaine) {
+        // Calculer depuis combien de temps
+        var d1 = new Date(derniere.date + 'T00:00:00');
+        var moisDepuis = Math.round((today - d1) / (1000 * 60 * 60 * 24) / 30.44);
+        if (moisDepuis < 12) reco = '⏳ ' + moisDepuis + ' mois depuis dernière';
+        else if (moisDepuis < 24) reco = '✅ ' + moisDepuis + ' mois — bookable';
+        else reco = '🚀 ' + moisDepuis + ' mois — à rebooker en priorité';
+      } else if (derniere && prochaine) {
+        if (ecartJours < 365) reco = '⚠️ Trop rapproché (' + ecartMois + ' mois)';
+        else if (ecartJours < 730) reco = '✅ Bon espacement (' + ecartMois + ' mois)';
+        else reco = '👍 Bon espacement (' + ecartMois + ' mois)';
+      }
+
+      return {
+        ville: grp.ville,
+        salle: grp.salle,
+        nbPassages: grp.dates.length,
+        nbPassees: datesPassees.length,
+        nbAvenir: datesAvenir.length,
+        derniereDate: derniere ? derniere.date : null,
+        prochaineDate: prochaine ? prochaine.date : null,
+        ecartJours: ecartJours,
+        ecartMois: ecartMois,
+        reco: reco
+      };
+    });
+
+    // Tri : nb passages desc, puis ville
+    _agPassagesData.sort(function(a, b) {
+      if (b.nbPassages !== a.nbPassages) return b.nbPassages - a.nbPassages;
+      return a.ville.localeCompare(b.ville);
+    });
+
+    analyseGeneraleFiltrerPassages();
+  }
+
+  function analyseGeneraleFiltrerPassages() {
+    var el = document.getElementById('ag-passages');
+    if (!el) return;
+    var input = document.getElementById('ag-search-ville-salle');
+    var filtre = (input ? input.value : '').toLowerCase().trim();
+
+    var data = _agPassagesData;
+    if (filtre) {
+      data = data.filter(function(item) {
+        return item.ville.toLowerCase().indexOf(filtre) !== -1 || (item.salle || '').toLowerCase().indexOf(filtre) !== -1;
+      });
+    }
+
+    if (data.length === 0) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:#666;font-size:12px;font-style:italic;">Aucun résultat</div>';
+      return;
+    }
+
+    var fmtDate = function(s) {
+      if (!s) return '—';
+      try { return new Date(s + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit' }); } catch(e) { return s; }
+    };
+
+    var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;min-width:900px;">'
+      + '<thead><tr style="background:#1a1a1a;">'
+      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Ville</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Salle</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Total</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Passées</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">À venir</th>'
+      + '<th style="padding:8px 10px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Dernière</th>'
+      + '<th style="padding:8px 10px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Prochaine</th>'
+      + '<th style="padding:8px 10px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Écart</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Recommandation</th>'
+      + '</tr></thead><tbody>';
+    data.forEach(function(item, idx) {
+      var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
+      var ecartStr = '—';
+      if (item.ecartJours !== null) {
+        ecartStr = item.ecartJours + ' j (' + item.ecartMois + ' mois)';
+      }
+      var couleurReco = '#aab4be';
+      if (item.reco.indexOf('⚠️') !== -1) couleurReco = '#f97316';
+      else if (item.reco.indexOf('🚀') !== -1) couleurReco = '#fbbf24';
+      else if (item.reco.indexOf('✅') !== -1) couleurReco = '#22c55e';
+      else if (item.reco.indexOf('👍') !== -1) couleurReco = '#22c55e';
+
+      html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
+        + '<td style="padding:8px 10px;color:#fff;font-weight:600;">' + item.ville + '</td>'
+        + '<td style="padding:8px 10px;color:#aab4be;font-size:10px;">' + (item.salle || '—') + '</td>'
+        + '<td style="padding:8px 6px;text-align:center;color:#a855f7;font-weight:700;">' + item.nbPassages + '</td>'
+        + '<td style="padding:8px 6px;text-align:center;color:#aab4be;">' + item.nbPassees + '</td>'
+        + '<td style="padding:8px 6px;text-align:center;color:#aab4be;">' + item.nbAvenir + '</td>'
+        + '<td style="padding:8px 10px;text-align:center;color:#aab4be;font-size:10px;">' + fmtDate(item.derniereDate) + '</td>'
+        + '<td style="padding:8px 10px;text-align:center;color:#aab4be;font-size:10px;">' + fmtDate(item.prochaineDate) + '</td>'
+        + '<td style="padding:8px 10px;text-align:center;color:#aab4be;font-size:10px;">' + ecartStr + '</td>'
+        + '<td style="padding:8px 10px;color:' + couleurReco + ';font-size:10px;font-weight:600;">' + (item.reco || '—') + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+  window.analyseGeneraleFiltrerPassages = analyseGeneraleFiltrerPassages;
+
+  function analyseGeneraleImprimerPDF() {
+    if (!_suiviDonnees || _suiviDonnees.length === 0) {
+      alert('❌ Aucune donnée à imprimer. Attends le chargement complet.');
+      return;
+    }
+    window.print();
+  }
+  window.analyseGeneraleImprimerPDF = analyseGeneraleImprimerPDF;
 
   /**
    * Ouvre la modale de choix de période pour l'impression.
