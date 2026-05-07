@@ -3473,7 +3473,7 @@ function _hideTeamSelection() {
             <div onclick="selectDropdownItem(event, function(){ showPage('gestion-omp'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
             <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviDatesResume(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#c9a84c; font-weight:600; border-bottom:1px solid #333; background:rgba(201,168,76,0.08);" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='rgba(201,168,76,0.08)'">📊 Suivi Financier Tour</div>
             <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviMEV(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#22c55e; font-weight:600; border-bottom:1px solid #333; background:rgba(34,197,94,0.08);" onmouseover="this.style.background='rgba(34,197,94,0.15)'" onmouseout="this.style.background='rgba(34,197,94,0.08)'">🎫 Suivi MEV</div>
-            <div onclick="selectDropdownItem(event, function(){ ouvrirAnalyseGeneraleTour(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#a855f7; font-weight:600; border-bottom:1px solid #333; background:rgba(168,85,247,0.08);" onmouseover="this.style.background='rgba(168,85,247,0.15)'" onmouseout="this.style.background='rgba(168,85,247,0.08)'">📈 Analyse Générale</div>
+            <div onclick="selectDropdownItem(event, function(){ ouvrirAnalyseGeneraleTour(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#0891b2; font-weight:600; border-bottom:1px solid #333; background:rgba(8,145,178,0.08);" onmouseover="this.style.background='rgba(8,145,178,0.15)'" onmouseout="this.style.background='rgba(8,145,178,0.08)'">📈 Analyse Générale</div>
             <div onclick="selectDropdownItem(event, function(){ carteTourneeOuvrir(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🗺️ Carte Tournée</div>
             <div onclick="selectDropdownItem(event, function(){ openModal('modal-vhr-tournee'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
           </div>
@@ -3685,7 +3685,7 @@ function _hideTeamSelection() {
     <div id="page-analyse-generale-tour" class="page">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
         <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:0;">← Retour au Tableau de bord</button>
-        <button onclick="analyseGeneraleImprimerPDF()" style="background:#a855f7;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;">🖨️ IMPRIMER / PDF</button>
+        <button onclick="analyseGeneraleImprimerPDF()" style="background:#0891b2;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;">🖨️ IMPRIMER / PDF</button>
       </div>
       <div class="page-title">📈 ANALYSE GÉNÉRALE TOUR</div>
       <div style="font-size:13px;color:#888;margin-bottom:16px;margin-top:-12px;font-style:italic;">Tournée TWOQ — L'Hommage à la Légende + L'Éternelle Légende</div>
@@ -3694,7 +3694,7 @@ function _hideTeamSelection() {
       <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;margin-bottom:20px;">
         <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">📊 Critère de classement</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button id="ag-crit-billets" onclick="analyseGeneraleSetCritere('billets')" class="ag-crit-btn" style="background:#a855f7;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">🎫 BILLETS</button>
+          <button id="ag-crit-billets" onclick="analyseGeneraleSetCritere('billets')" class="ag-crit-btn" style="background:#0891b2;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">🎫 BILLETS</button>
           <button id="ag-crit-pct" onclick="analyseGeneraleSetCritere('pct')" class="ag-crit-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">📊 % REMPLISSAGE</button>
           <button id="ag-crit-resultat" onclick="analyseGeneraleSetCritere('resultat')" class="ag-crit-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">💰 RÉSULTAT OMP</button>
           <button id="ag-crit-ca" onclick="analyseGeneraleSetCritere('ca')" class="ag-crit-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">💵 CA TTC</button>
@@ -3710,30 +3710,30 @@ function _hideTeamSelection() {
         <!-- BLOC 1 : 2 tableaux côte à côte (Top Villes + Top Régions) -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
           <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
-            <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">🏆 TOP 20 VILLES</div>
+            <div style="background:#0891b2;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">🏆 TOP 20 VILLES</div>
             <div id="ag-top-villes" style="padding:0;"></div>
           </div>
           <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
-            <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">🗺️ TOP RÉGIONS</div>
+            <div style="background:#0891b2;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">🗺️ TOP RÉGIONS</div>
             <div id="ag-top-regions" style="padding:0;"></div>
           </div>
         </div>
 
         <!-- BLOC 2 : Classement par mois -->
         <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
-          <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">📅 CLASSEMENT PAR MOIS</div>
+          <div style="background:#0891b2;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">📅 CLASSEMENT PAR MOIS</div>
           <div id="ag-top-mois" style="padding:0;"></div>
         </div>
 
         <!-- BLOC 3 : Graphique scores par mois -->
         <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
-          <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">📊 GRAPHIQUE — SCORES MENSUELS</div>
+          <div style="background:#0891b2;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">📊 GRAPHIQUE — SCORES MENSUELS</div>
           <div id="ag-graph-mois" style="padding:20px;"></div>
         </div>
 
         <!-- BLOC 4 : Tableau passages villes/salles -->
         <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;margin-bottom:20px;">
-          <div style="background:#a855f7;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+          <div style="background:#0891b2;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
             <span>🎯 PASSAGES PAR VILLE / SALLE — RECOMMANDATIONS BOOKING</span>
             <input id="ag-search-ville-salle" type="text" placeholder="🔍 Filtrer ville ou salle..." oninput="analyseGeneraleFiltrerPassages()" style="background:#fff;color:#000;border:none;border-radius:5px;padding:5px 10px;font-size:11px;width:200px;">
           </div>
@@ -22028,6 +22028,7 @@ function _hideTeamSelection() {
           ville: d.ville || '',
           salle: d.nom_salle || '',
           tournee: tourneesById[d.tournee_id] || '',
+          tournee_id: d.tournee_id || '',
           categorie: categorie,
           // Actuel
           billets: calc.billets,
@@ -22588,7 +22589,7 @@ function _hideTeamSelection() {
       var btn = document.getElementById('ag-crit-' + k);
       if (btn) {
         if (k === c) {
-          btn.style.background = '#a855f7';
+          btn.style.background = '#0891b2';
           btn.style.color = '#fff';
           btn.style.border = 'none';
         } else {
@@ -22603,15 +22604,21 @@ function _hideTeamSelection() {
   window.analyseGeneraleSetCritere = analyseGeneraleSetCritere;
 
   function analyseGeneraleAfficherTout() {
-    // ⚠️ On ne prend QUE les dates passées avec données réelles, sur les 2 tournées TWOQ
-    var TOURNEES_TWOQ = ['L\'Hommage à la Légende', 'L\'Éternelle Légende', 'L\'Hommage à la Legende', 'L\'Eternelle Legende'];
+    // ⚠️ Filtre par UUIDs des tournées TWOQ (plus fiable que par nom)
+    var TWOQ_TOURNEE_IDS = [
+      '11111111-1111-1111-1111-111111111111', // TWOQ L'Hommage à la Légende
+      '22222222-2222-2222-2222-222222222222'  // TWOQ L'Éternelle Légende
+    ];
     var datesTwoq = (_suiviDonnees || []).filter(function(d) {
-      // On garde toutes les dates des tournées TWOQ (passées ET à venir pour le bloc 4)
-      var t = (d.tournee || '').toLowerCase();
-      var isTwoq = t.indexOf('queen') !== -1 || t.indexOf('hommage') !== -1 || t.indexOf('éternelle') !== -1 || t.indexOf('eternelle') !== -1 || t.indexOf('twoq') !== -1;
-      return isTwoq;
+      return TWOQ_TOURNEE_IDS.indexOf(d.tournee_id) !== -1;
     });
     var datesPassees = datesTwoq.filter(function(d) { return d.categorie === 'passees' && d.billets > 0; });
+
+    console.log('📈 ANALYSE GÉNÉRALE :', {
+      total_suivi: (_suiviDonnees || []).length,
+      datesTwoq: datesTwoq.length,
+      datesPassees: datesPassees.length
+    });
 
     _agAfficherTopVilles(datesPassees);
     _agAfficherTopRegions(datesPassees);
@@ -22646,10 +22653,10 @@ function _hideTeamSelection() {
 
     var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
       + '<thead><tr style="background:#1a1a1a;">'
-      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
-      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Ville</th>'
-      + '<th style="padding:7px 10px;text-align:right;color:#a855f7;border-bottom:1px solid #2a2a2a;">' + _agLibelleCritere() + '</th>'
-      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Date</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Ville</th>'
+      + '<th style="padding:7px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">' + _agLibelleCritere() + '</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Date</th>'
       + '</tr></thead><tbody>';
     tri.forEach(function(item, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
@@ -22661,7 +22668,7 @@ function _hideTeamSelection() {
       html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
         + '<td style="padding:6px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
         + '<td style="padding:6px 10px;color:#fff;font-weight:600;">' + item.ville + '</td>'
-        + '<td style="padding:6px 10px;text-align:right;color:#a855f7;font-weight:700;">' + _agFormatValeur(item.val) + '</td>'
+        + '<td style="padding:6px 10px;text-align:right;color:#0891b2;font-weight:700;">' + _agFormatValeur(item.val) + '</td>'
         + '<td style="padding:6px 10px;color:#aab4be;font-size:10px;">' + dateStr + '</td>'
         + '</tr>';
     });
@@ -22700,11 +22707,11 @@ function _hideTeamSelection() {
 
     var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
       + '<thead><tr style="background:#1a1a1a;">'
-      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
-      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Région</th>'
-      + '<th style="padding:7px 10px;text-align:right;color:#a855f7;border-bottom:1px solid #2a2a2a;">Meilleur</th>'
-      + '<th style="padding:7px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Top ville</th>'
-      + '<th style="padding:7px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Nb</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Région</th>'
+      + '<th style="padding:7px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Meilleur</th>'
+      + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Top ville</th>'
+      + '<th style="padding:7px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Nb</th>'
       + '</tr></thead><tbody>';
     tri.forEach(function(item, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
@@ -22714,7 +22721,7 @@ function _hideTeamSelection() {
       html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
         + '<td style="padding:6px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
         + '<td style="padding:6px 10px;color:#fff;font-weight:600;">' + item.region + '</td>'
-        + '<td style="padding:6px 10px;text-align:right;color:#a855f7;font-weight:700;">' + _agFormatValeur(item.best) + '</td>'
+        + '<td style="padding:6px 10px;text-align:right;color:#0891b2;font-weight:700;">' + _agFormatValeur(item.best) + '</td>'
         + '<td style="padding:6px 10px;color:#aab4be;font-size:10px;">' + (item.bestVille || '—') + '</td>'
         + '<td style="padding:6px 6px;text-align:center;color:#888;font-size:10px;">' + item.count + '</td>'
         + '</tr>';
@@ -22762,12 +22769,12 @@ function _hideTeamSelection() {
 
     var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
       + '<thead><tr style="background:#1a1a1a;">'
-      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
-      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Mois</th>'
-      + '<th style="padding:8px 10px;text-align:right;color:#a855f7;border-bottom:1px solid #2a2a2a;">Moyenne ' + _agLibelleCritere() + '</th>'
-      + '<th style="padding:8px 10px;text-align:right;color:#a855f7;border-bottom:1px solid #2a2a2a;">Meilleur</th>'
-      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Top ville</th>'
-      + '<th style="padding:8px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Nb dates</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Mois</th>'
+      + '<th style="padding:8px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Moyenne ' + _agLibelleCritere() + '</th>'
+      + '<th style="padding:8px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Meilleur</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Top ville</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Nb dates</th>'
       + '</tr></thead><tbody>';
     tri.forEach(function(item, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
@@ -22778,7 +22785,7 @@ function _hideTeamSelection() {
       html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
         + '<td style="padding:7px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
         + '<td style="padding:7px 10px;color:#fff;font-weight:600;">' + NOMS_MOIS[item.mois - 1] + '</td>'
-        + '<td style="padding:7px 10px;text-align:right;color:#a855f7;font-weight:700;">' + _agFormatValeur(moy) + '</td>'
+        + '<td style="padding:7px 10px;text-align:right;color:#0891b2;font-weight:700;">' + _agFormatValeur(moy) + '</td>'
         + '<td style="padding:7px 10px;text-align:right;color:#aab4be;">' + _agFormatValeur(item.best) + '</td>'
         + '<td style="padding:7px 10px;color:#aab4be;font-size:10px;">' + (item.bestVille || '—') + '</td>'
         + '<td style="padding:7px 6px;text-align:center;color:#888;font-size:10px;">' + item.count + '</td>'
@@ -22826,7 +22833,7 @@ function _hideTeamSelection() {
 
     var svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" style="width:100%;height:auto;max-height:350px;font-family:\'Inter\',sans-serif;">';
     // Titre
-    svg += '<text x="' + (width / 2) + '" y="20" text-anchor="middle" fill="#a855f7" font-size="13" font-weight="700">Moyenne ' + _agLibelleCritere() + ' par mois</text>';
+    svg += '<text x="' + (width / 2) + '" y="20" text-anchor="middle" fill="#0891b2" font-size="13" font-weight="700">Moyenne ' + _agLibelleCritere() + ' par mois</text>';
 
     // Axe Y (valeurs)
     var nbTicks = 5;
@@ -22842,7 +22849,7 @@ function _hideTeamSelection() {
       var x = padLeft + (chartW / 12) * idx + 3;
       var h = (v / maxVal) * chartH;
       var y = padTop + chartH - h;
-      var couleur = v === maxVal ? '#fbbf24' : '#a855f7';
+      var couleur = v === maxVal ? '#fbbf24' : '#0891b2';
       if (v > 0) {
         svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + h + '" fill="' + couleur + '" opacity="0.8" rx="2"/>';
         // Valeur au-dessus
@@ -22963,15 +22970,15 @@ function _hideTeamSelection() {
 
     var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;min-width:900px;">'
       + '<thead><tr style="background:#1a1a1a;">'
-      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Ville</th>'
-      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Salle</th>'
-      + '<th style="padding:8px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Total</th>'
-      + '<th style="padding:8px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Passées</th>'
-      + '<th style="padding:8px 6px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">À venir</th>'
-      + '<th style="padding:8px 10px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Dernière</th>'
-      + '<th style="padding:8px 10px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Prochaine</th>'
-      + '<th style="padding:8px 10px;text-align:center;color:#a855f7;border-bottom:1px solid #2a2a2a;">Écart</th>'
-      + '<th style="padding:8px 10px;text-align:left;color:#a855f7;border-bottom:1px solid #2a2a2a;">Recommandation</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Ville</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Salle</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Total</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Passées</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">À venir</th>'
+      + '<th style="padding:8px 10px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Dernière</th>'
+      + '<th style="padding:8px 10px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Prochaine</th>'
+      + '<th style="padding:8px 10px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Écart</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Recommandation</th>'
       + '</tr></thead><tbody>';
     data.forEach(function(item, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
@@ -22988,7 +22995,7 @@ function _hideTeamSelection() {
       html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
         + '<td style="padding:8px 10px;color:#fff;font-weight:600;">' + item.ville + '</td>'
         + '<td style="padding:8px 10px;color:#aab4be;font-size:10px;">' + (item.salle || '—') + '</td>'
-        + '<td style="padding:8px 6px;text-align:center;color:#a855f7;font-weight:700;">' + item.nbPassages + '</td>'
+        + '<td style="padding:8px 6px;text-align:center;color:#0891b2;font-weight:700;">' + item.nbPassages + '</td>'
         + '<td style="padding:8px 6px;text-align:center;color:#aab4be;">' + item.nbPassees + '</td>'
         + '<td style="padding:8px 6px;text-align:center;color:#aab4be;">' + item.nbAvenir + '</td>'
         + '<td style="padding:8px 10px;text-align:center;color:#aab4be;font-size:10px;">' + fmtDate(item.derniereDate) + '</td>'
