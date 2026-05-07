@@ -22728,17 +22728,20 @@ function _hideTeamSelection() {
       + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Région</th>'
       + '<th style="padding:7px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Total ' + _agLibelleCritere() + '</th>'
       + '<th style="padding:7px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Nb dates</th>'
+      + '<th style="padding:7px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Moyenne / date</th>'
       + '</tr></thead><tbody>';
     tri.forEach(function(item, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
       var rang = idx + 1;
       var emoji = rang === 1 ? '🥇' : (rang === 2 ? '🥈' : (rang === 3 ? '🥉' : ''));
       var couleurRang = rang === 1 ? '#fbbf24' : (rang === 2 ? '#cbd5e1' : (rang === 3 ? '#d97706' : '#666'));
+      var moy = item.count > 0 ? item.total / item.count : 0;
       html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
         + '<td style="padding:6px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
         + '<td style="padding:6px 10px;color:#fff;font-weight:600;">' + item.region + '</td>'
         + '<td style="padding:6px 10px;text-align:right;color:#0891b2;font-weight:700;">' + _agFormatValeur(item.total) + '</td>'
         + '<td style="padding:6px 6px;text-align:center;color:#888;font-size:10px;">' + item.count + '</td>'
+        + '<td style="padding:6px 10px;text-align:right;color:#aab4be;">' + _agFormatValeur(moy) + '</td>'
         + '</tr>';
     });
     html += '</tbody></table>';
@@ -22779,8 +22782,8 @@ function _hideTeamSelection() {
       + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
       + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Mois</th>'
       + '<th style="padding:8px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Total ' + _agLibelleCritere() + '</th>'
-      + '<th style="padding:8px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Moyenne / date</th>'
       + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Nb dates</th>'
+      + '<th style="padding:8px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Moyenne / date</th>'
       + '</tr></thead><tbody>';
     tri.forEach(function(item, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
@@ -22792,15 +22795,15 @@ function _hideTeamSelection() {
         + '<td style="padding:7px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
         + '<td style="padding:7px 10px;color:#fff;font-weight:600;">' + NOMS_MOIS[item.mois - 1] + '</td>'
         + '<td style="padding:7px 10px;text-align:right;color:#0891b2;font-weight:700;">' + _agFormatValeur(item.total) + '</td>'
-        + '<td style="padding:7px 10px;text-align:right;color:#aab4be;">' + _agFormatValeur(moy) + '</td>'
         + '<td style="padding:7px 6px;text-align:center;color:#888;font-size:10px;">' + item.count + '</td>'
+        + '<td style="padding:7px 10px;text-align:right;color:#aab4be;">' + _agFormatValeur(moy) + '</td>'
         + '</tr>';
     });
     html += '</tbody></table>';
     el.innerHTML = html;
   }
 
-  // ===== BLOC 3 : Graphique scores par mois =====
+  // ===== BLOC 3 : Graphique scores par mois (TOTAL — cohérent avec classement) =====
   function _agAfficherGraphMois(dates) {
     var el = document.getElementById('ag-graph-mois');
     if (!el) return;
@@ -22818,13 +22821,13 @@ function _hideTeamSelection() {
       } catch(e) {}
     });
 
-    // Calcul moyenne par mois
-    var moyennes = [];
+    // 📊 On affiche le TOTAL (et plus la moyenne) pour être cohérent avec le classement par mois
+    var totaux = [];
     for (var m = 1; m <= 12; m++) {
-      moyennes.push(byMois[m].count > 0 ? byMois[m].total / byMois[m].count : 0);
+      totaux.push(byMois[m].total);
     }
 
-    var maxVal = Math.max.apply(null, moyennes);
+    var maxVal = Math.max.apply(null, totaux);
     if (maxVal === 0) {
       el.innerHTML = '<div style="text-align:center;color:#666;font-size:12px;font-style:italic;">Aucune donnée disponible</div>';
       return;
@@ -22838,7 +22841,7 @@ function _hideTeamSelection() {
 
     var svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" style="width:100%;height:auto;max-height:350px;font-family:\'Inter\',sans-serif;">';
     // Titre
-    svg += '<text x="' + (width / 2) + '" y="20" text-anchor="middle" fill="#0891b2" font-size="13" font-weight="700">Moyenne ' + _agLibelleCritere() + ' par mois</text>';
+    svg += '<text x="' + (width / 2) + '" y="20" text-anchor="middle" fill="#0891b2" font-size="13" font-weight="700">Total ' + _agLibelleCritere() + ' par mois</text>';
 
     // Axe Y (valeurs)
     var nbTicks = 5;
@@ -22850,13 +22853,13 @@ function _hideTeamSelection() {
     }
 
     // Barres
-    moyennes.forEach(function(v, idx) {
+    totaux.forEach(function(v, idx) {
       var x = padLeft + (chartW / 12) * idx + 3;
       var h = (v / maxVal) * chartH;
       var y = padTop + chartH - h;
-      var couleur = v === maxVal ? '#fbbf24' : '#0891b2';
+      var couleur = (v === maxVal && v > 0) ? '#fbbf24' : '#0891b2';
       if (v > 0) {
-        svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + h + '" fill="' + couleur + '" opacity="0.8" rx="2"/>';
+        svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + h + '" fill="' + couleur + '" opacity="0.85" rx="2"/>';
         // Valeur au-dessus
         svg += '<text x="' + (x + barW / 2) + '" y="' + (y - 5) + '" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">' + _agFormatValeur(v) + '</text>';
       }
@@ -23020,50 +23023,103 @@ function _hideTeamSelection() {
       try { return new Date(s + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit' }); } catch(e) { return s; }
     };
 
-    var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;min-width:900px;">'
-      + '<thead><tr style="background:#1a1a1a;">'
-      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Ville</th>'
-      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Salle</th>'
-      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Total passages</th>'
-      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Historique des passages & écarts</th>'
-      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Recommandation</th>'
-      + '</tr></thead><tbody>';
+    var today = new Date(); today.setHours(0,0,0,0);
+
+    // Calcul du nb max de passages pour dimensionner le tableau
+    var maxPassages = 0;
+    data.forEach(function(item) {
+      if (item.passages.length > maxPassages) maxPassages = item.passages.length;
+    });
+    if (maxPassages === 0) maxPassages = 1;
+
+    // Recommandation entre 2 dates (basée sur écart en mois)
+    var calcRecoEcart = function(jours) {
+      if (jours === null) return { txt: '', color: '#aab4be' };
+      var mois = (jours / 30.44).toFixed(1);
+      if (jours < 365) return { txt: '⚠️ ' + mois + ' mois (rapproché)', color: '#f97316' };
+      if (jours < 730) return { txt: '✅ ' + mois + ' mois (correct)', color: '#22c55e' };
+      return { txt: '👍 ' + mois + ' mois (large)', color: '#22c55e' };
+    };
+
+    // Recommandation pour la prochaine date à booker (depuis dernière passée)
+    var calcRecoFuture = function(joursDepuisDerniere) {
+      var moisDepuis = Math.round(joursDepuisDerniere / 30.44);
+      if (moisDepuis < 12) return { txt: '⏳ ' + moisDepuis + ' mois', color: '#aab4be' };
+      if (moisDepuis < 24) return { txt: '✅ ' + moisDepuis + ' mois — bookable', color: '#22c55e' };
+      return { txt: '🚀 ' + moisDepuis + ' mois — à rebooker', color: '#fbbf24' };
+    };
+
+    // Construire l'en-tête dynamique : Ville | Salle | Total | (Date 1 | Écart→2) | (Date 2 | Écart→3) | ...
+    var thead = '<thead><tr style="background:#1a1a1a;">'
+      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;border-right:1px solid #2a2a2a;position:sticky;left:0;background:#1a1a1a;z-index:2;">Ville</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;border-right:1px solid #2a2a2a;">Salle</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;border-right:2px solid #0891b2;">Total</th>';
+    for (var i = 0; i < maxPassages; i++) {
+      var num = i + 1;
+      thead += '<th style="padding:8px 10px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;border-right:1px solid #2a2a2a;background:rgba(8,145,178,0.05);">📅 Date ' + num + '</th>';
+      if (i < maxPassages - 1) {
+        thead += '<th style="padding:8px 10px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;border-right:2px solid #0891b2;background:rgba(8,145,178,0.10);font-size:10px;">Écart vers ' + (num + 1) + '</th>';
+      }
+    }
+    // Dernière colonne : recommandation finale (pour la prochaine date à booker si pas encore d'à venir)
+    thead += '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;background:rgba(8,145,178,0.10);">📌 Reco booking</th>';
+    thead += '</tr></thead>';
+
+    // Construire les lignes
+    var tbody = '<tbody>';
     data.forEach(function(item, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
-      var couleurReco = '#aab4be';
-      if (item.reco.indexOf('⚠️') !== -1) couleurReco = '#f97316';
-      else if (item.reco.indexOf('🚀') !== -1) couleurReco = '#fbbf24';
-      else if (item.reco.indexOf('✅') !== -1) couleurReco = '#22c55e';
-      else if (item.reco.indexOf('👍') !== -1) couleurReco = '#22c55e';
-      else if (item.reco.indexOf('🆕') !== -1) couleurReco = '#3b82f6';
+      var altBgSticky = idx % 2 === 1 ? '#0d0d0d' : '#0a0a0a';
 
-      // Construire l'historique : Date1 → (écart) → Date2 → (écart) → Date3 ...
-      var historique = '';
-      item.passages.forEach(function(p, pi) {
-        var estAvenir = new Date(p.dateDebut + 'T00:00:00') >= new Date(new Date().setHours(0,0,0,0));
-        var couleurDate = estAvenir ? '#fbbf24' : '#aab4be';
-        var prefixe = estAvenir ? '🔮 ' : '';
-        var libellePassage = fmtDate(p.dateDebut);
-        if (p.nbDates > 1) {
-          libellePassage += ' (résidence ' + p.nbDates + ' dates)';
-        }
-        if (pi > 0) {
-          var ec = item.ecarts[pi - 1];
-          historique += '<span style="color:#666;margin:0 6px;">→ <b style="color:#0891b2;">' + ec.mois + ' mois</b> →</span>';
-        }
-        historique += '<span style="color:' + couleurDate + ';font-weight:600;">' + prefixe + libellePassage + '</span>';
-      });
-      if (!historique) historique = '<span style="color:#555;font-style:italic;">Aucun passage</span>';
+      tbody += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">';
+      tbody += '<td style="padding:8px 10px;color:#fff;font-weight:600;border-right:1px solid #2a2a2a;position:sticky;left:0;background:' + altBgSticky + ';z-index:1;white-space:nowrap;">' + item.ville + '</td>';
+      tbody += '<td style="padding:8px 10px;color:#aab4be;font-size:10px;border-right:1px solid #2a2a2a;white-space:nowrap;">' + (item.salle || '—') + '</td>';
+      tbody += '<td style="padding:8px 6px;text-align:center;color:#0891b2;font-weight:700;border-right:2px solid #0891b2;">' + item.nbPassages + '</td>';
 
-      html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
-        + '<td style="padding:8px 10px;color:#fff;font-weight:600;vertical-align:top;">' + item.ville + '</td>'
-        + '<td style="padding:8px 10px;color:#aab4be;font-size:10px;vertical-align:top;">' + (item.salle || '—') + '</td>'
-        + '<td style="padding:8px 6px;text-align:center;color:#0891b2;font-weight:700;vertical-align:top;">' + item.nbPassages + '<div style="color:#888;font-size:9px;font-weight:400;">(' + item.nbPassagesPassees + ' passés / ' + item.nbPassagesAvenir + ' à venir)</div></td>'
-        + '<td style="padding:8px 10px;color:#aab4be;font-size:10px;line-height:1.6;vertical-align:top;">' + historique + '</td>'
-        + '<td style="padding:8px 10px;color:' + couleurReco + ';font-size:10px;font-weight:600;vertical-align:top;">' + (item.reco || '—') + '</td>'
-        + '</tr>';
+      // Pour chaque slot 0..maxPassages-1 : afficher la date (si présente) + l'écart vers la suivante
+      for (var i = 0; i < maxPassages; i++) {
+        if (i < item.passages.length) {
+          var p = item.passages[i];
+          var estAvenir = new Date(p.dateDebut + 'T00:00:00') >= today;
+          var couleurDate = estAvenir ? '#fbbf24' : '#aab4be';
+          var prefixe = estAvenir ? '🔮 ' : '';
+          var libellePassage = fmtDate(p.dateDebut);
+          if (p.nbDates > 1) {
+            libellePassage += '<div style="color:#888;font-size:9px;margin-top:2px;">(résidence ' + p.nbDates + ' dates)</div>';
+          }
+          tbody += '<td style="padding:8px 10px;text-align:center;color:' + couleurDate + ';font-weight:600;font-size:11px;border-right:1px solid #2a2a2a;white-space:nowrap;">' + prefixe + libellePassage + '</td>';
+        } else {
+          // Slot vide
+          tbody += '<td style="padding:8px 10px;text-align:center;color:#333;border-right:1px solid #2a2a2a;">—</td>';
+        }
+
+        // Écart vers la date suivante (sauf pour le dernier slot)
+        if (i < maxPassages - 1) {
+          if (i < item.ecarts.length) {
+            var ec = item.ecarts[i];
+            var reco = calcRecoEcart(ec.jours);
+            tbody += '<td style="padding:8px 10px;text-align:center;color:' + reco.color + ';font-size:10px;font-weight:600;border-right:2px solid #0891b2;white-space:nowrap;">' + reco.txt + '</td>';
+          } else {
+            // Pas d'écart (passage suivant inexistant)
+            tbody += '<td style="padding:8px 10px;text-align:center;color:#333;border-right:2px solid #0891b2;">—</td>';
+          }
+        }
+      }
+
+      // Dernière colonne : recommandation finale
+      var couleurRecoFin = '#aab4be';
+      if (item.reco.indexOf('⚠️') !== -1) couleurRecoFin = '#f97316';
+      else if (item.reco.indexOf('🚀') !== -1) couleurRecoFin = '#fbbf24';
+      else if (item.reco.indexOf('✅') !== -1) couleurRecoFin = '#22c55e';
+      else if (item.reco.indexOf('👍') !== -1) couleurRecoFin = '#22c55e';
+      else if (item.reco.indexOf('🆕') !== -1) couleurRecoFin = '#3b82f6';
+      tbody += '<td style="padding:8px 10px;color:' + couleurRecoFin + ';font-size:10px;font-weight:600;background:rgba(8,145,178,0.05);">' + (item.reco || '—') + '</td>';
+
+      tbody += '</tr>';
     });
-    html += '</tbody></table>';
+    tbody += '</tbody>';
+
+    var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;min-width:1200px;">' + thead + tbody + '</table>';
     el.innerHTML = html;
   }
   window.analyseGeneraleFiltrerPassages = analyseGeneraleFiltrerPassages;
