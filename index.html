@@ -4271,7 +4271,7 @@ function _hideTeamSelection() {
 
         <!-- Bandeau d'alerte si champs manquants -->
         <div id="fp-alerte-publication-site" style="display:none;background:rgba(227,30,36,0.12);border:1px solid #e31e24;border-radius:6px;padding:10px 14px;margin-bottom:14px;color:#e31e24;font-size:13px;font-weight:600;">
-          ⚠️ Merci de compléter tous les champs de publication site avant de sauvegarder.
+          ⚠️ Pour publier sur le site : choisis un statut + remplis au moins 1 lien billetterie (Ticketmaster, Oh My Prod, Fnac, Salle ou PMR).
         </div>
 
         <!-- Toggle Publier sur le site -->
@@ -4303,27 +4303,39 @@ function _hideTeamSelection() {
             </select>
           </div>
 
-          <!-- Lien billetterie principal -->
-          <div style="margin-bottom:14px;">
-            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">🎫 Lien billetterie principal <span style="color:#e31e24;">*</span></div>
-            <input id="fp-lien-billetterie-principal" type="url" placeholder="https://www.ticketmaster.fr/fr/manifestation/..." oninput="autoSave('fiche'); fpValiderPublicationSite();" onchange="autoSave('fiche'); fpValiderPublicationSite();" data-required-pub="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
-            <div style="font-size:10px;color:#666;margin-top:4px;">Le bouton "BILLETS" du widget public pointera vers cette URL</div>
-          </div>
-
-          <!-- Liens additionnels -->
+          <!-- Liens billetterie multi-réseaux -->
           <div style="border-top:1px solid #2a2a2a;padding-top:14px;margin-top:14px;">
-            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🔗 Liens additionnels (optionnels)</div>
-            <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center;margin-bottom:8px;">
-              <div style="font-size:12px;color:#fff;">Fnac</div>
-              <input id="fp-lien-fnac" type="url" placeholder="https://www.fnacspectacles.com/..." oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">🎫 Liens billetterie <span style="color:#e31e24;">*</span> <span style="color:#666;font-weight:normal;">(au moins 1 obligatoire)</span></div>
+            <div style="font-size:10px;color:#666;margin-bottom:12px;">Ces liens apparaîtront dans la popup "Réserver" du site public, dans cet ordre.</div>
+
+            <!-- 1 - Ticketmaster -->
+            <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:center;margin-bottom:8px;">
+              <div style="font-size:12px;color:#fff;display:flex;align-items:center;gap:6px;"><span style="color:#c9a84c;font-weight:700;">1.</span> 🎟️ Ticketmaster</div>
+              <input id="fp-lien-ticketmaster" type="url" placeholder="https://www.ticketmaster.fr/..." oninput="autoSave('fiche'); fpValiderPublicationSite();" onchange="autoSave('fiche'); fpValiderPublicationSite();" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
             </div>
-            <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center;margin-bottom:8px;">
-              <div style="font-size:12px;color:#fff;">Box Office</div>
-              <input id="fp-lien-boxoffice" type="url" placeholder="https://app2.aparteweb.com/..." oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+
+            <!-- 2 - Oh My Prod -->
+            <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:center;margin-bottom:8px;">
+              <div style="font-size:12px;color:#fff;display:flex;align-items:center;gap:6px;"><span style="color:#c9a84c;font-weight:700;">2.</span> 🎤 Oh My Prod</div>
+              <input id="fp-lien-ohmyprod" type="url" placeholder="https://billetterie.ohmyprod.com/..." oninput="autoSave('fiche'); fpValiderPublicationSite();" onchange="autoSave('fiche'); fpValiderPublicationSite();" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
             </div>
-            <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center;">
-              <div style="font-size:12px;color:#fff;">Autre</div>
-              <input id="fp-lien-autre" type="url" placeholder="https://..." oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+
+            <!-- 3 - Fnac -->
+            <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:center;margin-bottom:8px;">
+              <div style="font-size:12px;color:#fff;display:flex;align-items:center;gap:6px;"><span style="color:#c9a84c;font-weight:700;">3.</span> 🛍️ Fnac</div>
+              <input id="fp-lien-fnac" type="url" placeholder="https://www.fnacspectacles.com/..." oninput="autoSave('fiche'); fpValiderPublicationSite();" onchange="autoSave('fiche'); fpValiderPublicationSite();" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            </div>
+
+            <!-- 4 - Salle -->
+            <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:center;margin-bottom:8px;">
+              <div style="font-size:12px;color:#fff;display:flex;align-items:center;gap:6px;"><span style="color:#c9a84c;font-weight:700;">4.</span> 🏟️ Salle</div>
+              <input id="fp-lien-salle" type="url" placeholder="Lien billetterie de la salle..." oninput="autoSave('fiche'); fpValiderPublicationSite();" onchange="autoSave('fiche'); fpValiderPublicationSite();" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            </div>
+
+            <!-- 5 - PMR -->
+            <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:center;">
+              <div style="font-size:12px;color:#fff;display:flex;align-items:center;gap:6px;"><span style="color:#c9a84c;font-weight:700;">5.</span> ♿ PMR</div>
+              <input id="fp-lien-pmr" type="url" placeholder="Lien réservation places PMR..." oninput="autoSave('fiche'); fpValiderPublicationSite();" onchange="autoSave('fiche'); fpValiderPublicationSite();" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
             </div>
           </div>
         </div>
@@ -12811,19 +12823,20 @@ function _hideTeamSelection() {
       if (togglePub) togglePub.checked = dc.publier_site === true;
       var statutPub = document.getElementById('fp-statut-public');
       if (statutPub) statutPub.value = dc.statut_public || 'en_vente';
-      var lienPrincipal = document.getElementById('fp-lien-billetterie-principal');
-      if (lienPrincipal) lienPrincipal.value = dc.lien_billetterie_principal || '';
-      // Liens additionnels (JSONB)
-      var liensAdd = dc.liens_billetterie || {};
-      if (typeof liensAdd === 'string') {
-        try { liensAdd = JSON.parse(liensAdd); } catch(e) { liensAdd = {}; }
+      // Liens billetterie multi-réseaux (JSONB)
+      var liens = dc.liens_billetterie || {};
+      if (typeof liens === 'string') {
+        try { liens = JSON.parse(liens); } catch(e) { liens = {}; }
       }
-      var elFnac = document.getElementById('fp-lien-fnac');
-      if (elFnac) elFnac.value = liensAdd.fnac || '';
-      var elBox = document.getElementById('fp-lien-boxoffice');
-      if (elBox) elBox.value = liensAdd.boxoffice || '';
-      var elAutre = document.getElementById('fp-lien-autre');
-      if (elAutre) elAutre.value = liensAdd.autre || '';
+      var setLien = function(id, key) {
+        var el = document.getElementById(id);
+        if (el) el.value = liens[key] || '';
+      };
+      setLien('fp-lien-ticketmaster', 'ticketmaster');
+      setLien('fp-lien-ohmyprod', 'ohmyprod');
+      setLien('fp-lien-fnac', 'fnac');
+      setLien('fp-lien-salle', 'salle');
+      setLien('fp-lien-pmr', 'pmr');
       // Rafraîchir l'UI du toggle
       if (typeof fpValiderPublicationSite === 'function') fpValiderPublicationSite(false);
     }
@@ -14215,34 +14228,61 @@ function _hideTeamSelection() {
 
     if (publierSite && publierSite.checked) {
       // Toggle ON → vérifier les champs obligatoires
-      var champsRequisPub = ['fp-statut-public', 'fp-lien-billetterie-principal'];
-      
-      champsRequisPub.forEach(function(id) {
-        var el = document.getElementById(id);
-        if (!el) return;
-        var valeur = (el.value || '').toString().trim();
-        var estVide = !valeur;
-        
-        // Validation supplémentaire pour le lien : doit être une URL valide
-        if (id === 'fp-lien-billetterie-principal' && valeur) {
-          if (!/^https?:\/\/.+/i.test(valeur)) {
-            estVide = true; // URL invalide = considéré comme vide
-          }
-        }
-
-        if (estVide) {
+      // Statut public obligatoire
+      var elStatut = document.getElementById('fp-statut-public');
+      if (elStatut) {
+        var v = (elStatut.value || '').toString().trim();
+        if (!v) {
           tousValides = false;
           if (afficherErreurs) {
-            el.style.border = '2px solid #e31e24';
-            el.style.background = '#0a0a0a';
-            el.style.boxShadow = '0 0 0 1px rgba(227,30,36,0.3)';
+            elStatut.style.border = '2px solid #e31e24';
+            elStatut.style.boxShadow = '0 0 0 1px rgba(227,30,36,0.3)';
           }
         } else {
+          elStatut.style.border = '1px solid #2a2a2a';
+          elStatut.style.boxShadow = '';
+        }
+      }
+
+      // Au moins 1 des 5 liens billetterie doit être rempli ET valide
+      var liensIds = ['fp-lien-ticketmaster', 'fp-lien-ohmyprod', 'fp-lien-fnac', 'fp-lien-salle', 'fp-lien-pmr'];
+      var auMoinsUnLien = false;
+      
+      liensIds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var v = (el.value || '').toString().trim();
+        // Si rempli, vérifier que c'est une URL valide
+        if (v) {
+          if (/^https?:\/\/.+/i.test(v)) {
+            auMoinsUnLien = true;
+            el.style.border = '1px solid #2a2a2a';
+            el.style.boxShadow = '';
+          } else {
+            // URL invalide
+            if (afficherErreurs) {
+              el.style.border = '2px solid #e31e24';
+              el.style.boxShadow = '0 0 0 1px rgba(227,30,36,0.3)';
+            }
+          }
+        } else {
+          // Vide : pas d'erreur (les autres peuvent suffire)
           el.style.border = '1px solid #2a2a2a';
-          el.style.background = '#0a0a0a';
           el.style.boxShadow = '';
         }
       });
+
+      if (!auMoinsUnLien) {
+        tousValides = false;
+        // Marquer le 1er champ (Ticketmaster) comme à remplir en priorité
+        if (afficherErreurs) {
+          var elTM = document.getElementById('fp-lien-ticketmaster');
+          if (elTM) {
+            elTM.style.border = '2px solid #e31e24';
+            elTM.style.boxShadow = '0 0 0 1px rgba(227,30,36,0.3)';
+          }
+        }
+      }
     }
 
     // Bandeau d'alerte
@@ -14271,15 +14311,25 @@ function _hideTeamSelection() {
     // ➕ Ajouter les champs publication site SI le toggle est ON
     var togglePub = document.getElementById('fp-publier-site');
     if (togglePub && togglePub.checked) {
-      champs.push('fp-statut-public', 'fp-lien-billetterie-principal');
+      champs.push('fp-statut-public');
+      // Pour les liens : on cherche le 1er qui n'a pas de valeur valide
+      var liensPub = ['fp-lien-ticketmaster', 'fp-lien-ohmyprod', 'fp-lien-fnac', 'fp-lien-salle', 'fp-lien-pmr'];
+      var auMoinsUnLienOK = liensPub.some(function(id) {
+        var e = document.getElementById(id);
+        var v = e ? (e.value || '').trim() : '';
+        return v && /^https?:\/\/.+/i.test(v);
+      });
+      if (!auMoinsUnLienOK) {
+        champs.push('fp-lien-ticketmaster'); // On scrolle vers Ticketmaster en priorité
+      }
     }
     for (var i = 0; i < champs.length; i++) {
       var el = document.getElementById(champs[i]);
       if (!el) continue;
       var v = (el.value || '').toString().trim();
       var estVide = !v || (champs[i].includes('jauge') && parseInt(v) === 0);
-      // Pour le lien billetterie, vérifier aussi que c'est une URL valide
-      if (champs[i] === 'fp-lien-billetterie-principal' && v && !/^https?:\/\/.+/i.test(v)) {
+      // Pour les champs lien : aussi vérifier URL valide
+      if (champs[i].startsWith('fp-lien-') && v && !/^https?:\/\/.+/i.test(v)) {
         estVide = true;
       }
       if (estVide) {
@@ -17396,14 +17446,21 @@ function _hideTeamSelection() {
     };
 
     // Mettre à jour dates_concert (date + heure + ville + salle + statut + infos clés + publication site)
-    // 🌐 PUBLICATION SITE : on construit l'objet liens_billetterie en JSON
-    var liensAdditionnels = {};
+    // 🌐 PUBLICATION SITE : on construit l'objet liens_billetterie en JSON avec les 5 réseaux
+    var liensBilletterie = {};
+    var lienTM = (document.getElementById('fp-lien-ticketmaster')?.value || '').trim();
+    var lienOMP = (document.getElementById('fp-lien-ohmyprod')?.value || '').trim();
     var lienFnac = (document.getElementById('fp-lien-fnac')?.value || '').trim();
-    var lienBoxoffice = (document.getElementById('fp-lien-boxoffice')?.value || '').trim();
-    var lienAutre = (document.getElementById('fp-lien-autre')?.value || '').trim();
-    if (lienFnac) liensAdditionnels.fnac = lienFnac;
-    if (lienBoxoffice) liensAdditionnels.boxoffice = lienBoxoffice;
-    if (lienAutre) liensAdditionnels.autre = lienAutre;
+    var lienSalle = (document.getElementById('fp-lien-salle')?.value || '').trim();
+    var lienPMR = (document.getElementById('fp-lien-pmr')?.value || '').trim();
+    if (lienTM) liensBilletterie.ticketmaster = lienTM;
+    if (lienOMP) liensBilletterie.ohmyprod = lienOMP;
+    if (lienFnac) liensBilletterie.fnac = lienFnac;
+    if (lienSalle) liensBilletterie.salle = lienSalle;
+    if (lienPMR) liensBilletterie.pmr = lienPMR;
+
+    // 🛡️ Le 1er lien rempli sert aussi de "lien principal" (compat ancienne colonne)
+    var lienPrincipalAuto = lienTM || lienOMP || lienFnac || lienSalle || lienPMR || null;
 
     await _supabase.from('dates_concert').update({
       date_concert: document.getElementById('fp-date-concert').value || null,
@@ -17418,8 +17475,8 @@ function _hideTeamSelection() {
       // 🌐 Champs publication site
       publier_site: document.getElementById('fp-publier-site')?.checked || false,
       statut_public: document.getElementById('fp-statut-public')?.value || 'en_vente',
-      lien_billetterie_principal: (document.getElementById('fp-lien-billetterie-principal')?.value || '').trim() || null,
-      liens_billetterie: liensAdditionnels,
+      lien_billetterie_principal: lienPrincipalAuto, // 1er rempli, pour compatibilité
+      liens_billetterie: liensBilletterie,
     }).eq('id', _fpDateId);
 
     // Vérifier si fiche existe déjà
