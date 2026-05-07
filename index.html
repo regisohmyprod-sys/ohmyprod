@@ -3472,6 +3472,7 @@ function _hideTeamSelection() {
           <div id="dropdown-tour" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
             <div onclick="selectDropdownItem(event, function(){ showPage('gestion-omp'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
             <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviDatesResume(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#c9a84c; font-weight:600; border-bottom:1px solid #333; background:rgba(201,168,76,0.08);" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='rgba(201,168,76,0.08)'">📊 Suivi Financier Tour</div>
+            <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviMEV(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#22c55e; font-weight:600; border-bottom:1px solid #333; background:rgba(34,197,94,0.08);" onmouseover="this.style.background='rgba(34,197,94,0.15)'" onmouseout="this.style.background='rgba(34,197,94,0.08)'">🎫 Suivi MEV</div>
             <div onclick="selectDropdownItem(event, function(){ carteTourneeOuvrir(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🗺️ Carte Tournée</div>
             <div onclick="selectDropdownItem(event, function(){ openModal('modal-vhr-tournee'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
           </div>
@@ -3638,6 +3639,43 @@ function _hideTeamSelection() {
           </thead>
           <tbody id="suivi-tbody"></tbody>
           <tfoot id="suivi-tfoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== PAGE SUIVI MEV (Mise En Vente) ========== -->
+    <div id="page-suivi-mev" class="page">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+        <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:0;">← Retour au Tableau de bord</button>
+        <button onclick="suiviMevImprimerPDF()" style="background:#22c55e;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;">🖨️ IMPRIMER / PDF</button>
+      </div>
+      <div class="page-title">🎫 FICHE SUIVI MEV</div>
+      <div style="font-size:13px;color:#888;margin-bottom:16px;margin-top:-12px;font-style:italic;">Vue globale des Mises En Vente — état · date · gestionnaire</div>
+
+      <!-- Filtres (mêmes que suivi-resume) -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        <button id="suivi-mev-filter-all" onclick="suiviMevSetFilter('all')" class="suivi-mev-filter-btn" style="background:#22c55e;color:#000;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">TOUTES <span id="suivi-mev-count-all" style="opacity:0.7;">(0)</span></button>
+        <button id="suivi-mev-filter-passees" onclick="suiviMevSetFilter('passees')" class="suivi-mev-filter-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">PASSÉES <span id="suivi-mev-count-passees" style="opacity:0.7;">(0)</span></button>
+        <button id="suivi-mev-filter-encours" onclick="suiviMevSetFilter('encours')" class="suivi-mev-filter-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">EN COURS <span id="suivi-mev-count-encours" style="opacity:0.7;">(0)</span></button>
+        <button id="suivi-mev-filter-avenir" onclick="suiviMevSetFilter('avenir')" class="suivi-mev-filter-btn" style="background:#1a1a1a;color:#888;border:1px solid #333;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">À VENIR <span id="suivi-mev-count-avenir" style="opacity:0.7;">(0)</span></button>
+      </div>
+
+      <!-- Loader / Empty / Tableau -->
+      <div id="suivi-mev-loading" style="text-align:center;padding:40px 20px;color:#888;font-size:13px;">Chargement des données...</div>
+      <div id="suivi-mev-empty" style="display:none;text-align:center;padding:40px 20px;color:#555;font-size:13px;">Aucune date à afficher pour ce filtre.</div>
+
+      <div id="suivi-mev-table-container" style="display:none;overflow-x:auto;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:900px;">
+          <thead>
+            <tr style="background:#1a1a1a;">
+              <th style="padding:10px;text-align:left;color:#22c55e;border-right:2px solid #22c55e;border-bottom:1px solid #2a2a2a;font-size:11px;letter-spacing:0.5px;">DATE CONCERT</th>
+              <th style="padding:10px;text-align:left;color:#22c55e;border-right:2px solid #22c55e;border-bottom:1px solid #2a2a2a;font-size:11px;letter-spacing:0.5px;">VILLE / SALLE</th>
+              <th style="padding:10px;text-align:center;color:#22c55e;border-right:1px solid #2a2a2a;border-bottom:1px solid #2a2a2a;font-size:11px;letter-spacing:0.5px;">ÉTAT MEV</th>
+              <th style="padding:10px;text-align:center;color:#22c55e;border-right:1px solid #2a2a2a;border-bottom:1px solid #2a2a2a;font-size:11px;letter-spacing:0.5px;">DATE MEV</th>
+              <th style="padding:10px;text-align:left;color:#22c55e;border-bottom:1px solid #2a2a2a;font-size:11px;letter-spacing:0.5px;">GESTIONNAIRE MEV</th>
+            </tr>
+          </thead>
+          <tbody id="suivi-mev-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -3829,32 +3867,32 @@ function _hideTeamSelection() {
         <div style="margin-bottom:8px;">
           <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:10px;">📍 IDENTIFICATION DE LA DATE</div>
         <div class="fp-menu-btns" style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:12px 0 12px 0;">
-          <button onclick="fpOuvrirBilletterie()" class="btn-billetterie-nav fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🎟️ BILLETTERIE</button>
-          <button onclick="fpOuvrirFinancier()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📊 DÉPENSES</button>
-          <button onclick="fpOuvrirPilote()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🎯 PILOTE</button>
-          <button onclick="fpOuvrirClotureSalle()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🏟️ CLÔTURE</button>
-          <button onclick="fpOuvrirDecla()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📋 DÉCLA</button>
-          <button onclick="fpOuvrirBilanAMH()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📊 BILAN AMH</button>
-          <button onclick="if(_fpDateId){dupliquerDateOuvrir(_fpDateId)}else{alert('Aucune date ouverte.')}" class="fp-btn-menu" title="Dupliquer cette date" style="background:#1a1a1a;color:#c9a84c;border:1px solid #c9a84c;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📋 DUPLIQUER</button>
-          <button onclick="carteDateOuvrir()" class="fp-btn-menu" title="Voir la ville de cette date sur une carte" style="background:#1a1a1a;color:#22c55e;border:1px solid #22c55e;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🗺️ CARTE</button>
+          <button onclick="if(fpValiderIdentification())fpOuvrirBilletterie()" class="btn-billetterie-nav fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🎟️ BILLETTERIE</button>
+          <button onclick="if(fpValiderIdentification())fpOuvrirFinancier()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📊 DÉPENSES</button>
+          <button onclick="if(fpValiderIdentification())fpOuvrirPilote()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🎯 PILOTE</button>
+          <button onclick="if(fpValiderIdentification())fpOuvrirClotureSalle()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🏟️ CLÔTURE</button>
+          <button onclick="if(fpValiderIdentification())fpOuvrirDecla()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📋 DÉCLA</button>
+          <button onclick="if(fpValiderIdentification())fpOuvrirBilanAMH()" class="fp-btn-menu" style="background:#0a0a0a;color:#fff;border:1px solid #3b82f6;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📊 BILAN AMH</button>
+          <button onclick="if(_fpDateId){if(fpValiderIdentification())dupliquerDateOuvrir(_fpDateId)}else{alert('Aucune date ouverte.')}" class="fp-btn-menu" title="Dupliquer cette date" style="background:#1a1a1a;color:#c9a84c;border:1px solid #c9a84c;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">📋 DUPLIQUER</button>
+          <button onclick="if(fpValiderIdentification())carteDateOuvrir()" class="fp-btn-menu" title="Voir la ville de cette date sur une carte" style="background:#1a1a1a;color:#22c55e;border:1px solid #22c55e;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-align:center;white-space:nowrap;">🗺️ CARTE</button>
         </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Ville</label>
-            <input id="fp-ville" type="text" placeholder="ex : NIORT" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:8px 10px;font-size:15px;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;box-sizing:border-box;">
+            <input id="fp-ville" type="text" placeholder="ex : NIORT" oninput="autoSave('fiche');fpValiderIdentificationLive()" onchange="autoSave('fiche');fpValiderIdentificationLive()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:15px;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;box-sizing:border-box;">
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Date du concert</label>
-            <input id="fp-date-concert" type="date" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <input id="fp-date-concert" type="date" oninput="autoSave('fiche');fpValiderIdentificationLive()" onchange="autoSave('fiche');fpValiderIdentificationLive()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Horaire</label>
-            <input id="fp-horaire" type="text" placeholder="20H30" oninput="document.getElementById('fp-heure').value=this.value" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <input id="fp-horaire" type="text" placeholder="20H30" oninput="document.getElementById('fp-heure').value=this.value;fpValiderIdentificationLive()" onchange="fpValiderIdentificationLive()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
           </div>
           <div>
             <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">État de la date</label>
-            <select id="fp-statut" oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <select id="fp-statut" oninput="autoSave('fiche');fpValiderIdentificationLive()" onchange="autoSave('fiche');fpValiderIdentificationLive()" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
               <option value="confirmee">✅ Confirmée</option>
               <option value="option">🟡 Option</option>
               <option value="reportee">🔵 Reportée</option>
@@ -4622,7 +4660,7 @@ function _hideTeamSelection() {
                   <tr style="border-bottom:1px solid #2a2a2a;background:#111;"><td style="padding:7px 16px;color:#888;font-weight:600;">Projection CA</td><td id="pilote-fin-ca" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right;"></td></tr>
                   <tr><td colspan="2" style="height:16px;background:#0a0a0a;border-top:1px solid #2a2a2a;border-bottom:1px solid #2a2a2a;"></td></tr>
                   <tr style="background:rgba(201,168,76,0.08);border-bottom:1px solid #2a2a2a;"><td style="padding:7px 16px;color:#c9a84c;font-weight:700;">🎯 POINT ÉQUILIBRE PROJETÉ</td><td style="padding:7px 16px;text-align:right;"><div id="pilote-fin-equilibre" style="font-weight:700;"></div><div id="pilote-fin-equilibre-info" style="font-size:11px;color:#888;font-weight:400;margin-top:2px;"></div></td></tr>
-                  <tr style="background:rgba(201,168,76,0.08);"><td style="padding:7px 16px;color:#c9a84c;font-weight:700;">💰 PROJECTION FINANCIÈRE</td><td id="pilote-fin-projection" style="padding:7px 16px;font-weight:700;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;"></td></tr>
+                  <tr style="background:rgba(201,168,76,0.08);"><td style="padding:7px 16px;color:#c9a84c;font-weight:700;">💰 TA PART OMP</td><td id="pilote-fin-projection" style="padding:7px 16px;font-weight:700;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;"></td></tr>
                 </tbody>
               </table>
             </div>
@@ -11516,6 +11554,7 @@ function _hideTeamSelection() {
     // Pages communes accessibles selon rôle
     'dashboard':            ['admin'],
     'suivi-resume':         ['admin'],
+    'suivi-mev':            ['admin'],
     'gestion-omp':          ['admin'],
     'fiche-prod':           ['admin'],
     'fiche-financier':      ['admin'],
@@ -12464,6 +12503,77 @@ function _hideTeamSelection() {
   }
   window._fpEstResidence = _fpEstResidence;
   window._fpAppliquerModeResidence = _fpAppliquerModeResidence;
+
+  // ============================================================
+  // ✅ VALIDATION IDENTIFICATION DE LA DATE (zone obligatoire)
+  // ============================================================
+  /**
+   * Vérifie que la zone IDENTIFICATION DE LA DATE est entièrement remplie.
+   * Si pas OK : affiche une alerte + met en surbrillance les champs manquants + retourne false.
+   * Si OK : retire les surbrillances + retourne true.
+   * Champs obligatoires : Ville, Date du concert, Horaire, État de la date
+   */
+  function fpValiderIdentification() {
+    var villeEl = document.getElementById('fp-ville');
+    var dateEl = document.getElementById('fp-date-concert');
+    var horaireEl = document.getElementById('fp-horaire');
+    var statutEl = document.getElementById('fp-statut');
+
+    var ville = (villeEl?.value || '').trim();
+    var dateConcert = (dateEl?.value || '').trim();
+    var horaire = (horaireEl?.value || '').trim();
+    var statut = (statutEl?.value || '').trim();
+
+    var manques = [];
+    if (!ville) manques.push('• Ville');
+    if (!dateConcert) manques.push('• Date du concert');
+    if (!horaire) manques.push('• Horaire');
+    if (!statut) manques.push('• État de la date');
+
+    // Réinitialiser tous les contours
+    if (villeEl) villeEl.style.borderColor = '#2a2a2a';
+    if (dateEl) dateEl.style.borderColor = '#2a2a2a';
+    if (horaireEl) horaireEl.style.borderColor = '#2a2a2a';
+    if (statutEl) statutEl.style.borderColor = '#2a2a2a';
+
+    if (manques.length === 0) {
+      return true;
+    }
+
+    // Mettre en rouge les champs manquants
+    if (!ville && villeEl) villeEl.style.borderColor = '#ef4444';
+    if (!dateConcert && dateEl) dateEl.style.borderColor = '#ef4444';
+    if (!horaire && horaireEl) horaireEl.style.borderColor = '#ef4444';
+    if (!statut && statutEl) statutEl.style.borderColor = '#ef4444';
+
+    alert('⚠️ Identification de la date incomplète\n\nMerci de remplir tous les champs obligatoires :\n\n' + manques.join('\n') + '\n\nUne fois remplis, tu pourras accéder aux autres modules.');
+
+    // Focus sur le premier champ manquant
+    if (!ville && villeEl) villeEl.focus();
+    else if (!dateConcert && dateEl) dateEl.focus();
+    else if (!horaire && horaireEl) horaireEl.focus();
+    else if (!statut && statutEl) statutEl.focus();
+
+    return false;
+  }
+  window.fpValiderIdentification = fpValiderIdentification;
+
+  /**
+   * Validation "live" silencieuse : retire le contour rouge dès qu'un champ est rempli.
+   * Pas d'alerte ni de message, juste un retour visuel discret pendant la saisie.
+   */
+  function fpValiderIdentificationLive() {
+    var villeEl = document.getElementById('fp-ville');
+    var dateEl = document.getElementById('fp-date-concert');
+    var horaireEl = document.getElementById('fp-horaire');
+    var statutEl = document.getElementById('fp-statut');
+
+    if (villeEl && villeEl.value.trim()) villeEl.style.borderColor = '#2a2a2a';
+    if (dateEl && dateEl.value.trim()) dateEl.style.borderColor = '#2a2a2a';
+    if (horaireEl && horaireEl.value.trim()) horaireEl.style.borderColor = '#2a2a2a';
+    if (statutEl && statutEl.value.trim()) statutEl.style.borderColor = '#2a2a2a';
+  }
+  window.fpValiderIdentificationLive = fpValiderIdentificationLive;
 
   async function fpOuvrir(dateConcertId, ville, dateStr) {
     if (_fpOuvrirEnCours) { console.log('fpOuvrir déjà en cours, ignoré'); return; }
@@ -20974,13 +21084,15 @@ function _hideTeamSelection() {
       // Exemple Niort : 38 670,65 + (113 × 41,58) = 43 369,19 €
       var projectionCA = recetteTTCActuelle + (diffBillets * prixMoyen);
 
-      // C. Projection financière
-      //    Étape 1 : Diff × Prix moyen = bonus recette (ex : 113 × 41,58 = 4 698,54)
-      //    Étape 2 : + Résultat OMP actuel (ex : 4 698,54 + (-1 224,27) = 3 474,27)
-      //    Étape 3 : × (1 - 31%) pour déduire les charges variables (ex : 3 474,27 × 0,69 = 2 397,25)
+      // C. TA PART OMP (projection financière nette)
+      //    Étape 1 : Diff × Prix moyen = bonus recette future (ex : 491 × 43,82 = 21 515,62)
+      //    Étape 2 : Bonus recette × (1 - 31%) = recette future NETTE des charges variables
+      //              (les 31% = SACEM + fees billetterie + commissions sur les nouveaux billets)
+      //    Étape 3 : + Résultat OMP actuel (déjà net de charges, on l'ajoute tel quel)
+      //    → TA PART OMP = ce que tu vas vraiment empocher quand la date sera terminée
       var bonusRecette = diffBillets * prixMoyen;
-      var sousTotal = bonusRecette + resultatOMPActuel;
-      var projectionFinanciere = sousTotal * (1 - PROJ_FIN_TAUX_CHARGES_VARIABLES);
+      var bonusRecetteNet = bonusRecette * (1 - PROJ_FIN_TAUX_CHARGES_VARIABLES);
+      var projectionFinanciere = resultatOMPActuel + bonusRecetteNet;
 
       // D. POINT ÉQUILIBRE PROJETÉ
       //    Combien de billets au total pour atteindre le résultat = 0 ?
@@ -21037,42 +21149,21 @@ function _hideTeamSelection() {
       var elEq = document.getElementById('pilote-fin-equilibre');
       var elEqInfo = document.getElementById('pilote-fin-equilibre-info');
 
-      // Petits mots humoristiques tirés au hasard selon la situation
-      var CULOTTE_SAUVE = [
-        '🩲 Culotte sauvée !',
-        '🩲 La culotte est sèche !',
-        '🩲 On garde la culotte au chaud !',
-        '🎉 Rien à craindre pour la culotte !',
-        '🩲 Même pas besoin d\'y penser !'
-      ];
-      var CULOTTE_CHAUD = [
-        'pour ne pas perdre sa culotte 🩲',
-        'pour sauver la culotte 🩲',
-        'avant que la culotte tombe 🩲',
-        'et garder la culotte au sec 🩲',
-        'sinon bye bye la culotte 🩲'
-      ];
-      var CULOTTE_DANGER = [
-        '😱 La culotte est en danger !',
-        '🚨 Alerte culotte à terre !',
-        '⚠️ La culotte va sauter !',
-        '😬 Ça sent le slip...',
-        '🆘 SOS culotte !'
-      ];
-      var pick = function(arr) { return arr[Math.floor(Math.random() * arr.length)]; };
-
       if (prixMoyen <= 0 || ventesAujourdhui <= 0) {
         if (elEq) { elEq.textContent = '—'; elEq.style.color = '#888'; }
         if (elEqInfo) elEqInfo.textContent = '';
       } else if (equilibreAtteint) {
+        // Cas 1 : Vente actuelle ≥ point d'équilibre → déjà rentable
         if (elEq) { elEq.textContent = '✅ Équilibre atteint'; elEq.style.color = '#22c55e'; }
-        if (elEqInfo) elEqInfo.textContent = pick(CULOTTE_SAUVE) + ' · Marge actuelle : ' + _projFormatMontant(resultatOMPActuel);
+        if (elEqInfo) elEqInfo.textContent = '👍 OUF tu perds pas d\'argent ! · Marge actuelle : ' + _projFormatMontant(resultatOMPActuel);
       } else if (equilibreAtteignable) {
+        // Cas 2 : Pas encore à l'équilibre, mais la projection le permet
         if (elEq) { elEq.textContent = '🟡 ' + pointEquilibreTotal.toLocaleString('fr-FR') + ' billets'; elEq.style.color = '#f59e0b'; }
-        if (elEqInfo) elEqInfo.textContent = 'Encore ' + billetsManquants + ' billets à vendre ' + pick(CULOTTE_CHAUD);
+        if (elEqInfo) elEqInfo.textContent = 'Encore ' + billetsManquants + ' billets avant de trouver l\'équilibre de la date';
       } else {
+        // Cas 3 : Même la projection ne couvre pas → danger
         if (elEq) { elEq.textContent = '🔴 ' + pointEquilibreTotal.toLocaleString('fr-FR') + ' billets'; elEq.style.color = '#ef4444'; }
-        if (elEqInfo) elEqInfo.textContent = 'Manque ' + billetsManquants + ' billets · ' + pick(CULOTTE_DANGER);
+        if (elEqInfo) elEqInfo.textContent = '😱 Danger : il manque ' + billetsManquants + ' billets pour atteindre l\'équilibre';
       }
 
       console.log('💰 Projection Financière :', {
@@ -21734,7 +21825,7 @@ function _hideTeamSelection() {
       // 3. Toutes les fiches_production avec billetterie_data + financier_data (en une seule requête)
       var rFiches = await _supabase
         .from('fiches_production')
-        .select('date_concert_id, billetterie_data, financier_data, deal_billetterie, dl_omp_pct, dl_prod_locale_pct, pilote_taux, total_jauge, invitations, boost_bonus')
+        .select('date_concert_id, billetterie_data, financier_data, deal_billetterie, dl_omp_pct, dl_prod_locale_pct, pilote_taux, total_jauge, invitations, boost_bonus, date_mev, gestion_billetterie')
         .in('date_concert_id', dateIds);
 
       var fichesByDateId = {};
@@ -21869,7 +21960,10 @@ function _hideTeamSelection() {
           projCA: projectionCA,
           projCAHT: projectionCAHT,
           projResultatOMP: projectionResultatOMP,
-          aSnapshots: snapshots.length >= 2
+          aSnapshots: snapshots.length >= 2,
+          // 🆕 SUIVI MEV
+          dateMev: fiche.date_mev || '',
+          gestionnaireMev: fiche.gestion_billetterie || ''
         };
       });
 
@@ -22101,6 +22195,170 @@ function _hideTeamSelection() {
     }
   }
   window.suiviOuvrirDate = suiviOuvrirDate;
+
+  // ============================================================
+  // 🎫 SUIVI MEV (Mise En Vente)
+  // Réutilise _suiviDonnees (chargé par suiviChargerDonnees)
+  // ============================================================
+  var _suiviMevFiltre = 'all';
+
+  /**
+   * Ouvre la page SUIVI MEV.
+   * Si les données ne sont pas encore chargées, on les charge (même source que SUIVI DATES RÉSUMÉ).
+   */
+  async function ouvrirSuiviMEV() {
+    showPage('suivi-mev');
+    try {
+      if (!_suiviDonnees || _suiviDonnees.length === 0) {
+        document.getElementById('suivi-mev-loading').style.display = 'block';
+        await suiviChargerDonnees();
+      }
+      suiviMevAfficher();
+    } catch (err) {
+      console.error('❌ Erreur ouverture SUIVI MEV :', err);
+      document.getElementById('suivi-mev-loading').textContent = '❌ Erreur de chargement.';
+    }
+  }
+  window.ouvrirSuiviMEV = ouvrirSuiviMEV;
+
+  function suiviMevSetFilter(f) {
+    _suiviMevFiltre = f;
+    // Mettre à jour les styles des boutons filtres
+    var btns = document.querySelectorAll('.suivi-mev-filter-btn');
+    btns.forEach(function(b) {
+      b.style.background = '#1a1a1a';
+      b.style.color = '#888';
+      b.style.border = '1px solid #333';
+    });
+    var actif = document.getElementById('suivi-mev-filter-' + f);
+    if (actif) {
+      actif.style.background = '#22c55e';
+      actif.style.color = '#000';
+      actif.style.border = 'none';
+    }
+    suiviMevAfficher();
+  }
+  window.suiviMevSetFilter = suiviMevSetFilter;
+
+  function suiviMevAfficher() {
+    var loadingEl = document.getElementById('suivi-mev-loading');
+    var emptyEl = document.getElementById('suivi-mev-empty');
+    var containerEl = document.getElementById('suivi-mev-table-container');
+    var tbody = document.getElementById('suivi-mev-tbody');
+    if (!loadingEl || !emptyEl || !containerEl || !tbody) return;
+
+    loadingEl.style.display = 'none';
+
+    // Compteurs par catégorie
+    var nbAll = _suiviDonnees.length;
+    var nbPassees = _suiviDonnees.filter(function(d) { return d.categorie === 'passees'; }).length;
+    var nbEnCours = _suiviDonnees.filter(function(d) { return d.categorie === 'encours'; }).length;
+    var nbAvenir = _suiviDonnees.filter(function(d) { return d.categorie === 'avenir'; }).length;
+    var setCount = function(id, n) { var el = document.getElementById(id); if (el) el.textContent = '(' + n + ')'; };
+    setCount('suivi-mev-count-all', nbAll);
+    setCount('suivi-mev-count-passees', nbPassees);
+    setCount('suivi-mev-count-encours', nbEnCours);
+    setCount('suivi-mev-count-avenir', nbAvenir);
+
+    // Filtrage
+    var dates = _suiviMevFiltre === 'all' ? _suiviDonnees.slice() : _suiviDonnees.filter(function(d) { return d.categorie === _suiviMevFiltre; });
+
+    if (dates.length === 0) {
+      emptyEl.style.display = 'block';
+      containerEl.style.display = 'none';
+      return;
+    }
+
+    emptyEl.style.display = 'none';
+    containerEl.style.display = 'block';
+
+    // === RENDU TABLEAU ===
+    tbody.innerHTML = dates.map(function(d, idx) {
+      var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
+      var dateStr = '';
+      try { dateStr = new Date(d.date + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' }); } catch(e) { dateStr = d.date; }
+
+      // 1️⃣ ÉTAT MEV : si billets > 0 → EN VENTE (vert), sinon À FAIRE (rouge)
+      var etatMevHtml;
+      if (d.billets > 0) {
+        etatMevHtml = '<span style="display:inline-block;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid #22c55e;border-radius:5px;padding:3px 10px;font-weight:700;font-size:11px;letter-spacing:0.5px;">✅ EN VENTE</span>';
+      } else {
+        etatMevHtml = '<span style="display:inline-block;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;border-radius:5px;padding:3px 10px;font-weight:700;font-size:11px;letter-spacing:0.5px;">⚠️ À FAIRE</span>';
+      }
+
+      // 2️⃣ DATE MEV : depuis fiche.date_mev
+      var dateMevStr = '—';
+      if (d.dateMev) {
+        try { dateMevStr = new Date(d.dateMev + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' }); } catch(e) { dateMevStr = d.dateMev; }
+      }
+
+      // 3️⃣ GESTIONNAIRE MEV : depuis fiche.gestion_billetterie
+      var gestionnaireStr = d.gestionnaireMev || '<span style="color:#555;font-style:italic;">non renseigné</span>';
+
+      return '<tr style="border-bottom:1px solid #222;' + altBg + 'cursor:pointer;" onmouseover="this.style.background=\'#1a1a1a\'" onmouseout="this.style.background=\'' + (idx % 2 === 1 ? '#0d0d0d' : 'transparent') + '\'" onclick="suiviOuvrirDate(\'' + d.id + '\')">'
+        + '<td style="padding:10px;color:#ddd;white-space:nowrap;border-right:2px solid #22c55e;font-weight:600;">' + dateStr + '</td>'
+        + '<td style="padding:10px;color:#fff;border-right:2px solid #22c55e;"><strong>' + (d.ville || '—') + '</strong>' + (d.salle ? '<br><span style="color:#888;font-size:10px;">' + d.salle + '</span>' : '') + '</td>'
+        + '<td style="padding:10px;text-align:center;border-right:1px solid #2a2a2a;">' + etatMevHtml + '</td>'
+        + '<td style="padding:10px;text-align:center;color:#fff;border-right:1px solid #2a2a2a;white-space:nowrap;">' + dateMevStr + '</td>'
+        + '<td style="padding:10px;color:#aab4be;">' + gestionnaireStr + '</td>'
+        + '</tr>';
+    }).join('');
+  }
+  window.suiviMevAfficher = suiviMevAfficher;
+
+  /**
+   * Impression PDF du SUIVI MEV (utilise window.print sur la page filtrée actuelle)
+   */
+  function suiviMevImprimerPDF() {
+    if (!_suiviDonnees || _suiviDonnees.length === 0) {
+      alert('❌ Aucune donnée à imprimer. Attends le chargement complet.');
+      return;
+    }
+    var dates = _suiviMevFiltre === 'all' ? _suiviDonnees.slice() : _suiviDonnees.filter(function(d) { return d.categorie === _suiviMevFiltre; });
+    if (dates.length === 0) {
+      alert('❌ Aucune date à imprimer pour ce filtre.');
+      return;
+    }
+
+    var titreFiltre = ({ all: 'TOUTES LES DATES', passees: 'DATES PASSÉES', encours: 'DATES EN COURS', avenir: 'DATES À VENIR' })[_suiviMevFiltre] || 'TOUTES LES DATES';
+    var dateImpression = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    var rows = dates.map(function(d) {
+      var dateStr = '';
+      try { dateStr = new Date(d.date + 'T00:00:00').toLocaleDateString('fr-FR'); } catch(e) { dateStr = d.date; }
+      var dateMevStr = '—';
+      if (d.dateMev) {
+        try { dateMevStr = new Date(d.dateMev + 'T00:00:00').toLocaleDateString('fr-FR'); } catch(e) { dateMevStr = d.dateMev; }
+      }
+      var etat = d.billets > 0 ? '<span style="color:#22c55e;font-weight:700;">EN VENTE</span>' : '<span style="color:#ef4444;font-weight:700;">A FAIRE</span>';
+      return '<tr>'
+        + '<td>' + dateStr + '</td>'
+        + '<td><b>' + (d.ville || '—') + '</b>' + (d.salle ? '<br><small>' + d.salle + '</small>' : '') + '</td>'
+        + '<td style="text-align:center;">' + etat + '</td>'
+        + '<td style="text-align:center;">' + dateMevStr + '</td>'
+        + '<td>' + (d.gestionnaireMev || '—') + '</td>'
+        + '</tr>';
+    }).join('');
+
+    var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Fiche Suivi MEV</title>'
+      + '<style>body{font-family:Arial,sans-serif;color:#222;margin:20px;}h1{color:#22c55e;font-size:22px;margin:0 0 6px 0;}h2{color:#666;font-size:12px;margin:0 0 16px 0;font-weight:normal;}table{width:100%;border-collapse:collapse;font-size:11px;}th{background:#22c55e;color:#fff;padding:8px;text-align:left;border:1px solid #1ea34c;}td{padding:6px 8px;border:1px solid #ccc;}tr:nth-child(even) td{background:#f5f5f5;}</style>'
+      + '</head><body>'
+      + '<h1>🎫 FICHE SUIVI MEV — ' + titreFiltre + '</h1>'
+      + '<h2>Édité le ' + dateImpression + ' — ' + dates.length + ' date' + (dates.length > 1 ? 's' : '') + '</h2>'
+      + '<table><thead><tr><th>Date concert</th><th>Ville / Salle</th><th>État MEV</th><th>Date MEV</th><th>Gestionnaire MEV</th></tr></thead>'
+      + '<tbody>' + rows + '</tbody></table>'
+      + '<script>window.onload=function(){window.print();}</' + 'script>'
+      + '</body></html>';
+
+    var w = window.open('', '_blank');
+    if (!w) {
+      alert('❌ Impossible d\'ouvrir la fenêtre d\'impression. Vérifie ton bloqueur de popup.');
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
+  }
+  window.suiviMevImprimerPDF = suiviMevImprimerPDF;
 
   /**
    * Ouvre la modale de choix de période pour l'impression.
