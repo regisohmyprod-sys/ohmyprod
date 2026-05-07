@@ -3710,7 +3710,7 @@ function _hideTeamSelection() {
         <!-- BLOC 1 : 2 tableaux côte à côte (Top Villes + Top Régions) -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
           <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
-            <div style="background:#0891b2;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">🏆 TOP 20 VILLES</div>
+            <div style="background:#0891b2;padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#fff;">🏆 TOP VILLES</div>
             <div id="ag-top-villes" style="padding:0;"></div>
           </div>
           <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
@@ -22360,11 +22360,13 @@ function _hideTeamSelection() {
     // 🎯 Liste des dates marquées "NO TICKETS" (résidences, showcases privés, etc.)
     // Format : "YYYY-MM-DD|VILLE_NORMALISÉE_UPPER"
     var DATES_NO_TICKETS = [
-      '2025-06-01|PARIS',     // Paris Parc des Princes — 01/06/2025
-      '2026-09-15|NARBONNE',  // Narbonne — 15/09/2026
-      '2026-09-16|NARBONNE',  // Narbonne — 16/09/2026
-      '2026-09-17|NARBONNE',  // Narbonne — 17/09/2026
-      '2026-09-18|NARBONNE'   // Narbonne — 18/09/2026
+      '2023-09-27|MONTPELLIER', // Montpellier 27/09/2023 — concert gratuit
+      '2024-06-23|CHAMONIX',    // Chamonix — concert gratuit plein air
+      '2025-06-01|PARIS',       // Paris Parc des Princes — 01/06/2025
+      '2026-09-15|NARBONNE',    // Narbonne — 15/09/2026
+      '2026-09-16|NARBONNE',    // Narbonne — 16/09/2026
+      '2026-09-17|NARBONNE',    // Narbonne — 17/09/2026
+      '2026-09-18|NARBONNE'     // Narbonne — 18/09/2026
     ];
 
     tbody.innerHTML = dates.map(function(d, idx) {
@@ -22433,6 +22435,8 @@ function _hideTeamSelection() {
       }
       // 🎫 Détection NO TICKETS (mêmes dates que le tableau)
       var DATES_NO_TICKETS_PDF = [
+        '2023-09-27|MONTPELLIER',
+        '2024-06-23|CHAMONIX',
         '2025-06-01|PARIS', '2026-09-15|NARBONNE', '2026-09-16|NARBONNE',
         '2026-09-17|NARBONNE', '2026-09-18|NARBONNE'
       ];
@@ -22609,14 +22613,33 @@ function _hideTeamSelection() {
       '11111111-1111-1111-1111-111111111111', // TWOQ L'Hommage à la Légende
       '22222222-2222-2222-2222-222222222222'  // TWOQ L'Éternelle Légende
     ];
+
+    // 🎫 Liste des dates "NO TICKETS" à EXCLURE des analyses
+    // (concerts gratuits, privés, showcases, résidences sans billetterie publique)
+    // Format : "YYYY-MM-DD|VILLE_NORMALISÉE_UPPER"
+    var AG_DATES_NO_TICKETS = [
+      '2023-09-27|MONTPELLIER', // Montpellier 27/09/2023 — concert gratuit
+      '2024-06-23|CHAMONIX',    // Chamonix — concert gratuit plein air
+      '2025-06-01|PARIS',       // Paris Parc des Princes — privé
+      '2026-09-15|NARBONNE',    // Narbonne — résidence
+      '2026-09-16|NARBONNE',
+      '2026-09-17|NARBONNE',
+      '2026-09-18|NARBONNE'
+    ];
+
     var datesTwoq = (_suiviDonnees || []).filter(function(d) {
-      return TWOQ_TOURNEE_IDS.indexOf(d.tournee_id) !== -1;
+      if (TWOQ_TOURNEE_IDS.indexOf(d.tournee_id) === -1) return false;
+      // Exclure les NO TICKETS
+      var villeNorm = (d.ville || '').toUpperCase().trim();
+      var cleNoTickets = (d.date || '') + '|' + villeNorm;
+      if (AG_DATES_NO_TICKETS.indexOf(cleNoTickets) !== -1) return false;
+      return true;
     });
     var datesPassees = datesTwoq.filter(function(d) { return d.categorie === 'passees' && d.billets > 0; });
 
     console.log('📈 ANALYSE GÉNÉRALE :', {
       total_suivi: (_suiviDonnees || []).length,
-      datesTwoq: datesTwoq.length,
+      datesTwoq_apres_filtre_no_tickets: datesTwoq.length,
       datesPassees: datesPassees.length
     });
 
@@ -22628,7 +22651,7 @@ function _hideTeamSelection() {
   }
   window.analyseGeneraleAfficherTout = analyseGeneraleAfficherTout;
 
-  // ===== BLOC 1A : Top 20 Villes =====
+  // ===== BLOC 1A : Top Villes (TOUTES les villes triées) =====
   function _agAfficherTopVilles(dates) {
     var el = document.getElementById('ag-top-villes');
     if (!el) return;
@@ -22644,7 +22667,7 @@ function _hideTeamSelection() {
       }
     });
 
-    var tri = Object.values(bestByVille).sort(function(a, b) { return b.val - a.val; }).slice(0, 20);
+    var tri = Object.values(bestByVille).sort(function(a, b) { return b.val - a.val; });
 
     if (tri.length === 0) {
       el.innerHTML = '<div style="padding:20px;text-align:center;color:#666;font-size:12px;font-style:italic;">Aucune donnée disponible</div>';
@@ -22676,29 +22699,23 @@ function _hideTeamSelection() {
     el.innerHTML = html;
   }
 
-  // ===== BLOC 1B : Top Régions =====
+  // ===== BLOC 1B : Top Régions (par TOTAL du critère, pas par meilleur) =====
   function _agAfficherTopRegions(dates) {
     var el = document.getElementById('ag-top-regions');
     if (!el) return;
 
-    // Pour chaque région : MEILLEURE date (= meilleure ville performante de la région)
-    // Mais on agrège aussi le total et la moyenne pour avoir le contexte
+    // Pour chaque région : SOMME du critère sur toutes les dates passées de la région
     var byRegion = {};
     dates.forEach(function(d) {
       var r = _agRegion(d.ville);
-      if (!byRegion[r]) byRegion[r] = { region: r, dates: [], best: 0, bestVille: '', total: 0, count: 0 };
+      if (!byRegion[r]) byRegion[r] = { region: r, total: 0, count: 0 };
       var val = _agValeurCritere(d);
-      byRegion[r].dates.push({ ville: d.ville, val: val });
       byRegion[r].total += val;
       byRegion[r].count++;
-      if (val > byRegion[r].best) {
-        byRegion[r].best = val;
-        byRegion[r].bestVille = d.ville;
-      }
     });
 
-    // Tri par MEILLEUR score régional (= meilleur ville de la région)
-    var tri = Object.values(byRegion).sort(function(a, b) { return b.best - a.best; });
+    // Tri par TOTAL décroissant
+    var tri = Object.values(byRegion).sort(function(a, b) { return b.total - a.total; });
 
     if (tri.length === 0) {
       el.innerHTML = '<div style="padding:20px;text-align:center;color:#666;font-size:12px;font-style:italic;">Aucune donnée disponible</div>';
@@ -22709,9 +22726,8 @@ function _hideTeamSelection() {
       + '<thead><tr style="background:#1a1a1a;">'
       + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
       + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Région</th>'
-      + '<th style="padding:7px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Meilleur</th>'
-      + '<th style="padding:7px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Top ville</th>'
-      + '<th style="padding:7px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Nb</th>'
+      + '<th style="padding:7px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Total ' + _agLibelleCritere() + '</th>'
+      + '<th style="padding:7px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Nb dates</th>'
       + '</tr></thead><tbody>';
     tri.forEach(function(item, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
@@ -22721,8 +22737,7 @@ function _hideTeamSelection() {
       html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
         + '<td style="padding:6px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
         + '<td style="padding:6px 10px;color:#fff;font-weight:600;">' + item.region + '</td>'
-        + '<td style="padding:6px 10px;text-align:right;color:#0891b2;font-weight:700;">' + _agFormatValeur(item.best) + '</td>'
-        + '<td style="padding:6px 10px;color:#aab4be;font-size:10px;">' + (item.bestVille || '—') + '</td>'
+        + '<td style="padding:6px 10px;text-align:right;color:#0891b2;font-weight:700;">' + _agFormatValeur(item.total) + '</td>'
         + '<td style="padding:6px 6px;text-align:center;color:#888;font-size:10px;">' + item.count + '</td>'
         + '</tr>';
     });
@@ -22730,36 +22745,28 @@ function _hideTeamSelection() {
     el.innerHTML = html;
   }
 
-  // ===== BLOC 2 : Classement par mois =====
+  // ===== BLOC 2 : Classement par mois (par TOTAL du critère) =====
   function _agAfficherTopMois(dates) {
     var el = document.getElementById('ag-top-mois');
     if (!el) return;
 
     var NOMS_MOIS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
     var byMois = {};
-    for (var m = 1; m <= 12; m++) byMois[m] = { mois: m, dates: [], total: 0, count: 0, best: 0, bestVille: '', bestDate: '' };
+    for (var m = 1; m <= 12; m++) byMois[m] = { mois: m, total: 0, count: 0 };
 
     dates.forEach(function(d) {
       try {
         var dt = new Date(d.date + 'T00:00:00');
         var m = dt.getMonth() + 1;
         var val = _agValeurCritere(d);
-        byMois[m].dates.push({ ville: d.ville, val: val, date: d.date });
         byMois[m].total += val;
         byMois[m].count++;
-        if (val > byMois[m].best) {
-          byMois[m].best = val;
-          byMois[m].bestVille = d.ville;
-          byMois[m].bestDate = d.date;
-        }
       } catch(e) {}
     });
 
-    // Tri par moyenne décroissante (mois les plus performants en premier)
+    // Tri par TOTAL décroissant (mois les plus performants en premier)
     var tri = Object.values(byMois).filter(function(m) { return m.count > 0; }).sort(function(a, b) {
-      var moyA = a.count > 0 ? a.total / a.count : 0;
-      var moyB = b.count > 0 ? b.total / b.count : 0;
-      return moyB - moyA;
+      return b.total - a.total;
     });
 
     if (tri.length === 0) {
@@ -22771,9 +22778,8 @@ function _hideTeamSelection() {
       + '<thead><tr style="background:#1a1a1a;">'
       + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;width:30px;">#</th>'
       + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Mois</th>'
-      + '<th style="padding:8px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Moyenne ' + _agLibelleCritere() + '</th>'
-      + '<th style="padding:8px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Meilleur</th>'
-      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Top ville</th>'
+      + '<th style="padding:8px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Total ' + _agLibelleCritere() + '</th>'
+      + '<th style="padding:8px 10px;text-align:right;color:#0891b2;border-bottom:1px solid #2a2a2a;">Moyenne / date</th>'
       + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Nb dates</th>'
       + '</tr></thead><tbody>';
     tri.forEach(function(item, idx) {
@@ -22785,9 +22791,8 @@ function _hideTeamSelection() {
       html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
         + '<td style="padding:7px 10px;color:' + couleurRang + ';font-weight:700;">' + (emoji || rang) + '</td>'
         + '<td style="padding:7px 10px;color:#fff;font-weight:600;">' + NOMS_MOIS[item.mois - 1] + '</td>'
-        + '<td style="padding:7px 10px;text-align:right;color:#0891b2;font-weight:700;">' + _agFormatValeur(moy) + '</td>'
-        + '<td style="padding:7px 10px;text-align:right;color:#aab4be;">' + _agFormatValeur(item.best) + '</td>'
-        + '<td style="padding:7px 10px;color:#aab4be;font-size:10px;">' + (item.bestVille || '—') + '</td>'
+        + '<td style="padding:7px 10px;text-align:right;color:#0891b2;font-weight:700;">' + _agFormatValeur(item.total) + '</td>'
+        + '<td style="padding:7px 10px;text-align:right;color:#aab4be;">' + _agFormatValeur(moy) + '</td>'
         + '<td style="padding:7px 6px;text-align:center;color:#888;font-size:10px;">' + item.count + '</td>'
         + '</tr>';
     });
@@ -22866,6 +22871,40 @@ function _hideTeamSelection() {
   // ===== BLOC 4 : Tableau passages villes/salles =====
   var _agPassagesData = []; // cache pour le filtrage
 
+  /**
+   * Regroupe les dates en "passages uniques" : une suite de dates rapprochées
+   * (< 7 jours entre 2 consécutives) compte comme UN SEUL passage = résidence.
+   * Retourne un tableau de "passages" avec leur date de début + nb dates.
+   */
+  function _agRegrouperResidences(dates) {
+    if (!dates || dates.length === 0) return [];
+    // Tri chronologique
+    var sorted = dates.slice().sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+    var passages = [];
+    var courant = null;
+    sorted.forEach(function(d) {
+      var dateD = new Date(d.date + 'T00:00:00');
+      if (!courant) {
+        courant = { dateDebut: d.date, dateFin: d.date, nbDates: 1, dates: [d] };
+      } else {
+        var dateFin = new Date(courant.dateFin + 'T00:00:00');
+        var ecartJours = Math.round((dateD - dateFin) / (1000 * 60 * 60 * 24));
+        if (ecartJours < 7) {
+          // Date rapprochée → fait partie du même passage (résidence)
+          courant.dateFin = d.date;
+          courant.nbDates++;
+          courant.dates.push(d);
+        } else {
+          // Nouvelle date isolée → on clôt le passage précédent et on en démarre un nouveau
+          passages.push(courant);
+          courant = { dateDebut: d.date, dateFin: d.date, nbDates: 1, dates: [d] };
+        }
+      }
+    });
+    if (courant) passages.push(courant);
+    return passages;
+  }
+
   function _agAfficherPassages(datesTwoq) {
     var el = document.getElementById('ag-passages');
     if (!el) return;
@@ -22883,55 +22922,68 @@ function _hideTeamSelection() {
       byKey[key].dates.push({ date: d.date, billets: d.billets, categorie: d.categorie });
     });
 
-    // Pour chaque couple, calculer dernière passée + prochaine à venir + écart
+    // Pour chaque couple ville+salle, regrouper les dates en passages (résidences = 1 passage)
+    // puis calculer les écarts entre tous les passages consécutifs
     _agPassagesData = Object.values(byKey).map(function(grp) {
-      // Tri par date
-      grp.dates.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
-      var datesPassees = grp.dates.filter(function(d) {
-        try { return new Date(d.date + 'T00:00:00') < today; } catch(e) { return false; }
+      // Regrouper les résidences
+      var passages = _agRegrouperResidences(grp.dates);
+
+      // Séparer passés / à venir (basé sur dateDebut)
+      var passagesPassees = passages.filter(function(p) {
+        try { return new Date(p.dateDebut + 'T00:00:00') < today; } catch(e) { return false; }
       });
-      var datesAvenir = grp.dates.filter(function(d) {
-        try { return new Date(d.date + 'T00:00:00') >= today; } catch(e) { return false; }
+      var passagesAvenir = passages.filter(function(p) {
+        try { return new Date(p.dateDebut + 'T00:00:00') >= today; } catch(e) { return false; }
       });
 
-      var derniere = datesPassees.length > 0 ? datesPassees[datesPassees.length - 1] : null;
-      var prochaine = datesAvenir.length > 0 ? datesAvenir[0] : null;
-
-      var ecartJours = null, ecartMois = null;
-      if (derniere && prochaine) {
-        var d1 = new Date(derniere.date + 'T00:00:00');
-        var d2 = new Date(prochaine.date + 'T00:00:00');
-        ecartJours = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
-        ecartMois = (ecartJours / 30.44).toFixed(1);
+      // Calcul des écarts entre passages consécutifs
+      var ecarts = [];
+      for (var i = 1; i < passages.length; i++) {
+        var d1 = new Date(passages[i - 1].dateFin + 'T00:00:00');
+        var d2 = new Date(passages[i].dateDebut + 'T00:00:00');
+        var jours = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+        var mois = (jours / 30.44).toFixed(1);
+        ecarts.push({
+          de: passages[i - 1].dateFin,
+          vers: passages[i].dateDebut,
+          jours: jours,
+          mois: mois,
+          versEstAvenir: new Date(passages[i].dateDebut + 'T00:00:00') >= today
+        });
       }
 
-      // Recommandation booking
+      // Recommandation booking (basée sur le DERNIER état)
       var reco = '';
-      if (!derniere && prochaine) {
-        reco = '🆕 Première date prévue';
-      } else if (derniere && !prochaine) {
-        // Calculer depuis combien de temps
-        var d1 = new Date(derniere.date + 'T00:00:00');
+      var dernierPassage = passagesPassees.length > 0 ? passagesPassees[passagesPassees.length - 1] : null;
+      var prochainPassage = passagesAvenir.length > 0 ? passagesAvenir[0] : null;
+      if (passages.length === 0) {
+        reco = '';
+      } else if (!dernierPassage && prochainPassage) {
+        reco = '🆕 Première venue prévue';
+      } else if (dernierPassage && !prochainPassage) {
+        var d1 = new Date(dernierPassage.dateFin + 'T00:00:00');
         var moisDepuis = Math.round((today - d1) / (1000 * 60 * 60 * 24) / 30.44);
         if (moisDepuis < 12) reco = '⏳ ' + moisDepuis + ' mois depuis dernière';
         else if (moisDepuis < 24) reco = '✅ ' + moisDepuis + ' mois — bookable';
         else reco = '🚀 ' + moisDepuis + ' mois — à rebooker en priorité';
-      } else if (derniere && prochaine) {
-        if (ecartJours < 365) reco = '⚠️ Trop rapproché (' + ecartMois + ' mois)';
-        else if (ecartJours < 730) reco = '✅ Bon espacement (' + ecartMois + ' mois)';
-        else reco = '👍 Bon espacement (' + ecartMois + ' mois)';
+      } else if (dernierPassage && prochainPassage) {
+        var d1b = new Date(dernierPassage.dateFin + 'T00:00:00');
+        var d2b = new Date(prochainPassage.dateDebut + 'T00:00:00');
+        var jb = Math.round((d2b - d1b) / (1000 * 60 * 60 * 24));
+        var mb = (jb / 30.44).toFixed(1);
+        if (jb < 365) reco = '⚠️ Trop rapproché (' + mb + ' mois)';
+        else if (jb < 730) reco = '✅ Bon espacement (' + mb + ' mois)';
+        else reco = '👍 Bon espacement (' + mb + ' mois)';
       }
 
       return {
         ville: grp.ville,
         salle: grp.salle,
-        nbPassages: grp.dates.length,
-        nbPassees: datesPassees.length,
-        nbAvenir: datesAvenir.length,
-        derniereDate: derniere ? derniere.date : null,
-        prochaineDate: prochaine ? prochaine.date : null,
-        ecartJours: ecartJours,
-        ecartMois: ecartMois,
+        nbPassages: passages.length,
+        nbPassagesPassees: passagesPassees.length,
+        nbPassagesAvenir: passagesAvenir.length,
+        passages: passages,
+        ecarts: ecarts,
         reco: reco
       };
     });
@@ -22972,36 +23024,43 @@ function _hideTeamSelection() {
       + '<thead><tr style="background:#1a1a1a;">'
       + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Ville</th>'
       + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Salle</th>'
-      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Total</th>'
-      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Passées</th>'
-      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">À venir</th>'
-      + '<th style="padding:8px 10px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Dernière</th>'
-      + '<th style="padding:8px 10px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Prochaine</th>'
-      + '<th style="padding:8px 10px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Écart</th>'
+      + '<th style="padding:8px 6px;text-align:center;color:#0891b2;border-bottom:1px solid #2a2a2a;">Total passages</th>'
+      + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Historique des passages & écarts</th>'
       + '<th style="padding:8px 10px;text-align:left;color:#0891b2;border-bottom:1px solid #2a2a2a;">Recommandation</th>'
       + '</tr></thead><tbody>';
     data.forEach(function(item, idx) {
       var altBg = idx % 2 === 1 ? 'background:#0d0d0d;' : '';
-      var ecartStr = '—';
-      if (item.ecartJours !== null) {
-        ecartStr = item.ecartJours + ' j (' + item.ecartMois + ' mois)';
-      }
       var couleurReco = '#aab4be';
       if (item.reco.indexOf('⚠️') !== -1) couleurReco = '#f97316';
       else if (item.reco.indexOf('🚀') !== -1) couleurReco = '#fbbf24';
       else if (item.reco.indexOf('✅') !== -1) couleurReco = '#22c55e';
       else if (item.reco.indexOf('👍') !== -1) couleurReco = '#22c55e';
+      else if (item.reco.indexOf('🆕') !== -1) couleurReco = '#3b82f6';
+
+      // Construire l'historique : Date1 → (écart) → Date2 → (écart) → Date3 ...
+      var historique = '';
+      item.passages.forEach(function(p, pi) {
+        var estAvenir = new Date(p.dateDebut + 'T00:00:00') >= new Date(new Date().setHours(0,0,0,0));
+        var couleurDate = estAvenir ? '#fbbf24' : '#aab4be';
+        var prefixe = estAvenir ? '🔮 ' : '';
+        var libellePassage = fmtDate(p.dateDebut);
+        if (p.nbDates > 1) {
+          libellePassage += ' (résidence ' + p.nbDates + ' dates)';
+        }
+        if (pi > 0) {
+          var ec = item.ecarts[pi - 1];
+          historique += '<span style="color:#666;margin:0 6px;">→ <b style="color:#0891b2;">' + ec.mois + ' mois</b> →</span>';
+        }
+        historique += '<span style="color:' + couleurDate + ';font-weight:600;">' + prefixe + libellePassage + '</span>';
+      });
+      if (!historique) historique = '<span style="color:#555;font-style:italic;">Aucun passage</span>';
 
       html += '<tr style="border-bottom:1px solid #1a1a1a;' + altBg + '">'
-        + '<td style="padding:8px 10px;color:#fff;font-weight:600;">' + item.ville + '</td>'
-        + '<td style="padding:8px 10px;color:#aab4be;font-size:10px;">' + (item.salle || '—') + '</td>'
-        + '<td style="padding:8px 6px;text-align:center;color:#0891b2;font-weight:700;">' + item.nbPassages + '</td>'
-        + '<td style="padding:8px 6px;text-align:center;color:#aab4be;">' + item.nbPassees + '</td>'
-        + '<td style="padding:8px 6px;text-align:center;color:#aab4be;">' + item.nbAvenir + '</td>'
-        + '<td style="padding:8px 10px;text-align:center;color:#aab4be;font-size:10px;">' + fmtDate(item.derniereDate) + '</td>'
-        + '<td style="padding:8px 10px;text-align:center;color:#aab4be;font-size:10px;">' + fmtDate(item.prochaineDate) + '</td>'
-        + '<td style="padding:8px 10px;text-align:center;color:#aab4be;font-size:10px;">' + ecartStr + '</td>'
-        + '<td style="padding:8px 10px;color:' + couleurReco + ';font-size:10px;font-weight:600;">' + (item.reco || '—') + '</td>'
+        + '<td style="padding:8px 10px;color:#fff;font-weight:600;vertical-align:top;">' + item.ville + '</td>'
+        + '<td style="padding:8px 10px;color:#aab4be;font-size:10px;vertical-align:top;">' + (item.salle || '—') + '</td>'
+        + '<td style="padding:8px 6px;text-align:center;color:#0891b2;font-weight:700;vertical-align:top;">' + item.nbPassages + '<div style="color:#888;font-size:9px;font-weight:400;">(' + item.nbPassagesPassees + ' passés / ' + item.nbPassagesAvenir + ' à venir)</div></td>'
+        + '<td style="padding:8px 10px;color:#aab4be;font-size:10px;line-height:1.6;vertical-align:top;">' + historique + '</td>'
+        + '<td style="padding:8px 10px;color:' + couleurReco + ';font-size:10px;font-weight:600;vertical-align:top;">' + (item.reco || '—') + '</td>'
         + '</tr>';
     });
     html += '</tbody></table>';
