@@ -4257,6 +4257,73 @@ function _hideTeamSelection() {
         </label>
       </div>
 
+      <!-- 🌐 PUBLICATION SITE THEWORLDOFQUEEN.COM -->
+      <div id="fp-bloc-publication-site" class="fp-bloc-apres-infos" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px;">
+        <div style="color:#c9a84c;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:6px;display:flex;align-items:center;gap:10px;">
+          🌐 PUBLICATION SITE THEWORLDOFQUEEN.COM <span style="color:#e31e24;font-size:14px;">(OBLIGATOIRE)</span>
+        </div>
+        <div style="font-size:11px;color:#888;margin-bottom:14px;">Ces infos s'affichent sur le widget public theworldofqueen.com/dates</div>
+
+        <!-- Bandeau d'alerte si champs manquants -->
+        <div id="fp-alerte-publication-site" style="display:none;background:rgba(227,30,36,0.12);border:1px solid #e31e24;border-radius:6px;padding:10px 14px;margin-bottom:14px;color:#e31e24;font-size:13px;font-weight:600;">
+          ⚠️ Merci de compléter tous les champs de publication site avant de sauvegarder.
+        </div>
+
+        <!-- Toggle Publier sur le site -->
+        <div style="display:flex;align-items:center;gap:12px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 14px;margin-bottom:14px;">
+          <label style="position:relative;display:inline-block;width:48px;height:26px;flex-shrink:0;">
+            <input id="fp-publier-site" type="checkbox" oninput="autoSave('fiche'); fpValiderPublicationSite();" onchange="autoSave('fiche'); fpValiderPublicationSite();" style="opacity:0;width:0;height:0;">
+            <span id="fp-publier-site-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#333;transition:.3s;border-radius:26px;">
+              <span style="position:absolute;content:'';height:20px;width:20px;left:3px;bottom:3px;background:#fff;transition:.3s;border-radius:50%;" id="fp-publier-site-knob"></span>
+            </span>
+          </label>
+          <div style="flex:1;">
+            <div style="font-size:13px;color:#fff;font-weight:600;">✅ Publier cette date sur le site</div>
+            <div id="fp-publier-site-statut" style="font-size:11px;color:#888;margin-top:2px;">⛔ Non publiée — invisible sur theworldofqueen.com</div>
+          </div>
+        </div>
+
+        <!-- Champs publication (visibles uniquement si toggle ON) -->
+        <div id="fp-publication-champs" style="display:none;">
+          <!-- Statut public -->
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">🎟️ Statut affiché publiquement <span style="color:#e31e24;">*</span></div>
+            <select id="fp-statut-public" oninput="autoSave('fiche'); fpValiderPublicationSite();" onchange="autoSave('fiche'); fpValiderPublicationSite();" data-required-pub="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+              <option value="en_vente">🟢 En vente</option>
+              <option value="dernieres_places">🟡 Dernières places</option>
+              <option value="complet">🔴 COMPLET</option>
+              <option value="bientot">🔵 Bientôt en vente</option>
+              <option value="reportee">🟠 Date reportée</option>
+              <option value="annulee">⚫ Annulée</option>
+            </select>
+          </div>
+
+          <!-- Lien billetterie principal -->
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">🎫 Lien billetterie principal <span style="color:#e31e24;">*</span></div>
+            <input id="fp-lien-billetterie-principal" type="url" placeholder="https://www.ticketmaster.fr/fr/manifestation/..." oninput="autoSave('fiche'); fpValiderPublicationSite();" onchange="autoSave('fiche'); fpValiderPublicationSite();" data-required-pub="1" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            <div style="font-size:10px;color:#666;margin-top:4px;">Le bouton "BILLETS" du widget public pointera vers cette URL</div>
+          </div>
+
+          <!-- Liens additionnels -->
+          <div style="border-top:1px solid #2a2a2a;padding-top:14px;margin-top:14px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🔗 Liens additionnels (optionnels)</div>
+            <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center;margin-bottom:8px;">
+              <div style="font-size:12px;color:#fff;">Fnac</div>
+              <input id="fp-lien-fnac" type="url" placeholder="https://www.fnacspectacles.com/..." oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            </div>
+            <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center;margin-bottom:8px;">
+              <div style="font-size:12px;color:#fff;">Box Office</div>
+              <input id="fp-lien-boxoffice" type="url" placeholder="https://app2.aparteweb.com/..." oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            </div>
+            <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center;">
+              <div style="font-size:12px;color:#fff;">Autre</div>
+              <input id="fp-lien-autre" type="url" placeholder="https://..." oninput="autoSave('fiche')" onchange="autoSave('fiche')" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Bouton sauvegarder -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:10px 14px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;">
         <span id="fp-autosave-ind" style="font-size:12px;color:#888;">⏳ Auto-save actif</span>
@@ -12721,9 +12788,9 @@ function _hideTeamSelection() {
     // Charger salles depuis Supabase
     csChargerSallesDatalist();
 
-    // Charger la date depuis dates_concert pour pré-remplir date + heure
+    // Charger la date depuis dates_concert pour pré-remplir date + heure + publication site
     console.log('Chargement date_concert...');
-    const { data: dc } = await _supabase.from('dates_concert').select('date_concert, heure_show, nom_salle, statut, type_date').eq('id', dateConcertId).single();
+    const { data: dc } = await _supabase.from('dates_concert').select('date_concert, heure_show, nom_salle, statut, type_date, publier_site, statut_public, lien_billetterie_principal, liens_billetterie').eq('id', dateConcertId).single();
     console.log('date_concert chargée:', dc);
     if (dc) {
       if (dc.date_concert) document.getElementById('fp-date-concert').value = dc.date_concert;
@@ -12733,6 +12800,27 @@ function _hideTeamSelection() {
       }
       if (dc.nom_salle) document.getElementById('fp-salle').value = dc.nom_salle;
       if (dc.statut) document.getElementById('fp-statut').value = dc.statut;
+
+      // 🌐 PUBLICATION SITE
+      var togglePub = document.getElementById('fp-publier-site');
+      if (togglePub) togglePub.checked = dc.publier_site === true;
+      var statutPub = document.getElementById('fp-statut-public');
+      if (statutPub) statutPub.value = dc.statut_public || 'en_vente';
+      var lienPrincipal = document.getElementById('fp-lien-billetterie-principal');
+      if (lienPrincipal) lienPrincipal.value = dc.lien_billetterie_principal || '';
+      // Liens additionnels (JSONB)
+      var liensAdd = dc.liens_billetterie || {};
+      if (typeof liensAdd === 'string') {
+        try { liensAdd = JSON.parse(liensAdd); } catch(e) { liensAdd = {}; }
+      }
+      var elFnac = document.getElementById('fp-lien-fnac');
+      if (elFnac) elFnac.value = liensAdd.fnac || '';
+      var elBox = document.getElementById('fp-lien-boxoffice');
+      if (elBox) elBox.value = liensAdd.boxoffice || '';
+      var elAutre = document.getElementById('fp-lien-autre');
+      if (elAutre) elAutre.value = liensAdd.autre || '';
+      // Rafraîchir l'UI du toggle
+      if (typeof fpValiderPublicationSite === 'function') fpValiderPublicationSite(false);
     }
 
     // Charger fiche existante
@@ -14074,22 +14162,121 @@ function _hideTeamSelection() {
 
     return tousValides;
   }
-  
+
+  // ───────────────────────────────────────────────────────────────────
+  // 🌐 VALIDATION PUBLICATION SITE
+  // ───────────────────────────────────────────────────────────────────
+  function fpValiderPublicationSite(afficherErreurs) {
+    var bloc = document.getElementById('fp-bloc-publication-site');
+    if (!bloc) return true;
+    if (afficherErreurs === undefined) afficherErreurs = false;
+
+    var publierSite = document.getElementById('fp-publier-site');
+    var statutPub = document.getElementById('fp-statut-public');
+    var lienPrincipal = document.getElementById('fp-lien-billetterie-principal');
+    var champsBloc = document.getElementById('fp-publication-champs');
+    var statutLabel = document.getElementById('fp-publier-site-statut');
+    var slider = document.getElementById('fp-publier-site-slider');
+    var knob = document.getElementById('fp-publier-site-knob');
+
+    // Mise à jour visuelle du toggle
+    if (publierSite && publierSite.checked) {
+      if (champsBloc) champsBloc.style.display = 'block';
+      if (statutLabel) {
+        statutLabel.innerHTML = '✅ Publiée — visible sur theworldofqueen.com';
+        statutLabel.style.color = '#22c55e';
+      }
+      if (slider) slider.style.background = '#22c55e';
+      if (knob) knob.style.transform = 'translateX(22px)';
+    } else {
+      if (champsBloc) champsBloc.style.display = 'none';
+      if (statutLabel) {
+        statutLabel.innerHTML = '⛔ Non publiée — invisible sur theworldofqueen.com';
+        statutLabel.style.color = '#888';
+      }
+      if (slider) slider.style.background = '#333';
+      if (knob) knob.style.transform = 'translateX(0)';
+    }
+
+    // 🚨 RÈGLE OBLIGATOIRE : la publication site doit toujours être DÉCIDÉE
+    // (soit publiée + champs remplis, soit explicitement non publiée)
+    // Pour rendre cette section vraiment obligatoire, on exige que :
+    // - SOIT le toggle est sur OFF (la décision est prise : "pas publier")
+    // - SOIT le toggle est sur ON et tous les champs requis sont remplis
+    // Mais comme le toggle a une valeur par défaut (false), il est toujours "décidé".
+    // → On valide donc UNIQUEMENT les champs si le toggle est ON.
+
+    var tousValides = true;
+
+    if (publierSite && publierSite.checked) {
+      // Toggle ON → vérifier les champs obligatoires
+      var champsRequisPub = ['fp-statut-public', 'fp-lien-billetterie-principal'];
+      
+      champsRequisPub.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var valeur = (el.value || '').toString().trim();
+        var estVide = !valeur;
+        
+        // Validation supplémentaire pour le lien : doit être une URL valide
+        if (id === 'fp-lien-billetterie-principal' && valeur) {
+          if (!/^https?:\/\/.+/i.test(valeur)) {
+            estVide = true; // URL invalide = considéré comme vide
+          }
+        }
+
+        if (estVide) {
+          tousValides = false;
+          if (afficherErreurs) {
+            el.style.border = '2px solid #e31e24';
+            el.style.background = '#0a0a0a';
+            el.style.boxShadow = '0 0 0 1px rgba(227,30,36,0.3)';
+          }
+        } else {
+          el.style.border = '1px solid #2a2a2a';
+          el.style.background = '#0a0a0a';
+          el.style.boxShadow = '';
+        }
+      });
+    }
+
+    // Bandeau d'alerte
+    var alerte = document.getElementById('fp-alerte-publication-site');
+    if (alerte) {
+      if (afficherErreurs && !tousValides) {
+        alerte.style.display = 'block';
+      } else if (tousValides) {
+        alerte.style.display = 'none';
+      }
+    }
+
+    return tousValides;
+  }
+
   /**
-   * 🚀 Auto-scroll vers le premier champ obligatoire vide (INFOS GÉN ou SALLE & VENTES)
+   * 🚀 Auto-scroll vers le premier champ obligatoire vide (INFOS GÉN, SALLE & VENTES, PUBLICATION SITE)
    * Utilisé quand l'utilisateur essaie de sauvegarder une fiche incomplète.
    */
   function fpScrollVersPremierChampVide() {
-    // Liste exhaustive des champs obligatoires des 2 blocs
+    // Liste exhaustive des champs obligatoires des 3 blocs
     var champs = [
       'fp-producteur', 'fp-promoteur', 'fp-type-prod', 'fp-billetterie', 'fp-deal-omp', 'fp-deal-billetterie',
       'fp-salle', 'fp-adresse-salle', 'fp-jauge-depart', 'fp-date-mev', 'fp-jauge-finale'
     ];
+    // ➕ Ajouter les champs publication site SI le toggle est ON
+    var togglePub = document.getElementById('fp-publier-site');
+    if (togglePub && togglePub.checked) {
+      champs.push('fp-statut-public', 'fp-lien-billetterie-principal');
+    }
     for (var i = 0; i < champs.length; i++) {
       var el = document.getElementById(champs[i]);
       if (!el) continue;
       var v = (el.value || '').toString().trim();
       var estVide = !v || (champs[i].includes('jauge') && parseInt(v) === 0);
+      // Pour le lien billetterie, vérifier aussi que c'est une URL valide
+      if (champs[i] === 'fp-lien-billetterie-principal' && v && !/^https?:\/\/.+/i.test(v)) {
+        estVide = true;
+      }
       if (estVide) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         setTimeout(function(){ try { el.focus(); } catch(e) {} }, 400);
@@ -17101,8 +17288,9 @@ function _hideTeamSelection() {
     // 🚨 Mode "afficher erreurs" : on passe TRUE pour activer bordures rouges + bandeau
     var infosGenOK = (typeof fpValiderInfosGen === 'function') ? fpValiderInfosGen(true) : true;
     var salleVentesOK = (typeof fpValiderSalleVentes === 'function') ? fpValiderSalleVentes(true) : true;
+    var publicationSiteOK = (typeof fpValiderPublicationSite === 'function') ? fpValiderPublicationSite(true) : true;
 
-    if (!infosGenOK || !salleVentesOK) {
+    if (!infosGenOK || !salleVentesOK || !publicationSiteOK) {
       // Scroll vers le premier champ vide
       fpScrollVersPremierChampVide();
       // Mini feedback sur le bouton
@@ -17202,7 +17390,16 @@ function _hideTeamSelection() {
       updated_at: new Date().toISOString()
     };
 
-    // Mettre à jour dates_concert (date + heure + ville + salle + statut + infos clés)
+    // Mettre à jour dates_concert (date + heure + ville + salle + statut + infos clés + publication site)
+    // 🌐 PUBLICATION SITE : on construit l'objet liens_billetterie en JSON
+    var liensAdditionnels = {};
+    var lienFnac = (document.getElementById('fp-lien-fnac')?.value || '').trim();
+    var lienBoxoffice = (document.getElementById('fp-lien-boxoffice')?.value || '').trim();
+    var lienAutre = (document.getElementById('fp-lien-autre')?.value || '').trim();
+    if (lienFnac) liensAdditionnels.fnac = lienFnac;
+    if (lienBoxoffice) liensAdditionnels.boxoffice = lienBoxoffice;
+    if (lienAutre) liensAdditionnels.autre = lienAutre;
+
     await _supabase.from('dates_concert').update({
       date_concert: document.getElementById('fp-date-concert').value || null,
       heure_show: heure || null,
@@ -17213,6 +17410,11 @@ function _hideTeamSelection() {
       jauge_max: parseInt(document.getElementById('fp-jauge-depart').value) || null,
       pointage_ventes: parseInt(document.getElementById('fp-etat-ventes').value) || 0,
       jauge_occupee: parseInt(document.getElementById('fp-total-jauge').value) || 0,
+      // 🌐 Champs publication site
+      publier_site: document.getElementById('fp-publier-site')?.checked || false,
+      statut_public: document.getElementById('fp-statut-public')?.value || 'en_vente',
+      lien_billetterie_principal: (document.getElementById('fp-lien-billetterie-principal')?.value || '').trim() || null,
+      liens_billetterie: liensAdditionnels,
     }).eq('id', _fpDateId);
 
     // Vérifier si fiche existe déjà
