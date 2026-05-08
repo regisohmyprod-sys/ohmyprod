@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The World of Queen — Dates de tournée</title>
+  
+  <!-- Google Fonts : Cinzel (titres) + Montserrat (corps) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    :root {
+      --bg: #000000;
+      --bg-card: #0d0d0d;
+      --bg-card-hover: #161616;
+      --gold: #c9a84c;
+      --gold-soft: rgba(201, 168, 76, 0.12);
+      --gold-line: rgba(201, 168, 76, 0.3);
+      --white: #ffffff;
+      --gray: #888888;
+      --gray-dark: #555555;
+      --green: #22c55e;
+      --red: #e24b4a;
+      --amber: #ef9f27;
+      --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      min-height: 100vh;
+      padding: 24px 16px;
+      line-height: 1.6;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    /* HEADER — logo centré */
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding: 16px;
+    }
+    .header-logo {
+      max-height: 180px;
+      max-width: 90%;
+      width: auto;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      object-fit: contain;
+    }
+    .header-divider {
+      width: 80px;
+      height: 1px;
+      background: var(--gold);
+      margin: 20px auto 0;
+      opacity: 0.6;
+    }
+
+    /* FILTRES */
+    .filters {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .filter-btn {
+      background: transparent;
+      color: var(--gray);
+      border: 1px solid #2a2a2a;
+      padding: 8px 18px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border-radius: 2px;
+    }
+    .filter-btn:hover {
+      color: var(--gold);
+      border-color: var(--gold-line);
+    }
+    .filter-btn.active {
+      background: var(--gold-soft);
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+
+    /* GROUPE PAR ANNÉE */
+    .year-group { margin-bottom: 36px; }
+    .year-label {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--gold-line);
+    }
+
+    /* DATE ROW */
+    .date-row {
+      display: grid;
+      grid-template-columns: 90px 1fr auto;
+      gap: 20px;
+      align-items: center;
+      background: var(--bg-card);
+      padding: 18px 22px;
+      border-radius: 8px;
+      border-left: 3px solid var(--gold);
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .date-row:hover {
+      background: var(--bg-card-hover);
+      transform: translateX(2px);
+    }
+    .date-row.passee {
+      opacity: 0.45;
+      border-left-color: var(--gray-dark);
+    }
+    .date-row.complet { border-left-color: var(--red); }
+    .date-row.bientot { border-left-color: var(--gold); }
+    .date-row.annulee, .date-row.reportee { 
+      opacity: 0.5;
+      border-left-color: var(--gray-dark);
+    }
+
+    /* COLONNE DATE */
+    .date-block { text-align: center; }
+    .date-month {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .date-day {
+      font-family: 'Cinzel', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1;
+      margin: 2px 0;
+    }
+    .date-year {
+      font-size: 10px;
+      color: var(--gray);
+      font-weight: 500;
+    }
+    .date-dow {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      color: var(--gray-dark);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* COLONNE INFO */
+    .info-block { min-width: 0; }
+    .info-city {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .info-venue {
+      font-size: 13px;
+      color: var(--gray);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .info-time {
+      font-size: 11px;
+      color: var(--gray-dark);
+      letter-spacing: 1px;
+    }
+    .info-tournee {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 8px;
+      padding: 3px 10px;
+      background: var(--gold-soft);
+      border-radius: 2px;
+    }
+    .info-tournee.nouveau {
+      color: #000;
+      background: var(--gold);
+      animation: pulse 2.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
+
+    /* COLONNE ACTION — un seul bouton par date, format unifié */
+    .action-block { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+      align-items: stretch;
+      min-width: 180px;
+    }
+    
+    /* STYLE UNIFIÉ pour TOUS les boutons et badges — angles arrondis */
+    .btn-billets,
+    .status-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 22px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 22px;
+      white-space: nowrap;
+      box-sizing: border-box;
+      transition: all 0.25s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* RÉSERVER → fond OR, écriture NOIRE */
+    .btn-billets {
+      background: var(--gold);
+      color: #000;
+      border: 1px solid var(--gold);
+    }
+    .btn-billets:hover {
+      background: #d4b35e;
+      transform: translateY(-1px);
+    }
+
+    /* COMPLET → fond ROUGE, écriture BLANCHE, cadre BLANC */
+    .status-badge.complet { 
+      background: var(--red); 
+      color: var(--white); 
+      border: 1px solid var(--white);
+    }
+
+    /* BIENTÔT EN VENTE → fond NOIR, écriture OR, cadre OR */
+    .status-badge.bientot { 
+      background: #000; 
+      color: var(--gold); 
+      border: 1px solid var(--gold);
+    }
+
+    /* ANNULÉE / REPORTÉE — gris discret, cadre gris */
+    .status-badge.annulee, 
+    .status-badge.reportee {
+      background: transparent; 
+      color: var(--gray);
+      border: 1px solid var(--gray-dark);
+    }
+
+    /* TERMINÉ (date passée) — gris très discret */
+    .status-badge.passee {
+      background: transparent; 
+      color: var(--gray-dark);
+      border: 1px solid var(--gray-dark);
+    }
+
+    /* LOADING / EMPTY / ERROR */
+    .state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--gray);
+    }
+    .state-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.4; }
+    .state-text { font-size: 14px; letter-spacing: 1px; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 2px solid #2a2a2a;
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding-top: 40px;
+      margin-top: 40px;
+      border-top: 1px solid #1a1a1a;
+      font-size: 10px;
+      color: var(--gray-dark);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .footer a {
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 1.5px;
+    }
+
+    /* MOBILE */
+    @media (max-width: 600px) {
+      body { padding: 16px 12px; }
+      .header-logo { max-height: 130px; }
+      .date-row {
+        grid-template-columns: 70px 1fr;
+        gap: 14px;
+        padding: 14px 16px;
+      }
+      .date-day { font-size: 28px; }
+      .info-city { font-size: 15px; letter-spacing: 1.5px; }
+      .info-venue { font-size: 12px; }
+      .action-block {
+        grid-column: 1 / -1;
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 0;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #1a1a1a;
+      }
+      .btn-billets,
+      .status-badge {
+        height: 42px;
+        font-size: 10px;
+        letter-spacing: 2px;
+        border-radius: 21px;
+      }
+      .filter-btn { font-size: 10px; padding: 6px 12px; letter-spacing: 1.5px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div class="header">
+      <img src="logo.jpg?v=3" 
+           alt="The World of Queen — L'Éternelle Légende" 
+           class="header-logo"
+           style="max-height: 180px !important; max-width: 90% !important; width: auto !important; height: auto !important; display: block !important; margin: 0 auto !important; object-fit: contain !important;">
+      <div class="header-divider"></div>
+    </div>
+
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="avenir">À venir</button>
+      <button class="filter-btn" data-filter="passees">Passées</button>
+      <button class="filter-btn" data-filter="all">Toutes</button>
+    </div>
+
+    <div id="dates-container">
+      <div class="state">
+        <div class="spinner"></div>
+        <div class="state-text">Chargement des dates...</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>The World of Queen — Production <a href="https://www.ohmyprod.com" target="_blank">Oh My Prod</a></div>
+    </div>
+
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════════
+    // CONFIGURATION SUPABASE
+    // ═══════════════════════════════════════════════════════════════════
+    const SUPABASE_URL = 'https://nhxqcavianozskxgfcbt.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_59Pg7368sxCT6y3j9nNw0g_i8ILGRZ3';
+    
+    // ⚠️ FIX : on renomme la variable locale en _sb pour éviter la collision
+    // avec window.supabase (la lib elle-même expose un objet "supabase" global)
+    const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
+
+    const MOIS_FR = ['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
+    const JOURS_FR = ['DIM','LUN','MAR','MER','JEU','VEN','SAM'];
+
+    let _allDates = [];
+    let _currentFilter = 'avenir';
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CHARGEMENT DES DATES PUBLIQUES
+    // ═══════════════════════════════════════════════════════════════════
+    async function chargerDates() {
+      try {
+        const { data, error } = await _sb
+          .from('public_dates_twoq')
+          .select('*')
+          .order('date_concert', { ascending: true });
+        
+        if (error) {
+          console.error('Erreur Supabase:', error);
+          afficherErreur(error.message);
+          return;
+        }
+
+        _allDates = data || [];
+        appliquerFiltre();
+      } catch (err) {
+        console.error('Erreur:', err);
+        afficherErreur('Impossible de charger les dates');
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // FILTRES
+    // ═══════════════════════════════════════════════════════════════════
+    function appliquerFiltre() {
+      const today = new Date(); today.setHours(0,0,0,0);
+      let filtered = [..._allDates];
+
+      switch (_currentFilter) {
+        case 'avenir':
+          filtered = filtered.filter(d => new Date(d.date_concert) >= today);
+          break;
+        case 'passees':
+          filtered = filtered.filter(d => new Date(d.date_concert) < today)
+            .sort((a,b) => new Date(b.date_concert) - new Date(a.date_concert));
+          break;
+      }
+
+      afficherDates(filtered);
+    }
+
+    document.getElementById('filters').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _currentFilter = btn.dataset.filter;
+      appliquerFiltre();
+    });
+
+    // ═══════════════════════════════════════════════════════════════════
+    // RENDU
+    // ═══════════════════════════════════════════════════════════════════
+    function afficherDates(dates) {
+      const container = document.getElementById('dates-container');
+      
+      if (!dates || dates.length === 0) {
+        container.innerHTML = `
+          <div class="state">
+            <div class="state-icon">🎭</div>
+            <div class="state-text">Aucune date à afficher pour ce filtre</div>
+          </div>`;
+        return;
+      }
+
+      // Grouper par année
+      const groupes = {};
+      dates.forEach(d => {
+        const annee = new Date(d.date_concert).getFullYear();
+        if (!groupes[annee]) groupes[annee] = [];
+        groupes[annee].push(d);
+      });
+
+      let html = '';
+      const annees = Object.keys(groupes).sort((a,b) => 
+        _currentFilter === 'passees' ? b - a : a - b
+      );
+
+      annees.forEach(annee => {
+        html += `<div class="year-group">
+          <div class="year-label">${annee}</div>`;
+        groupes[annee].forEach(d => {
+          html += rendreDate(d);
+        });
+        html += `</div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function rendreDate(d) {
+      const dt = new Date(d.date_concert);
+      const today = new Date(); today.setHours(0,0,0,0);
+      const passee = dt < today;
+      const statut = d.statut_public || 'en_vente';
+      
+      // Classes CSS selon statut
+      let rowClass = passee ? 'passee' : '';
+      let bouton = '';
+      
+      if (passee) {
+        bouton = `<span class="status-badge passee">Terminé</span>`;
+      } else if (statut === 'complet') {
+        rowClass = 'complet';
+        bouton = `<span class="status-badge complet">Complet</span>`;
+      } else if (statut === 'annulee') {
+        rowClass = 'annulee';
+        bouton = `<span class="status-badge annulee">Annulée</span>`;
+      } else if (statut === 'reportee') {
+        rowClass = 'reportee';
+        bouton = `<span class="status-badge reportee">Reportée</span>`;
+      } else if (statut === 'bientot') {
+        rowClass = 'bientot';
+        bouton = `<span class="status-badge bientot">Bientôt en vente</span>`;
+      } else {
+        // En vente OU dernières places → on affiche "Réserver"
+        bouton = construireBoutonsBilletterie(d, statut);
+      }
+
+      const heure = d.heure_show ? d.heure_show.substring(0,5).replace(':', 'h') : '';
+      const tourneeBadge = d.nouveau_spectacle 
+        ? `<span class="info-tournee nouveau">★ Nouveau spectacle ★</span>`
+        : `<span class="info-tournee">${d.nom_tournee || ''}</span>`;
+
+      return `
+        <div class="date-row ${rowClass}">
+          <div class="date-block">
+            <div class="date-month">${MOIS_FR[dt.getMonth()]}</div>
+            <div class="date-day">${String(dt.getDate()).padStart(2,'0')}</div>
+            <div class="date-year">${dt.getFullYear()}</div>
+            <div class="date-dow">${JOURS_FR[dt.getDay()]}</div>
+          </div>
+          <div class="info-block">
+            <div class="info-city">${d.ville || ''}</div>
+            <div class="info-venue">${d.nom_salle || ''}</div>
+            ${heure ? `<div class="info-time">${heure}</div>` : ''}
+            ${tourneeBadge}
+          </div>
+          <div class="action-block">
+            ${bouton}
+          </div>
+        </div>`;
+    }
+
+    function construireBoutonsBilletterie(d, statut) {
+      // Un SEUL bouton "Réserver" — pas de boutons secondaires
+      if (d.lien_billetterie_principal) {
+        return `<a href="${d.lien_billetterie_principal}" target="_blank" rel="noopener" class="btn-billets">Réserver</a>`;
+      }
+      return '';
+    }
+
+    function afficherErreur(msg) {
+      document.getElementById('dates-container').innerHTML = `
+        <div class="state">
+          <div class="state-icon">⚠️</div>
+          <div class="state-text">Erreur de chargement<br><small style="color:var(--gray-dark)">${msg}</small></div>
+        </div>`;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════════════════════
+    chargerDates();
+
+    // Auto-refresh toutes les 5 minutes (au cas où des dates changent)
+    setInterval(chargerDates, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
