@@ -114,14 +114,14 @@
     /* DATE ROW */
     .date-row {
       display: grid;
-      grid-template-columns: 110px 1fr auto;
-      gap: 28px;
+      grid-template-columns: 95px 1fr auto;
+      gap: 24px;
       align-items: center;
       background: var(--bg-card);
-      padding: 22px 26px;
+      padding: 18px 22px;
       border-radius: 8px;
       border-left: 3px solid var(--gold);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       transition: all 0.3s ease;
       position: relative;
     }
@@ -130,13 +130,14 @@
       transform: translateX(2px);
     }
     .date-row.passee {
-      opacity: 0.45;
+      opacity: 0.65;
       border-left-color: var(--gray-dark);
     }
     .date-row.complet { border-left-color: var(--red); }
     .date-row.bientot { border-left-color: var(--gold); }
+    .date-row.residence { border-left-color: var(--gold); }
     .date-row.annulee, .date-row.reportee { 
-      opacity: 0.5;
+      opacity: 0.55;
       border-left-color: var(--gray-dark);
     }
 
@@ -144,32 +145,32 @@
     .date-block { text-align: center; }
     .date-month {
       font-family: 'Cinzel', serif;
-      font-size: 14px;
-      letter-spacing: 2.5px;
+      font-size: 12px;
+      letter-spacing: 2px;
       color: var(--gold);
       font-weight: 700;
       text-transform: uppercase;
     }
     .date-day {
       font-family: 'Cinzel', serif;
-      font-size: 44px;
+      font-size: 38px;
       font-weight: 700;
       color: var(--white);
       line-height: 1;
       margin: 3px 0;
     }
     .date-year {
-      font-size: 13px;
+      font-size: 11px;
       color: var(--gold);
       font-weight: 600;
       letter-spacing: 1px;
     }
     .date-dow {
-      font-size: 10px;
+      font-size: 9px;
       letter-spacing: 1.5px;
       color: var(--gray);
       text-transform: uppercase;
-      margin-top: 5px;
+      margin-top: 4px;
       font-weight: 500;
     }
 
@@ -177,25 +178,25 @@
     .info-block { min-width: 0; }
     .info-city {
       font-family: 'Cinzel', serif;
-      font-size: 32px;
+      font-size: 27px;
       font-weight: 700;
       color: var(--white);
-      letter-spacing: 3px;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
       line-height: 1.05;
     }
     .info-venue {
-      font-size: 15px;
+      font-size: 13px;
       color: #b8b8b8;
       font-weight: 500;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       letter-spacing: 0.3px;
     }
     .info-time {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--gold);
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       font-weight: 600;
     }
     .info-tournee {
@@ -205,10 +206,15 @@
       color: var(--gold);
       text-transform: uppercase;
       font-weight: 600;
-      margin-top: 10px;
+      margin-top: 8px;
       padding: 3px 10px;
       background: var(--gold-soft);
       border-radius: 2px;
+    }
+    .info-tournee.residence {
+      color: #000;
+      background: var(--gold);
+      letter-spacing: 1.2px;
     }
     .info-tournee.nouveau {
       color: #000;
@@ -284,11 +290,18 @@
       border: 1px solid var(--gray-dark);
     }
 
-    /* TERMINÉ (date passée) — gris très discret */
+    /* TERMINÉ (date passée) — gris discret mais lisible */
     .status-badge.passee {
       background: transparent; 
-      color: var(--gray-dark);
-      border: 1px solid var(--gray-dark);
+      color: #999;
+      border: 1px solid #555;
+    }
+
+    /* NO TICKETS (résidence) — fond NOIR, écriture OR, cadre OR */
+    .status-badge.residence { 
+      background: #000; 
+      color: var(--gold); 
+      border: 1px solid var(--gold);
     }
 
     /* LOADING / EMPTY / ERROR */
@@ -331,33 +344,33 @@
       body { padding: 16px 12px; }
       .header-banner { max-width: 100% !important; }
       .date-row {
-        grid-template-columns: 80px 1fr;
-        gap: 14px;
-        padding: 18px 16px;
+        grid-template-columns: 70px 1fr;
+        gap: 12px;
+        padding: 14px 14px;
       }
-      .date-month { font-size: 11px; letter-spacing: 1.5px; }
-      .date-day { font-size: 34px; }
-      .date-year { font-size: 11px; }
-      .date-dow { font-size: 9px; }
-      .info-city { font-size: 22px; letter-spacing: 1.5px; }
-      .info-venue { font-size: 13px; }
-      .info-time { font-size: 12px; }
+      .date-month { font-size: 10px; letter-spacing: 1.5px; }
+      .date-day { font-size: 30px; }
+      .date-year { font-size: 10px; }
+      .date-dow { font-size: 8px; }
+      .info-city { font-size: 19px; letter-spacing: 1.5px; }
+      .info-venue { font-size: 12px; }
+      .info-time { font-size: 11px; }
       .action-block {
         grid-column: 1 / -1;
         flex-direction: column;
         align-items: stretch;
         min-width: 0;
         gap: 8px;
-        margin-top: 14px;
-        padding-top: 14px;
+        margin-top: 12px;
+        padding-top: 12px;
         border-top: 1px solid #1a1a1a;
       }
       .btn-billets,
       .status-badge {
-        height: 42px;
+        height: 40px;
         font-size: 10px;
-        letter-spacing: 2px;
-        border-radius: 21px;
+        letter-spacing: 1.8px;
+        border-radius: 20px;
       }
       .filter-btn { font-size: 10px; padding: 6px 12px; letter-spacing: 1.5px; }
     }
@@ -529,15 +542,20 @@
       } else if (statut === 'bientot') {
         rowClass = 'bientot';
         bouton = `<span class="status-badge bientot">Bientôt en vente</span>`;
+      } else if (statut === 'residence') {
+        rowClass = 'residence';
+        bouton = `<span class="status-badge residence">No Tickets</span>`;
       } else {
         // En vente OU dernières places → on affiche "Réserver"
         bouton = construireBoutonsBilletterie(d, statut);
       }
 
       const heure = d.heure_show ? d.heure_show.substring(0,5).replace(':', 'h') : '';
-      const tourneeBadge = d.nouveau_spectacle 
-        ? `<span class="info-tournee nouveau">★ Nouveau spectacle ★</span>`
-        : `<span class="info-tournee">${d.nom_tournee || ''}</span>`;
+      const tourneeBadge = (statut === 'residence')
+        ? `<span class="info-tournee residence">Résidence Nouveau Show</span>`
+        : (d.nouveau_spectacle 
+            ? `<span class="info-tournee nouveau">★ Nouveau spectacle ★</span>`
+            : `<span class="info-tournee">${d.nom_tournee || ''}</span>`);
 
       return `
         <div class="date-row ${rowClass}">
