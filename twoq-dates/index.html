@@ -281,6 +281,12 @@
       color: var(--gold); 
       border: 1px solid var(--gold);
     }
+    /* Variante avec date d'ouverture : on autorise un peu plus de largeur */
+    .status-badge.bientot.bientot-avec-date {
+      letter-spacing: 1.2px;
+      padding: 0 18px;
+      font-size: 10px;
+    }
 
     /* ANNULÉE / REPORTÉE — gris discret, cadre gris */
     .status-badge.annulee, 
@@ -687,7 +693,13 @@
         bouton = `<span class="status-badge reportee">Reportée</span>`;
       } else if (statut === 'bientot') {
         rowClass = 'bientot';
-        bouton = `<span class="status-badge bientot">Bientôt en vente</span>`;
+        // Si date_open_mev est renseignée, on l'affiche sur le bouton
+        if (d.date_open_mev) {
+          const dateOuv = formaterDateCourte(d.date_open_mev);
+          bouton = `<span class="status-badge bientot bientot-avec-date">Bientôt en vente le ${dateOuv}</span>`;
+        } else {
+          bouton = `<span class="status-badge bientot">Bientôt en vente</span>`;
+        }
       } else if (statut === 'residence') {
         rowClass = 'residence';
         bouton = `<span class="status-badge residence">No Tickets</span>`;
@@ -840,6 +852,15 @@
       liens.sort((a, b) => a.ordre - b.ordre);
       
       return liens;
+    }
+    
+    function formaterDateCourte(dateStr) {
+      if (!dateStr) return '';
+      const dt = new Date(dateStr);
+      const jour = String(dt.getDate()).padStart(2, '0');
+      const mois = String(dt.getMonth() + 1).padStart(2, '0');
+      const annee = dt.getFullYear();
+      return `${jour}/${mois}/${annee}`;
     }
     
     function formaterDateLong(dateStr) {
