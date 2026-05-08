@@ -752,6 +752,12 @@
     // Mapping des réseaux connus (clé jsonb → nom affiché + couleur indicateur)
     const RESEAUX_MAPPING = {
       'ticketmaster':  { nom: 'Ticketmaster',         couleur: '#024b96' },
+      'organisateur':  { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'ohmyprod_ldc':  { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'ohmyprod-ldc':  { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'ohmyprod':      { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'producteur':    { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'ldc':           { nom: 'Organisateur',         couleur: '#c9a84c' },
       'fnac':          { nom: 'Fnac Spectacles',      couleur: '#e1a925' },
       'digitick':      { nom: 'Digitick',             couleur: '#7e3ff2' },
       'seetickets':    { nom: 'See Tickets',          couleur: '#ed1c24' },
@@ -761,17 +767,44 @@
       'salle':         { nom: 'Site de la salle',     couleur: '#c9a84c' },
       'dome':          { nom: 'Dôme de Paris',        couleur: '#c9a84c' },
       'zenith':        { nom: 'Zénith',               couleur: '#c9a84c' },
-      'arena':         { nom: 'Arena',                couleur: '#c9a84c' },
-      'producteur':    { nom: 'Producteur officiel',  couleur: '#c9a84c' }
+      'arena':         { nom: 'Arena',                couleur: '#c9a84c' }
+    };
+    
+    // Ordre de priorité d'affichage dans le modal
+    // Plus le poids est faible, plus le réseau apparaît en haut
+    const ORDRE_RESEAUX = {
+      'ticketmaster':  1,
+      'organisateur':  2,
+      'ohmyprod_ldc':  2,
+      'ohmyprod-ldc':  2,
+      'ohmyprod':      2,
+      'producteur':    2,
+      'ldc':           2,
+      'fnac':          3,
+      'digitick':      4,
+      'seetickets':    5,
+      'see_tickets':   5,
+      'carrefour':     6,
+      'cultura':       7,
+      'salle':         8,
+      'dome':          9,
+      'zenith':        9,
+      'arena':         9
     };
     
     function infosReseau(cle) {
       const k = (cle || '').toLowerCase().trim();
-      if (RESEAUX_MAPPING[k]) return RESEAUX_MAPPING[k];
+      if (RESEAUX_MAPPING[k]) {
+        return { 
+          ...RESEAUX_MAPPING[k], 
+          ordre: ORDRE_RESEAUX[k] || 99 
+        };
+      }
       // Fallback : on capitalise la clé inconnue
       return { 
         nom: k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' '), 
-        couleur: '#c9a84c' 
+        couleur: '#c9a84c',
+        ordre: 99
       };
     }
     
@@ -792,12 +825,19 @@
       // 2. Le lien principal s'il n'est pas déjà inclus
       if (d.lien_billetterie_principal && d.lien_billetterie_principal.startsWith('http') 
           && !vus.has(d.lien_billetterie_principal)) {
+        // Si le principal est un lien Ticketmaster, on le tague comme tel
+        const cleDeduite = d.lien_billetterie_principal.includes('ticketmaster.fr') 
+          ? 'ticketmaster' 
+          : 'organisateur';
         liens.push({ 
-          cle: 'principal', 
+          cle: cleDeduite, 
           url: d.lien_billetterie_principal, 
-          ...infosReseau('producteur')
+          ...infosReseau(cleDeduite)
         });
       }
+      
+      // 3. TRI par ordre de priorité (Ticketmaster > Organisateur > Fnac > reste)
+      liens.sort((a, b) => a.ordre - b.ordre);
       
       return liens;
     }
