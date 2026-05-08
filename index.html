@@ -50,11 +50,13 @@
       padding: 16px;
     }
     .header-logo {
-      max-width: 320px;
-      width: 80%;
+      max-height: 180px;
+      max-width: 90%;
+      width: auto;
       height: auto;
       display: block;
       margin: 0 auto;
+      object-fit: contain;
     }
     .header-divider {
       width: 80px;
@@ -323,7 +325,7 @@
     /* MOBILE */
     @media (max-width: 600px) {
       body { padding: 16px 12px; }
-      .header-logo { max-width: 220px; width: 65%; }
+      .header-logo { max-height: 130px; }
       .date-row {
         grid-template-columns: 70px 1fr;
         gap: 14px;
