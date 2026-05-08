@@ -304,7 +304,142 @@
       border: 1px solid var(--gold);
     }
 
-    /* LOADING / EMPTY / ERROR */
+    /* MODAL BILLETTERIE — popup choix réseau */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: modalFadeIn 0.25s ease;
+    }
+    .modal-overlay.active { display: flex; }
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .modal-box {
+      background: #0d0d0d;
+      border: 1px solid var(--gold-line);
+      border-radius: 12px;
+      padding: 32px 28px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(201, 168, 76, 0.15);
+      animation: modalSlideUp 0.3s ease;
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .modal-subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      color: var(--white);
+      text-align: center;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .modal-date {
+      font-size: 12px;
+      color: var(--gray);
+      text-align: center;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .modal-networks {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .modal-network-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .modal-network-btn:hover {
+      border-color: var(--gold);
+      background: #1f1f1f;
+      transform: translateX(2px);
+    }
+    .modal-network-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-network-icon {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .modal-network-arrow {
+      color: var(--gold);
+      font-size: 18px;
+      opacity: 0.6;
+      transition: all 0.2s ease;
+    }
+    .modal-network-btn:hover .modal-network-arrow {
+      opacity: 1;
+      transform: translateX(3px);
+    }
+    .modal-close {
+      display: block;
+      margin: 24px auto 0;
+      padding: 10px 24px;
+      background: transparent;
+      border: 1px solid #2a2a2a;
+      color: var(--gray);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .modal-close:hover {
+      color: var(--white);
+      border-color: var(--gray);
+    }
+
+    @media (max-width: 600px) {
+      .modal-box { padding: 26px 22px; }
+      .modal-title { font-size: 13px; letter-spacing: 2px; }
+      .modal-subtitle { font-size: 16px; }
+    }
     .state {
       text-align: center;
       padding: 80px 20px;
@@ -404,6 +539,17 @@
       <div>The World of Queen — Production <a href="https://www.ohmyprod.com" target="_blank">Oh My Prod</a></div>
     </div>
 
+  </div>
+
+  <!-- MODAL BILLETTERIE — choix du réseau -->
+  <div class="modal-overlay" id="modal-billetterie" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <div class="modal-title" id="modal-title">Choisissez votre billetterie</div>
+      <div class="modal-subtitle" id="modal-ville"></div>
+      <div class="modal-date" id="modal-date-text"></div>
+      <div class="modal-networks" id="modal-networks"></div>
+      <button class="modal-close" onclick="fermerModal()">Fermer</button>
+    </div>
   </div>
 
   <script>
@@ -578,12 +724,127 @@
     }
 
     function construireBoutonsBilletterie(d, statut) {
-      // Un SEUL bouton "Réserver" — pas de boutons secondaires
-      if (d.lien_billetterie_principal) {
-        return `<a href="${d.lien_billetterie_principal}" target="_blank" rel="noopener" class="btn-billets">Réserver</a>`;
+      // Récupère tous les liens disponibles depuis liens_billetterie (jsonb) + lien_billetterie_principal
+      const liens = collecterLiens(d);
+      
+      if (liens.length === 0) return '';
+      
+      // Si 1 seul lien → ouverture directe (pas de modal)
+      if (liens.length === 1) {
+        return `<a href="${liens[0].url}" target="_blank" rel="noopener" class="btn-billets">Réserver</a>`;
       }
-      return '';
+      
+      // Plusieurs liens → bouton qui ouvre le modal
+      // On stocke les données dans un attribut data pour les récupérer au clic
+      const dateStr = formaterDateLong(d.date_concert);
+      const payload = encodeURIComponent(JSON.stringify({
+        ville: d.ville || '',
+        date: dateStr,
+        liens: liens
+      }));
+      return `<button onclick="ouvrirModal('${payload}')" class="btn-billets">Réserver</button>`;
     }
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // MODAL BILLETTERIE — gestion multi-réseaux
+    // ═══════════════════════════════════════════════════════════════════
+    
+    // Mapping des réseaux connus (clé jsonb → nom affiché + couleur indicateur)
+    const RESEAUX_MAPPING = {
+      'ticketmaster':  { nom: 'Ticketmaster',         couleur: '#024b96' },
+      'fnac':          { nom: 'Fnac Spectacles',      couleur: '#e1a925' },
+      'digitick':      { nom: 'Digitick',             couleur: '#7e3ff2' },
+      'seetickets':    { nom: 'See Tickets',          couleur: '#ed1c24' },
+      'see_tickets':   { nom: 'See Tickets',          couleur: '#ed1c24' },
+      'carrefour':     { nom: 'Carrefour Spectacles', couleur: '#0064d9' },
+      'cultura':       { nom: 'Cultura',              couleur: '#00a651' },
+      'salle':         { nom: 'Site de la salle',     couleur: '#c9a84c' },
+      'dome':          { nom: 'Dôme de Paris',        couleur: '#c9a84c' },
+      'zenith':        { nom: 'Zénith',               couleur: '#c9a84c' },
+      'arena':         { nom: 'Arena',                couleur: '#c9a84c' },
+      'producteur':    { nom: 'Producteur officiel',  couleur: '#c9a84c' }
+    };
+    
+    function infosReseau(cle) {
+      const k = (cle || '').toLowerCase().trim();
+      if (RESEAUX_MAPPING[k]) return RESEAUX_MAPPING[k];
+      // Fallback : on capitalise la clé inconnue
+      return { 
+        nom: k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' '), 
+        couleur: '#c9a84c' 
+      };
+    }
+    
+    function collecterLiens(d) {
+      const liens = [];
+      const vus = new Set();
+      
+      // 1. D'abord les liens nommés dans liens_billetterie (jsonb)
+      if (d.liens_billetterie && typeof d.liens_billetterie === 'object') {
+        for (const [cle, url] of Object.entries(d.liens_billetterie)) {
+          if (url && typeof url === 'string' && url.startsWith('http') && !vus.has(url)) {
+            liens.push({ cle, url, ...infosReseau(cle) });
+            vus.add(url);
+          }
+        }
+      }
+      
+      // 2. Le lien principal s'il n'est pas déjà inclus
+      if (d.lien_billetterie_principal && d.lien_billetterie_principal.startsWith('http') 
+          && !vus.has(d.lien_billetterie_principal)) {
+        liens.push({ 
+          cle: 'principal', 
+          url: d.lien_billetterie_principal, 
+          ...infosReseau('producteur')
+        });
+      }
+      
+      return liens;
+    }
+    
+    function formaterDateLong(dateStr) {
+      const dt = new Date(dateStr);
+      const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+      const mois = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      return `${jours[dt.getDay()]} ${dt.getDate()} ${mois[dt.getMonth()]} ${dt.getFullYear()}`;
+    }
+    
+    function ouvrirModal(payloadEncode) {
+      try {
+        const data = JSON.parse(decodeURIComponent(payloadEncode));
+        document.getElementById('modal-ville').textContent = data.ville;
+        document.getElementById('modal-date-text').textContent = data.date;
+        
+        const container = document.getElementById('modal-networks');
+        container.innerHTML = data.liens.map(l => `
+          <a href="${l.url}" target="_blank" rel="noopener" class="modal-network-btn" onclick="fermerModal()">
+            <span class="modal-network-name">
+              <span class="modal-network-icon" style="background:${l.couleur}"></span>
+              ${l.nom}
+            </span>
+            <span class="modal-network-arrow">→</span>
+          </a>
+        `).join('');
+        
+        document.getElementById('modal-billetterie').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      } catch (e) {
+        console.error('Erreur ouverture modal:', e);
+      }
+    }
+    
+    function fermerModal() {
+      document.getElementById('modal-billetterie').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    // Fermeture du modal au clic en dehors ou sur Échap
+    document.getElementById('modal-billetterie').addEventListener('click', e => {
+      if (e.target.id === 'modal-billetterie') fermerModal();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') fermerModal();
+    });
 
     function afficherErreur(msg) {
       document.getElementById('dates-container').innerHTML = `
