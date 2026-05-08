@@ -43,26 +43,25 @@
 
     .container { max-width: 1100px; margin: 0 auto; }
 
-    /* HEADER — logo centré */
+    /* HEADER — bannière paysage pleine largeur */
     .header {
       text-align: center;
       margin-bottom: 32px;
-      padding: 16px;
+      padding: 0;
     }
-    .header-logo {
-      max-height: 180px;
-      max-width: 90%;
-      width: auto;
+    .header-banner {
+      width: 100%;
+      max-width: 1100px;
       height: auto;
       display: block;
       margin: 0 auto;
-      object-fit: contain;
+      border-radius: 4px;
     }
     .header-divider {
-      width: 80px;
+      width: 120px;
       height: 1px;
       background: var(--gold);
-      margin: 20px auto 0;
+      margin: 28px auto 0;
       opacity: 0.6;
     }
 
@@ -115,8 +114,8 @@
     /* DATE ROW */
     .date-row {
       display: grid;
-      grid-template-columns: 90px 1fr auto;
-      gap: 20px;
+      grid-template-columns: 95px 1fr auto;
+      gap: 24px;
       align-items: center;
       background: var(--bg-card);
       padding: 18px 22px;
@@ -131,13 +130,14 @@
       transform: translateX(2px);
     }
     .date-row.passee {
-      opacity: 0.45;
+      opacity: 0.65;
       border-left-color: var(--gray-dark);
     }
     .date-row.complet { border-left-color: var(--red); }
     .date-row.bientot { border-left-color: var(--gold); }
+    .date-row.residence { border-left-color: var(--gold); }
     .date-row.annulee, .date-row.reportee { 
-      opacity: 0.5;
+      opacity: 0.55;
       border-left-color: var(--gray-dark);
     }
 
@@ -145,54 +145,59 @@
     .date-block { text-align: center; }
     .date-month {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 2px;
       color: var(--gold);
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
     }
     .date-day {
       font-family: 'Cinzel', serif;
-      font-size: 32px;
+      font-size: 38px;
       font-weight: 700;
       color: var(--white);
       line-height: 1;
-      margin: 2px 0;
+      margin: 3px 0;
     }
     .date-year {
-      font-size: 10px;
-      color: var(--gray);
-      font-weight: 500;
+      font-size: 11px;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 1px;
     }
     .date-dow {
       font-size: 9px;
       letter-spacing: 1.5px;
-      color: var(--gray-dark);
+      color: var(--gray);
       text-transform: uppercase;
       margin-top: 4px;
+      font-weight: 500;
     }
 
     /* COLONNE INFO */
     .info-block { min-width: 0; }
     .info-city {
       font-family: 'Cinzel', serif;
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 27px;
+      font-weight: 700;
       color: var(--white);
-      letter-spacing: 2px;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
       margin-bottom: 4px;
+      line-height: 1.05;
     }
     .info-venue {
       font-size: 13px;
-      color: var(--gray);
+      color: #b8b8b8;
       font-weight: 500;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
+      letter-spacing: 0.3px;
     }
     .info-time {
-      font-size: 11px;
-      color: var(--gray-dark);
-      letter-spacing: 1px;
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: 1.2px;
+      font-weight: 600;
     }
     .info-tournee {
       display: inline-block;
@@ -205,6 +210,11 @@
       padding: 3px 10px;
       background: var(--gold-soft);
       border-radius: 2px;
+    }
+    .info-tournee.residence {
+      color: #000;
+      background: var(--gold);
+      letter-spacing: 1.2px;
     }
     .info-tournee.nouveau {
       color: #000;
@@ -280,14 +290,156 @@
       border: 1px solid var(--gray-dark);
     }
 
-    /* TERMINÉ (date passée) — gris très discret */
+    /* TERMINÉ (date passée) — gris discret mais lisible */
     .status-badge.passee {
       background: transparent; 
-      color: var(--gray-dark);
-      border: 1px solid var(--gray-dark);
+      color: #999;
+      border: 1px solid #555;
     }
 
-    /* LOADING / EMPTY / ERROR */
+    /* NO TICKETS (résidence) — fond NOIR, écriture OR, cadre OR */
+    .status-badge.residence { 
+      background: #000; 
+      color: var(--gold); 
+      border: 1px solid var(--gold);
+    }
+
+    /* MODAL BILLETTERIE — popup choix réseau */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: modalFadeIn 0.25s ease;
+    }
+    .modal-overlay.active { display: flex; }
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .modal-box {
+      background: #0d0d0d;
+      border: 1px solid var(--gold-line);
+      border-radius: 12px;
+      padding: 32px 28px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(201, 168, 76, 0.15);
+      animation: modalSlideUp 0.3s ease;
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .modal-subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      color: var(--white);
+      text-align: center;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .modal-date {
+      font-size: 12px;
+      color: var(--gray);
+      text-align: center;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .modal-networks {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .modal-network-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .modal-network-btn:hover {
+      border-color: var(--gold);
+      background: #1f1f1f;
+      transform: translateX(2px);
+    }
+    .modal-network-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-network-icon {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .modal-network-arrow {
+      color: var(--gold);
+      font-size: 18px;
+      opacity: 0.6;
+      transition: all 0.2s ease;
+    }
+    .modal-network-btn:hover .modal-network-arrow {
+      opacity: 1;
+      transform: translateX(3px);
+    }
+    .modal-close {
+      display: block;
+      margin: 24px auto 0;
+      padding: 10px 24px;
+      background: transparent;
+      border: 1px solid #2a2a2a;
+      color: var(--gray);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .modal-close:hover {
+      color: var(--white);
+      border-color: var(--gray);
+    }
+
+    @media (max-width: 600px) {
+      .modal-box { padding: 26px 22px; }
+      .modal-title { font-size: 13px; letter-spacing: 2px; }
+      .modal-subtitle { font-size: 16px; }
+    }
     .state {
       text-align: center;
       padding: 80px 20px;
@@ -325,15 +477,19 @@
     /* MOBILE */
     @media (max-width: 600px) {
       body { padding: 16px 12px; }
-      .header-logo { max-height: 130px; }
+      .header-banner { max-width: 100% !important; }
       .date-row {
         grid-template-columns: 70px 1fr;
-        gap: 14px;
-        padding: 14px 16px;
+        gap: 12px;
+        padding: 14px 14px;
       }
-      .date-day { font-size: 28px; }
-      .info-city { font-size: 15px; letter-spacing: 1.5px; }
+      .date-month { font-size: 10px; letter-spacing: 1.5px; }
+      .date-day { font-size: 30px; }
+      .date-year { font-size: 10px; }
+      .date-dow { font-size: 8px; }
+      .info-city { font-size: 19px; letter-spacing: 1.5px; }
       .info-venue { font-size: 12px; }
+      .info-time { font-size: 11px; }
       .action-block {
         grid-column: 1 / -1;
         flex-direction: column;
@@ -346,10 +502,10 @@
       }
       .btn-billets,
       .status-badge {
-        height: 42px;
+        height: 40px;
         font-size: 10px;
-        letter-spacing: 2px;
-        border-radius: 21px;
+        letter-spacing: 1.8px;
+        border-radius: 20px;
       }
       .filter-btn { font-size: 10px; padding: 6px 12px; letter-spacing: 1.5px; }
     }
@@ -359,7 +515,10 @@
   <div class="container">
     
     <div class="header">
-      <img src="logo.jpg" alt="The World of Queen — L'Éternelle Légende" class="header-logo">
+      <img src="banniere.jpg?v=2" 
+           alt="The World of Queen — L'Éternelle Légende" 
+           class="header-banner"
+           style="width: 100% !important; max-width: 1100px !important; height: auto !important; display: block !important; margin: 0 auto !important; border-radius: 4px !important;">
       <div class="header-divider"></div>
     </div>
 
@@ -380,6 +539,17 @@
       <div>The World of Queen — Production <a href="https://www.ohmyprod.com" target="_blank">Oh My Prod</a></div>
     </div>
 
+  </div>
+
+  <!-- MODAL BILLETTERIE — choix du réseau -->
+  <div class="modal-overlay" id="modal-billetterie" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <div class="modal-title" id="modal-title">Choisissez votre billetterie</div>
+      <div class="modal-subtitle" id="modal-ville"></div>
+      <div class="modal-date" id="modal-date-text"></div>
+      <div class="modal-networks" id="modal-networks"></div>
+      <button class="modal-close" onclick="fermerModal()">Fermer</button>
+    </div>
   </div>
 
   <script>
@@ -518,15 +688,20 @@
       } else if (statut === 'bientot') {
         rowClass = 'bientot';
         bouton = `<span class="status-badge bientot">Bientôt en vente</span>`;
+      } else if (statut === 'residence') {
+        rowClass = 'residence';
+        bouton = `<span class="status-badge residence">No Tickets</span>`;
       } else {
         // En vente OU dernières places → on affiche "Réserver"
         bouton = construireBoutonsBilletterie(d, statut);
       }
 
       const heure = d.heure_show ? d.heure_show.substring(0,5).replace(':', 'h') : '';
-      const tourneeBadge = d.nouveau_spectacle 
-        ? `<span class="info-tournee nouveau">★ Nouveau spectacle ★</span>`
-        : `<span class="info-tournee">${d.nom_tournee || ''}</span>`;
+      const tourneeBadge = (statut === 'residence')
+        ? `<span class="info-tournee residence">Résidence Nouveau Show</span>`
+        : (d.nouveau_spectacle 
+            ? `<span class="info-tournee nouveau">★ Nouveau spectacle ★</span>`
+            : `<span class="info-tournee">${d.nom_tournee || ''}</span>`);
 
       return `
         <div class="date-row ${rowClass}">
@@ -549,12 +724,167 @@
     }
 
     function construireBoutonsBilletterie(d, statut) {
-      // Un SEUL bouton "Réserver" — pas de boutons secondaires
-      if (d.lien_billetterie_principal) {
-        return `<a href="${d.lien_billetterie_principal}" target="_blank" rel="noopener" class="btn-billets">Réserver</a>`;
+      // Récupère tous les liens disponibles depuis liens_billetterie (jsonb) + lien_billetterie_principal
+      const liens = collecterLiens(d);
+      
+      if (liens.length === 0) return '';
+      
+      // Si 1 seul lien → ouverture directe (pas de modal)
+      if (liens.length === 1) {
+        return `<a href="${liens[0].url}" target="_blank" rel="noopener" class="btn-billets">Réserver</a>`;
       }
-      return '';
+      
+      // Plusieurs liens → bouton qui ouvre le modal
+      // On stocke les données dans un attribut data pour les récupérer au clic
+      const dateStr = formaterDateLong(d.date_concert);
+      const payload = encodeURIComponent(JSON.stringify({
+        ville: d.ville || '',
+        date: dateStr,
+        liens: liens
+      }));
+      return `<button onclick="ouvrirModal('${payload}')" class="btn-billets">Réserver</button>`;
     }
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // MODAL BILLETTERIE — gestion multi-réseaux
+    // ═══════════════════════════════════════════════════════════════════
+    
+    // Mapping des réseaux connus (clé jsonb → nom affiché + couleur indicateur)
+    const RESEAUX_MAPPING = {
+      'ticketmaster':  { nom: 'Ticketmaster',         couleur: '#024b96' },
+      'organisateur':  { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'ohmyprod_ldc':  { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'ohmyprod-ldc':  { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'ohmyprod':      { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'producteur':    { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'ldc':           { nom: 'Organisateur',         couleur: '#c9a84c' },
+      'fnac':          { nom: 'Fnac Spectacles',      couleur: '#e1a925' },
+      'digitick':      { nom: 'Digitick',             couleur: '#7e3ff2' },
+      'seetickets':    { nom: 'See Tickets',          couleur: '#ed1c24' },
+      'see_tickets':   { nom: 'See Tickets',          couleur: '#ed1c24' },
+      'carrefour':     { nom: 'Carrefour Spectacles', couleur: '#0064d9' },
+      'cultura':       { nom: 'Cultura',              couleur: '#00a651' },
+      'salle':         { nom: 'Site de la salle',     couleur: '#c9a84c' },
+      'dome':          { nom: 'Dôme de Paris',        couleur: '#c9a84c' },
+      'zenith':        { nom: 'Zénith',               couleur: '#c9a84c' },
+      'arena':         { nom: 'Arena',                couleur: '#c9a84c' }
+    };
+    
+    // Ordre de priorité d'affichage dans le modal
+    // Plus le poids est faible, plus le réseau apparaît en haut
+    const ORDRE_RESEAUX = {
+      'ticketmaster':  1,
+      'organisateur':  2,
+      'ohmyprod_ldc':  2,
+      'ohmyprod-ldc':  2,
+      'ohmyprod':      2,
+      'producteur':    2,
+      'ldc':           2,
+      'fnac':          3,
+      'digitick':      4,
+      'seetickets':    5,
+      'see_tickets':   5,
+      'carrefour':     6,
+      'cultura':       7,
+      'salle':         8,
+      'dome':          9,
+      'zenith':        9,
+      'arena':         9
+    };
+    
+    function infosReseau(cle) {
+      const k = (cle || '').toLowerCase().trim();
+      if (RESEAUX_MAPPING[k]) {
+        return { 
+          ...RESEAUX_MAPPING[k], 
+          ordre: ORDRE_RESEAUX[k] || 99 
+        };
+      }
+      // Fallback : on capitalise la clé inconnue
+      return { 
+        nom: k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' '), 
+        couleur: '#c9a84c',
+        ordre: 99
+      };
+    }
+    
+    function collecterLiens(d) {
+      const liens = [];
+      const vus = new Set();
+      
+      // 1. D'abord les liens nommés dans liens_billetterie (jsonb)
+      if (d.liens_billetterie && typeof d.liens_billetterie === 'object') {
+        for (const [cle, url] of Object.entries(d.liens_billetterie)) {
+          if (url && typeof url === 'string' && url.startsWith('http') && !vus.has(url)) {
+            liens.push({ cle, url, ...infosReseau(cle) });
+            vus.add(url);
+          }
+        }
+      }
+      
+      // 2. Le lien principal s'il n'est pas déjà inclus
+      if (d.lien_billetterie_principal && d.lien_billetterie_principal.startsWith('http') 
+          && !vus.has(d.lien_billetterie_principal)) {
+        // Si le principal est un lien Ticketmaster, on le tague comme tel
+        const cleDeduite = d.lien_billetterie_principal.includes('ticketmaster.fr') 
+          ? 'ticketmaster' 
+          : 'organisateur';
+        liens.push({ 
+          cle: cleDeduite, 
+          url: d.lien_billetterie_principal, 
+          ...infosReseau(cleDeduite)
+        });
+      }
+      
+      // 3. TRI par ordre de priorité (Ticketmaster > Organisateur > Fnac > reste)
+      liens.sort((a, b) => a.ordre - b.ordre);
+      
+      return liens;
+    }
+    
+    function formaterDateLong(dateStr) {
+      const dt = new Date(dateStr);
+      const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+      const mois = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      return `${jours[dt.getDay()]} ${dt.getDate()} ${mois[dt.getMonth()]} ${dt.getFullYear()}`;
+    }
+    
+    function ouvrirModal(payloadEncode) {
+      try {
+        const data = JSON.parse(decodeURIComponent(payloadEncode));
+        document.getElementById('modal-ville').textContent = data.ville;
+        document.getElementById('modal-date-text').textContent = data.date;
+        
+        const container = document.getElementById('modal-networks');
+        container.innerHTML = data.liens.map(l => `
+          <a href="${l.url}" target="_blank" rel="noopener" class="modal-network-btn" onclick="fermerModal()">
+            <span class="modal-network-name">
+              <span class="modal-network-icon" style="background:${l.couleur}"></span>
+              ${l.nom}
+            </span>
+            <span class="modal-network-arrow">→</span>
+          </a>
+        `).join('');
+        
+        document.getElementById('modal-billetterie').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      } catch (e) {
+        console.error('Erreur ouverture modal:', e);
+      }
+    }
+    
+    function fermerModal() {
+      document.getElementById('modal-billetterie').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    // Fermeture du modal au clic en dehors ou sur Échap
+    document.getElementById('modal-billetterie').addEventListener('click', e => {
+      if (e.target.id === 'modal-billetterie') fermerModal();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') fermerModal();
+    });
 
     function afficherErreur(msg) {
       document.getElementById('dates-container').innerHTML = `
