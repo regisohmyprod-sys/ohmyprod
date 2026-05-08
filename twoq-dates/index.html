@@ -281,11 +281,19 @@
       color: var(--gold); 
       border: 1px solid var(--gold);
     }
-    /* Variante avec date d'ouverture : on autorise un peu plus de largeur */
-    .status-badge.bientot.bientot-avec-date {
-      letter-spacing: 1.2px;
-      padding: 0 18px;
+    
+    /* Petit texte "Ouverture le XX/XX/XXXX" sous le bouton Bientôt en vente */
+    .ouverture-date {
+      display: block;
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
       font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: var(--gold);
+      opacity: 0.85;
+      margin-top: 6px;
+      text-transform: none;
     }
 
     /* ANNULÉE / REPORTÉE — gris discret, cadre gris */
@@ -693,12 +701,11 @@
         bouton = `<span class="status-badge reportee">Reportée</span>`;
       } else if (statut === 'bientot') {
         rowClass = 'bientot';
-        // Si date_open_mev est renseignée, on l'affiche sur le bouton
+        // Bouton normal "Bientôt en vente" + date d'ouverture en petit en dessous si renseignée
+        bouton = `<span class="status-badge bientot">Bientôt en vente</span>`;
         if (d.date_open_mev) {
           const dateOuv = formaterDateCourte(d.date_open_mev);
-          bouton = `<span class="status-badge bientot bientot-avec-date">Bientôt en vente le ${dateOuv}</span>`;
-        } else {
-          bouton = `<span class="status-badge bientot">Bientôt en vente</span>`;
+          bouton += `<span class="ouverture-date">Ouverture le ${dateOuv}</span>`;
         }
       } else if (statut === 'residence') {
         rowClass = 'residence';
