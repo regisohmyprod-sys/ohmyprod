@@ -942,6 +942,34 @@
 
     // Auto-refresh toutes les 5 minutes (au cas où des dates changent)
     setInterval(chargerDates, 5 * 60 * 1000);
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // AUTO-RESIZE quand utilisé en iframe (intégration Wix theworldofqueen.com)
+    // Envoie la hauteur du contenu au parent pour qu'il ajuste l'iframe
+    // ═══════════════════════════════════════════════════════════════════
+    function envoyerHauteur() {
+      try {
+        const hauteur = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.offsetHeight
+        );
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ 
+            type: 'twoq-widget-resize', 
+            hauteur: hauteur 
+          }, '*');
+        }
+      } catch(e) { /* silencieux */ }
+    }
+    
+    // Envoyer la hauteur après chaque rendu et au resize
+    new ResizeObserver(envoyerHauteur).observe(document.body);
+    window.addEventListener('load', envoyerHauteur);
+    setTimeout(envoyerHauteur, 500);
+    setTimeout(envoyerHauteur, 1500);
+    setTimeout(envoyerHauteur, 3000);
   </script>
 </body>
 </html>
