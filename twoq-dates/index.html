@@ -1146,12 +1146,17 @@
       } catch(e) { /* silencieux */ }
     }
     
-    // Envoyer la hauteur après chaque rendu et au resize
-    new ResizeObserver(envoyerHauteur).observe(document.body);
-    window.addEventListener('load', envoyerHauteur);
-    setTimeout(envoyerHauteur, 500);
-    setTimeout(envoyerHauteur, 1500);
-    setTimeout(envoyerHauteur, 3000);
+    // Envoyer la hauteur après chaque rendu et au resize (sécurisé pour Chrome mobile)
+    try {
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(envoyerHauteur).observe(document.body);
+      }
+    } catch(e) { /* silencieux */ }
+    
+    try { window.addEventListener('load', envoyerHauteur); } catch(e) {}
+    try { setTimeout(envoyerHauteur, 500); } catch(e) {}
+    try { setTimeout(envoyerHauteur, 1500); } catch(e) {}
+    try { setTimeout(envoyerHauteur, 3000); } catch(e) {}
   </script>
 </body>
 </html>
