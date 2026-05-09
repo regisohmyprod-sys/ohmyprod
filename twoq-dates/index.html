@@ -682,7 +682,20 @@
       const dt = new Date(d.date_concert);
       const today = new Date(); today.setHours(0,0,0,0);
       const passee = dt < today;
-      const statut = d.statut_public || 'en_vente';
+      let statut = d.statut_public || 'en_vente';
+      
+      // 🎯 LOGIQUE INTELLIGENTE — date d'ouverture billetterie (DATE MEV)
+      // Si DATE MEV est dans le futur, on FORCE le statut "bientot" 
+      // (peu importe ce qui est en base) avec la date d'ouverture
+      let mevFuture = false;
+      if (d.date_open_mev) {
+        const dateMev = new Date(d.date_open_mev);
+        dateMev.setHours(0,0,0,0);
+        if (dateMev > today) {
+          mevFuture = true;
+          statut = 'bientot'; // on force le statut bientôt en vente
+        }
+      }
       
       // Classes CSS selon statut
       let rowClass = passee ? 'passee' : '';
