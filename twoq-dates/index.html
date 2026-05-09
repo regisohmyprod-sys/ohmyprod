@@ -950,7 +950,7 @@
       }
     }
     
-    // Modal CSS plein écran pour mobile (overlay positionné à la hauteur de scroll)
+    // Modal CSS plein écran pour mobile (overlay positionné en HAUT de l'iframe)
     function ouvrirModalFullScreen(data) {
       const liensHtml = data.liens.map(l => `
         <a href="${l.url}" target="_blank" rel="noopener" class="fs-btn" onclick="fermerModalFullScreen()">
@@ -967,12 +967,11 @@
         document.body.appendChild(modalEl);
       }
       
-      // Demander au parent (Wix) sa position de scroll
-      let topPos = 0;
-      let viewportH = window.innerHeight;
-      
-      // Hack temporaire : on positionne d'abord par défaut, puis on ajuste avec postMessage
-      window.parent.postMessage({ type: 'twoq-modal-ouvert' }, '*');
+      // Notifier le parent (Wix) qu'on ouvre un modal
+      // Le parent va scroller la page Wix vers le haut de l'iframe
+      try {
+        window.parent.postMessage({ type: 'twoq-modal-ouvert' }, '*');
+      } catch(e) {}
       
       modalEl.innerHTML = `
         <style>
@@ -980,7 +979,7 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%;
-            min-height: 100vh;
+            height: 100vh;
             background: rgba(0, 0, 0, 0.95);
             z-index: 999999;
             display: flex;
@@ -1079,26 +1078,6 @@
       
       document.body.style.overflow = 'hidden';
     }
-    
-    // Écoute la réponse de Wix avec la position de scroll pour positionner le modal
-    window.addEventListener('message', function(e) {
-      if (!e.data || typeof e.data !== 'object') return;
-      
-      if (e.data.type === 'twoq-position-scroll') {
-        const modalEl = document.getElementById('twoq-fs-modal');
-        if (!modalEl) return;
-        
-        const parentScrollY = e.data.parentScrollY || 0;
-        const iframeOffsetTop = e.data.iframeOffsetTop || 0;
-        const viewportH = e.data.viewportH || window.innerHeight;
-        
-        // Position dans l'iframe = scroll Wix - position iframe sur page Wix
-        const topDansIframe = Math.max(0, parentScrollY - iframeOffsetTop);
-        
-        modalEl.style.top = topDansIframe + 'px';
-        modalEl.style.minHeight = viewportH + 'px';
-      }
-    });
     
     function fermerModalFullScreen() {
       const modalEl = document.getElementById('twoq-fs-modal');
