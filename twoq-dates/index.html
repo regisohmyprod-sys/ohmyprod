@@ -328,11 +328,15 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 99999;
       padding: 20px;
       animation: modalFadeIn 0.25s ease;
     }
     .modal-overlay.active { display: flex; }
+    /* En contexte iframe : on force la position absolue calculée par JS */
+    .modal-overlay.iframe-mode {
+      position: absolute;
+    }
     @keyframes modalFadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -907,7 +911,31 @@
           </a>
         `).join('');
         
-        document.getElementById('modal-billetterie').classList.add('active');
+        const overlay = document.getElementById('modal-billetterie');
+        overlay.classList.add('active');
+        
+        // 🎯 GESTION IFRAME : si on est dans une iframe (Wix), 
+        // on positionne le modal à hauteur de scroll de l'utilisateur
+        // (sinon position:fixed se réfère à l'iframe entière qui peut faire 15000px)
+        if (window.parent !== window) {
+          // On est en iframe, demander au parent où est le scroll
+          overlay.classList.add('iframe-mode');
+          window.parent.postMessage({ type: 'twoq-modal-ouvert' }, '*');
+          
+          // Centrer le modal dans le viewport visible
+          const scrollY = window.scrollY || document.documentElement.scrollTop;
+          const viewportH = window.innerHeight;
+          const modalBox = overlay.querySelector('.modal-box');
+          
+          // Position absolue calculée
+          overlay.style.position = 'absolute';
+          overlay.style.top = scrollY + 'px';
+          overlay.style.left = '0';
+          overlay.style.width = '100%';
+          overlay.style.height = viewportH + 'px';
+          overlay.style.minHeight = '100vh';
+        }
+        
         document.body.style.overflow = 'hidden';
       } catch (e) {
         console.error('Erreur ouverture modal:', e);
@@ -915,8 +943,22 @@
     }
     
     function fermerModal() {
-      document.getElementById('modal-billetterie').classList.remove('active');
+      const overlay = document.getElementById('modal-billetterie');
+      overlay.classList.remove('active');
+      overlay.classList.remove('iframe-mode');
+      // Reset des styles inline éventuels
+      overlay.style.position = '';
+      overlay.style.top = '';
+      overlay.style.left = '';
+      overlay.style.width = '';
+      overlay.style.height = '';
+      overlay.style.minHeight = '';
       document.body.style.overflow = '';
+      
+      // Notifier le parent (pour Wix)
+      if (window.parent !== window) {
+        try { window.parent.postMessage({ type: 'twoq-modal-ferme' }, '*'); } catch(e) {}
+      }
     }
     
     // Fermeture du modal au clic en dehors ou sur Échap
