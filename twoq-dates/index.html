@@ -913,22 +913,23 @@
       try {
         const data = JSON.parse(decodeURIComponent(payloadEncode));
         
-        // 🎯 SI ON EST EN IFRAME (Wix theworldofqueen.com) : 
-        // Sur DESKTOP : popup natif (vraie fenêtre)
-        // Sur MOBILE : modal CSS plein écran dans la page (Chrome mobile bug avec window.open)
+        // 🎯 EN IFRAME (Wix theworldofqueen.com)
         if (window.parent !== window) {
           const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
           if (isMobile) {
-            // Mobile : modal CSS dans la page actuelle
-            ouvrirModalFullScreen(data);
+            // Mobile : ouvrir directement le 1er lien (priorité Ticketmaster)
+            // L'ordre dans data.liens est déjà : Ticketmaster > Organisateur > Fnac > etc.
+            if (data.liens && data.liens.length > 0) {
+              window.open(data.liens[0].url, '_blank', 'noopener');
+            }
           } else {
-            // Desktop : vraie fenêtre popup
+            // Desktop : vraie fenêtre popup avec choix multi-réseaux
             ouvrirPopupNatif(data);
           }
           return;
         }
         
-        // Sinon (mode standalone sur app.ohmyprod.com), modal classique
+        // Sinon (mode standalone sur app.ohmyprod.com), modal classique dans la page
         document.getElementById('modal-ville').textContent = data.ville;
         document.getElementById('modal-date-text').textContent = data.date;
         
