@@ -897,6 +897,15 @@
     function ouvrirModal(payloadEncode) {
       try {
         const data = JSON.parse(decodeURIComponent(payloadEncode));
+        
+        // 🎯 SI ON EST EN IFRAME (Wix theworldofqueen.com) : 
+        // on ouvre une VRAIE fenêtre popup native du navigateur, plus simple et fiable
+        if (window.parent !== window) {
+          ouvrirPopupNatif(data);
+          return;
+        }
+        
+        // Sinon (mode standalone sur app.ohmyprod.com), modal classique
         document.getElementById('modal-ville').textContent = data.ville;
         document.getElementById('modal-date-text').textContent = data.date;
         
@@ -911,71 +920,137 @@
           </a>
         `).join('');
         
-        const overlay = document.getElementById('modal-billetterie');
-        overlay.classList.add('active');
-        
-        // 🎯 GESTION IFRAME : si on est dans une iframe (Wix),
-        // on demande au parent où l'utilisateur a scrollé
-        if (window.parent !== window) {
-          // Demander au parent (Wix) sa position de scroll + la position absolue de l'iframe
-          window.parent.postMessage({ 
-            type: 'twoq-modal-ouvert',
-            action: 'demande-scroll'
-          }, '*');
-          // La réponse arrivera dans le listener postMessage et positionnera le modal
-        }
-        
+        document.getElementById('modal-billetterie').classList.add('active');
         document.body.style.overflow = 'hidden';
       } catch (e) {
         console.error('Erreur ouverture modal:', e);
       }
     }
     
-    // Écoute les réponses du parent (Wix) pour positionner le modal
-    window.addEventListener('message', function(e) {
-      if (!e.data || typeof e.data !== 'object') return;
+    // Popup natif HTML autonome — ouvert via window.open dans une vraie fenêtre
+    function ouvrirPopupNatif(data) {
+      const liensHtml = data.liens.map(l => `
+        <a href="${l.url}" target="_blank" rel="noopener" class="btn-reseau" onclick="window.close()">
+          <span class="dot" style="background:${l.couleur}"></span>
+          <span class="nom">${l.nom}</span>
+          <span class="fleche">→</span>
+        </a>
+      `).join('');
       
-      // Le parent nous renvoie sa position de scroll et la position de l'iframe
-      if (e.data.type === 'twoq-position-scroll') {
-        const overlay = document.getElementById('modal-billetterie');
-        if (!overlay.classList.contains('active')) return;
-        
-        // Calcul : l'utilisateur voit la zone [parentScrollY, parentScrollY + viewportH] sur la page Wix.
-        // L'iframe commence à iframeOffsetTop sur la page Wix.
-        // Donc dans le repère de l'iframe, l'utilisateur voit [parentScrollY - iframeOffsetTop, parentScrollY - iframeOffsetTop + viewportH]
-        const parentScrollY = e.data.parentScrollY || 0;
-        const iframeOffsetTop = e.data.iframeOffsetTop || 0;
-        const viewportH = e.data.viewportH || window.innerHeight;
-        
-        const topDansIframe = Math.max(0, parentScrollY - iframeOffsetTop);
-        
-        overlay.classList.add('iframe-mode');
-        overlay.style.position = 'absolute';
-        overlay.style.top = topDansIframe + 'px';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = viewportH + 'px';
-        overlay.style.minHeight = '0';
-      }
-    });
-    
-    function fermerModal() {
-      const overlay = document.getElementById('modal-billetterie');
-      overlay.classList.remove('active');
-      overlay.classList.remove('iframe-mode');
-      // Reset des styles inline éventuels
-      overlay.style.position = '';
-      overlay.style.top = '';
-      overlay.style.left = '';
-      overlay.style.width = '';
-      overlay.style.height = '';
-      overlay.style.minHeight = '';
-      document.body.style.overflow = '';
+      const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Choisir billetterie - ${data.ville}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #000;
+    color: #fff;
+    min-height: 100vh;
+    padding: 30px 24px;
+    line-height: 1.6;
+  }
+  .titre {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: #c9a84c;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .ville {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    color: #fff;
+    text-align: center;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .date {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .reseaux { display: flex; flex-direction: column; gap: 10px; }
+  .btn-reseau {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    background: #161616;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+  }
+  .btn-reseau:hover {
+    border-color: #c9a84c;
+    background: #1f1f1f;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .nom { flex: 1; }
+  .fleche { color: #c9a84c; font-size: 18px; opacity: 0.7; }
+  .fermer {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    color: #888;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  .fermer:hover { color: #fff; border-color: #888; }
+</style>
+</head>
+<body>
+  <div class="titre">Choisissez votre billetterie</div>
+  <div class="ville">${data.ville}</div>
+  <div class="date">${data.date}</div>
+  <div class="reseaux">${liensHtml}</div>
+  <button class="fermer" onclick="window.close()">Fermer</button>
+</body>
+</html>`;
       
-      // Notifier le parent (pour Wix)
-      if (window.parent !== window) {
-        try { window.parent.postMessage({ type: 'twoq-modal-ferme' }, '*'); } catch(e) {}
+      // Ouvrir une nouvelle fenêtre popup
+      const popup = window.open('', '_blank', 
+        'width=480,height=600,resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no');
+      
+      if (!popup) {
+        // Si bloqué par bloqueur de popup, fallback : on ouvre directement le 1er lien
+        if (data.liens.length > 0) {
+          window.open(data.liens[0].url, '_blank', 'noopener');
+        }
+        return;
       }
+      
+      popup.document.write(html);
+      popup.document.close();
+      popup.focus();
     }
     
     // Fermeture du modal au clic en dehors ou sur Échap
