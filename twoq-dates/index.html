@@ -914,9 +914,17 @@
         const data = JSON.parse(decodeURIComponent(payloadEncode));
         
         // 🎯 SI ON EST EN IFRAME (Wix theworldofqueen.com) : 
-        // on ouvre une VRAIE fenêtre popup native du navigateur, plus simple et fiable
+        // Sur DESKTOP : popup natif (vraie fenêtre)
+        // Sur MOBILE : modal CSS plein écran dans la page (Chrome mobile bug avec window.open)
         if (window.parent !== window) {
-          ouvrirPopupNatif(data);
+          const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+          if (isMobile) {
+            // Mobile : modal CSS dans la page actuelle
+            ouvrirModalFullScreen(data);
+          } else {
+            // Desktop : vraie fenêtre popup
+            ouvrirPopupNatif(data);
+          }
           return;
         }
         
@@ -940,6 +948,135 @@
       } catch (e) {
         console.error('Erreur ouverture modal:', e);
       }
+    }
+    
+    // Modal CSS plein écran pour mobile (overlay 100vw x 100vh)
+    function ouvrirModalFullScreen(data) {
+      const liensHtml = data.liens.map(l => `
+        <a href="${l.url}" target="_blank" rel="noopener" class="fs-btn" onclick="fermerModalFullScreen()">
+          <span class="fs-dot" style="background:${l.couleur}"></span>
+          <span class="fs-nom">${l.nom}</span>
+          <span class="fs-fleche">→</span>
+        </a>
+      `).join('');
+      
+      let modalEl = document.getElementById('twoq-fs-modal');
+      if (!modalEl) {
+        modalEl = document.createElement('div');
+        modalEl.id = 'twoq-fs-modal';
+        document.body.appendChild(modalEl);
+      }
+      
+      modalEl.innerHTML = `
+        <style>
+          #twoq-fs-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            animation: fsFade 0.3s ease;
+          }
+          @keyframes fsFade { from { opacity: 0; } to { opacity: 1; } }
+          .fs-box {
+            width: 100%;
+            max-width: 480px;
+            background: #0a0a0a;
+            border: 2px solid #c9a84c;
+            border-radius: 14px;
+            padding: 28px 24px;
+            box-shadow: 0 0 40px rgba(201,168,76,0.4), 0 0 80px rgba(201,168,76,0.15);
+          }
+          .fs-titre {
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            color: #c9a84c;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 12px;
+            font-weight: 600;
+          }
+          .fs-ville {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            color: #fff;
+            text-align: center;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 700;
+          }
+          .fs-date {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 22px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+          }
+          .fs-list { display: flex; flex-direction: column; gap: 10px; }
+          .fs-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 18px;
+            background: #161616;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+          }
+          .fs-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+          }
+          .fs-nom { flex: 1; }
+          .fs-fleche { color: #c9a84c; font-size: 18px; opacity: 0.7; }
+          .fs-fermer {
+            display: block;
+            margin: 22px auto 0;
+            padding: 10px 28px;
+            background: transparent;
+            border: 1px solid #2a2a2a;
+            color: #888;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 20px;
+            cursor: pointer;
+          }
+        </style>
+        <div class="fs-box">
+          <div class="fs-titre">Choisissez votre billetterie</div>
+          <div class="fs-ville">${data.ville}</div>
+          <div class="fs-date">${data.date}</div>
+          <div class="fs-list">${liensHtml}</div>
+          <button class="fs-fermer" onclick="fermerModalFullScreen()">Fermer</button>
+        </div>
+      `;
+      
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function fermerModalFullScreen() {
+      const modalEl = document.getElementById('twoq-fs-modal');
+      if (modalEl) modalEl.remove();
+      document.body.style.overflow = '';
     }
     
     // Popup natif HTML autonome — ouvert via window.open dans une vraie fenêtre
