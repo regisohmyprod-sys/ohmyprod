@@ -3668,8 +3668,8 @@ function _hideTeamSelection() {
     </div>
 
     <!-- MODAL AJOUTER / MODIFIER ACTION META PLANNING -->
-    <div id="metaPromoModal" class="modal-overlay" onclick="if(event.target===this){metaPromoCloseModal()}" style="display:none;background:rgba(0,0,0,0.85);position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;align-items:center;justify-content:center;padding:20px;">
-      <div class="modal-content" style="background:#1a1a1a;border:2px solid #d4af37;border-radius:12px;padding:25px;max-width:550px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
+    <div id="metaPromoModal" class="mp-modal-overlay" onclick="if(event.target===this){metaPromoCloseModal()}" style="display:none;background:rgba(0,0,0,0.85);position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;align-items:center;justify-content:center;padding:20px;">
+      <div class="modal-content" onclick="event.stopPropagation()" style="background:#1a1a1a;border:2px solid #d4af37;border-radius:12px;padding:25px;max-width:550px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
         <button onclick="metaPromoCloseModal()" style="position:absolute;top:12px;right:12px;background:transparent;border:none;color:#888;font-size:24px;cursor:pointer;">✕</button>
         <h3 id="metaPromoModalTitle" style="color:#d4af37;margin:0 0 20px 0;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border-bottom:1px solid rgba(212,175,55,0.3);padding-bottom:10px;">NOUVELLE ACTION</h3>
 
@@ -3739,8 +3739,8 @@ function _hideTeamSelection() {
     </div>
 
     <!-- MODAL MODIFIER CAMPAGNE META (CLUSTER) -->
-    <div id="metaPromoModalCluster" class="modal-overlay" onclick="if(event.target===this){metaPromoCloseModalCluster()}" style="display:none;background:rgba(0,0,0,0.85);position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;align-items:center;justify-content:center;padding:20px;">
-      <div class="modal-content" style="background:#1a1a1a;border:2px solid #d4af37;border-radius:12px;padding:25px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
+    <div id="metaPromoModalCluster" class="mp-modal-overlay" onclick="if(event.target===this){metaPromoCloseModalCluster()}" style="display:none;background:rgba(0,0,0,0.85);position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;align-items:center;justify-content:center;padding:20px;">
+      <div class="modal-content" onclick="event.stopPropagation()" style="background:#1a1a1a;border:2px solid #d4af37;border-radius:12px;padding:25px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
         <button onclick="metaPromoCloseModalCluster()" style="position:absolute;top:12px;right:12px;background:transparent;border:none;color:#888;font-size:24px;cursor:pointer;">✕</button>
         <h3 id="metaPromoModalClusterTitle" style="color:#d4af37;margin:0 0 20px 0;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border-bottom:1px solid rgba(212,175,55,0.3);padding-bottom:10px;">MODIFIER LA CAMPAGNE</h3>
 
@@ -27454,6 +27454,52 @@ console.log('✅ OMP Mobile Kit chargé');
   .meta-promo-actions { grid-column: 2; justify-content: flex-end; }
 }
 
+/* ━━━━━━ MODALS DU MODULE META PLANNING (isolées) ━━━━━━ */
+.mp-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 99999 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  background: rgba(0,0,0,0.85) !important;
+  /* IMPORTANT : ne PAS hériter du padding-bottom mobile global */
+}
+.mp-modal-overlay .modal-content {
+  background: #1a1a1a !important;
+  border: 2px solid #d4af37 !important;
+  border-radius: 12px !important;
+  max-width: 600px;
+  width: 100%;
+  max-height: 92vh !important;
+  overflow-y: auto !important;
+  position: relative !important;
+  padding: 25px !important;
+  /* Bloquer la propagation des clics vers l'overlay */
+  pointer-events: auto;
+}
+/* Empêcher tout comportement global de fermer la modal sur clics dans les inputs */
+.mp-modal-overlay input,
+.mp-modal-overlay textarea,
+.mp-modal-overlay select,
+.mp-modal-overlay button,
+.mp-modal-overlay label {
+  pointer-events: auto !important;
+}
+/* Style focus visible pour ne pas perdre le fil */
+.mp-modal-overlay input:focus,
+.mp-modal-overlay textarea:focus,
+.mp-modal-overlay select:focus {
+  outline: 2px solid #d4af37 !important;
+  outline-offset: 1px !important;
+  border-color: #d4af37 !important;
+}
+/* Empêcher le scroll de l'app derrière la modal ouverte */
+body.mp-modal-open { overflow: hidden; }
+
 /* ━━━━━━ AFFICHAGE VISUEL/VIDÉO ━━━━━━ */
 .meta-promo-visuel {
   margin-top: 6px;
@@ -28072,6 +28118,7 @@ console.log('✅ OMP Mobile Kit chargé');
     const modal = document.getElementById('metaPromoModal');
     if (!modal) return;
     modal.style.display = 'flex';
+    document.body.classList.add('mp-modal-open');
     const title = document.getElementById('metaPromoModalTitle');
     if (title) title.textContent = editId ? 'MODIFIER L\'ACTION' : 'NOUVELLE ACTION';
     if (editId) {
@@ -28105,6 +28152,7 @@ console.log('✅ OMP Mobile Kit chargé');
   function metaPromoCloseModal() {
     const modal = document.getElementById('metaPromoModal');
     if (modal) modal.style.display = 'none';
+    document.body.classList.remove('mp-modal-open');
   }
 
   // ━━━━━━ COPIER LE POST COMPLET DANS LE PRESSE-PAPIER ━━━━━━
@@ -28248,11 +28296,13 @@ ${c.notes || '(aucune)'}`
     document.getElementById('mpCluster_notes').value = c.notes || '';
 
     modal.style.display = 'flex';
+    document.body.classList.add('mp-modal-open');
   }
 
   function metaPromoCloseModalCluster() {
     const modal = document.getElementById('metaPromoModalCluster');
     if (modal) modal.style.display = 'none';
+    document.body.classList.remove('mp-modal-open');
   }
 
   async function metaPromoSaveCluster() {
