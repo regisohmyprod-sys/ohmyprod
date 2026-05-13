@@ -3555,6 +3555,14 @@ function _hideTeamSelection() {
           <div id="meta-planning-badge" style="position:absolute;top:8px;right:8px;display:none;background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.5px;">0 EN COURS</div>
         </div>
 
+        <!-- TÂCHES OMP -->
+        <div class="stat-card" style="border-left:3px solid #8e44ad;padding:20px;cursor:pointer;position:relative;background:linear-gradient(135deg,#1a1a1a 0%,#1f1a2e 100%);" onclick="showPage('omp-taches')">
+          <div class="stat-label">📋 Mes tâches</div>
+          <div class="stat-value" style="font-size:28px;color:#a569bd;line-height:1.1;">TÂCHES</div>
+          <div class="stat-sub" id="omp-taches-mini">Cliquer pour gérer</div>
+          <div id="omp-taches-badge" style="position:absolute;top:8px;right:8px;display:none;background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.5px;">0</div>
+        </div>
+
         <!-- BILLETTERIE -->
         <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-billetterie')">
           <div class="stat-label">🎟️ Billetterie</div>
@@ -3820,6 +3828,125 @@ function _hideTeamSelection() {
 
     <!-- ═══════════════════════════════════════════════════════════ -->
     <!-- FIN PAGE META PLANNING                                       -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- 📋 PAGE TÂCHES OMP                                            -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div id="page-omp-taches" class="page">
+      <button class="back-btn" onclick="showPage('dashboard')">← Tableau de Bord</button>
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 14px 0;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#a569bd;line-height:1;">📋 MES TÂCHES</div>
+          <div style="color:#999;font-size:12px;letter-spacing:1px;margin-top:6px;text-transform:uppercase;">Liste & rappels — Oh My Prod</div>
+        </div>
+        <button onclick="tachesOpenModal()" style="background:#8e44ad;color:#fff;border:none;border-radius:8px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;">+ NOUVELLE TÂCHE</button>
+      </div>
+
+      <!-- Filtres -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid rgba(168,105,189,0.2);">
+        <button class="taches-filter-btn active" data-filter="actives" onclick="tachesSetFilter('actives')">📌 Actives</button>
+        <button class="taches-filter-btn" data-filter="aujourdhui" onclick="tachesSetFilter('aujourdhui')">📅 Aujourd'hui</button>
+        <button class="taches-filter-btn" data-filter="urgent" onclick="tachesSetFilter('urgent')">🔥 Urgent (J-3)</button>
+        <button class="taches-filter-btn" data-filter="retard" onclick="tachesSetFilter('retard')">⏰ En retard</button>
+        <button class="taches-filter-btn" data-filter="haute" onclick="tachesSetFilter('haute')">🔴 Priorité haute</button>
+        <button class="taches-filter-btn" data-filter="fait" onclick="tachesSetFilter('fait')">✅ Faits</button>
+        <button class="taches-filter-btn" data-filter="tout" onclick="tachesSetFilter('tout')">🗂️ Tout</button>
+      </div>
+
+      <!-- Stats -->
+      <div id="taches-stats" style="background:linear-gradient(135deg,rgba(142,68,173,0.1),rgba(0,0,0,0.5));border:1px solid rgba(142,68,173,0.3);border-radius:8px;padding:12px 16px;margin-bottom:18px;display:flex;gap:16px;flex-wrap:wrap;font-size:0.85rem;color:#c0c0c0;">
+        <span>📊 Chargement…</span>
+      </div>
+
+      <!-- Liste des tâches -->
+      <div id="taches-list">
+        <div style="text-align:center;color:#888;padding:30px;">Chargement…</div>
+      </div>
+    </div>
+
+    <!-- MODAL AJOUTER / MODIFIER TÂCHE -->
+    <div id="tachesModal" class="mp-modal-overlay" onclick="if(event.target===this){tachesCloseModal()}" style="display:none;background:rgba(0,0,0,0.85);position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;align-items:center;justify-content:center;padding:20px;">
+      <div class="modal-content" onclick="event.stopPropagation()" style="background:#1a1a1a;border:2px solid #8e44ad;border-radius:12px;padding:25px;max-width:600px;width:100%;max-height:92vh;overflow-y:auto;position:relative;">
+        <button onclick="tachesCloseModal()" style="position:absolute;top:12px;right:12px;background:transparent;border:none;color:#888;font-size:24px;cursor:pointer;">✕</button>
+        <h3 id="tachesModalTitle" style="color:#a569bd;margin:0 0 20px 0;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border-bottom:1px solid rgba(168,105,189,0.3);padding-bottom:10px;">NOUVELLE TÂCHE</h3>
+        
+        <input type="hidden" id="mpTache_id" />
+        
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="font-size:11px;color:#a569bd;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Titre *</label>
+            <input id="mpTache_titre" type="text" placeholder="Ex: Appeler SACEM Coumes" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:10px 12px;font-size:14px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          
+          <div>
+            <label style="font-size:11px;color:#a569bd;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Description</label>
+            <textarea id="mpTache_description" placeholder="Détails, notes, contexte…" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;min-height:90px;resize:vertical;box-sizing:border-box;"></textarea>
+          </div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;color:#a569bd;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Date butoir</label>
+              <input id="mpTache_date" type="date" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#a569bd;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Priorité</label>
+              <select id="mpTache_priorite" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;box-sizing:border-box;">
+                <option value="HAUTE">🔴 HAUTE</option>
+                <option value="MOYENNE" selected>🟡 MOYENNE</option>
+                <option value="BASSE">🟢 BASSE</option>
+              </select>
+            </div>
+          </div>
+          
+          <div>
+            <label style="font-size:11px;color:#a569bd;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">État</label>
+            <select id="mpTache_etat" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;box-sizing:border-box;">
+              <option value="A_FAIRE">⏳ À FAIRE</option>
+              <option value="EN_COURS">🔥 EN COURS</option>
+              <option value="FAIT">✅ FAIT</option>
+            </select>
+          </div>
+          
+          <div>
+            <label style="font-size:11px;color:#a569bd;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">🎤 Lier à un concert (optionnel)</label>
+            <select id="mpTache_dateConcert" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;box-sizing:border-box;">
+              <option value="">— Aucun —</option>
+            </select>
+          </div>
+          
+          <div>
+            <label style="font-size:11px;color:#a569bd;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Module concerné</label>
+            <select id="mpTache_module" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;box-sizing:border-box;">
+              <option value="">— Aucun —</option>
+              <option value="META">📢 Meta / Posts</option>
+              <option value="BILLETTERIE">🎟️ Billetterie</option>
+              <option value="VHR">🚌 VHR</option>
+              <option value="TECHNIQUE">🔧 Technique</option>
+              <option value="ADMIN">📊 Admin / Compta</option>
+              <option value="PRESSE">📰 Presse</option>
+              <option value="EMAILING">📧 Emailing</option>
+              <option value="AUTRE">📌 Autre</option>
+            </select>
+          </div>
+          
+          <div>
+            <label style="font-size:11px;color:#a569bd;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Notes</label>
+            <textarea id="mpTache_notes" placeholder="Notes additionnelles" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;min-height:50px;resize:vertical;box-sizing:border-box;"></textarea>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:20px;">
+          <button onclick="tachesCloseModal()" style="flex:1;background:#3a3a3a;color:#c0c0c0;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">ANNULER</button>
+          <button id="tachesBtnDelete" onclick="tachesDeleteCurrent()" style="display:none;background:#7f1d1d;color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🗑️</button>
+          <button onclick="tachesSaveModal()" style="flex:2;background:#8e44ad;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- FIN PAGE TÂCHES OMP                                          -->
     <!-- ═══════════════════════════════════════════════════════════ -->
 
     <!-- GESTION OMP -->
@@ -11965,6 +12092,8 @@ function _hideTeamSelection() {
     'carte-date':           ['admin', 'staff_omp', 'artiste', 'technique'],
     'equipe':               ['admin'],
     'contacts-promo':       ['admin'],
+    'meta-planning':        ['admin'],
+    'omp-taches':           ['admin'],
     // Pages espaces spécifiques
     'staff-omp':            ['admin', 'staff_omp'],
     'artistique':           ['admin', 'artiste'],
@@ -27655,7 +27784,7 @@ console.log('✅ OMP Mobile Kit chargé');
       const futureLimit = new Date(today.getTime() + 15 * 86400000).toISOString().slice(0, 10);
       const { data: nearDates } = await sb
         .from('dates_concert')
-        .select('id, ville, date_concert')
+        .select('id, ville, date_concert, tournee_id')
         .gte('date_concert', todayStr)
         .lte('date_concert', futureLimit)
         .limit(30);
@@ -27692,10 +27821,77 @@ console.log('✅ OMP Mobile Kit chargé');
               actionType: 'FICHE_PROD_VHR',
               dateConcertId: d.id,
               ville: d.ville,
-              dateStr: d.date_concert
+              dateStr: d.date_concert,
+              tourneeId: d.tournee_id
             });
           }
         });
+      }
+
+      // ━━━━━━ 5. TÂCHES OMP — urgentes (jour J + retard + J-3 à J-1) ━━━━━━
+      try {
+        const { data: tachesArr } = await sb
+          .from('omp_taches')
+          .select('id, titre, date_butoir, priorite, etat, module_lie, description')
+          .neq('etat', 'FAIT')
+          .order('date_butoir', { ascending: true, nullsLast: true });
+        
+        (tachesArr || []).forEach(t => {
+          // Tâches sans date : seulement les priorité HAUTE
+          if (!t.date_butoir) {
+            if (t.priorite === 'HAUTE') {
+              alertes.push({
+                source: 'TACHE',
+                niveau: 'orange',
+                icon: '📋',
+                jour: 'PRIO',
+                urgent: false,
+                titre: t.titre,
+                sub: t.description ? t.description.substring(0, 70) : 'Priorité haute',
+                actionType: 'TACHE',
+                tacheId: t.id
+              });
+            }
+            return;
+          }
+          // Tâches datées
+          if (t.date_butoir === todayStr) {
+            alertes.push({
+              source: 'TACHE', niveau: 'rouge', icon: '📋', jour: 'AUJ.',
+              urgent: true,
+              titre: t.titre,
+              sub: 'À faire aujourd\'hui',
+              actionType: 'TACHE',
+              tacheId: t.id
+            });
+          } else if (t.date_butoir < todayStr) {
+            const daysOver = Math.floor((today - new Date(t.date_butoir)) / 86400000);
+            alertes.push({
+              source: 'TACHE', niveau: 'rouge', icon: '⏰', jour: 'J+' + daysOver,
+              urgent: true,
+              titre: 'EN RETARD : ' + t.titre,
+              sub: 'Prévu le ' + new Date(t.date_butoir).toLocaleDateString('fr-FR'),
+              actionType: 'TACHE',
+              tacheId: t.id
+            });
+          } else {
+            const diffDays = Math.floor((new Date(t.date_butoir) - today) / 86400000);
+            if (diffDays <= 3) {
+              alertes.push({
+                source: 'TACHE',
+                niveau: diffDays === 1 ? 'orange' : 'jaune',
+                icon: '📋',
+                jour: 'J-' + diffDays,
+                titre: t.titre,
+                sub: new Date(t.date_butoir).toLocaleDateString('fr-FR'),
+                actionType: 'TACHE',
+                tacheId: t.id
+              });
+            }
+          }
+        });
+      } catch (errT) {
+        console.warn('[ALERTES] Erreur scan tâches :', errT);
       }
 
     } catch (err) {
@@ -27736,6 +27932,7 @@ console.log('✅ OMP Mobile Kit chargé');
 
     const labels = {
       META: '📢 Posts & Pubs Meta',
+      TACHE: '📋 Mes tâches',
       CONCERT: '🎤 Concerts à venir',
       DECLA: '📋 Décla droits à faire',
       VHR: '🚌 VHR à organiser'
@@ -27774,6 +27971,10 @@ console.log('✅ OMP Mobile Kit chargé');
   }
   
   // ━━━━━━ DISPATCHER DE CLIC SUR ALERTE ━━━━━━
+  // UUID des tournées TWOQ
+  const TOURNEE_HOMMAGE_UUID = '11111111-1111-1111-1111-111111111111';
+  const TOURNEE_ETERNELLE_UUID = '22222222-2222-2222-2222-222222222222';
+  
   window.alerteClickAction = function(idx) {
     try {
       const a = window._alertesData?.[idx];
@@ -27787,7 +27988,6 @@ console.log('✅ OMP Mobile Kit chargé');
       // ━━ META PLANNING : ouvrir directement la fiche du post ━━
       if (a.actionType === 'META_PLANNING') {
         if (typeof window.showPage === 'function') window.showPage('meta-planning');
-        // Ouvrir la fiche du post si on a son ID
         if (a.metaActionId && typeof window.metaPromoEditAction === 'function') {
           setTimeout(function() {
             try {
@@ -27800,7 +28000,45 @@ console.log('✅ OMP Mobile Kit chargé');
         return;
       }
       
-      // ━━ Autres : aller à la gestion OMP (navigation simple) ━━
+      // ━━ TÂCHE : aller à la page tâches + ouvrir la fiche ━━
+      if (a.actionType === 'TACHE') {
+        if (typeof window.showPage === 'function') window.showPage('omp-taches');
+        if (a.tacheId && typeof window.tachesEdit === 'function') {
+          setTimeout(function() {
+            try {
+              window.tachesEdit(a.tacheId);
+            } catch(err) {
+              console.error('[ALERTES] Erreur ouverture tâche :', err);
+            }
+          }, 400);
+        }
+        return;
+      }
+      
+      // ━━ VHR : ouvrir la fiche VHR avec la bonne tournée pré-sélectionnée ━━
+      if (a.actionType === 'FICHE_PROD_VHR' && a.tourneeId) {
+        // Déterminer le code tournée à partir de l'UUID
+        let codeTournee = null;
+        if (a.tourneeId === TOURNEE_HOMMAGE_UUID) codeTournee = 'twoq';
+        else if (a.tourneeId === TOURNEE_ETERNELLE_UUID) codeTournee = 'twoq2';
+        
+        if (codeTournee && typeof window.ouvrirFicheVHR === 'function') {
+          setTimeout(function() {
+            try {
+              window.ouvrirFicheVHR(codeTournee);
+            } catch(err) {
+              console.error('[ALERTES] Erreur ouverture VHR :', err);
+              if (typeof window.showPage === 'function') window.showPage('gestion-omp');
+            }
+          }, 100);
+          return;
+        }
+        // Fallback si on n'a pas pu identifier la tournée
+        if (typeof window.showPage === 'function') window.showPage('gestion-omp');
+        return;
+      }
+      
+      // ━━ Autres (concerts, décla) : aller à la gestion OMP ━━
       if (typeof window.showPage === 'function') {
         window.showPage('gestion-omp');
       }
@@ -27833,6 +28071,598 @@ console.log('✅ OMP Mobile Kit chargé');
   window.alertesScan = alertesScan;
 
   console.log('✅ Système d\'alertes OMP chargé');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 📋 MODULE TÂCHES OMP                                          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<style>
+.taches-filter-btn {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(168,105,189,0.3);
+  color: #c0c0c0;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.taches-filter-btn:hover {
+  background: rgba(168,105,189,0.1);
+  color: #a569bd;
+}
+.taches-filter-btn.active {
+  background: #8e44ad;
+  color: #fff;
+  border-color: #8e44ad;
+  font-weight: 700;
+}
+
+.tache-item {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  transition: all 0.15s;
+}
+.tache-item:hover {
+  background: rgba(168,105,189,0.06);
+  border-color: rgba(168,105,189,0.25);
+}
+.tache-item.prio-HAUTE { border-left: 4px solid #e74c3c; }
+.tache-item.prio-MOYENNE { border-left: 4px solid #f39c12; }
+.tache-item.prio-BASSE { border-left: 4px solid #2ecc71; }
+.tache-item.etat-FAIT { opacity: 0.55; }
+.tache-item.etat-FAIT .tache-titre { text-decoration: line-through; color: #888; }
+
+.tache-etat-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid;
+  background: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tache-etat-btn.etat-A_FAIRE { border-color: #3498db; color: #3498db; }
+.tache-etat-btn.etat-EN_COURS { border-color: #f39c12; color: #f39c12; background: rgba(243,156,18,0.1); }
+.tache-etat-btn.etat-FAIT { border-color: #2ecc71; color: #2ecc71; background: rgba(46,204,113,0.1); }
+
+.tache-jour {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  color: #a569bd;
+  min-width: 60px;
+  text-align: center;
+  padding: 4px 8px;
+  background: rgba(168,105,189,0.1);
+  border-radius: 4px;
+}
+.tache-jour.urgent { background: rgba(231,76,60,0.2); color: #ff7575; }
+.tache-jour.retard { background: rgba(231,76,60,0.3); color: #ff5555; font-weight: 700; }
+.tache-jour.no-date { background: rgba(149,165,166,0.1); color: #888; }
+
+.tache-content { min-width: 0; }
+.tache-titre {
+  font-size: 0.95rem;
+  color: #f0f0f0;
+  font-weight: 500;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tache-sub {
+  font-size: 0.78rem;
+  color: #888;
+  margin-top: 4px;
+}
+.tache-badge-module {
+  font-size: 0.65rem;
+  background: rgba(168,105,189,0.15);
+  color: #d2b4de;
+  padding: 2px 8px;
+  border-radius: 8px;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+.tache-badge-concert {
+  font-size: 0.65rem;
+  background: rgba(212,175,55,0.15);
+  color: #d4af37;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+.tache-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.tache-btn-icon {
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #c0c0c0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.tache-btn-icon:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.tache-btn-icon.danger:hover { background: rgba(231,76,60,0.15); color: #ff7575; border-color: #e74c3c; }
+
+@media (max-width: 700px) {
+  .tache-item { grid-template-columns: auto 1fr; }
+  .tache-jour { grid-column: 2; }
+  .tache-content { grid-column: 1 / span 2; }
+  .tache-actions { grid-column: 1 / span 2; justify-content: flex-end; }
+}
+</style>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// MODULE TÂCHES OMP — Logique
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  function getSb() { return window._supabase; }
+  
+  let tachesData = [];
+  let tachesFilter = 'actives';
+  let datesConcertCache = []; // pour le sélecteur de concert
+
+  const PRIO_LABELS = {
+    HAUTE: { label: 'HAUTE', icon: '🔴', color: '#e74c3c' },
+    MOYENNE: { label: 'MOYENNE', icon: '🟡', color: '#f39c12' },
+    BASSE: { label: 'BASSE', icon: '🟢', color: '#2ecc71' }
+  };
+  const ETAT_LABELS = {
+    A_FAIRE: { label: 'À FAIRE', icon: '⏳' },
+    EN_COURS: { label: 'EN COURS', icon: '🔥' },
+    FAIT: { label: 'FAIT', icon: '✅' }
+  };
+  const MODULE_LABELS = {
+    META: '📢 Meta',
+    BILLETTERIE: '🎟️ Billetterie',
+    VHR: '🚌 VHR',
+    TECHNIQUE: '🔧 Tech',
+    ADMIN: '📊 Admin',
+    PRESSE: '📰 Presse',
+    EMAILING: '📧 Mail',
+    AUTRE: '📌 Autre'
+  };
+
+  // Chargement initial
+  async function tachesLoad() {
+    const sb = getSb();
+    if (!sb) return;
+    try {
+      const { data, error } = await sb
+        .from('omp_taches')
+        .select('*')
+        .order('date_butoir', { ascending: true, nullsLast: true })
+        .order('priorite', { ascending: true });
+      if (error) throw error;
+      tachesData = data || [];
+      console.log('[TÂCHES] ' + tachesData.length + ' tâches chargées');
+      tachesUpdateDashboardCard();
+    } catch (err) {
+      console.error('[TÂCHES] Erreur chargement :', err);
+    }
+  }
+
+  // Chargement des dates concert pour le sélecteur
+  async function tachesLoadDatesConcert() {
+    const sb = getSb();
+    if (!sb) return;
+    try {
+      const { data } = await sb
+        .from('dates_concert')
+        .select('id, ville, date_concert')
+        .order('date_concert', { ascending: false })
+        .limit(200);
+      datesConcertCache = data || [];
+      // Remplir le select de la modal
+      const sel = document.getElementById('mpTache_dateConcert');
+      if (sel) {
+        const currentValue = sel.value;
+        sel.innerHTML = '<option value="">— Aucun —</option>';
+        datesConcertCache.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.id;
+          const dateFr = d.date_concert ? new Date(d.date_concert).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+          opt.textContent = (d.ville || 'Sans ville') + ' — ' + dateFr;
+          sel.appendChild(opt);
+        });
+        sel.value = currentValue;
+      }
+    } catch (err) {
+      console.error('[TÂCHES] Erreur chargement dates :', err);
+    }
+  }
+
+  // Calcul du "jour" relatif (J-X, AUJ, J+X)
+  function tachesGetJourInfo(dateButoir) {
+    if (!dateButoir) return { label: '—', cls: 'no-date', urgent: false };
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const due = new Date(dateButoir);
+    due.setHours(0,0,0,0);
+    const diffDays = Math.floor((due - today) / 86400000);
+    if (diffDays === 0) return { label: 'AUJ.', cls: 'urgent', urgent: true };
+    if (diffDays === 1) return { label: 'J-1', cls: 'urgent', urgent: true };
+    if (diffDays > 0 && diffDays <= 3) return { label: 'J-' + diffDays, cls: 'urgent', urgent: false };
+    if (diffDays > 0) return { label: 'J-' + diffDays, cls: '', urgent: false };
+    // Retard
+    return { label: 'J+' + Math.abs(diffDays), cls: 'retard', urgent: true };
+  }
+
+  // Filtrage selon le filtre actif
+  function tachesGetFiltered() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const todayStr = today.toISOString().slice(0,10);
+    
+    let filtered = tachesData;
+    
+    switch (tachesFilter) {
+      case 'actives':
+        filtered = filtered.filter(t => t.etat !== 'FAIT');
+        break;
+      case 'aujourdhui':
+        filtered = filtered.filter(t => t.date_butoir === todayStr && t.etat !== 'FAIT');
+        break;
+      case 'urgent':
+        filtered = filtered.filter(t => {
+          if (t.etat === 'FAIT' || !t.date_butoir) return false;
+          const diff = Math.floor((new Date(t.date_butoir) - today) / 86400000);
+          return diff >= 0 && diff <= 3;
+        });
+        break;
+      case 'retard':
+        filtered = filtered.filter(t => {
+          if (t.etat === 'FAIT' || !t.date_butoir) return false;
+          return t.date_butoir < todayStr;
+        });
+        break;
+      case 'haute':
+        filtered = filtered.filter(t => t.priorite === 'HAUTE' && t.etat !== 'FAIT');
+        break;
+      case 'fait':
+        filtered = filtered.filter(t => t.etat === 'FAIT');
+        break;
+      case 'tout':
+      default:
+        break;
+    }
+    return filtered;
+  }
+
+  // Rendu de la liste
+  function tachesRender() {
+    const listEl = document.getElementById('taches-list');
+    const statsEl = document.getElementById('taches-stats');
+    if (!listEl) return;
+    
+    // Mettre à jour les boutons filtre
+    document.querySelectorAll('.taches-filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.filter === tachesFilter);
+    });
+
+    // Stats globales
+    const totalActives = tachesData.filter(t => t.etat !== 'FAIT').length;
+    const aFaire = tachesData.filter(t => t.etat === 'A_FAIRE').length;
+    const enCours = tachesData.filter(t => t.etat === 'EN_COURS').length;
+    const fait = tachesData.filter(t => t.etat === 'FAIT').length;
+    const haute = tachesData.filter(t => t.priorite === 'HAUTE' && t.etat !== 'FAIT').length;
+    if (statsEl) {
+      statsEl.innerHTML = `
+        <span>📌 <strong style="color:#a569bd;">${totalActives}</strong> active${totalActives>1?'s':''}</span>
+        <span style="color:#3498db;">⏳ ${aFaire}</span>
+        <span style="color:#f39c12;">🔥 ${enCours}</span>
+        <span style="color:#2ecc71;">✅ ${fait}</span>
+        ${haute > 0 ? `<span style="color:#e74c3c;">🔴 ${haute} priorité haute</span>` : ''}
+      `;
+    }
+    
+    const filtered = tachesGetFiltered();
+    
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center;color:#888;padding:30px;background:rgba(0,0,0,0.3);border-radius:8px;">Aucune tâche pour ce filtre. Clique sur "+ NOUVELLE TÂCHE" pour en créer.</div>';
+      return;
+    }
+    
+    listEl.innerHTML = filtered.map(t => tachesRenderItem(t)).join('');
+  }
+
+  function tachesRenderItem(t) {
+    const prio = PRIO_LABELS[t.priorite] || PRIO_LABELS.MOYENNE;
+    const etat = ETAT_LABELS[t.etat] || ETAT_LABELS.A_FAIRE;
+    const jour = tachesGetJourInfo(t.date_butoir);
+    
+    // Concert lié
+    let concertBadge = '';
+    if (t.date_concert_id) {
+      const dc = datesConcertCache.find(d => d.id === t.date_concert_id);
+      if (dc) {
+        concertBadge = `<span class="tache-badge-concert">🎤 ${tachesEscape(dc.ville)}</span>`;
+      }
+    }
+    
+    const moduleBadge = t.module_lie ? `<span class="tache-badge-module">${MODULE_LABELS[t.module_lie] || t.module_lie}</span>` : '';
+    
+    return `
+      <div class="tache-item prio-${t.priorite} etat-${t.etat}">
+        <button class="tache-etat-btn etat-${t.etat}" title="${etat.label} (clic = cycle)" onclick="tachesCycleEtat('${t.id}')">${etat.icon}</button>
+        <span class="tache-jour ${jour.cls}">${jour.label}</span>
+        <div class="tache-content">
+          <div class="tache-titre">
+            ${prio.icon}
+            ${tachesEscape(t.titre)}
+            ${moduleBadge}
+            ${concertBadge}
+          </div>
+          ${t.description ? `<div class="tache-sub">${tachesEscape(t.description.substring(0,120))}${t.description.length>120?'…':''}</div>` : ''}
+        </div>
+        <div class="tache-actions">
+          <button class="tache-btn-icon" title="Modifier" onclick="tachesEdit('${t.id}')">✏️</button>
+          <button class="tache-btn-icon danger" title="Supprimer" onclick="tachesDelete('${t.id}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function tachesEscape(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // Changement de filtre
+  function tachesSetFilter(filter) {
+    tachesFilter = filter;
+    tachesRender();
+  }
+
+  // Cycle d'état (A_FAIRE → EN_COURS → FAIT → A_FAIRE)
+  async function tachesCycleEtat(id) {
+    const t = tachesData.find(x => x.id === id);
+    if (!t) return;
+    const next = { A_FAIRE: 'EN_COURS', EN_COURS: 'FAIT', FAIT: 'A_FAIRE' };
+    const nextEtat = next[t.etat] || 'A_FAIRE';
+    const sb = getSb();
+    try {
+      const { error } = await sb.from('omp_taches').update({ etat: nextEtat }).eq('id', id);
+      if (error) throw error;
+      t.etat = nextEtat;
+      tachesRender();
+      tachesUpdateDashboardCard();
+      // Refresh alertes si le bandeau est ouvert
+      if (typeof window.alertesRefresh === 'function') window.alertesRefresh();
+    } catch (err) {
+      console.error('[TÂCHES] Erreur cycle état :', err);
+      alert('Erreur lors du changement d\'état : ' + err.message);
+    }
+  }
+
+  // Ouvrir modal en édition
+  function tachesEdit(id) {
+    tachesOpenModal(id);
+  }
+
+  // Suppression depuis la liste
+  async function tachesDelete(id) {
+    const t = tachesData.find(x => x.id === id);
+    if (!t) return;
+    if (!confirm('Supprimer la tâche "' + t.titre + '" ?')) return;
+    const sb = getSb();
+    try {
+      const { error } = await sb.from('omp_taches').delete().eq('id', id);
+      if (error) throw error;
+      tachesData = tachesData.filter(x => x.id !== id);
+      tachesRender();
+      tachesUpdateDashboardCard();
+      if (typeof window.alertesRefresh === 'function') window.alertesRefresh();
+    } catch (err) {
+      console.error('[TÂCHES] Erreur suppression :', err);
+      alert('Erreur : ' + err.message);
+    }
+  }
+
+  // Ouvrir modal (ajout ou édition)
+  function tachesOpenModal(editId) {
+    const modal = document.getElementById('tachesModal');
+    if (!modal) return;
+    
+    // Charger les dates concerts à chaque ouverture
+    tachesLoadDatesConcert();
+    
+    const title = document.getElementById('tachesModalTitle');
+    const btnDelete = document.getElementById('tachesBtnDelete');
+    
+    if (editId) {
+      const t = tachesData.find(x => x.id === editId);
+      if (!t) return;
+      title.textContent = 'MODIFIER LA TÂCHE';
+      document.getElementById('mpTache_id').value = t.id;
+      document.getElementById('mpTache_titre').value = t.titre || '';
+      document.getElementById('mpTache_description').value = t.description || '';
+      document.getElementById('mpTache_date').value = t.date_butoir || '';
+      document.getElementById('mpTache_priorite').value = t.priorite || 'MOYENNE';
+      document.getElementById('mpTache_etat').value = t.etat || 'A_FAIRE';
+      document.getElementById('mpTache_dateConcert').value = t.date_concert_id || '';
+      document.getElementById('mpTache_module').value = t.module_lie || '';
+      document.getElementById('mpTache_notes').value = t.notes || '';
+      if (btnDelete) btnDelete.style.display = 'block';
+    } else {
+      title.textContent = 'NOUVELLE TÂCHE';
+      document.getElementById('mpTache_id').value = '';
+      document.getElementById('mpTache_titre').value = '';
+      document.getElementById('mpTache_description').value = '';
+      document.getElementById('mpTache_date').value = '';
+      document.getElementById('mpTache_priorite').value = 'MOYENNE';
+      document.getElementById('mpTache_etat').value = 'A_FAIRE';
+      document.getElementById('mpTache_dateConcert').value = '';
+      document.getElementById('mpTache_module').value = '';
+      document.getElementById('mpTache_notes').value = '';
+      if (btnDelete) btnDelete.style.display = 'none';
+    }
+    
+    modal.style.display = 'flex';
+    document.body.classList.add('mp-modal-open');
+    setTimeout(() => document.getElementById('mpTache_titre').focus(), 100);
+  }
+
+  function tachesCloseModal() {
+    const modal = document.getElementById('tachesModal');
+    if (modal) modal.style.display = 'none';
+    document.body.classList.remove('mp-modal-open');
+  }
+
+  // Sauvegarde
+  async function tachesSaveModal() {
+    const sb = getSb();
+    if (!sb) return;
+    const id = document.getElementById('mpTache_id').value;
+    const titre = document.getElementById('mpTache_titre').value.trim();
+    if (!titre) { alert('⚠️ Le titre est obligatoire.'); return; }
+    
+    const payload = {
+      titre: titre,
+      description: document.getElementById('mpTache_description').value.trim() || null,
+      date_butoir: document.getElementById('mpTache_date').value || null,
+      priorite: document.getElementById('mpTache_priorite').value,
+      etat: document.getElementById('mpTache_etat').value,
+      date_concert_id: document.getElementById('mpTache_dateConcert').value || null,
+      module_lie: document.getElementById('mpTache_module').value || null,
+      notes: document.getElementById('mpTache_notes').value.trim() || null
+    };
+    
+    try {
+      let result;
+      if (id) {
+        result = await sb.from('omp_taches').update(payload).eq('id', id).select().single();
+      } else {
+        result = await sb.from('omp_taches').insert(payload).select().single();
+      }
+      if (result.error) throw result.error;
+      
+      // Mettre à jour le cache local
+      if (id) {
+        const idx = tachesData.findIndex(x => x.id === id);
+        if (idx >= 0) tachesData[idx] = result.data;
+      } else {
+        tachesData.unshift(result.data);
+      }
+      
+      tachesCloseModal();
+      tachesRender();
+      tachesUpdateDashboardCard();
+      if (typeof window.alertesRefresh === 'function') window.alertesRefresh();
+    } catch (err) {
+      console.error('[TÂCHES] Erreur sauvegarde :', err);
+      alert('Erreur : ' + err.message);
+    }
+  }
+
+  // Suppression depuis la modal (bouton dédié)
+  async function tachesDeleteCurrent() {
+    const id = document.getElementById('mpTache_id').value;
+    if (!id) return;
+    const t = tachesData.find(x => x.id === id);
+    if (!t) return;
+    if (!confirm('Supprimer définitivement la tâche "' + t.titre + '" ?')) return;
+    const sb = getSb();
+    try {
+      const { error } = await sb.from('omp_taches').delete().eq('id', id);
+      if (error) throw error;
+      tachesData = tachesData.filter(x => x.id !== id);
+      tachesCloseModal();
+      tachesRender();
+      tachesUpdateDashboardCard();
+      if (typeof window.alertesRefresh === 'function') window.alertesRefresh();
+    } catch (err) {
+      console.error('[TÂCHES] Erreur suppression :', err);
+      alert('Erreur : ' + err.message);
+    }
+  }
+
+  // Mise à jour de la carte dashboard
+  function tachesUpdateDashboardCard() {
+    const mini = document.getElementById('omp-taches-mini');
+    const badge = document.getElementById('omp-taches-badge');
+    if (!mini || !badge) return;
+    
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const todayStr = today.toISOString().slice(0,10);
+    
+    const actives = tachesData.filter(t => t.etat !== 'FAIT');
+    const urgentes = actives.filter(t => {
+      if (!t.date_butoir) return t.priorite === 'HAUTE';
+      return t.date_butoir <= todayStr;
+    });
+    
+    if (actives.length === 0) {
+      mini.textContent = 'Aucune tâche';
+      badge.style.display = 'none';
+    } else {
+      // Affiche les 3 plus urgentes en mini
+      const top3 = [...actives].sort((a, b) => {
+        // Tri : date butoir asc (nulls last), puis priorité
+        if (a.date_butoir && b.date_butoir) return a.date_butoir.localeCompare(b.date_butoir);
+        if (a.date_butoir && !b.date_butoir) return -1;
+        if (!a.date_butoir && b.date_butoir) return 1;
+        const pOrder = { HAUTE: 1, MOYENNE: 2, BASSE: 3 };
+        return (pOrder[a.priorite] || 9) - (pOrder[b.priorite] || 9);
+      }).slice(0, 2);
+      
+      mini.textContent = top3.map(t => t.titre.substring(0, 25) + (t.titre.length > 25 ? '…' : '')).join(' · ');
+      
+      if (urgentes.length > 0) {
+        badge.textContent = urgentes.length + ' URGENT' + (urgentes.length > 1 ? 'S' : '');
+        badge.style.display = 'block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  }
+
+  // Initialisation au chargement
+  function tachesInit() {
+    if (!window._supabase) {
+      setTimeout(tachesInit, 1500);
+      return;
+    }
+    tachesLoad().then(() => {
+      tachesRender();
+    });
+  }
+  setTimeout(tachesInit, 2700);
+
+  // Expose globalement
+  window.tachesOpenModal = tachesOpenModal;
+  window.tachesCloseModal = tachesCloseModal;
+  window.tachesSaveModal = tachesSaveModal;
+  window.tachesDeleteCurrent = tachesDeleteCurrent;
+  window.tachesSetFilter = tachesSetFilter;
+  window.tachesCycleEtat = tachesCycleEtat;
+  window.tachesEdit = tachesEdit;
+  window.tachesDelete = tachesDelete;
+  window.tachesRender = tachesRender;
+  window.tachesLoad = tachesLoad;
+  window.tachesGetData = function() { return tachesData; }; // pour le système d'alertes
+
+  console.log('✅ Module TÂCHES OMP chargé');
 })();
 </script>
 
@@ -29029,6 +29859,15 @@ ${c.notes || '(aucune)'}`
       const result = origShowPage.apply(this, arguments);
       if (id === 'meta-planning') {
         setTimeout(metaPromoLoad, 50);
+      }
+      if (id === 'omp-taches' && typeof window.tachesRender === 'function') {
+        setTimeout(function(){
+          if (typeof window.tachesLoad === 'function') {
+            window.tachesLoad().then(window.tachesRender);
+          } else {
+            window.tachesRender();
+          }
+        }, 50);
       }
       return result;
     };
