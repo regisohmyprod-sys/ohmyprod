@@ -3713,6 +3713,19 @@ function _hideTeamSelection() {
             </div>
           </div>
           <div>
+            <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">📝 Texte du post</label>
+            <textarea id="mpAction_textePost" placeholder="Ex:&#10;THE WORLD OF QUEEN TOUR ✨&#10;Vous allez vivre une expérience comme jamais...&#10;&#10;🎟️ Réservez vos places → www.theworldofqueen.com&#10;📍 Dôme de Paris — 28/11/2026 🏟️" style="width:100%;background:#0a0a0a;border:1px solid rgba(212,175,55,0.25);border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;min-height:120px;resize:vertical;box-sizing:border-box;line-height:1.5;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;"># Hashtags</label>
+            <textarea id="mpAction_hashtags" placeholder="#fredcaramia #theworldofqueen #eternellelegende #ohmyprod #queen #freddiemercury #livemusic #concert #tributeshow #domedeparis #magevents #coulissesevents" style="width:100%;background:#0a0a0a;border:1px solid rgba(212,175,55,0.25);border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;min-height:60px;resize:vertical;box-sizing:border-box;line-height:1.5;"></textarea>
+            <button type="button" onclick="metaPromoCopyFullPost()" style="margin-top:8px;width:100%;background:linear-gradient(135deg,#4267B2,#3055a0);color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:14px;">📋 COPIER LE POST COMPLET (texte + hashtags)</button>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">🎬 Visuel / Vidéo + commentaires</label>
+            <textarea id="mpAction_visuel" placeholder="Ex: Vidéo TWOQ Live Wembley 90s + texte 'Bohemian Rhapsody'&#10;✅ Bien marché en mars&#10;⚠️ Couper le début, trop long" style="width:100%;background:#0a0a0a;border:1px solid rgba(212,175,55,0.25);border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;min-height:70px;resize:vertical;box-sizing:border-box;"></textarea>
+          </div>
+          <div>
             <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Notes</label>
             <textarea id="mpAction_notes" placeholder="Notes internes" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;min-height:50px;resize:vertical;box-sizing:border-box;"></textarea>
           </div>
@@ -27441,6 +27454,30 @@ console.log('✅ OMP Mobile Kit chargé');
   .meta-promo-actions { grid-column: 2; justify-content: flex-end; }
 }
 
+/* ━━━━━━ AFFICHAGE VISUEL/VIDÉO ━━━━━━ */
+.meta-promo-visuel {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(212,175,55,0.08);
+  border-left: 2px solid #d4af37;
+  border-radius: 3px;
+  font-size: 0.78rem;
+  color: #d4d0bc;
+  white-space: pre-line;
+  line-height: 1.4;
+}
+.planning-event-visuel {
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: rgba(212,175,55,0.08);
+  border-left: 2px solid #d4af37;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  color: #d4d0bc;
+  white-space: pre-line;
+  line-height: 1.35;
+}
+
 /* ━━━━━━ VUE PLANNING TIMELINE ━━━━━━ */
 .planning-header {
   background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.5));
@@ -27904,8 +27941,10 @@ console.log('✅ OMP Mobile Kit chargé');
             <div class="planning-event-title">
               <span class="meta-promo-badge badge-type-${ev.type}">${TYPE_LABELS[ev.type] || ev.type}</span>
               ${metaPromoEscape(ev.titre)}
+              ${ev.texte_post ? '<span class="meta-promo-badge" style="background:rgba(46,204,113,0.2);color:#82e0aa;" title="Texte du post écrit">📝</span>' : ''}
             </div>
             ${ev.description ? `<div class="planning-event-sub">${metaPromoEscape(ev.description.substring(0, 80))}${ev.description.length > 80 ? '…' : ''}</div>` : ''}
+            ${ev.visuel_video ? `<div class="planning-event-visuel">🎬 ${metaPromoEscape(ev.visuel_video.substring(0, 100))}${ev.visuel_video.length > 100 ? '…' : ''}</div>` : ''}
           </div>
           <div class="planning-event-actions">
             ${isMetaType ? `<button class="meta-promo-btn-icon" title="🔗 Ouvrir dans Meta" onclick="metaPromoOpenMeta('action','${ev.type}')" style="color:#4267B2;">🔗</button>` : ''}
@@ -27982,11 +28021,13 @@ console.log('✅ OMP Mobile Kit chargé');
             <div class="meta-promo-title">
               <span class="meta-promo-badge badge-type-${item.type}">${TYPE_LABELS[item.type] || item.type}</span>
               ${metaPromoEscape(item.titre)}
+              ${item.texte_post ? '<span class="meta-promo-badge" style="background:rgba(46,204,113,0.2);color:#82e0aa;" title="Texte du post écrit">📝</span>' : ''}
             </div>
             <div class="meta-promo-sub">
               <span>📅 ${dateFr}</span>
               ${desc ? `<span>${metaPromoEscape(desc.substring(0, 60))}${desc.length > 60 ? '…' : ''}</span>` : ''}
             </div>
+            ${item.visuel_video ? `<div class="meta-promo-visuel">🎬 ${metaPromoEscape(item.visuel_video.substring(0, 120))}${item.visuel_video.length > 120 ? '…' : ''}</div>` : ''}
           </div>
           <div class="meta-promo-actions">
             ${['PUB_META','POST_FB','POST_INSTA','REEL','STORY'].includes(item.type) ?
@@ -28042,6 +28083,9 @@ console.log('✅ OMP Mobile Kit chargé');
         document.getElementById('mpAction_description').value = action.description || '';
         document.getElementById('mpAction_date').value = action.date_prevue || '';
         document.getElementById('mpAction_etat').value = action.etat || 'A_FAIRE';
+        document.getElementById('mpAction_textePost').value = action.texte_post || '';
+        document.getElementById('mpAction_hashtags').value = action.hashtags || '';
+        document.getElementById('mpAction_visuel').value = action.visuel_video || '';
         document.getElementById('mpAction_notes').value = action.notes || '';
       }
     } else {
@@ -28051,6 +28095,9 @@ console.log('✅ OMP Mobile Kit chargé');
       document.getElementById('mpAction_description').value = '';
       document.getElementById('mpAction_date').value = new Date().toISOString().slice(0,10);
       document.getElementById('mpAction_etat').value = 'A_FAIRE';
+      document.getElementById('mpAction_textePost').value = '';
+      document.getElementById('mpAction_hashtags').value = '';
+      document.getElementById('mpAction_visuel').value = '';
       document.getElementById('mpAction_notes').value = '';
     }
   }
@@ -28058,6 +28105,49 @@ console.log('✅ OMP Mobile Kit chargé');
   function metaPromoCloseModal() {
     const modal = document.getElementById('metaPromoModal');
     if (modal) modal.style.display = 'none';
+  }
+
+  // ━━━━━━ COPIER LE POST COMPLET DANS LE PRESSE-PAPIER ━━━━━━
+  async function metaPromoCopyFullPost() {
+    const texte = document.getElementById('mpAction_textePost').value.trim();
+    const hashtags = document.getElementById('mpAction_hashtags').value.trim();
+    if (!texte && !hashtags) {
+      alert('⚠️ Aucun contenu à copier. Remplis au moins le texte ou les hashtags.');
+      return;
+    }
+    // Format final : texte + double saut de ligne + hashtags
+    const fullPost = [texte, hashtags].filter(Boolean).join('\n\n');
+    try {
+      await navigator.clipboard.writeText(fullPost);
+      // Feedback visuel sur le bouton
+      const btn = document.querySelector('[onclick="metaPromoCopyFullPost()"]');
+      if (btn) {
+        const original = btn.innerHTML;
+        const originalBg = btn.style.background;
+        btn.innerHTML = '✅ COPIÉ ! Colle-le dans Meta';
+        btn.style.background = 'linear-gradient(135deg,#2ecc71,#27ae60)';
+        setTimeout(() => {
+          btn.innerHTML = original;
+          btn.style.background = originalBg;
+        }, 2000);
+      }
+    } catch (err) {
+      console.error('[META PROMO] Erreur copie :', err);
+      // Fallback ancien navigateur
+      const ta = document.createElement('textarea');
+      ta.value = fullPost;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        alert('✅ Post copié ! Colle-le dans Meta Business Suite.');
+      } catch (e) {
+        alert('❌ Impossible de copier automatiquement. Sélectionne le texte manuellement.');
+      }
+      document.body.removeChild(ta);
+    }
   }
 
   function metaPromoEditAction(id) { metaPromoOpenModal(id); }
@@ -28074,6 +28164,9 @@ console.log('✅ OMP Mobile Kit chargé');
       description: document.getElementById('mpAction_description').value.trim() || null,
       date_prevue: document.getElementById('mpAction_date').value || null,
       etat: document.getElementById('mpAction_etat').value,
+      texte_post: document.getElementById('mpAction_textePost').value.trim() || null,
+      hashtags: document.getElementById('mpAction_hashtags').value.trim() || null,
+      visuel_video: document.getElementById('mpAction_visuel').value.trim() || null,
       notes: document.getElementById('mpAction_notes').value.trim() || null
     };
     try {
@@ -28278,6 +28371,7 @@ ${c.notes || '(aucune)'}`
   window.metaPromoSaveCluster = metaPromoSaveCluster;
   window.metaPromoDeleteCluster = metaPromoDeleteCluster;
   window.metaPromoOpenMeta = metaPromoOpenMeta;
+  window.metaPromoCopyFullPost = metaPromoCopyFullPost;
 
   console.log('✅ Module META PLANNING chargé');
 })();
