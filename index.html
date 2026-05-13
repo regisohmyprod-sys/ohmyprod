@@ -27828,7 +27828,55 @@ console.log('✅ OMP Mobile Kit chargé');
         });
       }
 
-      // ━━━━━━ 5. TÂCHES OMP — urgentes (jour J + retard + J-3 à J-1) ━━━━━━
+      // ━━━━━━ 5. MEV — Mise en vente à déclencher dans 8 jours ou moins ━━━━━━
+      try {
+        const limitMev = new Date(today.getTime() + 8 * 86400000).toISOString().slice(0, 10);
+        const { data: mevDates } = await sb
+          .from('dates_concert')
+          .select('id, ville, date_concert, date_open_mev, salle, tournee_id, etat_mev')
+          .gte('date_open_mev', todayStr)
+          .lte('date_open_mev', limitMev)
+          .order('date_open_mev', { ascending: true });
+        
+        (mevDates || []).forEach(d => {
+          if (!d.date_open_mev) return;
+          // Exclure les dates déjà EN VENTE ou marquées NO TICKETS / privé / gratuit
+          if (d.etat_mev && /en\s*vente|no.?tickets|privé|prive|gratuit/i.test(d.etat_mev)) return;
+          
+          const diffDays = Math.floor((new Date(d.date_open_mev) - today) / 86400000);
+          let niveau, jour, urgent = false, icon;
+          
+          if (diffDays === 0) {
+            niveau = 'rouge'; jour = 'AUJ.'; urgent = true; icon = '🎫';
+          } else if (diffDays === 1) {
+            niveau = 'rouge'; jour = 'J-1'; urgent = true; icon = '⚡';
+          } else if (diffDays <= 3) {
+            niveau = 'orange'; jour = `J-${diffDays}`; icon = '🔥';
+          } else {
+            niveau = 'jaune'; jour = `J-${diffDays}`; icon = '🎫';
+          }
+          
+          const dateConcertFr = d.date_concert ? new Date(d.date_concert).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+          const dateMevFr = new Date(d.date_open_mev).toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'long' });
+          
+          alertes.push({
+            source: 'MEV',
+            niveau: niveau,
+            icon: icon,
+            jour: jour,
+            urgent: urgent,
+            titre: `MEV à déclencher : ${d.ville}`,
+            sub: `Mise en vente le ${dateMevFr} · Concert ${dateConcertFr}`,
+            actionType: 'MEV',
+            dateConcertId: d.id,
+            ville: d.ville
+          });
+        });
+      } catch (errM) {
+        console.warn('[ALERTES] Erreur scan MEV :', errM);
+      }
+
+      // ━━━━━━ 6. TÂCHES OMP — urgentes (jour J + retard + J-3 à J-1) ━━━━━━
       try {
         const { data: tachesArr } = await sb
           .from('omp_taches')
@@ -27931,6 +27979,7 @@ console.log('✅ OMP Mobile Kit chargé');
     });
 
     const labels = {
+      MEV: '🎫 MEV à déclencher',
       META: '📢 Posts & Pubs Meta',
       TACHE: '📋 Mes tâches',
       CONCERT: '🎤 Concerts à venir',
@@ -27996,6 +28045,23 @@ console.log('✅ OMP Mobile Kit chargé');
               console.error('[ALERTES] Erreur ouverture fiche META :', err);
             }
           }, 400);
+        }
+        return;
+      }
+      
+      // ━━ MEV : ouvrir la page Suivi MEV ━━
+      if (a.actionType === 'MEV') {
+        if (typeof window.ouvrirSuiviMEV === 'function') {
+          setTimeout(function() {
+            try {
+              window.ouvrirSuiviMEV();
+            } catch(err) {
+              console.error('[ALERTES] Erreur ouverture Suivi MEV :', err);
+              if (typeof window.showPage === 'function') window.showPage('gestion-omp');
+            }
+          }, 100);
+        } else if (typeof window.showPage === 'function') {
+          window.showPage('suivi-mev');
         }
         return;
       }
