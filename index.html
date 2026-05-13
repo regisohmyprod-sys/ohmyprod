@@ -27547,7 +27547,8 @@ console.log('✅ OMP Mobile Kit chargé');
             urgent: true,
             titre: a.titre,
             sub: a.heure_prevue ? `Aujourd'hui ${a.heure_prevue.substring(0,5)}` : 'Aujourd\'hui',
-            actionType: 'META_PLANNING'
+            actionType: 'META_PLANNING',
+            metaActionId: a.id
           });
         } else if (a.date_prevue < todayStr) {
           const days = Math.floor((today - new Date(a.date_prevue)) / 86400000);
@@ -27556,7 +27557,8 @@ console.log('✅ OMP Mobile Kit chargé');
             urgent: true,
             titre: `EN RETARD : ${a.titre}`,
             sub: `Prévu le ${new Date(a.date_prevue).toLocaleDateString('fr-FR')}`,
-            actionType: 'META_PLANNING'
+            actionType: 'META_PLANNING',
+            metaActionId: a.id
           });
         } else {
           const days = Math.floor((new Date(a.date_prevue) - today) / 86400000);
@@ -27566,7 +27568,8 @@ console.log('✅ OMP Mobile Kit chargé');
               icon: '📅', jour: `J-${days}`,
               titre: a.titre,
               sub: `${new Date(a.date_prevue).toLocaleDateString('fr-FR')}${a.heure_prevue ? ' ' + a.heure_prevue.substring(0,5) : ''}`,
-              actionType: 'META_PLANNING'
+              actionType: 'META_PLANNING',
+              metaActionId: a.id
             });
           }
         }
@@ -27771,51 +27774,38 @@ console.log('✅ OMP Mobile Kit chargé');
   }
   
   // ━━━━━━ DISPATCHER DE CLIC SUR ALERTE ━━━━━━
-  window.alerteClickAction = async function(idx) {
-    const a = window._alertesData?.[idx];
-    if (!a) {
-      console.warn('[ALERTES] Alerte introuvable', idx);
-      return;
-    }
-    
-    console.log('[ALERTES] Clic alerte :', a.actionType, a.titre);
-    
-    if (a.actionType === 'META_PLANNING') {
-      // Aller au module META PLANNING
-      if (window.showPage) window.showPage('meta-planning');
-      return;
-    }
-    
-    if (a.actionType && a.actionType.startsWith('FICHE_PROD') && a.dateConcertId) {
-      // Ouvrir la fiche prod du concert + sous-page éventuelle
-      try {
-        // Ouvre la fiche prod (qui mémorise _fpDateId)
-        if (typeof fpOuvrir === 'function') {
-          await fpOuvrir(a.dateConcertId, a.ville || '', a.dateStr || '');
-          
-          // Si on veut une sous-page spécifique : décla droits ou VHR
-          if (a.actionType === 'FICHE_PROD_DECLA') {
-            setTimeout(() => {
-              if (typeof fpOuvrirDecla === 'function') fpOuvrirDecla();
-            }, 500);
-          } else if (a.actionType === 'FICHE_PROD_VHR') {
-            // Pour VHR : aller à la page de gestion VHR de la date
-            setTimeout(() => {
-              if (typeof ouvrirVHR === 'function') {
-                ouvrirVHR(a.dateConcertId);
-              } else if (window.showPage) {
-                window.showPage('vhr-tournee');
-              }
-            }, 500);
-          }
-        } else {
-          console.error('[ALERTES] fpOuvrir introuvable');
-          if (window.showPage) window.showPage('gestion-omp');
-        }
-      } catch (err) {
-        console.error('[ALERTES] Erreur navigation :', err);
-        if (window.showPage) window.showPage('gestion-omp');
+  window.alerteClickAction = function(idx) {
+    try {
+      const a = window._alertesData?.[idx];
+      if (!a) {
+        console.warn('[ALERTES] Alerte introuvable', idx);
+        return;
       }
+      
+      console.log('[ALERTES] Clic alerte :', a.actionType, a.titre);
+      
+      // ━━ META PLANNING : ouvrir directement la fiche du post ━━
+      if (a.actionType === 'META_PLANNING') {
+        if (typeof window.showPage === 'function') window.showPage('meta-planning');
+        // Ouvrir la fiche du post si on a son ID
+        if (a.metaActionId && typeof window.metaPromoEditAction === 'function') {
+          setTimeout(function() {
+            try {
+              window.metaPromoEditAction(a.metaActionId);
+            } catch(err) {
+              console.error('[ALERTES] Erreur ouverture fiche META :', err);
+            }
+          }, 400);
+        }
+        return;
+      }
+      
+      // ━━ Autres : aller à la gestion OMP (navigation simple) ━━
+      if (typeof window.showPage === 'function') {
+        window.showPage('gestion-omp');
+      }
+    } catch (err) {
+      console.error('[ALERTES] Erreur clic alerte :', err);
     }
   };
 
