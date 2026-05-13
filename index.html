@@ -3405,6 +3405,26 @@ function _hideTeamSelection() {
         <div style="font-size:18px;color:#fff;">Hey <span id="welcome-prenom-dashboard" style="color:#c9a84c;font-weight:600;"></span> ! Content de te revoir 👋</div>
       </div>
 
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- 🚨 BANDEAU D'ALERTES OMP (V1)                              -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <div id="alertes-bandeau" class="alertes-bandeau" style="display:none;">
+        <div class="alertes-header" onclick="alertesToggle()">
+          <div class="alertes-titre">
+            <span class="alertes-icon">🚨</span>
+            <span>ALERTES OMP</span>
+            <span class="alertes-count" id="alertes-count">0</span>
+          </div>
+          <div class="alertes-actions">
+            <button onclick="event.stopPropagation(); alertesRefresh();" class="alertes-btn-refresh" title="Rafraîchir">🔄</button>
+            <span class="alertes-toggle" id="alertes-toggle-icon">▼</span>
+          </div>
+        </div>
+        <div class="alertes-corps" id="alertes-corps">
+          <div class="alertes-empty">Chargement…</div>
+        </div>
+      </div>
+
       <div style="margin-bottom:24px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;color:#fff;line-height:1;margin-bottom:8px;">TABLEAU DE BORD</div>
         <div style="display:flex;align-items:center;gap:12px;">
@@ -27263,6 +27283,415 @@ console.log('✅ OMP Mobile Kit chargé');
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 🚨 SYSTÈME D'ALERTES OMP — V1                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<style>
+.alertes-bandeau {
+  background: linear-gradient(135deg, #1a0f0f, #2a1515);
+  border: 2px solid #e74c3c;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(231,76,60,0.15);
+}
+.alertes-bandeau.calme {
+  background: linear-gradient(135deg, #0f1a0f, #152a15);
+  border-color: #2ecc71;
+  box-shadow: 0 4px 20px rgba(46,204,113,0.1);
+}
+.alertes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.alertes-header:hover { background: rgba(255,255,255,0.03); }
+.alertes-titre {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  color: #ff7575;
+}
+.alertes-bandeau.calme .alertes-titre { color: #82e0aa; }
+.alertes-icon { font-size: 1.3rem; }
+.alertes-count {
+  background: #e74c3c;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  min-width: 26px;
+  text-align: center;
+}
+.alertes-bandeau.calme .alertes-count { background: #2ecc71; }
+.alertes-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.alertes-btn-refresh {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #c0c0c0;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.alertes-btn-refresh:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.alertes-toggle {
+  color: #c0c0c0;
+  font-size: 0.9rem;
+  transition: transform 0.2s;
+}
+.alertes-bandeau.replie .alertes-toggle { transform: rotate(-90deg); }
+.alertes-bandeau.replie .alertes-corps { display: none; }
+.alertes-corps {
+  padding: 8px 18px 18px 18px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.alertes-section { margin-bottom: 12px; }
+.alertes-section:last-child { margin-bottom: 0; }
+.alertes-section-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #d4af37;
+  margin-bottom: 6px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(212,175,55,0.15);
+}
+.alerte-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 6px;
+  margin-bottom: 5px;
+  border-left: 3px solid;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.alerte-item:hover { background: rgba(255,255,255,0.04); }
+.alerte-rouge { border-left-color: #e74c3c; }
+.alerte-orange { border-left-color: #f39c12; }
+.alerte-jaune { border-left-color: #f1c40f; }
+.alerte-vert { border-left-color: #2ecc71; }
+.alerte-bleu { border-left-color: #3498db; }
+.alerte-icon { font-size: 1rem; flex-shrink: 0; }
+.alerte-jour {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  color: #d4af37;
+  min-width: 50px;
+  text-align: center;
+  padding: 2px 6px;
+  background: rgba(212,175,55,0.1);
+  border-radius: 4px;
+}
+.alerte-jour.urgent { background: rgba(231,76,60,0.2); color: #ff7575; }
+.alerte-content { flex: 1; min-width: 0; }
+.alerte-titre {
+  font-size: 0.88rem;
+  color: #f0f0f0;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.alerte-sub {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 2px;
+}
+.alertes-empty {
+  text-align: center;
+  color: #82e0aa;
+  padding: 15px;
+  font-size: 0.9rem;
+}
+@media (max-width: 700px) {
+  .alertes-corps { max-height: 60vh; }
+  .alerte-jour { min-width: 40px; font-size: 0.7rem; }
+}
+</style>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// SYSTÈME D'ALERTES OMP — V1
+// Sources : META PLANNING + Concerts (J-X) + VHR + Décla droits
+// ═══════════════════════════════════════════════════════════════
+(function() {
+
+  async function alertesScan() {
+    const sb = window._supabase;
+    if (!sb) return [];
+
+    const alertes = [];
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0, 10);
+
+    try {
+      // ━━━━━━ 1. META PLANNING ━━━━━━
+      const { data: actions } = await sb
+        .from('promo_actions')
+        .select('*')
+        .in('etat', ['A_FAIRE', 'EN_COURS'])
+        .order('date_prevue', { ascending: true });
+
+      (actions || []).forEach(a => {
+        if (!a.date_prevue) return;
+        if (a.date_prevue === todayStr) {
+          alertes.push({
+            source: 'META', niveau: 'rouge', icon: '📢', jour: 'AUJ.',
+            urgent: true,
+            titre: a.titre,
+            sub: a.heure_prevue ? `Aujourd'hui ${a.heure_prevue.substring(0,5)}` : 'Aujourd\'hui'
+          });
+        } else if (a.date_prevue < todayStr) {
+          const days = Math.floor((today - new Date(a.date_prevue)) / 86400000);
+          alertes.push({
+            source: 'META', niveau: 'rouge', icon: '⏰', jour: `J+${days}`,
+            urgent: true,
+            titre: `EN RETARD : ${a.titre}`,
+            sub: `Prévu le ${new Date(a.date_prevue).toLocaleDateString('fr-FR')}`
+          });
+        } else {
+          const days = Math.floor((new Date(a.date_prevue) - today) / 86400000);
+          if (days <= 3) {
+            alertes.push({
+              source: 'META', niveau: days === 1 ? 'orange' : 'jaune',
+              icon: '📅', jour: `J-${days}`,
+              titre: a.titre,
+              sub: `${new Date(a.date_prevue).toLocaleDateString('fr-FR')}${a.heure_prevue ? ' ' + a.heure_prevue.substring(0,5) : ''}`
+            });
+          }
+        }
+      });
+
+      // ━━━━━━ 2. CONCERTS — Jalons J-X ━━━━━━
+      const { data: dates } = await sb
+        .from('dates_concert')
+        .select('id, ville, date_concert, heure_show, salle_nom, statut')
+        .gte('date_concert', todayStr)
+        .order('date_concert', { ascending: true })
+        .limit(50);
+
+      (dates || []).forEach(d => {
+        if (!d.date_concert) return;
+        const diffDays = Math.floor((new Date(d.date_concert) - today) / 86400000);
+        const jalons = {
+          0: { niveau: 'rouge', icon: '🎤', label: 'JOUR J', urgent: true },
+          1: { niveau: 'rouge', icon: '⚡', label: 'J-1', urgent: true },
+          3: { niveau: 'orange', icon: '🔥', label: 'J-3' },
+          7: { niveau: 'orange', icon: '📌', label: 'J-7' },
+          15: { niveau: 'jaune', icon: '📍', label: 'J-15' },
+          30: { niveau: 'jaune', icon: '🗓️', label: 'J-30' },
+          90: { niveau: 'vert', icon: '📆', label: 'J-90' }
+        };
+        if (jalons[diffDays]) {
+          const j = jalons[diffDays];
+          alertes.push({
+            source: 'CONCERT', niveau: j.niveau, icon: j.icon, jour: j.label,
+            urgent: j.urgent,
+            titre: `${d.ville}${d.salle_nom ? ' — ' + d.salle_nom : ''}`,
+            sub: new Date(d.date_concert).toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'long' })
+          });
+        }
+      });
+
+      // ━━━━━━ 3. DÉCLA DROITS — concerts passés sans décla ━━━━━━
+      const past30 = new Date(today.getTime() - 30 * 86400000).toISOString().slice(0, 10);
+      const { data: pastDates } = await sb
+        .from('dates_concert')
+        .select('id, ville, date_concert')
+        .gte('date_concert', past30)
+        .lt('date_concert', todayStr)
+        .order('date_concert', { ascending: false })
+        .limit(20);
+
+      if (pastDates && pastDates.length > 0) {
+        const pastIds = pastDates.map(d => d.id);
+        const { data: fiches } = await sb
+          .from('fiches_production')
+          .select('date_concert_id, declaration_droits_data')
+          .in('date_concert_id', pastIds);
+
+        const fichesMap = {};
+        (fiches || []).forEach(f => { fichesMap[f.date_concert_id] = f; });
+
+        pastDates.forEach(d => {
+          const fp = fichesMap[d.id];
+          const ddData = fp?.declaration_droits_data;
+          if (!ddData || (typeof ddData === 'object' && Object.keys(ddData).length === 0)) {
+            const daysAgo = Math.floor((today - new Date(d.date_concert)) / 86400000);
+            alertes.push({
+              source: 'DECLA',
+              niveau: daysAgo > 15 ? 'rouge' : 'orange',
+              icon: '📋', jour: `J+${daysAgo}`,
+              urgent: daysAgo > 15,
+              titre: `Décla droits à faire : ${d.ville}`,
+              sub: `Concert du ${new Date(d.date_concert).toLocaleDateString('fr-FR')}`
+            });
+          }
+        });
+      }
+
+      // ━━━━━━ 4. VHR — concerts proches sans VHR ━━━━━━
+      const futureLimit = new Date(today.getTime() + 15 * 86400000).toISOString().slice(0, 10);
+      const { data: nearDates } = await sb
+        .from('dates_concert')
+        .select('id, ville, date_concert')
+        .gte('date_concert', todayStr)
+        .lte('date_concert', futureLimit)
+        .limit(30);
+
+      if (nearDates && nearDates.length > 0) {
+        const nearIds = nearDates.map(d => d.id);
+        const { data: vhrEntries } = await sb
+          .from('vhr_dates')
+          .select('date_concert_id, type')
+          .in('date_concert_id', nearIds);
+
+        const vhrByDate = {};
+        (vhrEntries || []).forEach(v => {
+          if (!vhrByDate[v.date_concert_id]) vhrByDate[v.date_concert_id] = [];
+          vhrByDate[v.date_concert_id].push(v.type);
+        });
+
+        nearDates.forEach(d => {
+          const types = vhrByDate[d.id] || [];
+          const hasVoyage = types.includes('voyage');
+          const hasHebergement = types.includes('hebergement');
+          if (!hasVoyage || !hasHebergement) {
+            const diffDays = Math.floor((new Date(d.date_concert) - today) / 86400000);
+            const manquant = [];
+            if (!hasVoyage) manquant.push('Voyage');
+            if (!hasHebergement) manquant.push('Hébergement');
+            alertes.push({
+              source: 'VHR',
+              niveau: diffDays <= 7 ? 'rouge' : 'orange',
+              icon: '🚌', jour: `J-${diffDays}`,
+              urgent: diffDays <= 7,
+              titre: `VHR à organiser : ${d.ville}`,
+              sub: `Manque : ${manquant.join(' + ')}`
+            });
+          }
+        });
+      }
+
+    } catch (err) {
+      console.error('[ALERTES] Erreur scan :', err);
+    }
+
+    // Tri par urgence
+    const niveauxOrder = { rouge: 1, orange: 2, jaune: 3, vert: 4, bleu: 5 };
+    alertes.sort((a, b) => (niveauxOrder[a.niveau] || 9) - (niveauxOrder[b.niveau] || 9));
+    return alertes;
+  }
+
+  async function alertesRefresh() {
+    const bandeau = document.getElementById('alertes-bandeau');
+    const corps = document.getElementById('alertes-corps');
+    const count = document.getElementById('alertes-count');
+    if (!bandeau || !corps || !count) return;
+
+    bandeau.style.display = 'block';
+    corps.innerHTML = '<div class="alertes-empty" style="color:#888;">🔄 Scan en cours…</div>';
+
+    const alertes = await alertesScan();
+    count.textContent = alertes.length;
+
+    if (alertes.length === 0) {
+      bandeau.classList.add('calme');
+      corps.innerHTML = '<div class="alertes-empty">✅ Tout est OK ! Aucune alerte aujourd\'hui.</div>';
+      return;
+    } else {
+      bandeau.classList.remove('calme');
+    }
+
+    const groupes = {};
+    alertes.forEach(a => {
+      if (!groupes[a.source]) groupes[a.source] = [];
+      groupes[a.source].push(a);
+    });
+
+    const labels = {
+      META: '📢 Posts & Pubs Meta',
+      CONCERT: '🎤 Concerts à venir',
+      DECLA: '📋 Décla droits à faire',
+      VHR: '🚌 VHR à organiser'
+    };
+    const pageTargets = {
+      META: 'meta-planning',
+      CONCERT: 'gestion-omp',
+      DECLA: 'gestion-omp',
+      VHR: 'gestion-omp'
+    };
+
+    let html = '';
+    Object.keys(labels).forEach(src => {
+      if (groupes[src] && groupes[src].length > 0) {
+        html += `<div class="alertes-section">
+          <div class="alertes-section-title">${labels[src]} (${groupes[src].length})</div>`;
+        groupes[src].forEach(a => {
+          const target = pageTargets[src] || 'dashboard';
+          html += `
+            <div class="alerte-item alerte-${a.niveau}" onclick="if(window.showPage)window.showPage('${target}')">
+              <span class="alerte-icon">${a.icon}</span>
+              <span class="alerte-jour ${a.urgent ? 'urgent' : ''}">${a.jour}</span>
+              <div class="alerte-content">
+                <div class="alerte-titre">${escapeHtml(a.titre)}</div>
+                ${a.sub ? `<div class="alerte-sub">${escapeHtml(a.sub)}</div>` : ''}
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+    });
+
+    corps.innerHTML = html;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function alertesToggle() {
+    const bandeau = document.getElementById('alertes-bandeau');
+    if (bandeau) bandeau.classList.toggle('replie');
+  }
+
+  function alertesInit() {
+    if (!window._supabase) {
+      setTimeout(alertesInit, 1500);
+      return;
+    }
+    alertesRefresh();
+  }
+  setTimeout(alertesInit, 2500);
+
+  window.alertesRefresh = alertesRefresh;
+  window.alertesToggle = alertesToggle;
+  window.alertesScan = alertesScan;
+
+  console.log('✅ Système d\'alertes OMP chargé');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
 <!-- MODULE META PUBS ET POSTS, PLANNING                          -->
 <!-- Ajouté le 13/05/2026                                          -->
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -27531,6 +27960,36 @@ body.mp-modal-open { overflow: hidden; }
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 18px;
+}
+.planning-filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(212,175,55,0.15);
+}
+.planning-filter-btn {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(212,175,55,0.3);
+  color: #c0c0c0;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.planning-filter-btn:hover {
+  background: rgba(212,175,55,0.1);
+  color: #d4af37;
+}
+.planning-filter-btn.active {
+  background: #d4af37;
+  color: #0a0a0a;
+  border-color: #d4af37;
+  font-weight: 700;
 }
 .planning-info {
   display: flex;
@@ -27810,6 +28269,13 @@ body.mp-modal-open { overflow: hidden; }
   }
 
   // ━━━━━━ VUE PLANNING TIMELINE ━━━━━━
+  let metaPromoPlanningFilter = 'futur'; // 'futur', 'passe', 'tout'
+
+  function metaPromoSetPlanningFilter(filter) {
+    metaPromoPlanningFilter = filter;
+    metaPromoRenderPlanning();
+  }
+
   function metaPromoRenderPlanning() {
     const list = document.getElementById('metaPromoList');
     if (!list) return;
@@ -27888,17 +28354,36 @@ body.mp-modal-open { overflow: hidden; }
     // Date du jour pour repère
     const today = new Date().toISOString().slice(0, 10);
 
-    // Stats globales
+    // Stats globales (sur TOUS les events, pas seulement filtrés)
     const totalEvents = events.length;
     const aFaire = events.filter(e => e.etat === 'A_FAIRE').length;
     const enCours = events.filter(e => e.etat === 'EN_COURS').length;
     const termine = events.filter(e => e.etat === 'TERMINE').length;
 
+    // === Application du filtre passe/futur/tout sur les dates à afficher ===
+    let datesToShow = allDates;
+    if (metaPromoPlanningFilter === 'passe') {
+      datesToShow = allDates.filter(d => d < today);
+    } else if (metaPromoPlanningFilter === 'futur') {
+      datesToShow = allDates.filter(d => d >= today);
+    }
+
+    // Compte des événements visibles selon filtre
+    const visibleEventsCount = datesToShow.reduce((sum, d) => sum + (groups[d]?.length || 0), 0);
+
     // Construire le HTML
     let html = `
       <div class="planning-header">
+        <div class="planning-filter-row">
+          <button class="planning-filter-btn ${metaPromoPlanningFilter === 'passe' ? 'active' : ''}"
+                  onclick="metaPromoSetPlanningFilter('passe')">📜 Passé</button>
+          <button class="planning-filter-btn ${metaPromoPlanningFilter === 'futur' ? 'active' : ''}"
+                  onclick="metaPromoSetPlanningFilter('futur')">📆 À venir</button>
+          <button class="planning-filter-btn ${metaPromoPlanningFilter === 'tout' ? 'active' : ''}"
+                  onclick="metaPromoSetPlanningFilter('tout')">🗂️ Tout</button>
+        </div>
         <div class="planning-info">
-          <span>📆 <strong>${totalEvents}</strong> événement${totalEvents > 1 ? 's' : ''} planifié${totalEvents > 1 ? 's' : ''}</span>
+          <span>📆 <strong>${visibleEventsCount}</strong> / ${totalEvents} événement${totalEvents > 1 ? 's' : ''}</span>
           <span>📅 Du <strong>${new Date(firstDate).toLocaleDateString('fr-FR')}</strong> au <strong>${new Date(lastDate).toLocaleDateString('fr-FR')}</strong></span>
           <span style="color:#3498db;">⏳ ${aFaire}</span>
           <span style="color:#f39c12;">🔥 ${enCours}</span>
@@ -27907,8 +28392,18 @@ body.mp-modal-open { overflow: hidden; }
       </div>
     `;
 
+    // Si aucune date à afficher après filtre
+    if (datesToShow.length === 0) {
+      const msg = metaPromoPlanningFilter === 'passe'
+        ? '📜 Aucun événement passé.'
+        : '📆 Aucun événement à venir. Tu peux en créer un avec "+ Ajouter une action" !';
+      html += `<div class="meta-promo-empty">${msg}</div>`;
+      list.innerHTML = html;
+      return;
+    }
+
     // Rendu jour par jour (avec affichage des trous)
-    allDates.forEach(dateStr => {
+    datesToShow.forEach(dateStr => {
       const dayEvents = groups[dateStr] || [];
       const dateObj = new Date(dateStr);
       const dayName = dateObj.toLocaleDateString('fr-FR', { weekday: 'long' });
@@ -28422,6 +28917,7 @@ ${c.notes || '(aucune)'}`
   window.metaPromoDeleteCluster = metaPromoDeleteCluster;
   window.metaPromoOpenMeta = metaPromoOpenMeta;
   window.metaPromoCopyFullPost = metaPromoCopyFullPost;
+  window.metaPromoSetPlanningFilter = metaPromoSetPlanningFilter;
 
   console.log('✅ Module META PLANNING chargé');
 })();
