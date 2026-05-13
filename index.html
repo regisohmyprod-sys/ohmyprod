@@ -16166,12 +16166,46 @@ function _hideTeamSelection() {
         ['dd-tm-ok','dd-fnac-ok','dd-sallefim-ok','dd-promoloc-ok','dd-weez-ok'].forEach(function(id) {
           var e = document.getElementById(id); if(e) data[id] = e.checked;
         });
-        var payload = { decla_droits_data: JSON.stringify(data) };
-        var { data: ex } = await _supabase.from('fiches_production').select('id').eq('date_concert_id', _fpDateId).single();
-        if (ex) { await _supabase.from('fiches_production').update(payload).eq('date_concert_id', _fpDateId); }
-        else { await _supabase.from('fiches_production').insert({ date_concert_id: _fpDateId, ...payload }); }
-      } catch(e) {}
+        // ⚠️ FIX : la vraie colonne s'appelle declaration_droits_data
+        var payload = { declaration_droits_data: data };
+        var { data: ex, error: errSel } = await _supabase.from('fiches_production').select('id').eq('date_concert_id', _fpDateId).maybeSingle();
+        if (errSel) throw errSel;
+        var result;
+        if (ex) {
+          result = await _supabase.from('fiches_production').update(payload).eq('date_concert_id', _fpDateId);
+        } else {
+          result = await _supabase.from('fiches_production').insert({ date_concert_id: _fpDateId, ...payload });
+        }
+        if (result.error) throw result.error;
+        // Feedback visuel succès
+        ddShowSaveFeedback(true);
+        console.log('[DECLA DROITS] Sauvegarde OK', data);
+      } catch(e) {
+        console.error('[DECLA DROITS] Erreur sauvegarde :', e);
+        ddShowSaveFeedback(false, e.message);
+      }
     }, 800);
+  }
+
+  // Petit toast pour confirmer la sauvegarde
+  function ddShowSaveFeedback(success, errorMsg) {
+    var existing = document.getElementById('dd-save-toast');
+    if (existing) existing.remove();
+    var toast = document.createElement('div');
+    toast.id = 'dd-save-toast';
+    toast.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:opacity 0.3s;';
+    if (success) {
+      toast.style.background = '#2ecc71';
+      toast.style.color = '#fff';
+      toast.textContent = '✅ Décla droits sauvegardée';
+    } else {
+      toast.style.background = '#e74c3c';
+      toast.style.color = '#fff';
+      toast.textContent = '❌ Erreur : ' + (errorMsg || 'sauvegarde échouée');
+    }
+    document.body.appendChild(toast);
+    setTimeout(function(){ toast.style.opacity = '0'; }, 2000);
+    setTimeout(function(){ if(toast.parentNode) toast.remove(); }, 2400);
   }
 
   async function fpOuvrirDecla() {
@@ -16299,13 +16333,17 @@ function _hideTeamSelection() {
 
     // Charger checkboxes sauvegardées
     if (_fpDateId) {
-      _supabase.from('fiches_production').select('decla_droits_data').eq('date_concert_id', _fpDateId).single().then(function(r) {
-        if (!r.data || !r.data.decla_droits_data) { 
+      _supabase.from('fiches_production').select('declaration_droits_data').eq('date_concert_id', _fpDateId).maybeSingle().then(function(r) {
+        if (!r.data || !r.data.declaration_droits_data) { 
           ddApplyAllPayerColors(); 
           ddApplyAllReglColors();
           return; 
         }
-        var d = JSON.parse(r.data.decla_droits_data);
+        // Supporter à la fois JSON string et objet
+        var d = r.data.declaration_droits_data;
+        if (typeof d === 'string') {
+          try { d = JSON.parse(d); } catch(e) { console.error('[DECLA] JSON invalide', e); return; }
+        }
         Object.keys(d).forEach(function(id) {
           var e = document.getElementById(id); if(e) e.checked = d[id];
         });
