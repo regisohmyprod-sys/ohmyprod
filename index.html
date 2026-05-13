@@ -18644,49 +18644,75 @@ function _hideTeamSelection() {
     }
     
     var savedEmail = localStorage.getItem('omp_email');
-    var savedCode = localStorage.getItem('omp_code');
+    
+    // ═══════════════════════════════════════════════════════════
+    // 🔐 SESSION 24h — Vérifier si une session valide existe
+    // ═══════════════════════════════════════════════════════════
+    var sessionToken = localStorage.getItem('omp_session_token');
+    var sessionExpiry = parseInt(localStorage.getItem('omp_session_expiry') || '0', 10);
+    var now = Date.now();
+    var sessionValid = sessionToken && sessionExpiry > now;
+    
+    if (sessionValid && savedEmail) {
+      // Session valide → auto-connexion sans demander le code
+      console.log('[AUTH] Session 24h valide — auto-connexion');
+      document.getElementById('login-screen') && (document.getElementById('login-screen').style.display = 'none');
+      _supabase.from('membres').select('prenom, nom, role, email').eq('email', savedEmail).single().then(function(res) {
+        if (!res.data) {
+          // Membre supprimé → invalider session
+          localStorage.removeItem('omp_session_token');
+          localStorage.removeItem('omp_session_expiry');
+          var login = document.getElementById('login-screen');
+          if (login) login.style.display = 'flex';
+          return;
+        }
+        var mb = res.data;
+        var role = mb.role || 'membre';
+        // Vérifier que le token correspond au rôle
+        var CODES = { 'admin': 'OMP1504!', 'staff_omp': 'Staffomp2026!', 'artiste': 'Ompartistes2026!', 'technique': 'TechOMP2026!' };
+        // Token = hash(email + code + jour) → on vérifie en recalculant
+        var expectedToken = simpleHash(savedEmail + (CODES[role] || '') + Math.floor(sessionExpiry / 86400000));
+        if (sessionToken !== expectedToken) {
+          console.warn('[AUTH] Token invalide — re-login requis');
+          localStorage.removeItem('omp_session_token');
+          localStorage.removeItem('omp_session_expiry');
+          var login = document.getElementById('login-screen');
+          if (login) login.style.display = 'flex';
+          return;
+        }
+        _currentUserEmail = savedEmail;
+        _currentUserNom = (mb.prenom + ' ' + mb.nom).trim();
+        _currentUserPrenom = mb.prenom || '';
+        _currentUserRole = role;
+        window._selectedTeam = window._selectedTeam || 'prod';
+        document.getElementById('app-screen').style.display = 'block';
+        applyAdminUI();
+        applyRoleUI();
+        chargerTournees().catch(function(e) { console.error(e); });
+      });
+      return;
+    }
+    
+    // Pas de session valide → pré-remplir l'email seulement
     if (savedEmail) {
       var el = document.getElementById('login-email');
       var cb = document.getElementById('login-remember');
-      var pwd = document.getElementById('login-password');
       if (el) el.value = savedEmail;
       if (cb) cb.checked = true;
-      if (pwd && savedCode) pwd.value = savedCode;
-      // Auto-connexion si email + code mémorisés
-      if (savedEmail && savedCode) {
-        document.getElementById('login-screen') && (document.getElementById('login-screen').style.display = 'none');
-        // Simuler le login
-        var fakeEmail = savedEmail;
-        var fakeCode = savedCode;
-        _supabase.from('membres').select('prenom, nom, role, email').eq('email', fakeEmail).single().then(function(res) {
-          if (!res.data) {
-            var login = document.getElementById('login-screen');
-            if (login) login.style.display = 'flex';
-            return;
-          }
-          var mb = res.data;
-          var role = mb.role || 'membre';
-          var CODES = { 'admin': 'OMP1504!', 'staff_omp': 'Staffomp2026!', 'artiste': 'Ompartistes2026!', 'technique': 'TechOMP2026!' };
-          if (fakeCode !== CODES[role]) {
-            var login = document.getElementById('login-screen');
-            if (login) login.style.display = 'flex';
-            return;
-          }
-          _currentUserEmail = fakeEmail;
-          _currentUserNom = (mb.prenom + ' ' + mb.nom).trim();
-          _currentUserPrenom = mb.prenom || '';
-          _currentUserRole = role;
-          window._selectedTeam = window._selectedTeam || 'prod';
-          document.getElementById('app-screen').style.display = 'block';
-          applyAdminUI();
-          applyRoleUI();
-          chargerTournees().catch(function(e) { console.error(e); });
-        });
-        return;
-      }
     }
     var login = document.getElementById('login-screen');
     if (login) login.style.display = 'flex';
+  }
+  
+  // Hash simple (pas crypto-grade, mais suffit pour valider qu'un token n'est pas forgé)
+  function simpleHash(str) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      var char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash |= 0;
+    }
+    return 'omp_' + Math.abs(hash).toString(36);
   }
 
   async function doResetPassword() {
@@ -18762,6 +18788,16 @@ function _hideTeamSelection() {
     }
     // Nettoyage des anciens codes éventuellement stockés par les versions précédentes
     localStorage.removeItem('omp_code');
+    
+    // ═══════════════════════════════════════════════════════════
+    // 🔐 SESSION 24h — Créer un token sécurisé (hash, pas le code en clair)
+    // Le token expire dans 24h ou plus tôt si le code change
+    // ═══════════════════════════════════════════════════════════
+    var expiry = Date.now() + 24 * 3600 * 1000; // 24h
+    var token = simpleHash(email + code + Math.floor(expiry / 86400000));
+    localStorage.setItem('omp_session_token', token);
+    localStorage.setItem('omp_session_expiry', String(expiry));
+    console.log('[AUTH] Session 24h créée — expiration :', new Date(expiry).toLocaleString('fr-FR'));
     
     // Toujours ajouter l'email à l'historique (même sans "Se souvenir")
     var emailsHistory = JSON.parse(localStorage.getItem('omp_emails_history') || '[]');
@@ -19752,6 +19788,10 @@ function _hideTeamSelection() {
   }
 
   async function doLogout() {
+    // 🔐 Invalider la session 24h
+    localStorage.removeItem('omp_session_token');
+    localStorage.removeItem('omp_session_expiry');
+    console.log('[AUTH] Session 24h invalidée');
     await _supabase.auth.signOut();
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app-screen').style.display = 'none';
@@ -27452,6 +27492,18 @@ console.log('✅ OMP Mobile Kit chargé');
   color: #999;
   margin-top: 2px;
 }
+.alerte-arrow {
+  color: #666;
+  font-size: 1.4rem;
+  font-weight: 300;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  padding: 0 4px;
+}
+.alerte-item:hover .alerte-arrow {
+  color: #d4af37;
+  transform: translateX(3px);
+}
 .alertes-empty {
   text-align: center;
   color: #82e0aa;
@@ -27494,7 +27546,8 @@ console.log('✅ OMP Mobile Kit chargé');
             source: 'META', niveau: 'rouge', icon: '📢', jour: 'AUJ.',
             urgent: true,
             titre: a.titre,
-            sub: a.heure_prevue ? `Aujourd'hui ${a.heure_prevue.substring(0,5)}` : 'Aujourd\'hui'
+            sub: a.heure_prevue ? `Aujourd'hui ${a.heure_prevue.substring(0,5)}` : 'Aujourd\'hui',
+            actionType: 'META_PLANNING'
           });
         } else if (a.date_prevue < todayStr) {
           const days = Math.floor((today - new Date(a.date_prevue)) / 86400000);
@@ -27502,7 +27555,8 @@ console.log('✅ OMP Mobile Kit chargé');
             source: 'META', niveau: 'rouge', icon: '⏰', jour: `J+${days}`,
             urgent: true,
             titre: `EN RETARD : ${a.titre}`,
-            sub: `Prévu le ${new Date(a.date_prevue).toLocaleDateString('fr-FR')}`
+            sub: `Prévu le ${new Date(a.date_prevue).toLocaleDateString('fr-FR')}`,
+            actionType: 'META_PLANNING'
           });
         } else {
           const days = Math.floor((new Date(a.date_prevue) - today) / 86400000);
@@ -27511,7 +27565,8 @@ console.log('✅ OMP Mobile Kit chargé');
               source: 'META', niveau: days === 1 ? 'orange' : 'jaune',
               icon: '📅', jour: `J-${days}`,
               titre: a.titre,
-              sub: `${new Date(a.date_prevue).toLocaleDateString('fr-FR')}${a.heure_prevue ? ' ' + a.heure_prevue.substring(0,5) : ''}`
+              sub: `${new Date(a.date_prevue).toLocaleDateString('fr-FR')}${a.heure_prevue ? ' ' + a.heure_prevue.substring(0,5) : ''}`,
+              actionType: 'META_PLANNING'
             });
           }
         }
@@ -27543,7 +27598,11 @@ console.log('✅ OMP Mobile Kit chargé');
             source: 'CONCERT', niveau: j.niveau, icon: j.icon, jour: j.label,
             urgent: j.urgent,
             titre: `${d.ville}${d.salle_nom ? ' — ' + d.salle_nom : ''}`,
-            sub: new Date(d.date_concert).toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'long' })
+            sub: new Date(d.date_concert).toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'long' }),
+            actionType: 'FICHE_PROD',
+            dateConcertId: d.id,
+            ville: d.ville,
+            dateStr: d.date_concert
           });
         }
       });
@@ -27579,7 +27638,11 @@ console.log('✅ OMP Mobile Kit chargé');
               icon: '📋', jour: `J+${daysAgo}`,
               urgent: daysAgo > 15,
               titre: `Décla droits à faire : ${d.ville}`,
-              sub: `Concert du ${new Date(d.date_concert).toLocaleDateString('fr-FR')}`
+              sub: `Concert du ${new Date(d.date_concert).toLocaleDateString('fr-FR')}`,
+              actionType: 'FICHE_PROD_DECLA',
+              dateConcertId: d.id,
+              ville: d.ville,
+              dateStr: d.date_concert
             });
           }
         });
@@ -27622,7 +27685,11 @@ console.log('✅ OMP Mobile Kit chargé');
               icon: '🚌', jour: `J-${diffDays}`,
               urgent: diffDays <= 7,
               titre: `VHR à organiser : ${d.ville}`,
-              sub: `Manque : ${manquant.join(' + ')}`
+              sub: `Manque : ${manquant.join(' + ')}`,
+              actionType: 'FICHE_PROD_VHR',
+              dateConcertId: d.id,
+              ville: d.ville,
+              dateStr: d.date_concert
             });
           }
         });
@@ -27670,28 +27737,29 @@ console.log('✅ OMP Mobile Kit chargé');
       DECLA: '📋 Décla droits à faire',
       VHR: '🚌 VHR à organiser'
     };
-    const pageTargets = {
-      META: 'meta-planning',
-      CONCERT: 'gestion-omp',
-      DECLA: 'gestion-omp',
-      VHR: 'gestion-omp'
-    };
 
     let html = '';
+    // Stocker globalement pour les actions de clic
+    window._alertesData = alertes;
+    let alerteIdx = 0;
+    
     Object.keys(labels).forEach(src => {
-      if (groupes[src] && groupes[src].length > 0) {
+      const groupAlertes = groupes[src] || [];
+      if (groupAlertes.length > 0) {
         html += `<div class="alertes-section">
-          <div class="alertes-section-title">${labels[src]} (${groupes[src].length})</div>`;
-        groupes[src].forEach(a => {
-          const target = pageTargets[src] || 'dashboard';
+          <div class="alertes-section-title">${labels[src]} (${groupAlertes.length})</div>`;
+        groupAlertes.forEach(a => {
+          // Trouver l'index global de l'alerte
+          const globalIdx = alertes.indexOf(a);
           html += `
-            <div class="alerte-item alerte-${a.niveau}" onclick="if(window.showPage)window.showPage('${target}')">
+            <div class="alerte-item alerte-${a.niveau}" onclick="alerteClickAction(${globalIdx})">
               <span class="alerte-icon">${a.icon}</span>
               <span class="alerte-jour ${a.urgent ? 'urgent' : ''}">${a.jour}</span>
               <div class="alerte-content">
                 <div class="alerte-titre">${escapeHtml(a.titre)}</div>
                 ${a.sub ? `<div class="alerte-sub">${escapeHtml(a.sub)}</div>` : ''}
               </div>
+              <div class="alerte-arrow">›</div>
             </div>
           `;
         });
@@ -27701,6 +27769,55 @@ console.log('✅ OMP Mobile Kit chargé');
 
     corps.innerHTML = html;
   }
+  
+  // ━━━━━━ DISPATCHER DE CLIC SUR ALERTE ━━━━━━
+  window.alerteClickAction = async function(idx) {
+    const a = window._alertesData?.[idx];
+    if (!a) {
+      console.warn('[ALERTES] Alerte introuvable', idx);
+      return;
+    }
+    
+    console.log('[ALERTES] Clic alerte :', a.actionType, a.titre);
+    
+    if (a.actionType === 'META_PLANNING') {
+      // Aller au module META PLANNING
+      if (window.showPage) window.showPage('meta-planning');
+      return;
+    }
+    
+    if (a.actionType && a.actionType.startsWith('FICHE_PROD') && a.dateConcertId) {
+      // Ouvrir la fiche prod du concert + sous-page éventuelle
+      try {
+        // Ouvre la fiche prod (qui mémorise _fpDateId)
+        if (typeof fpOuvrir === 'function') {
+          await fpOuvrir(a.dateConcertId, a.ville || '', a.dateStr || '');
+          
+          // Si on veut une sous-page spécifique : décla droits ou VHR
+          if (a.actionType === 'FICHE_PROD_DECLA') {
+            setTimeout(() => {
+              if (typeof fpOuvrirDecla === 'function') fpOuvrirDecla();
+            }, 500);
+          } else if (a.actionType === 'FICHE_PROD_VHR') {
+            // Pour VHR : aller à la page de gestion VHR de la date
+            setTimeout(() => {
+              if (typeof ouvrirVHR === 'function') {
+                ouvrirVHR(a.dateConcertId);
+              } else if (window.showPage) {
+                window.showPage('vhr-tournee');
+              }
+            }, 500);
+          }
+        } else {
+          console.error('[ALERTES] fpOuvrir introuvable');
+          if (window.showPage) window.showPage('gestion-omp');
+        }
+      } catch (err) {
+        console.error('[ALERTES] Erreur navigation :', err);
+        if (window.showPage) window.showPage('gestion-omp');
+      }
+    }
+  };
 
   function escapeHtml(str) {
     if (!str) return '';
