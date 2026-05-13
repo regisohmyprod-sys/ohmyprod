@@ -3725,6 +3725,66 @@ function _hideTeamSelection() {
       </div>
     </div>
 
+    <!-- MODAL MODIFIER CAMPAGNE META (CLUSTER) -->
+    <div id="metaPromoModalCluster" class="modal-overlay" onclick="if(event.target===this){metaPromoCloseModalCluster()}" style="display:none;background:rgba(0,0,0,0.85);position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;align-items:center;justify-content:center;padding:20px;">
+      <div class="modal-content" style="background:#1a1a1a;border:2px solid #d4af37;border-radius:12px;padding:25px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
+        <button onclick="metaPromoCloseModalCluster()" style="position:absolute;top:12px;right:12px;background:transparent;border:none;color:#888;font-size:24px;cursor:pointer;">✕</button>
+        <h3 id="metaPromoModalClusterTitle" style="color:#d4af37;margin:0 0 20px 0;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border-bottom:1px solid rgba(212,175,55,0.3);padding-bottom:10px;">MODIFIER LA CAMPAGNE</h3>
+
+        <input type="hidden" id="mpCluster_id">
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="background:rgba(212,175,55,0.08);padding:10px 14px;border-radius:6px;border-left:3px solid #d4af37;">
+            <div id="mpCluster_nom" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;color:#d4af37;">—</div>
+            <div id="mpCluster_dates_info" style="font-size:11px;color:#888;margin-top:4px;">—</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Budget mensuel (€)</label>
+              <input type="number" id="mpCluster_budget" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">État</label>
+              <select id="mpCluster_etat" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;">
+                <option value="A_FAIRE">⏳ À faire</option>
+                <option value="EN_COURS">🔥 En cours</option>
+                <option value="TERMINE">✅ Terminé</option>
+                <option value="NE_PAS_FAIRE">❌ Ne pas faire</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Date de lancement</label>
+              <input type="date" id="mpCluster_date_lancement" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Date de fin</label>
+              <input type="date" id="mpCluster_date_fin" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">URL Meta Ads (lien direct vers la campagne)</label>
+            <input type="url" id="mpCluster_url" placeholder="https://business.facebook.com/..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+
+          <div>
+            <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Notes</label>
+            <textarea id="mpCluster_notes" placeholder="Notes, observations, perfs..." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;min-height:80px;resize:vertical;box-sizing:border-box;"></textarea>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:20px;">
+          <button onclick="metaPromoDeleteCluster()" style="background:#3a1010;color:#e74c3c;border:1px solid #e74c3c;padding:10px 14px;border-radius:6px;cursor:pointer;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">🗑️ SUPPRIMER</button>
+          <button onclick="metaPromoCloseModalCluster()" style="flex:1;background:#3a3a3a;color:#c0c0c0;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">ANNULER</button>
+          <button onclick="metaPromoSaveCluster()" style="flex:1;background:#d4af37;color:#000;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ═══════════════════════════════════════════════════════════ -->
     <!-- FIN PAGE META PLANNING                                       -->
     <!-- ═══════════════════════════════════════════════════════════ -->
@@ -27513,6 +27573,7 @@ console.log('✅ OMP Mobile Kit chargé');
           </div>
           <div class="meta-promo-actions">
             <button class="meta-promo-btn-icon" title="Voir détail" onclick="metaPromoViewCampagne('${item.id}')">👁️</button>
+            <button class="meta-promo-btn-icon" title="Modifier" onclick="metaPromoEditCluster('${item.id}')">✏️</button>
           </div>
         </div>`;
     } else {
@@ -27675,6 +27736,90 @@ ${c.notes || '(aucune)'}`
     );
   }
 
+  // ━━━━━━ MODAL MODIFIER / SUPPRIMER CLUSTER ━━━━━━
+  function metaPromoEditCluster(id) {
+    const c = metaPromoData.campagnes.find(x => x.id === id);
+    if (!c) return;
+    const modal = document.getElementById('metaPromoModalCluster');
+    if (!modal) return;
+
+    document.getElementById('mpCluster_id').value = c.id;
+    document.getElementById('mpCluster_nom').textContent = c.nom_cluster + ' (' + c.code + ')';
+    const datesCount = (c.dates_concernees || []).length;
+    const villes = (c.dates_concernees || []).map(d => d.ville).join(', ');
+    document.getElementById('mpCluster_dates_info').textContent =
+      `📍 ${datesCount} dates : ${villes}`;
+    document.getElementById('mpCluster_budget').value = c.budget_mensuel || 0;
+    document.getElementById('mpCluster_etat').value = c.etat || 'A_FAIRE';
+    document.getElementById('mpCluster_date_lancement').value = c.date_lancement || '';
+    document.getElementById('mpCluster_date_fin').value = c.date_fin || '';
+    document.getElementById('mpCluster_url').value = c.url_meta_ads || '';
+    document.getElementById('mpCluster_notes').value = c.notes || '';
+
+    modal.style.display = 'flex';
+  }
+
+  function metaPromoCloseModalCluster() {
+    const modal = document.getElementById('metaPromoModalCluster');
+    if (modal) modal.style.display = 'none';
+  }
+
+  async function metaPromoSaveCluster() {
+    const sb = getSupabase();
+    if (!sb) return;
+    const id = document.getElementById('mpCluster_id').value;
+    if (!id) return;
+
+    const budget = parseInt(document.getElementById('mpCluster_budget').value, 10);
+    const payload = {
+      budget_mensuel: isNaN(budget) ? 0 : budget,
+      etat: document.getElementById('mpCluster_etat').value,
+      date_lancement: document.getElementById('mpCluster_date_lancement').value || null,
+      date_fin: document.getElementById('mpCluster_date_fin').value || null,
+      url_meta_ads: document.getElementById('mpCluster_url').value.trim() || null,
+      notes: document.getElementById('mpCluster_notes').value.trim() || null
+    };
+    try {
+      const { error } = await sb.from('promo_meta_campagnes').update(payload).eq('id', id);
+      if (error) throw error;
+      metaPromoCloseModalCluster();
+      await metaPromoLoad();
+    } catch (err) {
+      console.error('[META PROMO] Erreur save cluster:', err);
+      alert('Erreur : ' + err.message);
+    }
+  }
+
+  async function metaPromoDeleteCluster() {
+    const sb = getSupabase();
+    if (!sb) return;
+    const id = document.getElementById('mpCluster_id').value;
+    if (!id) return;
+    const c = metaPromoData.campagnes.find(x => x.id === id);
+    if (!c) return;
+
+    const confirmation = prompt(
+      `⚠️ SUPPRESSION DÉFINITIVE\n\n` +
+      `Tu vas supprimer la campagne :\n"${c.nom_cluster}" (${c.code})\n\n` +
+      `Cette action est IRRÉVERSIBLE.\n` +
+      `Pour confirmer, tape exactement le code : ${c.code}`
+    );
+    if (confirmation !== c.code) {
+      if (confirmation !== null) alert('Code incorrect, suppression annulée.');
+      return;
+    }
+    try {
+      const { error } = await sb.from('promo_meta_campagnes').delete().eq('id', id);
+      if (error) throw error;
+      metaPromoCloseModalCluster();
+      await metaPromoLoad();
+      alert('✅ Campagne supprimée.');
+    } catch (err) {
+      console.error('[META PROMO] Erreur delete cluster:', err);
+      alert('Erreur : ' + err.message);
+    }
+  }
+
   function metaPromoUpdateBadge() {
     const badge = document.getElementById('meta-planning-badge');
     if (!badge) return;
@@ -27730,6 +27875,10 @@ ${c.notes || '(aucune)'}`
   window.metaPromoSaveAction = metaPromoSaveAction;
   window.metaPromoDeleteAction = metaPromoDeleteAction;
   window.metaPromoViewCampagne = metaPromoViewCampagne;
+  window.metaPromoEditCluster = metaPromoEditCluster;
+  window.metaPromoCloseModalCluster = metaPromoCloseModalCluster;
+  window.metaPromoSaveCluster = metaPromoSaveCluster;
+  window.metaPromoDeleteCluster = metaPromoDeleteCluster;
 
   console.log('✅ Module META PLANNING chargé');
 })();
