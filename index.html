@@ -27550,6 +27550,29 @@ console.log('✅ OMP Mobile Kit chargé');
     return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
+  // ━━━━━━ OUVRIR META BUSINESS SUITE / ADS MANAGER ━━━━━━
+  const META_BUSINESS_ID = '644890879422593';
+  const META_PAGE_ID = '755396057664680';
+
+  function metaPromoOpenMeta(kind, type) {
+    // kind = 'campagne' (cluster meta) ou 'action' (post/pub/etc)
+    // type = pour les actions, le sous-type (PUB_META, POST_FB, etc.)
+    let url = '';
+
+    if (kind === 'campagne' || type === 'PUB_META') {
+      // Pubs Meta = Ads Manager
+      url = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=&business_id=${META_BUSINESS_ID}`;
+    } else if (type === 'POST_FB' || type === 'POST_INSTA' || type === 'REEL' || type === 'STORY') {
+      // Posts / Reels / Stories = Meta Business Suite Planificateur
+      url = `https://business.facebook.com/latest/posts/scheduled_posts?business_id=${META_BUSINESS_ID}&asset_id=${META_PAGE_ID}`;
+    } else {
+      // Fallback : accueil Business Suite
+      url = `https://business.facebook.com/latest/home?business_id=${META_BUSINESS_ID}`;
+    }
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
   function metaPromoRenderItem(item) {
     const etat = item.etat || 'A_FAIRE';
     const etatInfo = ETATS_LABELS[etat];
@@ -27574,6 +27597,7 @@ console.log('✅ OMP Mobile Kit chargé');
           <div class="meta-promo-actions">
             <button class="meta-promo-btn-icon" title="Voir détail" onclick="metaPromoViewCampagne('${item.id}')">👁️</button>
             <button class="meta-promo-btn-icon" title="Modifier" onclick="metaPromoEditCluster('${item.id}')">✏️</button>
+            <button class="meta-promo-btn-icon" title="🔗 Ouvrir Meta Ads Manager" onclick="metaPromoOpenMeta('campagne')" style="color:#4267B2;">🔗</button>
           </div>
         </div>`;
     } else {
@@ -27593,6 +27617,8 @@ console.log('✅ OMP Mobile Kit chargé');
             </div>
           </div>
           <div class="meta-promo-actions">
+            ${['PUB_META','POST_FB','POST_INSTA','REEL','STORY'].includes(item.type) ?
+              `<button class="meta-promo-btn-icon" title="🔗 Ouvrir dans Meta" onclick="metaPromoOpenMeta('action','${item.type}')" style="color:#4267B2;">🔗</button>` : ''}
             <button class="meta-promo-btn-icon" title="Modifier" onclick="metaPromoEditAction('${item.id}')">✏️</button>
             <button class="meta-promo-btn-icon danger" title="Supprimer" onclick="metaPromoDeleteAction('${item.id}')">🗑️</button>
           </div>
@@ -27879,6 +27905,7 @@ ${c.notes || '(aucune)'}`
   window.metaPromoCloseModalCluster = metaPromoCloseModalCluster;
   window.metaPromoSaveCluster = metaPromoSaveCluster;
   window.metaPromoDeleteCluster = metaPromoDeleteCluster;
+  window.metaPromoOpenMeta = metaPromoOpenMeta;
 
   console.log('✅ Module META PLANNING chargé');
 })();
