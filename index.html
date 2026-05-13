@@ -3658,7 +3658,7 @@ function _hideTeamSelection() {
       <div class="meta-promo-tabs">
         <button class="meta-promo-tab active" data-tab="campagnes" onclick="metaPromoSwitchTab('campagnes')">📊 8 Clusters Meta</button>
         <button class="meta-promo-tab" data-tab="actions" onclick="metaPromoSwitchTab('actions')">📅 Actions & Posts</button>
-        <button class="meta-promo-tab" data-tab="tous" onclick="metaPromoSwitchTab('tous')">🗂️ Tout voir</button>
+        <button class="meta-promo-tab" data-tab="tous" onclick="metaPromoSwitchTab('tous')">📆 Planning</button>
       </div>
 
       <!-- Liste -->
@@ -27440,6 +27440,188 @@ console.log('✅ OMP Mobile Kit chargé');
   .meta-promo-item { grid-template-columns: auto 1fr; }
   .meta-promo-actions { grid-column: 2; justify-content: flex-end; }
 }
+
+/* ━━━━━━ VUE PLANNING TIMELINE ━━━━━━ */
+.planning-header {
+  background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(0,0,0,0.5));
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+}
+.planning-info {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: #c0c0c0;
+}
+.planning-info strong { color: #d4af37; }
+
+.planning-day {
+  border-left: 3px solid rgba(212,175,55,0.4);
+  padding: 12px 0 12px 18px;
+  margin-bottom: 8px;
+  position: relative;
+}
+.planning-day::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 16px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #d4af37;
+  border: 2px solid #0a0a0a;
+}
+.planning-day.planning-today {
+  border-left-color: #e74c3c;
+  background: linear-gradient(90deg, rgba(231,76,60,0.08), transparent 60%);
+}
+.planning-day.planning-today::before {
+  background: #e74c3c;
+  box-shadow: 0 0 12px rgba(231,76,60,0.7);
+  animation: planningPulse 2s infinite;
+}
+@keyframes planningPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.6); }
+  50% { box-shadow: 0 0 0 8px rgba(231,76,60,0); }
+}
+.planning-day.planning-past { opacity: 0.5; }
+.planning-day.planning-past::before { background: #555; }
+.planning-day.planning-weekend {
+  background: linear-gradient(90deg, rgba(149,165,166,0.04), transparent 70%);
+}
+.planning-day.planning-day-empty {
+  border-left-color: rgba(149,165,166,0.2);
+  padding-bottom: 6px;
+}
+.planning-day.planning-day-empty::before {
+  background: #2a2a2a;
+  width: 9px;
+  height: 9px;
+  left: -6px;
+}
+
+.planning-day-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.planning-day-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 1.5px;
+  color: #d4af37;
+  text-transform: uppercase;
+}
+.planning-today .planning-day-name { color: #e74c3c; }
+.planning-past .planning-day-name { color: #777; }
+.planning-day-empty .planning-day-name { color: #555; font-size: 0.85rem; }
+
+.planning-day-date {
+  font-size: 0.85rem;
+  color: #888;
+}
+.planning-day-count {
+  font-size: 0.7rem;
+  background: rgba(212,175,55,0.15);
+  color: #d4af37;
+  padding: 2px 9px;
+  border-radius: 10px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.planning-today-badge {
+  background: #e74c3c;
+  color: #fff;
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.planning-empty-msg {
+  font-size: 0.78rem;
+  color: #555;
+  font-style: italic;
+  padding-left: 0;
+}
+
+.planning-day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.planning-event {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  transition: all 0.15s;
+}
+.planning-event:hover {
+  background: rgba(212,175,55,0.06);
+  border-color: rgba(212,175,55,0.25);
+}
+.planning-event.etat-TERMINE { opacity: 0.55; }
+.planning-event.etat-TERMINE .planning-event-title { text-decoration: line-through; color: #777; }
+.planning-event.etat-NE_PAS_FAIRE { opacity: 0.4; }
+.planning-event.etat-NE_PAS_FAIRE .planning-event-title { text-decoration: line-through; color: #555; }
+
+.planning-event-time {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  color: #d4af37;
+  min-width: 42px;
+  text-align: center;
+}
+.planning-event-content { min-width: 0; }
+.planning-event-title {
+  font-size: 0.88rem;
+  color: #f0f0f0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  line-height: 1.3;
+}
+.planning-event-sub {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 2px;
+}
+.planning-event-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.planning-event-actions .meta-promo-btn-icon {
+  width: 26px;
+  height: 26px;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .planning-event {
+    grid-template-columns: auto auto 1fr;
+  }
+  .planning-event-actions {
+    grid-column: 2 / span 2;
+    grid-row: 2;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+}
 </style>
 
 <script>
@@ -27533,16 +27715,206 @@ console.log('✅ OMP Mobile Kit chargé');
     } else if (metaPromoCurrentTab === 'actions') {
       items = metaPromoData.actions.map(a => ({ ...a, _kind: 'action' }));
     } else {
-      items = [
-        ...metaPromoData.campagnes.map(c => ({ ...c, _kind: 'campagne' })),
-        ...metaPromoData.actions.map(a => ({ ...a, _kind: 'action' }))
-      ];
+      // === ONGLET PLANNING : rendu timeline ===
+      metaPromoRenderPlanning();
+      return;
     }
     if (items.length === 0) {
       list.innerHTML = '<div class="meta-promo-empty">Aucun élément pour cet onglet. Clique sur "+ AJOUTER UNE ACTION" pour commencer.</div>';
       return;
     }
     list.innerHTML = items.map(metaPromoRenderItem).join('');
+  }
+
+  // ━━━━━━ VUE PLANNING TIMELINE ━━━━━━
+  function metaPromoRenderPlanning() {
+    const list = document.getElementById('metaPromoList');
+    if (!list) return;
+
+    // Récupérer toutes les actions datées + campagnes (avec date_lancement)
+    const events = [];
+
+    // Actions (posts, pubs, etc.) avec date_prevue
+    metaPromoData.actions.forEach(a => {
+      if (a.date_prevue) {
+        events.push({
+          ...a,
+          _kind: 'action',
+          _sortDate: a.date_prevue,
+          _sortTime: a.heure_prevue || '00:00:00'
+        });
+      }
+    });
+
+    // Campagnes clusters avec date_lancement (si renseignée)
+    metaPromoData.campagnes.forEach(c => {
+      if (c.date_lancement) {
+        events.push({
+          ...c,
+          _kind: 'campagne',
+          _sortDate: c.date_lancement,
+          _sortTime: '00:00:00',
+          _label_event: '🚀 LANCEMENT CAMPAGNE'
+        });
+      }
+      if (c.date_fin) {
+        events.push({
+          ...c,
+          _kind: 'campagne',
+          _sortDate: c.date_fin,
+          _sortTime: '23:59:59',
+          _label_event: '🏁 FIN CAMPAGNE'
+        });
+      }
+    });
+
+    if (events.length === 0) {
+      list.innerHTML = '<div class="meta-promo-empty">Aucune action datée. Ajoute des dates dans tes actions/campagnes pour voir le planning.</div>';
+      return;
+    }
+
+    // Trier chronologiquement
+    events.sort((a, b) => {
+      const dA = a._sortDate + ' ' + a._sortTime;
+      const dB = b._sortDate + ' ' + b._sortTime;
+      return dA.localeCompare(dB);
+    });
+
+    // Grouper par date
+    const groups = {};
+    events.forEach(ev => {
+      const d = ev._sortDate;
+      if (!groups[d]) groups[d] = [];
+      groups[d].push(ev);
+    });
+
+    // Détection des "trous" (jours sans action entre 2 actions)
+    const dates = Object.keys(groups).sort();
+    const firstDate = dates[0];
+    const lastDate = dates[dates.length - 1];
+
+    // Générer toutes les dates entre première et dernière
+    const allDates = [];
+    let curr = new Date(firstDate);
+    const end = new Date(lastDate);
+    while (curr <= end) {
+      allDates.push(curr.toISOString().slice(0, 10));
+      curr.setDate(curr.getDate() + 1);
+    }
+
+    // Date du jour pour repère
+    const today = new Date().toISOString().slice(0, 10);
+
+    // Stats globales
+    const totalEvents = events.length;
+    const aFaire = events.filter(e => e.etat === 'A_FAIRE').length;
+    const enCours = events.filter(e => e.etat === 'EN_COURS').length;
+    const termine = events.filter(e => e.etat === 'TERMINE').length;
+
+    // Construire le HTML
+    let html = `
+      <div class="planning-header">
+        <div class="planning-info">
+          <span>📆 <strong>${totalEvents}</strong> événement${totalEvents > 1 ? 's' : ''} planifié${totalEvents > 1 ? 's' : ''}</span>
+          <span>📅 Du <strong>${new Date(firstDate).toLocaleDateString('fr-FR')}</strong> au <strong>${new Date(lastDate).toLocaleDateString('fr-FR')}</strong></span>
+          <span style="color:#3498db;">⏳ ${aFaire}</span>
+          <span style="color:#f39c12;">🔥 ${enCours}</span>
+          <span style="color:#2ecc71;">✅ ${termine}</span>
+        </div>
+      </div>
+    `;
+
+    // Rendu jour par jour (avec affichage des trous)
+    allDates.forEach(dateStr => {
+      const dayEvents = groups[dateStr] || [];
+      const dateObj = new Date(dateStr);
+      const dayName = dateObj.toLocaleDateString('fr-FR', { weekday: 'long' });
+      const dayLabel = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+      const isToday = dateStr === today;
+      const isPast = dateStr < today;
+      const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+
+      if (dayEvents.length === 0) {
+        // Trou (jour vide)
+        html += `
+          <div class="planning-day planning-day-empty ${isWeekend ? 'planning-weekend' : ''} ${isToday ? 'planning-today' : ''} ${isPast ? 'planning-past' : ''}">
+            <div class="planning-day-header">
+              <span class="planning-day-name">${dayName}</span>
+              <span class="planning-day-date">${dayLabel}</span>
+              ${isToday ? '<span class="planning-today-badge">AUJOURD\'HUI</span>' : ''}
+            </div>
+            <div class="planning-empty-msg">— aucun post / action prévu —</div>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="planning-day ${isWeekend ? 'planning-weekend' : ''} ${isToday ? 'planning-today' : ''} ${isPast ? 'planning-past' : ''}">
+            <div class="planning-day-header">
+              <span class="planning-day-name">${dayName}</span>
+              <span class="planning-day-date">${dayLabel}</span>
+              <span class="planning-day-count">${dayEvents.length} action${dayEvents.length > 1 ? 's' : ''}</span>
+              ${isToday ? '<span class="planning-today-badge">AUJOURD\'HUI</span>' : ''}
+            </div>
+            <div class="planning-day-events">
+              ${dayEvents.map(ev => metaPromoRenderPlanningEvent(ev)).join('')}
+            </div>
+          </div>
+        `;
+      }
+    });
+
+    list.innerHTML = html;
+  }
+
+  function metaPromoRenderPlanningEvent(ev) {
+    const etat = ev.etat || 'A_FAIRE';
+    const etatInfo = ETATS_LABELS[etat];
+    const heure = ev._sortTime && ev._sortTime !== '00:00:00' && ev._sortTime !== '23:59:59'
+      ? ev._sortTime.substring(0, 5)
+      : '';
+
+    if (ev._kind === 'campagne') {
+      return `
+        <div class="planning-event etat-${etat}">
+          <button class="etat-btn etat-${etat}" style="width:30px;height:30px;font-size:0.9rem;" title="${etatInfo.label} (clic pour changer)"
+                  onclick="metaPromoCycleEtat('campagne','${ev.id}')">${etatInfo.icon}</button>
+          <div class="planning-event-time">${heure || '—'}</div>
+          <div class="planning-event-content">
+            <div class="planning-event-title">
+              ${ev._label_event || ''}
+              <span class="meta-promo-badge badge-cluster" style="margin-left:6px;">${metaPromoEscape(ev.code)}</span>
+              ${metaPromoEscape(ev.nom_cluster)}
+            </div>
+            <div class="planning-event-sub">💰 ${ev.budget_mensuel} €/mois</div>
+          </div>
+          <div class="planning-event-actions">
+            <button class="meta-promo-btn-icon" title="🔗 Ouvrir Meta Ads" onclick="metaPromoOpenMeta('campagne')" style="color:#4267B2;">🔗</button>
+            <button class="meta-promo-btn-icon" title="Modifier" onclick="metaPromoEditCluster('${ev.id}')">✏️</button>
+          </div>
+        </div>
+      `;
+    } else {
+      const isMetaType = ['PUB_META','POST_FB','POST_INSTA','REEL','STORY'].includes(ev.type);
+      return `
+        <div class="planning-event etat-${etat}">
+          <button class="etat-btn etat-${etat}" style="width:30px;height:30px;font-size:0.9rem;" title="${etatInfo.label} (clic pour changer)"
+                  onclick="metaPromoCycleEtat('action','${ev.id}')">${etatInfo.icon}</button>
+          <div class="planning-event-time">${heure || '—'}</div>
+          <div class="planning-event-content">
+            <div class="planning-event-title">
+              <span class="meta-promo-badge badge-type-${ev.type}">${TYPE_LABELS[ev.type] || ev.type}</span>
+              ${metaPromoEscape(ev.titre)}
+            </div>
+            ${ev.description ? `<div class="planning-event-sub">${metaPromoEscape(ev.description.substring(0, 80))}${ev.description.length > 80 ? '…' : ''}</div>` : ''}
+          </div>
+          <div class="planning-event-actions">
+            ${isMetaType ? `<button class="meta-promo-btn-icon" title="🔗 Ouvrir dans Meta" onclick="metaPromoOpenMeta('action','${ev.type}')" style="color:#4267B2;">🔗</button>` : ''}
+            <button class="meta-promo-btn-icon" title="Modifier" onclick="metaPromoEditAction('${ev.id}')">✏️</button>
+            <button class="meta-promo-btn-icon danger" title="Supprimer" onclick="metaPromoDeleteAction('${ev.id}')">🗑️</button>
+          </div>
+        </div>
+      `;
+    }
   }
 
   function metaPromoEscape(str) {
