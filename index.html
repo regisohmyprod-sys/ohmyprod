@@ -3464,7 +3464,7 @@ function _hideTeamSelection() {
         <div class="page-title" style="font-size:22px;margin-bottom:0;">GESTION TOUR</div>
       </div>
 
-      <!-- 7 cartes sur 2 lignes (4+3) : TOUR / FINANCIER / VHR / BOOKING // PROMO / BILLETTERIE / SPECTATEURS -->
+      <!-- 8 cartes sur 2 lignes (4+4) : TOUR / FINANCIER / VHR / BOOKING // PROMO / META PLANNING / BILLETTERIE / SPECTATEURS -->
       <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
         
         <!-- TOUR -->
@@ -3525,6 +3525,14 @@ function _hideTeamSelection() {
             <a href="https://www.instagram.com/theworldofqueenofficiel/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📸 TWOQ Instagram Off</a>
             <a href="https://www.youtube.com/channel/UCwyb6LJpE6kDfI3Wx7wP4Xg" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">▶️ TWOQ Youtube Off</a>
           </div>
+        </div>
+
+        <!-- META PUBS ET POSTS, PLANNING -->
+        <div class="stat-card" style="border-left:3px solid #d4af37;padding:20px;cursor:pointer;position:relative;background:linear-gradient(135deg,#1a1a1a 0%,#2a2419 100%);" onclick="showPage('meta-planning')">
+          <div class="stat-label">🎯 Meta & Posts</div>
+          <div class="stat-value" style="font-size:28px;color:#d4af37;line-height:1.1;">META PLANNING</div>
+          <div class="stat-sub">Pubs Meta + Posts FB/IG, planning</div>
+          <div id="meta-planning-badge" style="position:absolute;top:8px;right:8px;display:none;background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.5px;">0 EN COURS</div>
         </div>
 
         <!-- BILLETTERIE -->
@@ -3626,6 +3634,100 @@ function _hideTeamSelection() {
       </div>
 
     </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- PAGE META PUBS ET POSTS, PLANNING                            -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div id="page-meta-planning" class="page">
+      <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Tableau de bord</button>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#d4af37;">🎯 META PUBS ET POSTS, PLANNING</div>
+          <div style="font-size:13px;color:#888;margin-top:4px;">Centre de pilotage : campagnes Meta Ads + posts réseaux + planning</div>
+        </div>
+        <button onclick="metaPromoOpenModal()" style="background:#d4af37;color:#000;border:none;border-radius:8px;padding:10px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;">+ AJOUTER UNE ACTION</button>
+      </div>
+
+      <!-- Stats rapides -->
+      <div id="metaPromoStats" class="meta-promo-stats">
+        <div class="meta-promo-empty">Chargement…</div>
+      </div>
+
+      <!-- Onglets -->
+      <div class="meta-promo-tabs">
+        <button class="meta-promo-tab active" data-tab="campagnes" onclick="metaPromoSwitchTab('campagnes')">📊 8 Clusters Meta</button>
+        <button class="meta-promo-tab" data-tab="actions" onclick="metaPromoSwitchTab('actions')">📅 Actions & Posts</button>
+        <button class="meta-promo-tab" data-tab="tous" onclick="metaPromoSwitchTab('tous')">🗂️ Tout voir</button>
+      </div>
+
+      <!-- Liste -->
+      <div class="meta-promo-list" id="metaPromoList">
+        <div class="meta-promo-empty">Chargement…</div>
+      </div>
+    </div>
+
+    <!-- MODAL AJOUTER / MODIFIER ACTION META PLANNING -->
+    <div id="metaPromoModal" class="modal-overlay" onclick="if(event.target===this){metaPromoCloseModal()}" style="display:none;background:rgba(0,0,0,0.85);position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;align-items:center;justify-content:center;padding:20px;">
+      <div class="modal-content" style="background:#1a1a1a;border:2px solid #d4af37;border-radius:12px;padding:25px;max-width:550px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
+        <button onclick="metaPromoCloseModal()" style="position:absolute;top:12px;right:12px;background:transparent;border:none;color:#888;font-size:24px;cursor:pointer;">✕</button>
+        <h3 id="metaPromoModalTitle" style="color:#d4af37;margin:0 0 20px 0;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;border-bottom:1px solid rgba(212,175,55,0.3);padding-bottom:10px;">NOUVELLE ACTION</h3>
+
+        <input type="hidden" id="mpAction_id">
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Type</label>
+            <select id="mpAction_type" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;">
+              <option value="PUB_META">📊 Pub Meta</option>
+              <option value="POST_FB">📘 Post Facebook</option>
+              <option value="POST_INSTA">📷 Post Instagram</option>
+              <option value="REEL">🎬 Reel</option>
+              <option value="STORY">📲 Story</option>
+              <option value="EMAILING">✉️ Emailing</option>
+              <option value="PRESSE">📰 Presse</option>
+              <option value="AUTRE">📌 Autre</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Titre *</label>
+            <input type="text" id="mpAction_titre" placeholder="Ex: Post pré-show Narbonne" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Description</label>
+            <textarea id="mpAction_description" placeholder="Détails, lien créatif, etc." style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;min-height:70px;resize:vertical;box-sizing:border-box;"></textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Date prévue</label>
+              <input type="date" id="mpAction_date" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">État</label>
+              <select id="mpAction_etat" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;">
+                <option value="A_FAIRE">⏳ À faire</option>
+                <option value="EN_COURS">🔥 En cours</option>
+                <option value="TERMINE">✅ Terminé</option>
+                <option value="NE_PAS_FAIRE">❌ Ne pas faire</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#d4af37;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Notes</label>
+            <textarea id="mpAction_notes" placeholder="Notes internes" style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;color:#fff;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;min-height:50px;resize:vertical;box-sizing:border-box;"></textarea>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:20px;">
+          <button onclick="metaPromoCloseModal()" style="flex:1;background:#3a3a3a;color:#c0c0c0;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">ANNULER</button>
+          <button onclick="metaPromoSaveAction()" style="flex:1;background:#d4af37;color:#000;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💾 ENREGISTRER</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- FIN PAGE META PLANNING                                       -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
 
     <!-- GESTION OMP -->
     <!-- PAGE SUIVI DATES RÉSUMÉ (Accès Financier) -->
@@ -27085,6 +27187,552 @@ window.bnSyncActive = bnSyncActive;
 window.bnCloseDrawer = bnCloseDrawer;
 
 console.log('✅ OMP Mobile Kit chargé');
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MODULE META PUBS ET POSTS, PLANNING                          -->
+<!-- Ajouté le 13/05/2026                                          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<style>
+/* ━━━━━━ MODULE META PLANNING ━━━━━━ */
+.meta-promo-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+.meta-promo-tab {
+  background: #2a2a2a;
+  border: 1px solid rgba(212,175,55,0.3);
+  color: #c0c0c0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+}
+.meta-promo-tab:hover { background: #3a3a3a; }
+.meta-promo-tab.active {
+  background: #d4af37;
+  color: #0a0a0a;
+  font-weight: 700;
+  border-color: #d4af37;
+}
+.meta-promo-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.meta-promo-stat {
+  background: rgba(0,0,0,0.4);
+  padding: 12px 14px;
+  border-radius: 8px;
+  text-align: center;
+  border-left: 3px solid #d4af37;
+}
+.meta-promo-stat .num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #d4af37;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+}
+.meta-promo-stat .lbl {
+  font-size: 0.7rem;
+  color: #9a9a92;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 3px;
+}
+.meta-promo-list {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 5px;
+  margin-bottom: 15px;
+}
+.meta-promo-item {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  transition: all 0.2s;
+}
+.meta-promo-item:hover {
+  background: rgba(212,175,55,0.05);
+  border-color: rgba(212,175,55,0.3);
+}
+.meta-promo-item.etat-TERMINE { opacity: 0.55; }
+.meta-promo-item.etat-TERMINE .meta-promo-title {
+  text-decoration: line-through;
+  color: #6a6a6a;
+}
+.meta-promo-item.etat-NE_PAS_FAIRE { opacity: 0.4; }
+.meta-promo-item.etat-NE_PAS_FAIRE .meta-promo-title {
+  text-decoration: line-through;
+  color: #555;
+}
+.etat-btn {
+  background: none;
+  border: 2px solid;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+}
+.etat-btn:hover { transform: scale(1.1); }
+.etat-btn.etat-A_FAIRE { border-color: #3498db; background: rgba(52,152,219,0.1); }
+.etat-btn.etat-EN_COURS { border-color: #f39c12; background: rgba(243,156,18,0.15); animation: metaPromoPulse 2s infinite; }
+.etat-btn.etat-TERMINE { border-color: #2ecc71; background: rgba(46,204,113,0.15); }
+.etat-btn.etat-NE_PAS_FAIRE { border-color: #7f8c8d; background: rgba(127,140,141,0.1); }
+@keyframes metaPromoPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(243,156,18,0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(243,156,18,0); }
+}
+.meta-promo-content { min-width: 0; }
+.meta-promo-title {
+  font-weight: 600;
+  color: #f5f5f0;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.meta-promo-sub {
+  font-size: 0.8rem;
+  color: #9a9a92;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.meta-promo-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.badge-cluster { background: rgba(212,175,55,0.2); color: #d4af37; }
+.badge-type-POST_FB { background: rgba(66,103,178,0.3); color: #6fa8dc; }
+.badge-type-POST_INSTA { background: rgba(228,64,95,0.3); color: #f48fb1; }
+.badge-type-REEL { background: rgba(155,89,182,0.3); color: #c39bd3; }
+.badge-type-STORY { background: rgba(231,76,60,0.3); color: #f1948a; }
+.badge-type-PUB_META { background: rgba(46,204,113,0.3); color: #82e0aa; }
+.badge-type-EMAILING { background: rgba(243,156,18,0.3); color: #f8c471; }
+.badge-type-PRESSE { background: rgba(149,165,166,0.3); color: #d5dbdb; }
+.badge-type-AUTRE { background: rgba(149,165,166,0.3); color: #bdc3c7; }
+.badge-priorite-1 { background: rgba(231,76,60,0.3); color: #f1948a; }
+.badge-priorite-2 { background: rgba(243,156,18,0.3); color: #f8c471; }
+.meta-promo-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.meta-promo-btn-icon {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #9a9a92;
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.meta-promo-btn-icon:hover {
+  background: rgba(212,175,55,0.15);
+  color: #d4af37;
+  border-color: #d4af37;
+}
+.meta-promo-btn-icon.danger:hover {
+  background: rgba(231,76,60,0.15);
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+.meta-promo-empty {
+  text-align: center;
+  color: #6a6a6a;
+  padding: 30px 15px;
+  font-style: italic;
+}
+@media (max-width: 700px) {
+  .meta-promo-item { grid-template-columns: auto 1fr; }
+  .meta-promo-actions { grid-column: 2; justify-content: flex-end; }
+}
+</style>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// MODULE META PUBS ET POSTS, PLANNING — Logique
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  let metaPromoData = { campagnes: [], actions: [] };
+  let metaPromoCurrentTab = 'campagnes';
+  let metaPromoLoaded = false;
+
+  const ETATS_CYCLE = ['A_FAIRE', 'EN_COURS', 'TERMINE', 'NE_PAS_FAIRE'];
+  const ETATS_LABELS = {
+    'A_FAIRE': { icon: '⏳', label: 'À faire' },
+    'EN_COURS': { icon: '🔥', label: 'En cours' },
+    'TERMINE': { icon: '✅', label: 'Terminé' },
+    'NE_PAS_FAIRE': { icon: '❌', label: 'Ne pas faire' }
+  };
+  const TYPE_LABELS = {
+    'PUB_META': '📊 Pub Meta', 'POST_FB': '📘 FB', 'POST_INSTA': '📷 IG',
+    'REEL': '🎬 Reel', 'STORY': '📲 Story', 'EMAILING': '✉️ Email',
+    'PRESSE': '📰 Presse', 'AUTRE': '📌 Autre'
+  };
+
+  function getSupabase() {
+    return window._supabase || (typeof _supabase !== 'undefined' ? _supabase : null);
+  }
+
+  async function metaPromoLoad() {
+    const sb = getSupabase();
+    if (!sb) {
+      console.error('[META PROMO] Supabase non disponible');
+      const list = document.getElementById('metaPromoList');
+      if (list) list.innerHTML = '<div class="meta-promo-empty">⚠️ Supabase non disponible</div>';
+      return;
+    }
+    try {
+      const { data: camps, error: e1 } = await sb
+        .from('promo_meta_campagnes')
+        .select('*')
+        .order('ordre_affichage', { ascending: true });
+      const { data: acts, error: e2 } = await sb
+        .from('promo_actions')
+        .select('*')
+        .order('date_prevue', { ascending: true, nullsFirst: false });
+      if (e1) throw e1;
+      if (e2) throw e2;
+      metaPromoData.campagnes = camps || [];
+      metaPromoData.actions = acts || [];
+      metaPromoLoaded = true;
+      metaPromoRender();
+      metaPromoUpdateBadge();
+    } catch (err) {
+      console.error('[META PROMO] Erreur chargement:', err);
+      const list = document.getElementById('metaPromoList');
+      if (list) list.innerHTML = `<div class="meta-promo-empty">❌ Erreur: ${err.message}</div>`;
+    }
+  }
+
+  function metaPromoRender() {
+    metaPromoRenderStats();
+    metaPromoRenderList();
+  }
+
+  function metaPromoRenderStats() {
+    const statsEl = document.getElementById('metaPromoStats');
+    if (!statsEl) return;
+    const all = [...metaPromoData.campagnes, ...metaPromoData.actions];
+    const s = {
+      A_FAIRE: all.filter(x => x.etat === 'A_FAIRE').length,
+      EN_COURS: all.filter(x => x.etat === 'EN_COURS').length,
+      TERMINE: all.filter(x => x.etat === 'TERMINE').length
+    };
+    const budgetTotal = metaPromoData.campagnes
+      .filter(c => c.etat === 'EN_COURS' || c.etat === 'A_FAIRE')
+      .reduce((sum, c) => sum + (c.budget_mensuel || 0), 0);
+    statsEl.innerHTML = `
+      <div class="meta-promo-stat"><div class="num">⏳ ${s.A_FAIRE}</div><div class="lbl">À faire</div></div>
+      <div class="meta-promo-stat"><div class="num">🔥 ${s.EN_COURS}</div><div class="lbl">En cours</div></div>
+      <div class="meta-promo-stat"><div class="num">✅ ${s.TERMINE}</div><div class="lbl">Terminé</div></div>
+      <div class="meta-promo-stat"><div class="num">${budgetTotal} €</div><div class="lbl">Budget actif/mois</div></div>
+    `;
+  }
+
+  function metaPromoRenderList() {
+    const list = document.getElementById('metaPromoList');
+    if (!list) return;
+    let items = [];
+    if (metaPromoCurrentTab === 'campagnes') {
+      items = metaPromoData.campagnes.map(c => ({ ...c, _kind: 'campagne' }));
+    } else if (metaPromoCurrentTab === 'actions') {
+      items = metaPromoData.actions.map(a => ({ ...a, _kind: 'action' }));
+    } else {
+      items = [
+        ...metaPromoData.campagnes.map(c => ({ ...c, _kind: 'campagne' })),
+        ...metaPromoData.actions.map(a => ({ ...a, _kind: 'action' }))
+      ];
+    }
+    if (items.length === 0) {
+      list.innerHTML = '<div class="meta-promo-empty">Aucun élément pour cet onglet. Clique sur "+ AJOUTER UNE ACTION" pour commencer.</div>';
+      return;
+    }
+    list.innerHTML = items.map(metaPromoRenderItem).join('');
+  }
+
+  function metaPromoEscape(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function metaPromoRenderItem(item) {
+    const etat = item.etat || 'A_FAIRE';
+    const etatInfo = ETATS_LABELS[etat];
+    if (item._kind === 'campagne') {
+      const datesCount = (item.dates_concernees || []).length;
+      const villesPreview = (item.dates_concernees || []).slice(0, 3).map(d => d.ville).join(', ');
+      return `
+        <div class="meta-promo-item etat-${etat}">
+          <button class="etat-btn etat-${etat}" title="${etatInfo.label} (clic pour changer)" onclick="metaPromoCycleEtat('campagne','${item.id}')">${etatInfo.icon}</button>
+          <div class="meta-promo-content">
+            <div class="meta-promo-title">
+              <span class="meta-promo-badge badge-cluster">${metaPromoEscape(item.code)}</span>
+              ${metaPromoEscape(item.nom_cluster)}
+              ${item.priorite <= 2 ? `<span class="meta-promo-badge badge-priorite-${item.priorite}">P${item.priorite}</span>` : ''}
+            </div>
+            <div class="meta-promo-sub">
+              <span>💰 ${item.budget_mensuel} €/mois</span>
+              <span>📍 ${datesCount} dates</span>
+              <span>${metaPromoEscape(villesPreview)}${datesCount > 3 ? '…' : ''}</span>
+            </div>
+          </div>
+          <div class="meta-promo-actions">
+            <button class="meta-promo-btn-icon" title="Voir détail" onclick="metaPromoViewCampagne('${item.id}')">👁️</button>
+          </div>
+        </div>`;
+    } else {
+      const dateFr = item.date_prevue ? new Date(item.date_prevue).toLocaleDateString('fr-FR') : '—';
+      const desc = item.description || '';
+      return `
+        <div class="meta-promo-item etat-${etat}">
+          <button class="etat-btn etat-${etat}" title="${etatInfo.label} (clic pour changer)" onclick="metaPromoCycleEtat('action','${item.id}')">${etatInfo.icon}</button>
+          <div class="meta-promo-content">
+            <div class="meta-promo-title">
+              <span class="meta-promo-badge badge-type-${item.type}">${TYPE_LABELS[item.type] || item.type}</span>
+              ${metaPromoEscape(item.titre)}
+            </div>
+            <div class="meta-promo-sub">
+              <span>📅 ${dateFr}</span>
+              ${desc ? `<span>${metaPromoEscape(desc.substring(0, 60))}${desc.length > 60 ? '…' : ''}</span>` : ''}
+            </div>
+          </div>
+          <div class="meta-promo-actions">
+            <button class="meta-promo-btn-icon" title="Modifier" onclick="metaPromoEditAction('${item.id}')">✏️</button>
+            <button class="meta-promo-btn-icon danger" title="Supprimer" onclick="metaPromoDeleteAction('${item.id}')">🗑️</button>
+          </div>
+        </div>`;
+    }
+  }
+
+  function metaPromoSwitchTab(tab) {
+    metaPromoCurrentTab = tab;
+    document.querySelectorAll('.meta-promo-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === tab);
+    });
+    metaPromoRenderList();
+  }
+
+  async function metaPromoCycleEtat(kind, id) {
+    const sb = getSupabase();
+    if (!sb) return;
+    const arr = kind === 'campagne' ? metaPromoData.campagnes : metaPromoData.actions;
+    const item = arr.find(x => x.id === id);
+    if (!item) return;
+    const currentIdx = ETATS_CYCLE.indexOf(item.etat);
+    const nextEtat = ETATS_CYCLE[(currentIdx + 1) % ETATS_CYCLE.length];
+    const table = kind === 'campagne' ? 'promo_meta_campagnes' : 'promo_actions';
+    try {
+      const { error } = await sb.from(table).update({ etat: nextEtat }).eq('id', id);
+      if (error) throw error;
+      item.etat = nextEtat;
+      metaPromoRender();
+      metaPromoUpdateBadge();
+    } catch (err) {
+      console.error('[META PROMO] Erreur update:', err);
+      alert('Erreur : ' + err.message);
+    }
+  }
+
+  function metaPromoOpenModal(editId = null) {
+    const modal = document.getElementById('metaPromoModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    const title = document.getElementById('metaPromoModalTitle');
+    if (title) title.textContent = editId ? 'MODIFIER L\'ACTION' : 'NOUVELLE ACTION';
+    if (editId) {
+      const action = metaPromoData.actions.find(a => a.id === editId);
+      if (action) {
+        document.getElementById('mpAction_id').value = action.id;
+        document.getElementById('mpAction_type').value = action.type;
+        document.getElementById('mpAction_titre').value = action.titre || '';
+        document.getElementById('mpAction_description').value = action.description || '';
+        document.getElementById('mpAction_date').value = action.date_prevue || '';
+        document.getElementById('mpAction_etat').value = action.etat || 'A_FAIRE';
+        document.getElementById('mpAction_notes').value = action.notes || '';
+      }
+    } else {
+      document.getElementById('mpAction_id').value = '';
+      document.getElementById('mpAction_type').value = 'POST_FB';
+      document.getElementById('mpAction_titre').value = '';
+      document.getElementById('mpAction_description').value = '';
+      document.getElementById('mpAction_date').value = new Date().toISOString().slice(0,10);
+      document.getElementById('mpAction_etat').value = 'A_FAIRE';
+      document.getElementById('mpAction_notes').value = '';
+    }
+  }
+
+  function metaPromoCloseModal() {
+    const modal = document.getElementById('metaPromoModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function metaPromoEditAction(id) { metaPromoOpenModal(id); }
+
+  async function metaPromoSaveAction() {
+    const sb = getSupabase();
+    if (!sb) return;
+    const id = document.getElementById('mpAction_id').value;
+    const titre = document.getElementById('mpAction_titre').value.trim();
+    if (!titre) { alert('Le titre est obligatoire'); return; }
+    const payload = {
+      type: document.getElementById('mpAction_type').value,
+      titre: titre,
+      description: document.getElementById('mpAction_description').value.trim() || null,
+      date_prevue: document.getElementById('mpAction_date').value || null,
+      etat: document.getElementById('mpAction_etat').value,
+      notes: document.getElementById('mpAction_notes').value.trim() || null
+    };
+    try {
+      if (id) {
+        const { error } = await sb.from('promo_actions').update(payload).eq('id', id);
+        if (error) throw error;
+      } else {
+        const { error } = await sb.from('promo_actions').insert([payload]);
+        if (error) throw error;
+      }
+      metaPromoCloseModal();
+      await metaPromoLoad();
+    } catch (err) {
+      console.error('[META PROMO] Erreur save:', err);
+      alert('Erreur : ' + err.message);
+    }
+  }
+
+  async function metaPromoDeleteAction(id) {
+    const sb = getSupabase();
+    if (!sb) return;
+    if (!confirm('Supprimer cette action ?')) return;
+    try {
+      const { error } = await sb.from('promo_actions').delete().eq('id', id);
+      if (error) throw error;
+      await metaPromoLoad();
+    } catch (err) {
+      console.error('[META PROMO] Erreur delete:', err);
+      alert('Erreur : ' + err.message);
+    }
+  }
+
+  function metaPromoViewCampagne(id) {
+    const c = metaPromoData.campagnes.find(x => x.id === id);
+    if (!c) return;
+    const dates = (c.dates_concernees || []).map(d =>
+      `• ${new Date(d.date).toLocaleDateString('fr-FR')} — ${d.ville} (${d.salle})`
+    ).join('\n');
+    const villes = (c.villes_ciblage || []).map(v =>
+      `• ${v.ville} — rayon ${v.rayon} km`
+    ).join('\n');
+    alert(
+`▼ ${c.nom_cluster} (${c.code})
+
+💰 Budget mensuel : ${c.budget_mensuel} €
+📍 ${c.nb_dates} dates
+⚡ Priorité : ${c.priorite}
+📊 État : ${ETATS_LABELS[c.etat].label}
+
+━━━ DATES ━━━
+${dates}
+
+━━━ CIBLAGE GÉO ━━━
+${villes}
+
+━━━ NOTES ━━━
+${c.notes || '(aucune)'}`
+    );
+  }
+
+  function metaPromoUpdateBadge() {
+    const badge = document.getElementById('meta-planning-badge');
+    if (!badge) return;
+    const enCours = [...metaPromoData.campagnes, ...metaPromoData.actions]
+      .filter(x => x.etat === 'EN_COURS').length;
+    if (enCours > 0) {
+      badge.textContent = enCours + ' EN COURS';
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  // ━━━━━━ HOOK : recharger quand on entre sur la page ━━━━━━
+  function metaPromoCheckAndLoad() {
+    const page = document.getElementById('page-meta-planning');
+    if (page && page.classList.contains('active')) {
+      metaPromoLoad();
+    }
+  }
+
+  // ━━━━━━ HOOK sur showPage existant ━━━━━━
+  if (typeof window.showPage === 'function') {
+    const origShowPage = window.showPage;
+    window.showPage = function(id) {
+      const result = origShowPage.apply(this, arguments);
+      if (id === 'meta-planning') {
+        setTimeout(metaPromoLoad, 50);
+      }
+      return result;
+    };
+  }
+
+  // ━━━━━━ Init badge au chargement (après init Supabase) ━━━━━━
+  function metaPromoInitBadge() {
+    const sb = getSupabase();
+    if (!sb) {
+      setTimeout(metaPromoInitBadge, 1000);
+      return;
+    }
+    metaPromoLoad();
+  }
+  // Délai pour laisser Supabase s'initialiser
+  setTimeout(metaPromoInitBadge, 2000);
+
+  // ━━━━━━ EXPOSE GLOBAL ━━━━━━
+  window.metaPromoLoad = metaPromoLoad;
+  window.metaPromoSwitchTab = metaPromoSwitchTab;
+  window.metaPromoCycleEtat = metaPromoCycleEtat;
+  window.metaPromoOpenModal = metaPromoOpenModal;
+  window.metaPromoCloseModal = metaPromoCloseModal;
+  window.metaPromoEditAction = metaPromoEditAction;
+  window.metaPromoSaveAction = metaPromoSaveAction;
+  window.metaPromoDeleteAction = metaPromoDeleteAction;
+  window.metaPromoViewCampagne = metaPromoViewCampagne;
+
+  console.log('✅ Module META PLANNING chargé');
+})();
 </script>
 
 </body>
