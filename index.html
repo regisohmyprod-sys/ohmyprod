@@ -28017,14 +28017,14 @@ body.mp-modal-open { overflow: hidden; }
     let url = '';
 
     if (kind === 'campagne' || type === 'PUB_META') {
-      // Pubs Meta = Ads Manager
-      url = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=&business_id=${META_BUSINESS_ID}`;
+      // Pubs Meta = Ads Manager (accueil compte)
+      url = `https://adsmanager.facebook.com/adsmanager/`;
     } else if (type === 'POST_FB' || type === 'POST_INSTA' || type === 'REEL' || type === 'STORY') {
-      // Posts / Reels / Stories = Meta Business Suite Planificateur
-      url = `https://business.facebook.com/latest/posts/scheduled_posts?business_id=${META_BUSINESS_ID}&asset_id=${META_PAGE_ID}`;
+      // Posts / Reels / Stories = Meta Business Suite accueil
+      url = `https://business.facebook.com/latest/home`;
     } else {
       // Fallback : accueil Business Suite
-      url = `https://business.facebook.com/latest/home?business_id=${META_BUSINESS_ID}`;
+      url = `https://business.facebook.com/latest/home`;
     }
 
     window.open(url, '_blank', 'noopener,noreferrer');
