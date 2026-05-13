@@ -28365,21 +28365,24 @@ console.log('✅ OMP Mobile Kit chargé');
     if (!sb) return;
     try {
       // Charger les modèles
-      const { data: modeles } = await sb.from('presse_modeles').select('*').order('type');
+      const { data: modeles, error: errModeles } = await sb.from('presse_modeles').select('*').order('type');
+      if (errModeles) console.error('[PRESSE] Erreur modèles :', errModeles);
       presseModeles = modeles || [];
 
       // Charger les contacts presse (table contacts_promo)
-      const { data: contacts } = await sb.from('contacts_promo').select('*').order('ville');
+      const { data: contacts, error: errContacts } = await sb.from('contacts_promo').select('*').order('ville');
+      if (errContacts) console.error('[PRESSE] Erreur contacts :', errContacts);
       pressContacts = contacts || [];
 
       // Charger les dates concert à venir
       const todayStr = new Date().toISOString().slice(0, 10);
-      const { data: dates } = await sb
+      const { data: dates, error: errDates } = await sb
         .from('dates_concert')
-        .select('id, ville, date_concert, salle')
+        .select('id, ville, date_concert, nom_salle')
         .gte('date_concert', todayStr)
         .order('date_concert', { ascending: true })
         .limit(100);
+      if (errDates) console.error('[PRESSE] Erreur dates :', errDates);
       presseDates = dates || [];
 
       console.log('[PRESSE] ' + presseModeles.length + ' modèles · ' + pressContacts.length + ' contacts · ' + presseDates.length + ' dates');
@@ -28403,7 +28406,7 @@ console.log('✅ OMP Mobile Kit chargé');
         const opt = document.createElement('option');
         opt.value = d.id;
         const dateFr = new Date(d.date_concert).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-        opt.textContent = (d.ville || 'Sans ville') + ' — ' + dateFr + (d.salle ? ' — ' + d.salle : '');
+        opt.textContent = (d.ville || 'Sans ville') + ' — ' + dateFr + (d.nom_salle ? ' — ' + d.nom_salle : '');
         selConcert.appendChild(opt);
       });
     }
