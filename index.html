@@ -10739,6 +10739,14 @@ function _hideTeamSelection() {
         <!-- CONTENU VHR DATE — FEUILLE UNIQUE -->
         <div id="vhr-date-${d.id}" style="display:none;padding:16px;border-top:0.5px solid #262626;background:#0f0f0f;">
 
+          <!-- 🖨️ Barre d'impression PDF -->
+          <div class="vhr-admin-action" style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:0.5px solid #242424;">
+            <span style="font-size:10px;color:#777;text-transform:uppercase;letter-spacing:1px;margin-right:2px;">🖨️ Imprimer / PDF :</span>
+            <button onclick="event.stopPropagation();imprimerFicheVHRDate('${d.id}','tout')" style="background:#1a1a1a;color:#c9a84c;border:0.5px solid rgba(201,168,76,0.4);border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">📄 Feuille complète</button>
+            <button onclick="event.stopPropagation();imprimerFicheVHRDate('${d.id}','artistique')" style="background:rgba(224,85,111,0.1);color:#e0556f;border:0.5px solid rgba(224,85,111,0.4);border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">🎤 Équipe Artistique</button>
+            <button onclick="event.stopPropagation();imprimerFicheVHRDate('${d.id}','technique')" style="background:rgba(59,154,224,0.1);color:#3b9ae0;border:0.5px solid rgba(59,154,224,0.4);border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">🔧 Équipe Technique</button>
+          </div>
+
           <!-- ⚠️ Alerte infos manquantes (date concernée) — essentiel = voyages + hébergement -->
           ${(voyages.length === 0 || hotels.length === 0) && !isPast ? `
           <div style="background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.5);border-radius:8px;padding:9px 13px;margin-bottom:14px;display:flex;align-items:center;gap:9px;">
@@ -10870,6 +10878,110 @@ function _hideTeamSelection() {
     if (carte && carte.scrollIntoView) {
       carte.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+  }
+
+  // 🖨️ Génère et imprime le PDF d'une date VHR — filtre = 'tout' | 'artistique' | 'technique'
+  function imprimerFicheVHRDate(dateId, filtre) {
+    var dateObj = (_vhrAllDates || []).find(function(d) { return d.id === dateId; });
+    if (!dateObj) { alert('Date introuvable.'); return; }
+
+    var vd = (_vhrAllVhrData || []).filter(function(v) { return v.date_concert_id === dateId; });
+    var voyages = vd.filter(function(v) { return v.type === 'voyage'; });
+    var hotels = vd.filter(function(v) { return v.type === 'hebergement'; });
+    var contacts = vd.filter(function(v) { return v.type === 'contact'; });
+
+    // Filtre par équipe
+    var libelleFiltre = 'FEUILLE COMPLÈTE';
+    if (filtre === 'artistique') {
+      libelleFiltre = 'ÉQUIPE ARTISTIQUE';
+      voyages = voyages.filter(function(v) { return v.voy_team === 'artistique' || v.voy_team === 'tous'; });
+      hotels = hotels.filter(function(h) { return !h.hotel_teams || /artist/i.test(h.hotel_teams) || /tous/i.test(h.hotel_teams); });
+    } else if (filtre === 'technique') {
+      libelleFiltre = 'ÉQUIPE TECHNIQUE';
+      voyages = voyages.filter(function(v) { return v.voy_team === 'technique' || v.voy_team === 'tous'; });
+      hotels = hotels.filter(function(h) { return !h.hotel_teams || /techni/i.test(h.hotel_teams) || /tous/i.test(h.hotel_teams); });
+    }
+
+    var typeLabels = { voyage_aller:'Voyage aller', transfert_gare_salle:'Transfert Gare→Salle', transfert_gare_hotel:'Transfert Gare→Hôtel', transfert_salle_hotel:'Transfert Salle→Hôtel', transfert_hotel_gare:'Transfert Hôtel→Gare', voyage_retour:'Voyage retour' };
+    var teamLabels = { tous:'Tous', artistique:'Artistique', production:'Production', technique:'Technique' };
+    var jourLabels = { veille:'La veille', jour_j:'Jour J', lendemain:'Lendemain' };
+
+    var dt = new Date(dateObj.date_concert);
+    var dateStr = dt.toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+    var esc = function(s) { return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+
+    // --- Section VOYAGES ---
+    var voyHTML = voyages.length ? voyages.map(function(v) {
+      return '<tr>'
+        + '<td>' + esc(typeLabels[v.voy_type] || v.voy_type || '–') + '</td>'
+        + '<td>' + esc(jourLabels[v.voy_jour] || v.voy_jour || '') + '</td>'
+        + '<td>' + esc(v.voy_heure_debut || '') + (v.voy_heure_fin ? ' → ' + esc(v.voy_heure_fin) : '') + '</td>'
+        + '<td>' + esc(v.voy_lieu || '') + '</td>'
+        + '<td>' + esc(teamLabels[v.voy_team] || v.voy_team || '') + '</td>'
+        + '<td>' + esc(v.voy_notes && v.voy_notes.indexOf('dosier') !== 0 ? v.voy_notes : '') + '</td>'
+        + '</tr>';
+    }).join('') : '<tr><td colspan="6" style="color:#999;font-style:italic;">Aucun voyage</td></tr>';
+
+    // --- Section HÉBERGEMENT ---
+    var hotHTML = hotels.length ? hotels.map(function(h) {
+      return '<tr>'
+        + '<td><strong>' + esc(h.hotel_nom || '–') + '</strong></td>'
+        + '<td>' + esc(h.hotel_adresse || '') + '</td>'
+        + '<td>' + esc(h.hotel_dist_salle || '') + '</td>'
+        + '<td>' + esc(h.hotel_dist_gare || '') + '</td>'
+        + '<td>' + esc(h.hotel_teams || '') + '</td>'
+        + '</tr>';
+    }).join('') : '<tr><td colspan="5" style="color:#999;font-style:italic;">Aucun hébergement</td></tr>';
+
+    // --- Section CONTACTS ---
+    var conHTML = contacts.length ? contacts.map(function(c) {
+      return '<tr>'
+        + '<td><strong>' + esc((c.contact_prenom || '') + ' ' + (c.contact_nom || '')) + '</strong></td>'
+        + '<td>' + esc(c.contact_fonction || '') + '</td>'
+        + '<td>' + esc(c.contact_tel || '') + '</td>'
+        + '<td>' + esc(c.contact_email || '') + '</td>'
+        + '</tr>';
+    }).join('') : '<tr><td colspan="4" style="color:#999;font-style:italic;">Aucun contact</td></tr>';
+
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fiche VHR - ' + esc(dateObj.ville || '') + '</title>'
+      + '<style>'
+      + 'body { font-family: Arial, sans-serif; padding: 24px; color: #000; }'
+      + '.head { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #c9a84c; padding-bottom:12px; margin-bottom:18px; }'
+      + '.head h1 { font-size:20px; margin:0; }'
+      + '.head .sub { font-size:13px; color:#555; margin-top:3px; }'
+      + '.head .prod { text-align:right; font-size:11px; color:#666; }'
+      + '.head .prod strong { font-size:15px; color:#000; display:block; }'
+      + '.badge { display:inline-block; background:#c9a84c; color:#000; font-size:11px; font-weight:bold; padding:3px 10px; border-radius:4px; margin-top:6px; }'
+      + 'h2 { font-size:14px; margin:18px 0 6px; color:#000; border-bottom:1px solid #ccc; padding-bottom:3px; }'
+      + 'table { width:100%; border-collapse:collapse; margin-bottom:6px; }'
+      + 'th { background:#333; color:#fff; padding:6px 8px; font-size:10px; text-align:left; }'
+      + 'td { padding:6px 8px; font-size:11px; border:1px solid #ddd; }'
+      + 'tr:nth-child(even) td { background:#f7f7f7; }'
+      + '.foot { margin-top:24px; font-size:10px; color:#999; text-align:center; border-top:1px solid #ddd; padding-top:8px; }'
+      + '@media print { body { padding:14px; } }'
+      + '</style></head><body>'
+      + '<div class="head">'
+      +   '<div>'
+      +     '<h1>🚌 FICHE VHR — ' + esc(dateObj.ville || '') + '</h1>'
+      +     '<div class="sub">' + esc(dateObj.nom_salle || '') + ' · ' + esc(dateStr) + '</div>'
+      +     '<span class="badge">' + libelleFiltre + '</span>'
+      +   '</div>'
+      +   '<div class="prod"><span>PRODUCTION</span><strong>OH MY PROD</strong>THE WORLD OF QUEEN</div>'
+      + '</div>'
+      + '<h2>✈️ VOYAGES</h2>'
+      + '<table><thead><tr><th>Type</th><th>Jour</th><th>Horaire</th><th>Lieu</th><th>Équipe</th><th>Notes</th></tr></thead><tbody>' + voyHTML + '</tbody></table>'
+      + '<h2>🏨 HÉBERGEMENT</h2>'
+      + '<table><thead><tr><th>Hôtel</th><th>Adresse</th><th>Dist. salle</th><th>Dist. gare</th><th>Équipes</th></tr></thead><tbody>' + hotHTML + '</tbody></table>'
+      + '<h2>☎️ CONTACTS</h2>'
+      + '<table><thead><tr><th>Nom</th><th>Fonction</th><th>Téléphone</th><th>Email</th></tr></thead><tbody>' + conHTML + '</tbody></table>'
+      + '<div class="foot">Document généré par l\'APPLI OMP · ' + esc(new Date().toLocaleDateString('fr-FR')) + '</div>'
+      + '<' + 'script>window.onload=function(){window.print();}<' + '/script>'
+      + '</body></html>';
+
+    var win = window.open('', '_blank');
+    if (!win) { alert('Veuillez autoriser les pop-ups pour générer le PDF.'); return; }
+    win.document.write(html);
+    win.document.close();
   }
 
   function toggleVHRDate(id) {
@@ -11131,15 +11243,44 @@ function _hideTeamSelection() {
       alerteEl.innerHTML = '';
       return;
     }
-    const liens = datesIncompletes.map(function(d) {
+
+    var chip = function(d) {
       return '<span onclick="vhrScrollVersDate(\'' + d.id + '\')" style="display:inline-block;background:rgba(239,68,68,0.15);border:0.5px solid rgba(239,68,68,0.5);color:#f3a3a3;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;margin:3px 4px 0 0;" onmouseover="this.style.background=\'rgba(239,68,68,0.28)\'" onmouseout="this.style.background=\'rgba(239,68,68,0.15)\'">📍 ' + (d.ville || 'Date') + ' ▸</span>';
-    }).join('');
+    };
+
+    // ✨ Limite d'aperçu (env. 2 lignes) ; le reste se déroule au clic
+    var LIMITE = 6;
+    var apercu = datesIncompletes.slice(0, LIMITE).map(chip).join('');
+    var reste = datesIncompletes.slice(LIMITE);
+    var resteHtml = '';
+    if (reste.length > 0) {
+      resteHtml =
+        '<div id="vhr-alerte-reste" style="display:none;">' + reste.map(chip).join('') + '</div>' +
+        '<div onclick="vhrToggleAlerteReste()" id="vhr-alerte-toggle" style="display:inline-block;margin-top:6px;font-size:11px;color:#f3a3a3;cursor:pointer;text-decoration:underline;">+ ' + reste.length + ' autre' + (reste.length > 1 ? 's' : '') + ' ▾</div>';
+    }
+
     alerteEl.style.display = 'block';
     alerteEl.innerHTML =
       '<div style="background:rgba(239,68,68,0.08);border:0.5px solid rgba(239,68,68,0.45);border-left:3px solid #ef4444;border-radius:0 9px 9px 0;padding:11px 14px;margin-bottom:14px;">' +
         '<div style="font-size:12.5px;color:#f3a3a3;font-weight:600;">⚠️ ATTENTION SARAH, tu as oublié des infos dans ' + (datesIncompletes.length > 1 ? 'les fiches suivantes' : 'la fiche suivante') + ' :</div>' +
-        '<div style="margin-top:5px;">' + liens + '</div>' +
+        '<div style="margin-top:5px;">' + apercu + '</div>' +
+        resteHtml +
       '</div>';
+  }
+
+  // Déroule / replie la suite des dates dans le bandeau d'alerte
+  function vhrToggleAlerteReste() {
+    var reste = document.getElementById('vhr-alerte-reste');
+    var toggle = document.getElementById('vhr-alerte-toggle');
+    if (!reste || !toggle) return;
+    if (reste.style.display === 'none') {
+      reste.style.display = 'block';
+      toggle.textContent = 'Réduire ▴';
+    } else {
+      reste.style.display = 'none';
+      var n = reste.querySelectorAll('span').length;
+      toggle.textContent = '+ ' + n + ' autre' + (n > 1 ? 's' : '') + ' ▾';
+    }
   }
 
 
