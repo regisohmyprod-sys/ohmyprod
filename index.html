@@ -10668,6 +10668,12 @@ function _hideTeamSelection() {
 
     const today = new Date(); today.setHours(0,0,0,0);
 
+    // ✨ Identifier la prochaine date (1re date non passée de la liste)
+    let _vhrProchaineId = null;
+    for (let i = 0; i < dates.length; i++) {
+      if (new Date(dates[i].date_concert) >= today) { _vhrProchaineId = dates[i].id; break; }
+    }
+
     container.innerHTML = dates.map(d => {
       const dt = new Date(d.date_concert);
       const dateStr = dt.toLocaleDateString('fr-FR', {weekday:'short', day:'2-digit', month:'short', year:'numeric'}).toUpperCase();
@@ -10682,45 +10688,53 @@ function _hideTeamSelection() {
       const teamLabels = { tous:'👥 Tous', artistique:'🎤 Artistique', production:'📋 Production', technique:'🔧 Technique' };
       const jourLabels = { veille:'La veille', jour_j:'Jour J', lendemain:'Lendemain' };
 
-      // ✨ Pastille d'état par bloc + badge d'état global
-      const pastilleVHR = (n) => n > 0
-        ? '<span style="color:#2ecc71;font-size:12px;">●</span>'
-        : '<span style="color:#555;font-size:12px;">○</span>';
+      // ✨ État global de la date
       const nbRemplis = [voyages.length, hotels.length, contacts.length, docs.length].filter(x => x > 0).length;
+      const estProchaine = (d.id === _vhrProchaineId);
       let etatLabel, etatCol, etatBg, etatBd;
-      if (nbRemplis === 0) { etatLabel = 'À FAIRE'; etatCol = '#888'; etatBg = 'rgba(120,120,120,0.12)'; etatBd = '#333'; }
-      else if (nbRemplis === 4) { etatLabel = 'COMPLET'; etatCol = '#2ecc71'; etatBg = 'rgba(46,204,113,0.12)'; etatBd = 'rgba(46,204,113,0.4)'; }
-      else { etatLabel = 'EN COURS'; etatCol = '#c9a84c'; etatBg = 'rgba(201,168,76,0.12)'; etatBd = 'rgba(201,168,76,0.4)'; }
+      if (nbRemplis === 0) { etatLabel = 'À FAIRE'; etatCol = '#6b7280'; etatBg = 'rgba(107,114,128,0.14)'; etatBd = 'rgba(107,114,128,0.4)'; }
+      else if (nbRemplis === 4) { etatLabel = 'COMPLET'; etatCol = '#2ecc71'; etatBg = 'rgba(46,204,113,0.14)'; etatBd = 'rgba(46,204,113,0.45)'; }
+      else { etatLabel = 'EN COURS'; etatCol = '#c9a84c'; etatBg = 'rgba(201,168,76,0.14)'; etatBd = 'rgba(201,168,76,0.45)'; }
 
-      return `<div style="background:#1a1a1a;border:0.5px solid ${isPast?'#2a2a2a':'rgba(201,168,76,0.55)'};border-radius:10px;margin-bottom:9px;overflow:hidden;">
+      // ✨ Bloc date "agenda" : jour + mois abrégé
+      const vhrJour = dt.toLocaleDateString('fr-FR', { day: '2-digit' });
+      const vhrMois = dt.toLocaleDateString('fr-FR', { month: 'short' }).toUpperCase().replace('.', '');
+
+      // ✨ Chip compteur : s'allume en or si rempli
+      const chipVHR = (icon, n) => {
+        const ok = n > 0;
+        return '<span style="display:inline-flex;align-items:center;gap:4px;background:' + (ok ? 'rgba(201,168,76,0.1)' : 'rgba(255,255,255,0.03)') + ';border:0.5px solid ' + (ok ? 'rgba(201,168,76,0.3)' : '#2a2a2a') + ';border-radius:6px;padding:2px 7px;font-size:10.5px;color:' + (ok ? '#d8bd6a' : '#666') + ';">' + icon + ' ' + n + '</span>';
+      };
+
+      return `<div style="background:#161616;border:0.5px solid ${isPast?'#262626':'rgba(201,168,76,0.5)'};border-radius:9px;margin-bottom:7px;overflow:hidden;">
         <!-- HEADER DATE -->
         <div style="display:flex;align-items:stretch;cursor:pointer;" onclick="toggleVHRDate('vhr-date-${d.id}')">
-          <div style="width:4px;background:${isPast?'#333':'#c9a84c'};flex-shrink:0;"></div>
-          <div style="flex:1;padding:11px 14px;min-width:0;">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-              <div style="min-width:0;">
-                <div style="font-size:13.5px;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                  ${d.ville||'—'} ${d.nom_salle?'<span style="color:#777;font-weight:400;font-size:12px;">· '+d.nom_salle+'</span>':''}
-                </div>
-                <div style="font-size:11px;color:#888;margin-top:2px;">${dateStr}</div>
+          <!-- Bloc date agenda -->
+          <div style="background:${isPast?'#1a1a1a':'#1c1810'};border-right:0.5px solid #262626;padding:10px 13px;text-align:center;min-width:56px;display:flex;flex-direction:column;justify-content:center;flex-shrink:0;">
+            <div style="font-size:19px;font-weight:500;color:${isPast?'#ddd':'#c9a84c'};line-height:1;">${vhrJour}</div>
+            <div style="font-size:9px;color:#777;letter-spacing:1px;margin-top:2px;">${vhrMois}</div>
+          </div>
+          <!-- Contenu -->
+          <div style="flex:1;padding:9px 13px;min-width:0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <div style="font-size:13px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${d.ville||'—'} ${d.nom_salle?'<span style="color:#6f6f6f;font-weight:400;font-size:11.5px;">· '+d.nom_salle+'</span>':''}
               </div>
-              <span style="font-size:9px;font-weight:500;letter-spacing:0.5px;padding:3px 9px;border-radius:20px;background:${etatBg};color:${etatCol};border:0.5px solid ${etatBd};white-space:nowrap;flex-shrink:0;">${isPast?'✓ PASSÉE':etatLabel}</span>
+              <span style="font-size:8.5px;font-weight:500;letter-spacing:0.5px;padding:2px 8px;border-radius:4px;background:${etatBg};color:${etatCol};border:0.5px solid ${etatBd};white-space:nowrap;flex-shrink:0;">${isPast?'✓ PASSÉE':(estProchaine?'★ PROCHAINE':etatLabel)}</span>
             </div>
-            <div style="display:flex;align-items:center;gap:13px;margin-top:9px;flex-wrap:wrap;">
-              <span style="font-size:11px;color:#aaa;">${pastilleVHR(voyages.length)} <span style="color:#888;">✈</span> ${voyages.length}</span>
-              <span style="font-size:11px;color:#aaa;">${pastilleVHR(hotels.length)} <span style="color:#888;">🏨</span> ${hotels.length}</span>
-              <span style="font-size:11px;color:#aaa;">${pastilleVHR(contacts.length)} <span style="color:#888;">☎</span> ${contacts.length}</span>
-              <span style="font-size:11px;color:#aaa;">${pastilleVHR(docs.length)} <span style="color:#888;">▤</span> ${docs.length}</span>
+            <div style="font-size:10px;color:#777;margin-top:2px;">${dateStr}</div>
+            <div style="display:flex;align-items:center;gap:5px;margin-top:8px;flex-wrap:wrap;">
+              ${chipVHR('✈', voyages.length)} ${chipVHR('🏨', hotels.length)} ${chipVHR('☎', contacts.length)} ${chipVHR('▤', docs.length)}
               <span style="margin-left:auto;display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
-                <button onclick="event.stopPropagation();ouvrirCarteVHRDate('${d.id}')" title="Voir la ville sur la carte" style="font-size:10px;color:#e0556f;border:0.5px solid rgba(224,85,111,0.4);border-radius:6px;padding:3px 9px;background:rgba(224,85,111,0.1);cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">🗺️ PLAN</button>
-                <span id="arrow-${d.id}" style="font-size:11px;color:#c9a84c;">ouvrir ▼</span>
+                <button onclick="event.stopPropagation();ouvrirCarteVHRDate('${d.id}')" title="Voir la ville sur la carte" style="font-size:9.5px;color:#e0556f;border:0.5px solid rgba(224,85,111,0.35);border-radius:5px;padding:2px 8px;background:rgba(224,85,111,0.08);cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">🗺️ PLAN</button>
+                <span id="arrow-${d.id}" style="font-size:10px;color:#c9a84c;">ouvrir ▸</span>
               </span>
             </div>
           </div>
         </div>
 
         <!-- CONTENU VHR DATE -->
-        <div id="vhr-date-${d.id}" style="display:none;padding:16px;border-top:0.5px solid #2a2a2a;background:#0f0f0f;">
+        <div id="vhr-date-${d.id}" style="display:none;padding:16px;border-top:0.5px solid #262626;background:#0f0f0f;">
 
           <!-- VOYAGES -->
           <div style="margin-bottom:14px;">
@@ -10820,10 +10834,10 @@ function _hideTeamSelection() {
     const arrow = document.getElementById('arrow-'+dateId);
     if (el.style.display === 'none') {
       el.style.display = 'block';
-      if (arrow) arrow.textContent = 'fermer ▲';
+      if (arrow) arrow.textContent = 'fermer ▾';
     } else {
       el.style.display = 'none';
-      if (arrow) arrow.textContent = 'ouvrir ▼';
+      if (arrow) arrow.textContent = 'ouvrir ▸';
     }
   }
 
