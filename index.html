@@ -3722,26 +3722,11 @@ function _hideTeamSelection() {
       <!-- BLOC GESTION CLIENTS / SPECTATEURS : 2 cartes (CRM en cours) -->
       <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
 
-        <!-- ✨ BLOC PROJECTION (remplace l'ancienne carte SPECTATEURS) -->
-        <div class="stat-card dashboard-projection-card" style="border-left:3px solid #c9a84c;padding:16px 18px;cursor:default;position:relative;background:linear-gradient(135deg,#1a1a1a 0%,#211d12 100%);">
-          <div class="stat-label" style="display:flex;align-items:center;justify-content:space-between;">
-            <span>🎯 Projection Tournée</span>
-            <span id="dash-proj-etat" style="font-size:9px;color:#888;font-weight:400;">…</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,0.12);padding-bottom:6px;">
-              <span style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.5px;">👥 N° Spectateurs</span>
-              <span id="dash-proj-spectateurs" style="font-size:18px;font-weight:700;color:#c9a84c;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,0.12);padding-bottom:6px;">
-              <span style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.5px;">💰 CA TTC</span>
-              <span id="dash-proj-ca" style="font-size:18px;font-weight:700;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.5px;">📊 Résultat OMP</span>
-              <span id="dash-proj-resultat" style="font-size:18px;font-weight:700;color:#22c55e;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span>
-            </div>
-          </div>
+        <!-- SPECTATEURS -->
+        <div class="stat-card" style="border-left:3px solid #555;padding:20px;cursor:default;position:relative;opacity:0.7;">
+          <div class="stat-label">👥 Spectateurs</div>
+          <div class="stat-value" style="font-size:32px;color:#888;">SPECTATEURS</div>
+          <div class="stat-sub">⏳ CRM en cours de développement</div>
         </div>
 
         <!-- APPLI TWOQ PUBLIC -->
@@ -4552,22 +4537,19 @@ function _hideTeamSelection() {
             </div>
           </div>
 
-          <!-- BLOC 2 : SPECTATEURS -->
-          <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
-            <div style="background:#111;padding:8px 14px;border-bottom:2px solid #c9a84c;">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#fff;">SPECTATEURS</div>
-              <div style="font-size:10px;color:#c9a84c;">Billetterie & prévisions</div>
+          <!-- BLOC 2 : PROJECTION (remplace l'ancien bloc SPECTATEURS) -->
+          <div style="background:linear-gradient(135deg,#1a1a1a 0%,#211d12 100%);border:1px solid #c9a84c;border-radius:12px;overflow:hidden;">
+            <div style="background:#111;padding:8px 14px;border-bottom:2px solid #c9a84c;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#fff;">🎯 PROJECTION</div>
+                <div style="font-size:10px;color:#c9a84c;">Prévisions tournée — résumé Suivi Dates</div>
+              </div>
+              <span id="cs-proj-etat" style="font-size:9px;color:#888;">…</span>
             </div>
             <div style="padding:2px 0;">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 14px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Spectateurs à ce jour</span><span id="cs-mini-spec" style="font-size:15px;color:#c9a84c;font-family:'Bebas Neue',sans-serif;"></span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 14px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Spectateurs en prévision</span><span id="cs-mini-prevision" style="font-size:15px;color:#fff;font-family:'Bebas Neue',sans-serif;"></span></div>
-              <div style="padding:10px 14px;">
-                <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Remplissage prévisionnel</div>
-                <div style="background:#2a2a2a;border-radius:4px;height:8px;overflow:hidden;">
-                  <div id="cs-mini-jauge" style="height:100%;background:linear-gradient(to right,#c9a84c,#fff);border-radius:4px;width:0%;transition:width 0.8s ease;"></div>
-                </div>
-                <div id="cs-mini-pct" style="font-size:11px;color:#c9a84c;margin-top:4px;text-align:right;font-family:'Bebas Neue',sans-serif;"></div>
-              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">👥 N° Spectateurs</span><span id="cs-proj-spectateurs" style="font-size:17px;color:#c9a84c;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">💰 Chiffre d'affaires TTC</span><span id="cs-proj-ca" style="font-size:17px;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">📊 Résultat OMP</span><span id="cs-proj-resultat" style="font-size:17px;color:#22c55e;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span></div>
             </div>
           </div>
 
@@ -12552,13 +12534,16 @@ function _hideTeamSelection() {
     if (id === 'dashboard' && typeof chargerTournees === 'function' && typeof _currentUserRole !== 'undefined' && _currentUserRole === 'admin') {
       chargerTournees().catch(function(e) { console.error('refresh dashboard:', e); });
     }
-    // ✨ Refresh du bloc PROJECTION + de la bande TÂCHES à chaque ouverture du dashboard
+    // ✨ Refresh de la bande TÂCHES à chaque ouverture du dashboard
     if (id === 'dashboard') {
-      if (typeof window.dashboardChargerProjection === 'function') {
-        window.dashboardChargerProjection().catch(function(e) { console.error('projection dashboard:', e); });
-      }
       if (typeof window.dashboardChargerBandeTaches === 'function') {
         window.dashboardChargerBandeTaches();
+      }
+    }
+    // ✨ Refresh du bloc PROJECTION à chaque ouverture de CRÉA / SUIVI DATES
+    if (id === 'gestion-omp') {
+      if (typeof window.csChargerProjection === 'function') {
+        window.csChargerProjection().catch(function(e) { console.error('projection crea/suivi:', e); });
       }
     }
     if (id === 'acces-frais') {
@@ -12869,6 +12854,10 @@ function _hideTeamSelection() {
     _csTournee = tourneeId || null;
     showPage('gestion-omp');
     csChargerDates();
+    // ✨ Charger le bloc PROJECTION (3 chiffres clés du résumé Suivi Dates)
+    if (typeof window.csChargerProjection === 'function') {
+      window.csChargerProjection().catch(function(e) { console.error('projection:', e); });
+    }
   }
 
   const CS_TOURNEE_IDS = {
@@ -13300,8 +13289,11 @@ function _hideTeamSelection() {
         } catch(e) { console.log('Erreur calcul spectateurs:', e); }
         
         var prev = t.nb_spectateurs_prevision || 0;
-        document.getElementById('cs-mini-spec').textContent = spec.toLocaleString('fr-FR');
-        document.getElementById('cs-mini-prevision').textContent = prev.toLocaleString('fr-FR');
+        // ✨ Anciens éléments du bloc SPECTATEURS — remplacé par le bloc PROJECTION (null-safe)
+        var _csSpecEl = document.getElementById('cs-mini-spec');
+        var _csPrevEl = document.getElementById('cs-mini-prevision');
+        if (_csSpecEl) _csSpecEl.textContent = spec.toLocaleString('fr-FR');
+        if (_csPrevEl) _csPrevEl.textContent = prev.toLocaleString('fr-FR');
         var pct = prev > 0 ? Math.min(100, Math.round(spec / prev * 100)) : 0;
         var jauge = document.getElementById('cs-mini-jauge');
         var pctEl = document.getElementById('cs-mini-pct');
@@ -19490,10 +19482,7 @@ function _hideTeamSelection() {
     }
     // admin : page dashboard par défaut
     if (role === 'admin') {
-      // ✨ Charger le bloc PROJECTION + la bande TÂCHES dès l'arrivée sur le dashboard
-      if (typeof window.dashboardChargerProjection === 'function') {
-        window.dashboardChargerProjection().catch(function(e) { console.error('projection login:', e); });
-      }
+      // ✨ Charger la bande TÂCHES dès l'arrivée sur le dashboard
       if (typeof window.dashboardChargerBandeTaches === 'function') {
         // petit délai : laisser le module TÂCHES finir son chargement initial
         window.dashboardChargerBandeTaches();
@@ -29616,13 +29605,14 @@ console.log('✅ OMP Mobile Kit chargé');
 
   // ════════════════════════════════════════════════════════════
   // 1) BLOC PROJECTION — 3 chiffres clés repris du résumé SUIVI DATES
+  //    Affiché dans CRÉA / SUIVI DATES (BLOC 2, à la place de SPECTATEURS)
   //    (recalcul à l'identique du tfoot : tot.projBillets / projCA / projResultatOMP)
   // ════════════════════════════════════════════════════════════
-  window.dashboardChargerProjection = async function() {
-    var elSpec = document.getElementById('dash-proj-spectateurs');
-    var elCA   = document.getElementById('dash-proj-ca');
-    var elRes  = document.getElementById('dash-proj-resultat');
-    var elEtat = document.getElementById('dash-proj-etat');
+  window.csChargerProjection = async function() {
+    var elSpec = document.getElementById('cs-proj-spectateurs');
+    var elCA   = document.getElementById('cs-proj-ca');
+    var elRes  = document.getElementById('cs-proj-resultat');
+    var elEtat = document.getElementById('cs-proj-etat');
     if (!elSpec || !elCA || !elRes) return;
 
     try {
