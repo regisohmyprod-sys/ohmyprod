@@ -6309,16 +6309,16 @@ function _hideTeamSelection() {
       <button class="back-btn" onclick="showPage('artistique')">← Retour</button>
 
       <!-- HEADER TOURNÉE -->
-      <div style="margin-bottom:20px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#c9a84c;" id="avhr-titre">🚌 VOS VHR</div>
-        <div style="font-size:13px;color:#888;" id="avhr-sous-titre">Voyages · Hébergement · Ressources</div>
+      <div style="text-align:center;margin-bottom:18px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;color:#c9a84c;" id="avhr-titre">MA TOURNÉE</div>
+        <div style="font-size:12px;color:#888;margin-top:2px;" id="avhr-sous-titre">Voyages · Hébergement · Infos · Invitations</div>
       </div>
 
       <!-- FILTRES -->
-      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-        <button onclick="avhrFiltrer('avenir')" id="avhr-btn-avenir" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">→ À VENIR</button>
-        <button onclick="avhrFiltrer('passees')" id="avhr-btn-passees" style="background:#1a1a1a;color:#888;border:1px solid #2a2a2a;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✓ PASSÉES</button>
-        <button onclick="avhrFiltrer('toutes')" id="avhr-btn-toutes" style="background:#1a1a1a;color:#888;border:1px solid #2a2a2a;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">≡ TOUTES</button>
+      <div style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;align-items:center;justify-content:center;">
+        <button onclick="avhrFiltrer('avenir')" id="avhr-btn-avenir" style="background:#c9a84c;color:#000;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">→ À VENIR</button>
+        <button onclick="avhrFiltrer('passees')" id="avhr-btn-passees" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✓ PASSÉES</button>
+        <button onclick="avhrFiltrer('toutes')" id="avhr-btn-toutes" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">≡ TOUTES</button>
       </div>
 
       <!-- LISTE DES DATES -->
@@ -10356,8 +10356,11 @@ function _hideTeamSelection() {
     closeModal('modal-artiste-vhr-tournee');
     _avhrTourneeId = tourneeId;
 
-    const noms = { twoq:"🎸 TWOQ – L'Hommage", twoq2:'🎸 TWOQ – Éternelle Légende' };
-    document.getElementById('avhr-titre').textContent = '🚌 VOS VHR — ' + (noms[tourneeId]||'').toUpperCase();
+    const noms = { twoq:"THE WORLD OF QUEEN · L'Hommage à la Légende", twoq2:"THE WORLD OF QUEEN · L'Éternelle Légende" };
+    const titreEl = document.getElementById('avhr-titre');
+    const sousTitreEl = document.getElementById('avhr-sous-titre');
+    if (titreEl) titreEl.textContent = 'MA TOURNÉE';
+    if (sousTitreEl) sousTitreEl.textContent = noms[tourneeId] || 'Voyages · Hébergement · Infos · Invitations';
 
     showPage('artiste-vhr');
 
@@ -10385,9 +10388,9 @@ function _hideTeamSelection() {
     Object.entries(btns).forEach(([k,id]) => {
       const el = document.getElementById(id);
       if (!el) return;
-      el.style.background = k === filtre ? '#3b82f6' : '#1a1a1a';
-      el.style.color = k === filtre ? '#fff' : '#888';
-      el.style.border = k === filtre ? 'none' : '1px solid #2a2a2a';
+      el.style.background = k === filtre ? '#c9a84c' : '#1a1a1a';
+      el.style.color = k === filtre ? '#000' : '#888';
+      el.style.border = k === filtre ? 'none' : '0.5px solid #2a2a2a';
     });
 
     let dates = _avhrDates;
@@ -10400,22 +10403,32 @@ function _hideTeamSelection() {
       return;
     }
 
-    container.innerHTML = dates.map((d, i) => {
+    // Identifier la prochaine date (1re date non passée)
+    let _avhrProchaineId = null;
+    for (let i = 0; i < _avhrDates.length; i++) {
+      if (new Date(_avhrDates[i].date_concert) >= today) { _avhrProchaineId = _avhrDates[i].id; break; }
+    }
+
+    container.innerHTML = dates.map((d) => {
       const dt = new Date(d.date_concert);
       const isPast = dt < today;
-      const dateStr = dt.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'}).toUpperCase();
-      const heure = (d.heure_show||'20:30').substring(0,5).replace(':','h');
+      const estProchaine = (d.id === _avhrProchaineId);
+      const jour = dt.toLocaleDateString('fr-FR', { day:'2-digit' });
+      const mois = dt.toLocaleDateString('fr-FR', { month:'short' }).toUpperCase().replace('.', '');
       return `
-        <div onclick="ouvrirArtisteDate('${d.id}')" style="background:#1a1a1a;border:2px solid ${isPast?'#2a2a2a':'#3b82f6'};border-radius:12px;padding:14px 18px;margin-bottom:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:background 0.2s;"
-             onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">
-          <div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:${isPast?'#666':'#fff'};">${d.ville.toUpperCase()}</div>
-            <div style="font-size:12px;color:${isPast?'#555':'#aaa'};margin-top:2px;">${dateStr} · ${heure}</div>
-            <div style="font-size:11px;color:${isPast?'#444':'#7eb8d4'};margin-top:2px;">${d.nom_salle||''}</div>
+        <div onclick="ouvrirArtisteDate('${d.id}')" style="background:#161616;border:0.5px solid ${isPast?'#262626':'rgba(201,168,76,0.5)'};border-radius:9px;margin-bottom:8px;display:flex;align-items:stretch;overflow:hidden;cursor:pointer;"
+             onmouseover="this.style.background='#1c1c1c'" onmouseout="this.style.background='#161616'">
+          <div style="background:${isPast?'#1a1a1a':'#1c1810'};border-right:0.5px solid #262626;padding:11px 14px;text-align:center;min-width:58px;display:flex;flex-direction:column;justify-content:center;flex-shrink:0;">
+            <div style="font-size:20px;font-weight:500;color:${isPast?'#ddd':'#c9a84c'};line-height:1;">${jour}</div>
+            <div style="font-size:9px;color:#777;letter-spacing:1px;margin-top:2px;">${mois}</div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-            <span style="font-size:11px;color:${isPast?'#555':'#3b82f6'};font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">${isPast?'✓ PASSÉE':'→ À VENIR'}</span>
-            <span style="font-size:18px;color:#444;">›</span>
+          <div style="flex:1;padding:10px 14px;display:flex;flex-direction:column;justify-content:center;min-width:0;">
+            <div style="font-size:15px;color:${isPast?'#999':'#fff'};font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(d.ville||'—').toUpperCase()}</div>
+            <div style="font-size:11px;color:${isPast?'#555':'#888'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.nom_salle||''}</div>
+          </div>
+          <div style="display:flex;align-items:center;padding-right:14px;gap:8px;flex-shrink:0;">
+            ${estProchaine ? '<span style="font-size:8px;padding:2px 8px;border-radius:4px;background:rgba(46,204,113,0.14);color:#2ecc71;border:0.5px solid rgba(46,204,113,0.45);white-space:nowrap;">★ PROCHAINE</span>' : (isPast ? '<span style="font-size:8px;padding:2px 8px;border-radius:4px;background:rgba(107,114,128,0.14);color:#888;border:0.5px solid rgba(107,114,128,0.4);white-space:nowrap;">✓ PASSÉE</span>' : '')}
+            <span style="color:#c9a84c;font-size:14px;">›</span>
           </div>
         </div>`;
     }).join('');
@@ -10686,6 +10699,7 @@ function _hideTeamSelection() {
       const hotels = vhrDate.filter(v => v.type === 'hebergement');
       const contacts = vhrDate.filter(v => v.type === 'contact');
       const docs = vhrDate.filter(v => v.type === 'document');
+      const infos = vhrDate.filter(v => v.type === 'info');
 
       const typeLabels = { voyage_aller:'🚀 Voyage aller', transfert_gare_salle:'🚉 Gare→Salle', transfert_gare_hotel:'🏨 Gare→Hôtel', transfert_salle_hotel:'🎭 Salle→Hôtel', transfert_hotel_gare:'🚉 Hôtel→Gare', voyage_retour:'🏠 Voyage retour' };
       const teamLabels = { tous:'👥 Tous', artistique:'🎤 Artistique', production:'📋 Production', technique:'🔧 Technique' };
@@ -10854,6 +10868,34 @@ function _hideTeamSelection() {
                     <button onclick="supprimerVHREntry('${doc.id}','vhr-doc-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
                 </div>`).join('') : '<div style="color:#555;font-size:10.5px;font-style:italic;padding:4px 2px;">Aucun document pour cette date</div>'}
+            </div>
+          </div>
+
+          <div style="height:0.5px;background:#242424;margin:16px 0;"></div>
+
+          <!-- INFOS / COMMENTAIRES -->
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;">ℹ️ INFOS / COMMENTAIRES <span style="color:#555;">· ${infos.length}</span></span>
+              <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('info','${d.id}','${tourneeId}')" style="background:rgba(201,168,76,0.1);border:0.5px solid rgba(201,168,76,0.35);color:#c9a84c;border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">+ AJOUTER</button>
+            </div>
+            <div id="vhr-inf-${d.id}">
+              ${infos.length ? infos.map(info => {
+                var teamCol = info.info_team === 'artistique' ? '#e0556f' : (info.info_team === 'technique' ? '#3b9ae0' : '#888');
+                var teamLbl = info.info_team === 'artistique' ? '🎤 Artistique' : (info.info_team === 'technique' ? '🔧 Technique' : '👥 Tous');
+                var teamBg = info.info_team === 'artistique' ? 'rgba(224,85,111,0.15)' : (info.info_team === 'technique' ? 'rgba(59,154,224,0.15)' : 'rgba(136,136,136,0.15)');
+                return `
+                <div style="background:#111;border:0.5px solid #242424;border-left:2px solid ${teamCol};border-radius:0 7px 7px 0;padding:9px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                  <div style="flex:1;min-width:0;">
+                    <span style="display:inline-block;font-size:9px;padding:1px 8px;border-radius:20px;background:${teamBg};color:${teamCol};margin-bottom:4px;">${teamLbl}</span>
+                    <div style="font-size:12px;color:#fff;white-space:pre-wrap;">${(info.info_texte||'').replace(/</g,'&lt;')}</div>
+                  </div>
+                  <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
+                    <button onclick="modifierVHREntry('info','${info.id}')" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
+                    <button onclick="supprimerVHREntry('${info.id}','vhr-inf-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
+                  </div>
+                </div>`;
+              }).join('') : '<div style="color:#555;font-size:10.5px;font-style:italic;padding:4px 2px;">Aucune info pour cette date</div>'}
             </div>
           </div>
 
@@ -11034,6 +11076,16 @@ function _hideTeamSelection() {
     }
     else if (type === 'contact') openModal('modal-vhr-contact');
     else if (type === 'document') openModal('modal-vhr-doc');
+    else if (type === 'info') {
+      // Reset des champs pour un ajout
+      var infoTexte = document.getElementById('vhr-info-texte');
+      var infoTeam = document.getElementById('vhr-info-team');
+      if (infoTexte) infoTexte.value = '';
+      if (infoTeam) infoTeam.value = 'tous';
+      var titreInfo = document.querySelector('#modal-vhr-info .modal-title');
+      if (titreInfo) titreInfo.textContent = 'ℹ️ AJOUTER UNE INFO';
+      openModal('modal-vhr-info');
+    }
   }
 
   async function sauverVoyageVHR() {
@@ -11163,6 +11215,29 @@ function _hideTeamSelection() {
     _vhrEntryEditId = null;
     if (error) { alert('Erreur : ' + error.message); return; }
     closeModal('modal-vhr-doc');
+    if (_vhrEntryTourneeId && document.getElementById('page-fiche-vhr')?.classList.contains('active')) {
+      await ouvrirFicheVHR(_vhrEntryTourneeId);
+    } else {
+      chargerBlocVHR(_vhrEntryDateId);
+    }
+  }
+
+  async function sauverInfoVHR() {
+    const texte = (document.getElementById('vhr-info-texte')?.value || '').trim();
+    if (!texte) { alert('Le texte de l\'info est obligatoire.'); return; }
+    const infoData = {
+      info_texte: texte,
+      info_team: document.getElementById('vhr-info-team')?.value || 'tous',
+    };
+    let error;
+    if (_vhrEntryEditId) {
+      ({ error } = await _supabase.from('vhr_dates').update(infoData).eq('id', _vhrEntryEditId));
+    } else {
+      ({ error } = await _supabase.from('vhr_dates').insert({ date_concert_id: _vhrEntryDateId, tournee_id: _vhrEntryTourneeId, type: 'info', ...infoData }));
+    }
+    _vhrEntryEditId = null;
+    if (error) { alert('Erreur : ' + error.message); return; }
+    closeModal('modal-vhr-info');
     if (_vhrEntryTourneeId && document.getElementById('page-fiche-vhr')?.classList.contains('active')) {
       await ouvrirFicheVHR(_vhrEntryTourneeId);
     } else {
@@ -11549,6 +11624,13 @@ function _hideTeamSelection() {
       setVal('vhr-doc-date', data.doc_date);
       setVal('vhr-doc-lien', data.doc_lien);
       openModal('modal-vhr-doc');
+    }
+    else if (type === 'info') {
+      setVal('vhr-info-team', data.info_team || 'tous');
+      setVal('vhr-info-texte', data.info_texte);
+      var titreInfoEdit = document.querySelector('#modal-vhr-info .modal-title');
+      if (titreInfoEdit) titreInfoEdit.textContent = 'ℹ️ MODIFIER L\'INFO';
+      openModal('modal-vhr-info');
     }
   }
 
@@ -26618,6 +26700,38 @@ function _hideTeamSelection() {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-vhr-hotel')">Annuler</button>
       <button class="btn btn-primary" onclick="sauverHotelVHRFiche()">✅ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE INFO / COMMENTAIRE VHR -->
+<div id="modal-vhr-info" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box" style="max-width:540px;">
+    <div class="modal-header">
+      <div class="modal-title">ℹ️ AJOUTER UNE INFO</div>
+      <button class="modal-close" onclick="closeModal('modal-vhr-info')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>👥 Équipe concernée</label>
+          <select id="vhr-info-team" style="background:var(--black);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:100%;box-sizing:border-box;">
+            <option value="tous">👥 Tous</option>
+            <option value="artistique">🎤 Artistique</option>
+            <option value="technique">🔧 Technique</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>💬 Information / Commentaire *</label>
+          <textarea id="vhr-info-texte" placeholder="ex: Loges au 2e étage · Catering à 18h · Parking derrière la salle..." style="background:var(--black);border:1px solid var(--border);border-radius:8px;color:var(--white);padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;resize:vertical;min-height:90px;outline:none;width:100%;box-sizing:border-box;"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-vhr-info')">Annuler</button>
+      <button class="btn btn-primary" onclick="sauverInfoVHR()">✅ Enregistrer</button>
     </div>
   </div>
 </div>
