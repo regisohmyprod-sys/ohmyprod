@@ -6735,7 +6735,7 @@ function _hideTeamSelection() {
       <!-- 2 CARTES TOURNÉES CLIQUABLES -->
       <div class="db-tournees-cols" style="grid-template-columns:repeat(2,1fr);">
         <!-- TWOQ L'HOMMAGE -->
-        <div class="db-col-card" onclick="showTournee('twoq')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
+        <div class="db-col-card" onclick="ouvrirArtisteVHR('twoq')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="flex:1;min-width:0;">🎸 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'hommage à la légende</span></div><img src="assets/twoq1.jpg" alt="TWOQ Hommage" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:2px solid #c9a84c;box-shadow:0 0 10px rgba(201,168,76,0.3);flex-shrink:0;" onerror="this.style.display='none'"></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq-effectuees-art">–</div></div>
@@ -6748,7 +6748,7 @@ function _hideTeamSelection() {
           <div style="padding:10px;text-align:center;background:rgba(201,168,76,0.08);border-top:1px solid #2a2a2a;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1.5px;color:#c9a84c;">👉 VOIR LES DATES</div>
         </div>
         <!-- TWOQ ETERNELLE LEGENDE -->
-        <div class="db-col-card" onclick="showTournee('twoq2')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
+        <div class="db-col-card" onclick="ouvrirArtisteVHR('twoq2')" style="cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c9a84c';this.style.boxShadow='0 0 20px rgba(201,168,76,0.3)';" onmouseout="this.style.borderColor='';this.style.boxShadow='';">
           <div class="db-col-header" style="border-bottom:3px solid #c9a84c;background:linear-gradient(135deg,#1a1a1a,#0f0f0f);display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="flex:1;min-width:0;">👑 THE WORLD OF QUEEN<br><span style="font-size:13px;font-weight:400;opacity:.7;color:#c9a84c;">L'Éternelle Légende</span></div><img src="assets/twoq2.jpg" alt="TWOQ Eternelle" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:2px solid #c9a84c;box-shadow:0 0 10px rgba(201,168,76,0.3);flex-shrink:0;" onerror="this.style.display='none'"></div>
           <div class="db-col-stats">
             <div class="db-col-stat"><div class="db-tournee-label">Dates effectuées</div><div class="db-tournee-value" id="db-twoq2-effectuees-art">–</div></div>
@@ -10379,6 +10379,14 @@ function _hideTeamSelection() {
     const today = new Date(); today.setHours(0,0,0,0);
     _avhrDates = (tournee.dates_concert || []).sort((a,b) => new Date(a.date_concert) - new Date(b.date_concert));
 
+    // Ajouter la plage d'années au sous-titre (ex: "... · 2026 – 2028")
+    if (sousTitreEl && _avhrDates.length) {
+      const anneeDebut = new Date(_avhrDates[0].date_concert).getFullYear();
+      const anneeFin = new Date(_avhrDates[_avhrDates.length - 1].date_concert).getFullYear();
+      const plage = anneeDebut === anneeFin ? ('' + anneeDebut) : (anneeDebut + ' – ' + anneeFin);
+      sousTitreEl.textContent = (noms[tourneeId] || 'Tournée') + '  ·  ' + plage;
+    }
+
     avhrFiltrer('avenir');
   }
 
@@ -10415,12 +10423,14 @@ function _hideTeamSelection() {
       const estProchaine = (d.id === _avhrProchaineId);
       const jour = dt.toLocaleDateString('fr-FR', { day:'2-digit' });
       const mois = dt.toLocaleDateString('fr-FR', { month:'short' }).toUpperCase().replace('.', '');
+      const annee = dt.getFullYear();
       return `
         <div onclick="ouvrirArtisteDate('${d.id}')" style="background:#161616;border:0.5px solid ${isPast?'#262626':'rgba(201,168,76,0.5)'};border-radius:9px;margin-bottom:8px;display:flex;align-items:stretch;overflow:hidden;cursor:pointer;"
              onmouseover="this.style.background='#1c1c1c'" onmouseout="this.style.background='#161616'">
           <div style="background:${isPast?'#1a1a1a':'#1c1810'};border-right:0.5px solid #262626;padding:11px 14px;text-align:center;min-width:58px;display:flex;flex-direction:column;justify-content:center;flex-shrink:0;">
             <div style="font-size:20px;font-weight:500;color:${isPast?'#ddd':'#c9a84c'};line-height:1;">${jour}</div>
             <div style="font-size:9px;color:#777;letter-spacing:1px;margin-top:2px;">${mois}</div>
+            <div style="font-size:9px;color:#5a5a5a;letter-spacing:0.5px;margin-top:1px;">${annee}</div>
           </div>
           <div style="flex:1;padding:10px 14px;display:flex;flex-direction:column;justify-content:center;min-width:0;">
             <div style="font-size:15px;color:${isPast?'#999':'#fff'};font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(d.ville||'—').toUpperCase()}</div>
