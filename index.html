@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP — build 2026-05-14-livraison3-fixphoto-v2 -->
+<!-- APPLI OMP — build 2026-05-14-livraison3-fixphoto-v3-salles -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -10483,10 +10483,24 @@ function _hideTeamSelection() {
     const salleEl = document.getElementById('avhr-salle');
     if (salleEl) salleEl.textContent = date.nom_salle ? `📍 ${date.nom_salle}` : '';
 
-    // Photo
+    // Photo — d'abord la photo de la date, sinon celle de la salle (table salles)
     const photoContainer = document.getElementById('avhr-photo-container');
-    if (date.photo_salle_url) {
-      document.getElementById('avhr-photo').src = date.photo_salle_url;
+    let urlPhoto = date.photo_salle_url || null;
+    if (!urlPhoto && date.ville) {
+      try {
+        const { data: salleData } = await _supabase
+          .from('salles')
+          .select('photo_url, ville_nom')
+          .ilike('ville_nom', date.ville.trim())
+          .limit(1);
+        if (salleData && salleData.length && salleData[0].photo_url) {
+          urlPhoto = salleData[0].photo_url;
+        }
+      } catch(e) { console.warn('Recherche photo salle échouée', e); }
+    }
+    console.log('🖼️ DIAG PHOTO finale —', date.ville, '| date.photo_salle_url:', date.photo_salle_url, '| urlPhoto retenue:', urlPhoto);
+    if (urlPhoto) {
+      document.getElementById('avhr-photo').src = urlPhoto;
       photoContainer.style.display = 'block';
     } else {
       photoContainer.style.display = 'none';
