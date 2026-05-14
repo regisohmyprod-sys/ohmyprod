@@ -3408,7 +3408,7 @@ function _hideTeamSelection() {
       <!-- ═══════════════════════════════════════════════════════ -->
       <!-- 🚨 BANDEAU D'ALERTES OMP (V1)                              -->
       <!-- ═══════════════════════════════════════════════════════ -->
-      <div id="alertes-bandeau" class="alertes-bandeau" style="display:none;">
+      <div id="alertes-bandeau" class="alertes-bandeau replie" style="display:none;">
         <div class="alertes-header" onclick="alertesToggle()">
           <div class="alertes-titre">
             <span class="alertes-icon">🚨</span>
@@ -3436,9 +3436,9 @@ function _hideTeamSelection() {
       <!-- Ligne séparatrice dorée animée -->
       <div class="gold-line-shimmer"></div>
 
-      <!-- ADMINISTRATIF - Titre -->
+      <!-- ACCÈS ADMIN - Titre -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div class="page-title" style="font-size:22px;margin-bottom:0;">ADMINISTRATIF</div>
+        <div class="page-title" style="font-size:22px;margin-bottom:0;">ACCÈS ADMIN</div>
       </div>
 
       <!-- 5 BOUTONS ADMINISTRATIF SUR UNE LIGNE -->
@@ -3479,21 +3479,60 @@ function _hideTeamSelection() {
       <!-- Ligne séparatrice dorée animée -->
       <div class="gold-line-shimmer"></div>
 
+      <!-- ===== BANDEAU TOURNÉES OMP (déplacé entre ACCÈS ADMIN et GESTION TOUR) ===== -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="page-title" style="font-size:22px;margin-bottom:0;">TOURNÉES OMP</div>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom:20px;grid-template-columns:repeat(5, 1fr);">
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('tournees')">
+          <div class="stat-label">Tournées actives</div>
+          <div class="stat-value" id="stat-tournees-actives" style="font-size:48px;color:#c9a84c;">2</div>
+          <div class="stat-sub">TWOQ</div>
+          <div style="font-size:10px;color:#888;margin-top:4px;">Accès vers Dates & infos</div>
+        </div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showGestionOMP()">
+          <div class="stat-label">N° Dates en cours</div>
+          <div class="stat-value" id="stat-dates-en-cours" style="font-size:48px;color:#fff;">–</div>
+          <div class="stat-sub">jusqu'en 2028</div>
+        </div>
+        <div class="stat-card" style="border-left:3px solid #22c55e;padding:20px;cursor:pointer;" onclick="showGestionOMP()" title="Dates publiées sur theworldofqueen.com">
+          <div class="stat-label">🌐 Sur le site</div>
+          <div class="stat-value" id="stat-dates-publiees" style="font-size:48px;color:#22c55e;">–</div>
+          <div class="stat-sub">theworldofqueen.com</div>
+        </div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('equipe')" title="Voir les membres de l'équipe">
+          <div class="stat-label">Membres équipe</div>
+          <div class="stat-value" id="stat-membres-equipe" style="font-size:48px;color:#fff;">–</div>
+          <div class="stat-sub">artistes + technique + prod</div>
+        </div>
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;">
+          <div class="stat-label">Prochaine date</div>
+          <div class="stat-value" id="stat-prochaine-date" style="font-size:36px;color:#c9a84c;margin-top:4px;">–</div>
+          <div class="stat-sub" id="stat-prochaine-ville">–</div>
+        </div>
+      </div>
+
+      <!-- Ligne séparatrice dorée animée -->
+      <div class="gold-line-shimmer"></div>
+
       <!-- GESTION TOUR - Titre -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div class="page-title" style="font-size:22px;margin-bottom:0;">GESTION TOUR</div>
       </div>
 
-      <!-- 8 cartes sur 2 lignes (4+4) : TOUR / FINANCIER / VHR / BOOKING // PROMO / META PLANNING / BILLETTERIE / SPECTATEURS -->
+      <!-- BLOC GESTION TOUR : 5 cartes -->
       <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
         
-        <!-- TOUR -->
+        <!-- SUIVI / CRÉA DATES TOUR -->
         <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-tour')">
           <div class="stat-label">🚌 Tour</div>
-          <div class="stat-value" style="font-size:32px;color:#c9a84c;">GESTION TOUR</div>
-          <div class="stat-sub">Créa & Suivi dates</div>
+          <div class="stat-value" style="font-size:26px;color:#c9a84c;line-height:1.1;">SUIVI / CRÉA DATES TOUR</div>
+          <div class="stat-sub">Créa, suivi, MEV & carte</div>
           <div id="dropdown-tour" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
-            <div onclick="selectDropdownItem(event, function(){ showPage('gestion-omp'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('gestion-omp'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📅 Gestion Dates Tour</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('suivi-mev'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎫 Suivi MEV</div>
+            <div onclick="selectDropdownItem(event, function(){ carteTourneeOuvrir(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🗺️ Carte Tournée</div>
           </div>
         </div>
 
@@ -3504,7 +3543,187 @@ function _hideTeamSelection() {
           <div class="stat-sub">Suivi Financier Tour & Analyses</div>
           <div id="dropdown-financier" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
             <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviDatesResume(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#c9a84c; font-weight:600; border-bottom:1px solid #333; background:rgba(201,168,76,0.08);" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='rgba(201,168,76,0.08)'">📊 Suivi Financier Tour</div>
-            <div onclick="selectDropdownItem(event, function(){ ouvrirAnalyseGeneraleTour(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#0891b2; font-weight:600; background:rgba(8,145,178,0.08);" onmouseover="this.style.background='rgba(8,145,178,0.15)'" onmouseout="this.style.background='rgba(8,145,178,0.08)'">📈 Analyse Générale</div>
+            <div onclick="selectDropdownItem(event, function(){ ouvrirRecapFrais(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; font-weight:600; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">💰 Accès Notes de Frais Staff</div>
+            <div onclick="selectDropdownItem(event, function(){ ouvrirAnalyseGeneraleTour(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#0891b2; font-weight:600; border-bottom:1px solid #333; background:rgba(8,145,178,0.08);" onmouseover="this.style.background='rgba(8,145,178,0.15)'" onmouseout="this.style.background='rgba(8,145,178,0.08)'">📈 Analyse Générale</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('tdb-historique'); tdbCharger(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#a855f7; font-weight:600;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📉 Analyse Historique</div>
+          </div>
+        </div>
+
+        <!-- BOOKING TOUR -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-booking')">
+          <div class="stat-label">🏟️ Booking</div>
+          <div class="stat-value" style="font-size:32px;color:#c9a84c;">BOOKING TOUR</div>
+          <div class="stat-sub">Booking dates & Gestion salles</div>
+          <div id="dropdown-booking" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <div onclick="selectDropdownItem(event, function(){ showPage('gestion-salles'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Booking / Gestion Salles</div>
+            <div onclick="selectDropdownItem(event, function(){ carteTourneeOuvrir(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🗺️ Carte Tournée</div>
+          </div>
+        </div>
+
+        <!-- BILLETTERIE ACCÈS PLATEFORME -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-billetterie-acces')">
+          <div class="stat-label">🎟️ Billetterie</div>
+          <div class="stat-value" style="font-size:24px;color:#c9a84c;line-height:1.1;">BILLETTERIE ACCÈS PLATEFORME</div>
+          <div class="stat-sub">Accès back-office plateformes</div>
+          <div id="dropdown-billetterie-acces" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <a href="https://stats.trium.fr/auth/auth.html?authnum=0&uid=&time=&pswd=&logout=&url=L3JoczAwMDYvVHJpdW1Qcm9kX0Rpc3RyaWJ1dGlvbi8oUyhod3A0MGU0amF0bmtnYWJ0emhtaDBzbWgpKS9Mb2dpbi5hc3B4&totp=" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎟️ Ticketmaster</a>
+            <a href="https://www.francebillet.pro/signin" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎵 Fnac Spectacles</a>
+            <a href="https://app2.aparteweb.com/?ins=0612507023" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🏟️ Box Office</a>
+          </div>
+        </div>
+
+        <!-- BILLETTERIES LIENS VENTE -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-billetterie-vente')">
+          <div class="stat-label">🎫 Billetterie</div>
+          <div class="stat-value" style="font-size:26px;color:#c9a84c;line-height:1.1;">BILLETTERIES LIENS VENTE</div>
+          <div class="stat-sub">Liens publics réseaux de vente</div>
+          <div id="dropdown-billetterie-vente" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <a href="https://lesdernierscouches.com/spectacles/the-world-of-queen-2/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎫 Les Derniers Couchés</a>
+            <a href="https://www.ticketmaster.fr/fr/resultat?ipSearch=the+world+of+queen" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎟️ Ticketmaster</a>
+            <a href="https://www.fnacspectacles.com/artist/the-world-of-queen/the-world-of-queen-leternelle-legende-tournee-3839438/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎵 Fnac Spectacles</a>
+            <a href="https://spectacles.bleucitron.net/reserver/the-world-of-queen-zenith-toulouse-metropole/8945" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🍋 Bleu Citron</a>
+            <a href="https://www.nuits-dartistes.com/fr/product/the-world-of-queen-502353929" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🌙 Nuit Artistes</a>
+            <a href="https://www.seetickets.com/fr/tg/tour/the-world-of-queen/31415" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎪 See Ticket</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Ligne séparatrice dorée animée -->
+      <div class="gold-line-shimmer"></div>
+
+      <!-- PROMO / PRESSE / PUB - Titre -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="page-title" style="font-size:22px;margin-bottom:0;">PROMO / PRESSE / PUB</div>
+      </div>
+
+      <!-- BLOC PROMO / PRESSE / PUB : 3 cartes -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
+
+        <!-- PROMO -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-promo')">
+          <div class="stat-label">📣 Promo</div>
+          <div class="stat-value" style="font-size:32px;color:#c9a84c;">PROMO</div>
+          <div class="stat-sub">Marketing & Réseaux</div>
+          <div id="dropdown-promo" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <div onclick="selectDropdownItem(event, function(){ showPage('contacts-promo'); })" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333; cursor:pointer;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📋 Contacts Presse</div>
+            <a href="https://business.facebook.com/business/loginpage/?next=https%3A%2F%2Fbusiness.facebook.com%2Flatest%2Fhome%3Fbusiness_id%3D644890879422593%26nav_ref%3Dbiz_unified_f3_login_page_to_mbs&login_options[0]=FB&login_options[1]=IG&login_options[2]=SSO&config_ref=biz_login_tool_flavor_mbs" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📢 Meta Pubs (lien direct)</a>
+            <a href="https://www.theworldofqueen.com/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🌐 Site TWOQ Off</a>
+            <a href="https://www.ohmyprod.com/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🎬 Site OMP Off</a>
+            <a href="https://app.ohmyprod.com/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📱 Appli TWOQ</a>
+            <a href="https://www.facebook.com/theworldofqueen/?locale=fr_FR" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">👍 TWOQ Facebook Off</a>
+            <a href="https://www.instagram.com/theworldofqueenofficiel/" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📸 TWOQ Instagram Off</a>
+            <a href="https://www.youtube.com/channel/UCwyb6LJpE6kDfI3Wx7wP4Xg" target="_blank" onclick="event.stopPropagation()" style="display:block; padding:10px 14px; font-size:12px; color:#fff; text-decoration:none;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">▶️ TWOQ Youtube Off</a>
+          </div>
+        </div>
+
+        <!-- META PLANNING -->
+        <div class="stat-card" style="border-left:3px solid #d4af37;padding:20px;cursor:pointer;position:relative;background:linear-gradient(135deg,#1a1a1a 0%,#2a2419 100%);" onclick="showPage('meta-planning')">
+          <div class="stat-label">🎯 Meta & Posts</div>
+          <div class="stat-value" style="font-size:28px;color:#d4af37;line-height:1.1;">META PLANNING</div>
+          <div class="stat-sub">Pubs Meta + Posts FB/IG, planning</div>
+          <div id="meta-planning-badge" style="position:absolute;top:8px;right:8px;display:none;background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.5px;">0 EN COURS</div>
+        </div>
+
+        <!-- PRESSE / RELATION PRESSE -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #e67e22;padding:20px;cursor:pointer;position:relative;background:linear-gradient(135deg,#1a1a1a 0%,#2e2218 100%);" onclick="toggleDropdown('dropdown-presse')">
+          <div class="stat-label">📰 Relations presse</div>
+          <div class="stat-value" style="font-size:26px;color:#f39c12;line-height:1.1;">PRESSE / RELATION PRESSE</div>
+          <div class="stat-sub">Suivi presse & contacts</div>
+          <div id="dropdown-presse" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #e67e22; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <div onclick="selectDropdownItem(event, function(){ showPage('omp-presse'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#f39c12; font-weight:600; border-bottom:1px solid #333; background:rgba(230,126,34,0.08);" onmouseover="this.style.background='rgba(230,126,34,0.15)'" onmouseout="this.style.background='rgba(230,126,34,0.08)'">📰 Suivi Presse</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('contacts-promo'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📇 Contacts Presse</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Ligne séparatrice dorée animée -->
+      <div class="gold-line-shimmer"></div>
+
+      <!-- VHR / ORGA - Titre -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="page-title" style="font-size:22px;margin-bottom:0;">VHR / ORGA</div>
+      </div>
+
+      <!-- BLOC VHR / ORGA : 2 cartes -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
+
+        <!-- GESTION VHR -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-vhr')">
+          <div class="stat-label">🚌 VHR</div>
+          <div class="stat-value" style="font-size:32px;color:#c9a84c;">GESTION VHR</div>
+          <div class="stat-sub">Gestion VHR & Carte tournée</div>
+          <div id="dropdown-vhr" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <div onclick="selectDropdownItem(event, function(){ openModal('modal-vhr-tournee'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🚌 Gestion VHR</div>
+            <div onclick="selectDropdownItem(event, function(){ carteTourneeOuvrir(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🗺️ Carte Tournée</div>
+          </div>
+        </div>
+
+        <!-- CONTACTS PRESTA -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-contacts-presta')">
+          <div class="stat-label">📇 Contacts</div>
+          <div class="stat-value" style="font-size:30px;color:#c9a84c;">CONTACTS PRESTA</div>
+          <div class="stat-sub">Prestataires VHR & Technique</div>
+          <div id="dropdown-contacts-presta" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <div onclick="selectDropdownItem(event, function(){ showPage('contacts-presta'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📇 Contacts Presta VHR</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('contacts-presta-tech'); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">🔧 Contacts Presta Technique</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Ligne séparatrice dorée animée -->
+      <div class="gold-line-shimmer"></div>
+
+      <!-- GESTION CLIENTS / SPECTATEURS - Titre -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="page-title" style="font-size:22px;margin-bottom:0;">GESTION CLIENTS / SPECTATEURS</div>
+      </div>
+
+      <!-- BLOC GESTION CLIENTS / SPECTATEURS : 2 cartes (CRM en cours) -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
+
+        <!-- SPECTATEURS -->
+        <div class="stat-card" style="border-left:3px solid #555;padding:20px;cursor:default;position:relative;opacity:0.7;">
+          <div class="stat-label">👥 Spectateurs</div>
+          <div class="stat-value" style="font-size:32px;color:#888;">SPECTATEURS</div>
+          <div class="stat-sub">⏳ CRM en cours de développement</div>
+        </div>
+
+        <!-- APPLI TWOQ PUBLIC -->
+        <div class="stat-card" style="border-left:3px solid #555;padding:20px;cursor:default;position:relative;opacity:0.7;">
+          <div class="stat-label">📱 Appli publique</div>
+          <div class="stat-value" style="font-size:26px;color:#888;line-height:1.1;">APPLI TWOQ PUBLIC</div>
+          <div class="stat-sub">⏳ CRM en cours de développement</div>
+        </div>
+
+      </div>
+
+      <!-- Ligne séparatrice dorée animée -->
+      <div class="gold-line-shimmer" style="display:none;"></div>
+
+      <!-- ANCIEN BLOC GESTION TOUR (remplacé par la nouvelle structure ci-dessus) -->
+      <div style="display:none;">
+      <!-- 8 cartes sur 2 lignes (4+4) : TOUR / FINANCIER / VHR / BOOKING // PROMO / META PLANNING / BILLETTERIE / SPECTATEURS -->
+      <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
+        
+        <!-- TOUR -->
+        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="showPage('gestion-omp')">
+          <div class="stat-label">🚌 Tour</div>
+          <div class="stat-value" style="font-size:32px;color:#c9a84c;">GESTION TOUR</div>
+          <div class="stat-sub">Créa & Suivi dates</div>
+        </div>
+
+        <!-- FINANCIER -->
+        <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-financier')">
+          <div class="stat-label">💰 Financier</div>
+          <div class="stat-value" style="font-size:32px;color:#c9a84c;">FINANCIER</div>
+          <div class="stat-sub">Suivi Financier Tour & Analyses</div>
+          <div id="dropdown-financier" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
+            <div onclick="selectDropdownItem(event, function(){ ouvrirSuiviDatesResume(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#c9a84c; font-weight:600; border-bottom:1px solid #333; background:rgba(201,168,76,0.08);" onmouseover="this.style.background='rgba(201,168,76,0.15)'" onmouseout="this.style.background='rgba(201,168,76,0.08)'">📊 Suivi Financier Tour</div>
+            <div onclick="selectDropdownItem(event, function(){ ouvrirAnalyseGeneraleTour(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#0891b2; font-weight:600; border-bottom:1px solid #333; background:rgba(8,145,178,0.08);" onmouseover="this.style.background='rgba(8,145,178,0.15)'" onmouseout="this.style.background='rgba(8,145,178,0.08)'">📈 Analyse Générale</div>
+            <div onclick="selectDropdownItem(event, function(){ ouvrirRecapFrais(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#fff; font-weight:600;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">💰 Accès Notes Frais Staff</div>
           </div>
         </div>
 
@@ -3598,42 +3817,8 @@ function _hideTeamSelection() {
         </div>
 
       </div>
-
-      <!-- Ligne séparatrice dorée animée -->
-      <div class="gold-line-shimmer"></div>
-
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div class="page-title" style="font-size:22px;margin-bottom:0;">TOURNÉES OMP</div>
       </div>
-
-      <div class="stats-grid" style="margin-bottom:20px;grid-template-columns:repeat(5, 1fr);">
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('tournees')">
-          <div class="stat-label">Tournées actives</div>
-          <div class="stat-value" id="stat-tournees-actives" style="font-size:48px;color:#c9a84c;">2</div>
-          <div class="stat-sub">TWOQ</div>
-          <div style="font-size:10px;color:#888;margin-top:4px;">Accès vers Dates & infos</div>
-        </div>
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showGestionOMP()">
-          <div class="stat-label">N° Dates en cours</div>
-          <div class="stat-value" id="stat-dates-en-cours" style="font-size:48px;color:#fff;">–</div>
-          <div class="stat-sub">jusqu'en 2028</div>
-        </div>
-        <div class="stat-card" style="border-left:3px solid #22c55e;padding:20px;cursor:pointer;" onclick="showGestionOMP()" title="Dates publiées sur theworldofqueen.com">
-          <div class="stat-label">🌐 Sur le site</div>
-          <div class="stat-value" id="stat-dates-publiees" style="font-size:48px;color:#22c55e;">–</div>
-          <div class="stat-sub">theworldofqueen.com</div>
-        </div>
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;" onclick="showPage('equipe')" title="Voir les membres de l'équipe">
-          <div class="stat-label">Membres équipe</div>
-          <div class="stat-value" id="stat-membres-equipe" style="font-size:48px;color:#fff;">–</div>
-          <div class="stat-sub">artistes + technique + prod</div>
-        </div>
-        <div class="stat-card" style="border-left:3px solid #c9a84c;padding:20px;">
-          <div class="stat-label">Prochaine date</div>
-          <div class="stat-value" id="stat-prochaine-date" style="font-size:36px;color:#c9a84c;margin-top:4px;">–</div>
-          <div class="stat-sub" id="stat-prochaine-ville">–</div>
-        </div>
-      </div>
+      <!-- FIN ANCIEN BLOC GESTION TOUR (masqué) -->
 
       <!-- Ligne séparatrice dorée animée -->
       <div class="gold-line-shimmer"></div>
@@ -26834,13 +27019,6 @@ function _hideTeamSelection() {
         <div onclick="closeModal('modal-admin-alexandrine'); openModal('modal-gestion-admin');" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
           <span style="font-size:22px;">🔧</span>
           <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">GESTION ADMIN</div><div style="font-size:11px;color:#555;">Gestion administrative</div></div>
-          <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
-        </div>
-
-        <!-- ACCES NOTES FRAIS STAFF - Bouton unique vers récap admin -->
-        <div onclick="closeModal('modal-admin-alexandrine'); ouvrirRecapFrais();" style="display:flex;align-items:center;gap:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 16px;cursor:pointer;color:#fff;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#2a2a2a'">
-          <span style="font-size:22px;">💰</span>
-          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#c9a84c;">ACCES NOTES FRAIS STAFF</div><div style="font-size:11px;color:#555;">Notes et factures staff</div></div>
           <span style="margin-left:auto;color:#555;font-size:16px;">→</span>
         </div>
 
