@@ -4542,14 +4542,14 @@ function _hideTeamSelection() {
             <div style="background:#111;padding:8px 14px;border-bottom:2px solid #c9a84c;display:flex;align-items:center;justify-content:space-between;">
               <div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:#fff;">🎯 PROJECTION</div>
-                <div style="font-size:10px;color:#c9a84c;">Prévisions tournée — résumé Suivi Dates</div>
+                <div style="font-size:10px;color:#c9a84c;">L'Éternelle Légende — projection tournée</div>
               </div>
-              <span id="cs-proj-etat" style="font-size:9px;color:#888;">…</span>
+              <span id="cs-proj-etat" style="font-size:9px;color:#888;text-align:right;">…</span>
             </div>
             <div style="padding:2px 0;">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">👥 N° Spectateurs</span><span id="cs-proj-spectateurs" style="font-size:17px;color:#c9a84c;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">💰 Chiffre d'affaires TTC</span><span id="cs-proj-ca" style="font-size:17px;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">📊 Résultat OMP</span><span id="cs-proj-resultat" style="font-size:17px;color:#22c55e;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">👥 N° Spectateurs</span><span id="cs-proj-spectateurs" style="font-size:16px;color:#c9a84c;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;white-space:nowrap;">–</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.04);"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">💰 Chiffre d'affaires TTC</span><span id="cs-proj-ca" style="font-size:16px;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;white-space:nowrap;">–</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 14px;"><span style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">📊 Résultat OMP</span><span id="cs-proj-resultat" style="font-size:16px;color:#22c55e;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;white-space:nowrap;">–</span></div>
             </div>
           </div>
 
@@ -29595,19 +29595,32 @@ console.log('✅ OMP Mobile Kit chargé');
 // ═══════════════════════════════════════════════════════════════
 (function() {
 
-  // ----- Helpers de formatage (mêmes formats que SUIVI DATES) -----
+  // ----- Helpers de formatage (espace normale entre milliers = plus lisible en gros) -----
+  function dashSepMilliers(n) {
+    // Arrondi + séparateur de milliers = espace normale (U+0020), pas l'espace fine de toLocaleString
+    var s = Math.round(n || 0).toString();
+    var neg = s.charAt(0) === '-';
+    if (neg) s = s.substring(1);
+    s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return (neg ? '-' : '') + s;
+  }
   function dashFmtNb(n) {
-    return Math.round(n || 0).toLocaleString('fr-FR');
+    return dashSepMilliers(n);
   }
   function dashFmtEur(n) {
-    return Math.round(n || 0).toLocaleString('fr-FR') + ' €';
+    return dashSepMilliers(n) + ' €';
   }
 
   // ════════════════════════════════════════════════════════════
-  // 1) BLOC PROJECTION — 3 chiffres clés repris du résumé SUIVI DATES
+  // 1) BLOC PROJECTION — projection de la tournée L'ÉTERNELLE LÉGENDE
   //    Affiché dans CRÉA / SUIVI DATES (BLOC 2, à la place de SPECTATEURS)
-  //    (recalcul à l'identique du tfoot : tot.projBillets / projCA / projResultatOMP)
+  //    Calcul sur les dates de la tournée Éternelle Légende uniquement.
+  //    (même logique projBillets/projCA/projResultatOMP que le résumé Suivi Dates)
+  //    → aujourd'hui : 100% projection (tournée pas démarrée)
+  //    → au fil du temps : les dates jouées basculent sur le réel et s'additionnent
   // ════════════════════════════════════════════════════════════
+  var TOURNEE_ETERNELLE_LEGENDE = '22222222-2222-2222-2222-222222222222';
+
   window.csChargerProjection = async function() {
     var elSpec = document.getElementById('cs-proj-spectateurs');
     var elCA   = document.getElementById('cs-proj-ca');
@@ -29625,14 +29638,20 @@ console.log('✅ OMP Mobile Kit chargé');
         }
       }
 
-      var data = (typeof _suiviDonnees !== 'undefined' && Array.isArray(_suiviDonnees)) ? _suiviDonnees : [];
+      var dataAll = (typeof _suiviDonnees !== 'undefined' && Array.isArray(_suiviDonnees)) ? _suiviDonnees : [];
+
+      // ✨ Filtre : uniquement les dates de la tournée L'ÉTERNELLE LÉGENDE
+      var data = dataAll.filter(function(d) {
+        return d.tournee_id === TOURNEE_ETERNELLE_LEGENDE;
+      });
+
       if (data.length === 0) {
         elSpec.textContent = '–'; elCA.textContent = '–'; elRes.textContent = '–';
-        if (elEtat) elEtat.textContent = 'aucune donnée';
+        if (elEtat) elEtat.textContent = 'aucune date';
         return;
       }
 
-      // ✨ Même logique exacte que le tfoot de suiviAfficher() — filtre "all"
+      // ✨ Même logique exacte que le tfoot de suiviAfficher()
       var totProjBillets = 0, totProjCA = 0, totProjResultatOMP = 0;
       data.forEach(function(d) {
         var hasProjTot = (d.categorie !== 'passees') && (d.projBillets > 0 || d.billets > 0);
@@ -29646,8 +29665,8 @@ console.log('✅ OMP Mobile Kit chargé');
       elRes.textContent  = dashFmtEur(totProjResultatOMP);
       elRes.style.color  = totProjResultatOMP >= 0 ? '#22c55e' : '#ef4444';
 
-      if (elEtat) elEtat.textContent = data.length + ' dates';
-      console.log('[PROJECTION] Spectateurs:', Math.round(totProjBillets), '· CA:', Math.round(totProjCA), '· Résultat OMP:', Math.round(totProjResultatOMP));
+      if (elEtat) elEtat.textContent = data.length + ' dates · Éternelle Légende';
+      console.log('[PROJECTION Éternelle Légende] Spectateurs:', Math.round(totProjBillets), '· CA:', Math.round(totProjCA), '· Résultat OMP:', Math.round(totProjResultatOMP), '(' + data.length + ' dates)');
     } catch (err) {
       console.error('[PROJECTION] Erreur :', err);
       if (elEtat) elEtat.textContent = 'erreur';
