@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP build v6 - 14mai2026-2230 - fix photo salle artiste -->
+<!-- APPLI OMP build v8 - 14mai2026-2300 - photo salle match exact comme admin -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -10481,30 +10481,20 @@ function _hideTeamSelection() {
     if (salleEl) salleEl.textContent = date.nom_salle ? `📍 ${date.nom_salle}` : '';
 
     // Photo — d'abord la photo de la date, sinon celle de la salle (table salles).
-    // Dans salles, ville_nom = "VILLE + nom salle" (ex: "BREST Arena"), donc on matche sur le début.
+    // On reproduit EXACTEMENT la logique admin : match EXACT entre date.nom_salle et salles.ville_nom
+    // (le .ilike sans % = égalité insensible à la casse → évite les doublons de ville).
     const photoContainer = document.getElementById('avhr-photo-container');
     let urlPhoto = date.photo_salle_url || null;
-    if (!urlPhoto && date.ville) {
+    if (!urlPhoto && date.nom_salle) {
       try {
-        const villeRecherche = date.ville.trim();
-        const { data: salleData } = await _supabase
+        const nomSalle = date.nom_salle.trim();
+        const { data: sallesMatch } = await _supabase
           .from('salles')
           .select('photo_url, ville_nom')
-          .ilike('ville_nom', villeRecherche + '%');
-        if (salleData && salleData.length) {
-          const avecPhoto = salleData.find(s => s.photo_url);
-          if (avecPhoto) urlPhoto = avecPhoto.photo_url;
-        }
-        // 2e essai : recherche "contient" si le 1er essai n'a rien donné
-        if (!urlPhoto) {
-          const { data: salleData2 } = await _supabase
-            .from('salles')
-            .select('photo_url, ville_nom')
-            .ilike('ville_nom', '%' + villeRecherche + '%');
-          if (salleData2 && salleData2.length) {
-            const avecPhoto2 = salleData2.find(s => s.photo_url);
-            if (avecPhoto2) urlPhoto = avecPhoto2.photo_url;
-          }
+          .ilike('ville_nom', nomSalle)
+          .limit(1);
+        if (sallesMatch && sallesMatch.length > 0 && sallesMatch[0].photo_url) {
+          urlPhoto = sallesMatch[0].photo_url;
         }
       } catch(e) { console.warn('Recherche photo salle échouée', e); }
     }
