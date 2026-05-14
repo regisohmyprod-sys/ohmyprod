@@ -6452,6 +6452,9 @@ function _hideTeamSelection() {
         <span style="margin-left:auto;color:#555;">✈ voyages &nbsp;🏨 hôtel &nbsp;☎ contacts &nbsp;▤ docs</span>
       </div>
 
+      <!-- ⚠️ BANDEAU ALERTE — infos essentielles manquantes (voyages + hébergement) -->
+      <div id="vhr-alerte-manquantes" style="display:none;"></div>
+
       <!-- LISTE DES DATES -->
       <div id="vhr-dates-container">
         <div style="color:#888;font-size:13px;text-align:center;padding:40px;">Chargement des dates...</div>
@@ -10717,7 +10720,7 @@ function _hideTeamSelection() {
           <!-- Contenu -->
           <div style="flex:1;padding:9px 13px;min-width:0;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-              <div style="font-size:13px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              <div style="font-size:15px;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                 ${d.ville||'—'} ${d.nom_salle?'<span style="color:#6f6f6f;font-weight:400;font-size:11.5px;">· '+d.nom_salle+'</span>':''}
               </div>
               <span style="font-size:8.5px;font-weight:500;letter-spacing:0.5px;padding:2px 8px;border-radius:4px;background:${etatBg};color:${etatCol};border:0.5px solid ${etatBd};white-space:nowrap;flex-shrink:0;">${isPast?'✓ PASSÉE':(estProchaine?'★ PROCHAINE':etatLabel)}</span>
@@ -10733,98 +10736,140 @@ function _hideTeamSelection() {
           </div>
         </div>
 
-        <!-- CONTENU VHR DATE -->
+        <!-- CONTENU VHR DATE — FEUILLE UNIQUE -->
         <div id="vhr-date-${d.id}" style="display:none;padding:16px;border-top:0.5px solid #262626;background:#0f0f0f;">
 
+          <!-- ⚠️ Alerte infos manquantes (date concernée) — essentiel = voyages + hébergement -->
+          ${(voyages.length === 0 || hotels.length === 0) && !isPast ? `
+          <div style="background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.5);border-radius:8px;padding:9px 13px;margin-bottom:14px;display:flex;align-items:center;gap:9px;">
+            <span style="font-size:15px;">⚠️</span>
+            <div style="font-size:11.5px;color:#f3a3a3;">
+              Infos essentielles manquantes :
+              ${voyages.length === 0 ? '<span style="color:#ef4444;font-weight:600;">Voyages</span>' : ''}${voyages.length === 0 && hotels.length === 0 ? ' · ' : ''}${hotels.length === 0 ? '<span style="color:#ef4444;font-weight:600;">Hébergement</span>' : ''}
+            </div>
+          </div>` : ''}
+
           <!-- VOYAGES -->
-          <div style="margin-bottom:14px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">✈️ VOYAGES</div>
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;">
+                ${voyages.length === 0 && !isPast ? '<span style="color:#ef4444;margin-right:5px;" title="Information manquante">⚠️</span>' : ''}✈️ VOYAGES <span style="color:#555;">· ${voyages.length}</span>
+              </span>
+              <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('voyage','${d.id}','${tourneeId}')" style="background:rgba(201,168,76,0.1);border:0.5px solid rgba(201,168,76,0.35);color:#c9a84c;border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">+ AJOUTER</button>
+            </div>
             <div id="vhr-voy-${d.id}">
               ${voyages.length ? voyages.map(v => `
-                <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-                  <div style="flex:1;">
-                    <div style="font-size:12px;color:#fff;font-weight:600;">${typeLabels[v.voy_type]||v.voy_type||'–'} · ${teamLabels[v.voy_team]||v.voy_team||''} · ${jourLabels[v.voy_jour]||v.voy_jour||''}</div>
-                    ${v.voy_heure_debut?`<div style="font-size:11px;color:#888;">${v.voy_heure_debut}${v.voy_heure_fin?' → '+v.voy_heure_fin:''}</div>`:''}
-                    ${v.voy_lieu?`<div style="font-size:11px;color:#aaa;">📍 ${v.voy_lieu}</div>`:''}
-                    ${v.voy_notes&&!v.voy_notes.startsWith('dosier')?`<div style="font-size:11px;color:#777;font-style:italic;">💬 ${v.voy_notes}</div>`:''}
+                <div style="background:#111;border:0.5px solid #242424;border-left:2px solid ${v.voy_team==='artistique'?'#e0556f':(v.voy_team==='technique'?'#3b9ae0':'#888')};border-radius:0 7px 7px 0;padding:9px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:12px;color:#fff;">${typeLabels[v.voy_type]||v.voy_type||'–'} · ${jourLabels[v.voy_jour]||v.voy_jour||''}${v.voy_heure_debut?` · <span style="color:#c9a84c;">${v.voy_heure_debut}${v.voy_heure_fin?' → '+v.voy_heure_fin:''}</span>`:''}</div>
+                    ${v.voy_lieu?`<div style="font-size:10.5px;color:#999;margin-top:2px;">📍 ${v.voy_lieu}</div>`:''}
+                    ${v.voy_notes&&!v.voy_notes.startsWith('dosier')?`<div style="font-size:10.5px;color:#777;font-style:italic;margin-top:1px;">💬 ${v.voy_notes}</div>`:''}
+                    ${v.voy_team?`<span style="display:inline-block;margin-top:5px;font-size:9px;padding:1px 8px;border-radius:20px;background:${v.voy_team==='artistique'?'rgba(224,85,111,0.15)':(v.voy_team==='technique'?'rgba(59,154,224,0.15)':'rgba(136,136,136,0.15)')};color:${v.voy_team==='artistique'?'#e0556f':(v.voy_team==='technique'?'#3b9ae0':'#aaa')};">${teamLabels[v.voy_team]||v.voy_team}</span>`:''}
                   </div>
                   <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
                     <button onclick="modifierVHREntry('voyage','${v.id}')" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${v.id}','vhr-voy-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
-                </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun voyage</div>'}
+                </div>`).join('') : '<div style="color:#555;font-size:10.5px;font-style:italic;padding:4px 2px;">Aucun voyage pour cette date</div>'}
             </div>
-            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('voyage','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
           </div>
 
+          <div style="height:0.5px;background:#242424;margin:0 0 16px;"></div>
+
           <!-- HÉBERGEMENT -->
-          <div style="margin-bottom:14px;border-top:1px solid #2a2a2a;padding-top:12px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">🏨 HÉBERGEMENT</div>
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;">
+                ${hotels.length === 0 && !isPast ? '<span style="color:#ef4444;margin-right:5px;" title="Information manquante">⚠️</span>' : ''}🏨 HÉBERGEMENT <span style="color:#555;">· ${hotels.length}</span>
+              </span>
+              <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('hebergement','${d.id}','${tourneeId}')" style="background:rgba(201,168,76,0.1);border:0.5px solid rgba(201,168,76,0.35);color:#c9a84c;border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">+ AJOUTER</button>
+            </div>
             <div id="vhr-hot-${d.id}">
               ${hotels.length ? hotels.map(h => `
-                <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-                  <div style="flex:1;">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
-                      <div style="font-size:12px;color:#fff;font-weight:600;">🏨 ${h.hotel_nom||'–'}</div>
-                      ${h.hotel_teams ? `<div style="display:flex;gap:3px;flex-wrap:wrap;">${formatTeamsBadges(h.hotel_teams)}</div>` : ''}
-                    </div>
-                    ${h.hotel_adresse?`<div style="font-size:11px;color:#aaa;">📍 ${h.hotel_adresse}</div>`:''}
-                    ${h.hotel_dist_salle?`<div style="font-size:11px;color:#888;">🎭 ${h.hotel_dist_salle}</div>`:''}
-                    ${h.hotel_dist_gare?`<div style="font-size:11px;color:#888;">🚉 ${h.hotel_dist_gare}</div>`:''}
-                    ${h.hotel_commentaire?`<div style="font-size:11px;color:#777;font-style:italic;">💬 ${h.hotel_commentaire}</div>`:''}
+                <div style="background:#111;border:0.5px solid #242424;border-radius:7px;padding:9px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:12px;color:#fff;font-weight:500;">🏨 ${h.hotel_nom||'–'}</div>
+                    ${h.hotel_adresse?`<div style="font-size:10.5px;color:#999;margin-top:2px;">📍 ${h.hotel_adresse}</div>`:''}
+                    ${h.hotel_dist_salle||h.hotel_dist_gare?`<div style="font-size:10.5px;color:#888;margin-top:1px;">${h.hotel_dist_salle?'🎭 '+h.hotel_dist_salle:''}${h.hotel_dist_salle&&h.hotel_dist_gare?' · ':''}${h.hotel_dist_gare?'🚉 '+h.hotel_dist_gare:''}</div>`:''}
+                    ${h.hotel_commentaire?`<div style="font-size:10.5px;color:#777;font-style:italic;margin-top:1px;">💬 ${h.hotel_commentaire}</div>`:''}
+                    ${h.hotel_teams ? `<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:5px;">${formatTeamsBadges(h.hotel_teams)}</div>` : ''}
                   </div>
                   <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
                     <button onclick="modifierVHREntry('hebergement','${h.id}')" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${h.id}','vhr-hot-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
-                </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun hébergement</div>'}
+                </div>`).join('') : '<div style="color:#555;font-size:10.5px;font-style:italic;padding:4px 2px;">Aucun hébergement pour cette date</div>'}
             </div>
-            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('hebergement','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
           </div>
 
+          <div style="height:0.5px;background:#242424;margin:0 0 16px;"></div>
+
           <!-- CONTACTS -->
-          <div style="margin-bottom:14px;border-top:1px solid #2a2a2a;padding-top:12px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">📞 CONTACTS</div>
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;">☎️ CONTACTS <span style="color:#555;">· ${contacts.length}</span></span>
+              <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('contact','${d.id}','${tourneeId}')" style="background:rgba(201,168,76,0.1);border:0.5px solid rgba(201,168,76,0.35);color:#c9a84c;border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">+ AJOUTER</button>
+            </div>
             <div id="vhr-con-${d.id}">
               ${contacts.length ? contacts.map(c => `
-                <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-                  <div style="flex:1;">
-                    <div style="font-size:12px;color:#fff;font-weight:600;">📞 ${c.contact_prenom||''} ${c.contact_nom||''}${c.contact_fonction?' — '+c.contact_fonction:''}</div>
-                    ${c.contact_tel?`<div style="font-size:11px;color:#aaa;">📱 ${c.contact_tel}</div>`:''}
-                    ${c.contact_email?`<div style="font-size:11px;color:#aaa;">✉️ ${c.contact_email}</div>`:''}
+                <div style="background:#111;border:0.5px solid #242424;border-radius:7px;padding:9px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:12px;color:#fff;font-weight:500;">☎️ ${c.contact_prenom||''} ${c.contact_nom||''}${c.contact_fonction?'<span style="color:#999;font-weight:400;"> — '+c.contact_fonction+'</span>':''}</div>
+                    ${c.contact_tel||c.contact_email?`<div style="font-size:10.5px;color:#999;margin-top:2px;">${c.contact_tel?'📱 '+c.contact_tel:''}${c.contact_tel&&c.contact_email?' · ':''}${c.contact_email?'✉️ '+c.contact_email:''}</div>`:''}
                   </div>
                   <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
                     <button onclick="modifierVHREntry('contact','${c.id}')" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${c.id}','vhr-con-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
-                </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun contact</div>'}
+                </div>`).join('') : '<div style="color:#555;font-size:10.5px;font-style:italic;padding:4px 2px;">Aucun contact pour cette date</div>'}
             </div>
-            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('contact','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
           </div>
 
+          <div style="height:0.5px;background:#242424;margin:0 0 16px;"></div>
+
           <!-- DOCUMENTS -->
-          <div style="border-top:1px solid #2a2a2a;padding-top:12px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">📄 DOCUMENTS</div>
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;">▤ DOCUMENTS <span style="color:#555;">· ${docs.length}</span></span>
+              <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('document','${d.id}','${tourneeId}')" style="background:rgba(201,168,76,0.1);border:0.5px solid rgba(201,168,76,0.35);color:#c9a84c;border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">+ AJOUTER</button>
+            </div>
             <div id="vhr-doc-${d.id}">
               ${docs.length ? docs.map(doc => `
-                <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-                  <div style="flex:1;">
-                    <div style="font-size:12px;color:#fff;font-weight:600;">📄 ${doc.doc_type||'–'} <span style="color:#888;font-weight:400;">${doc.doc_categorie||''}</span></div>
-                    ${doc.doc_deposant?`<div style="font-size:11px;color:#888;">👤 ${doc.doc_deposant} · ${doc.doc_date||''}</div>`:''}
-                    ${doc.doc_lien?`<a href="${doc.doc_lien}" target="_blank" style="font-size:11px;color:#c9a84c;">🔗 Ouvrir</a>`:''}
+                <div style="background:#111;border:0.5px solid #242424;border-radius:7px;padding:9px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:12px;color:#fff;font-weight:500;">📄 ${doc.doc_type||'–'} <span style="color:#888;font-weight:400;">${doc.doc_categorie||''}</span></div>
+                    ${doc.doc_deposant?`<div style="font-size:10.5px;color:#888;margin-top:2px;">👤 ${doc.doc_deposant} · ${doc.doc_date||''}</div>`:''}
+                    ${doc.doc_lien?`<a href="${doc.doc_lien}" target="_blank" style="font-size:10.5px;color:#c9a84c;">🔗 Ouvrir</a>`:''}
                   </div>
                   <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
                     <button onclick="modifierVHREntry('document','${doc.id}')" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${doc.id}','vhr-doc-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
-                </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun document</div>'}
+                </div>`).join('') : '<div style="color:#555;font-size:10.5px;font-style:italic;padding:4px 2px;">Aucun document pour cette date</div>'}
             </div>
-            <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('document','${d.id}','${tourneeId}')" style="margin-top:6px;background:transparent;color:#fff;border:1px dashed #555;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">+ AJOUTER</button>
           </div>
 
         </div>
       </div>`;
     }).join('');
+
+    // ⚠️ Mettre à jour le bandeau d'alerte (basé sur TOUTES les dates, pas le filtre courant)
+    if (typeof vhrMajBandeauAlerte === 'function') vhrMajBandeauAlerte();
+  }
+
+  // Ouvre + scrolle vers la fiche d'une date depuis le bandeau d'alerte
+  function vhrScrollVersDate(dateId) {
+    const contenu = document.getElementById('vhr-date-' + dateId);
+    if (!contenu) return;
+    // Ouvrir le déroulé s'il est fermé
+    if (contenu.style.display === 'none') {
+      toggleVHRDate('vhr-date-' + dateId);
+    }
+    // Scroller en douceur jusqu'à la carte
+    const carte = contenu.closest('div[style*="margin-bottom:7px"]') || contenu.parentElement;
+    if (carte && carte.scrollIntoView) {
+      carte.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   function toggleVHRDate(id) {
@@ -11029,18 +11074,18 @@ function _hideTeamSelection() {
     _vhrFiltreActif = filtre;
     const search = (document.getElementById('vhr-search')?.value || '').toLowerCase().trim();
 
-    // Mettre à jour les boutons
+    // Mettre à jour les boutons (style or OMP)
     ['avenir','passees','toutes'].forEach(f => {
       const btn = document.getElementById('vhr-filter-' + f);
       if (!btn) return;
       if (f === filtre) {
-        btn.style.background = '#3b82f6';
-        btn.style.color = '#fff';
+        btn.style.background = '#c9a84c';
+        btn.style.color = '#000';
         btn.style.border = 'none';
       } else {
         btn.style.background = '#1a1a1a';
         btn.style.color = '#888';
-        btn.style.border = '1px solid #2a2a2a';
+        btn.style.border = '0.5px solid #2a2a2a';
       }
     });
 
@@ -11060,6 +11105,41 @@ function _hideTeamSelection() {
     }
 
     afficherFicheVHR(dates, _vhrAllVhrData, _vhrTourneeId);
+
+    // ⚠️ Le bandeau d'alerte scanne TOUTES les dates (indépendamment du filtre actif)
+    vhrMajBandeauAlerte();
+  }
+
+  // Met à jour le bandeau d'alerte "infos manquantes" sur la base de TOUTES les dates de la tournée
+  function vhrMajBandeauAlerte() {
+    const alerteEl = document.getElementById('vhr-alerte-manquantes');
+    if (!alerteEl) return;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const allDates = _vhrAllDates || [];
+    const allVhr = _vhrAllVhrData || [];
+
+    const datesIncompletes = allDates.filter(function(d) {
+      if (new Date(d.date_concert) < today) return false;
+      const vd = allVhr.filter(function(v) { return v.date_concert_id === d.id; });
+      const aVoyage = vd.some(function(v) { return v.type === 'voyage'; });
+      const aHotel = vd.some(function(v) { return v.type === 'hebergement'; });
+      return !aVoyage || !aHotel;
+    });
+
+    if (datesIncompletes.length === 0) {
+      alerteEl.style.display = 'none';
+      alerteEl.innerHTML = '';
+      return;
+    }
+    const liens = datesIncompletes.map(function(d) {
+      return '<span onclick="vhrScrollVersDate(\'' + d.id + '\')" style="display:inline-block;background:rgba(239,68,68,0.15);border:0.5px solid rgba(239,68,68,0.5);color:#f3a3a3;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;margin:3px 4px 0 0;" onmouseover="this.style.background=\'rgba(239,68,68,0.28)\'" onmouseout="this.style.background=\'rgba(239,68,68,0.15)\'">📍 ' + (d.ville || 'Date') + ' ▸</span>';
+    }).join('');
+    alerteEl.style.display = 'block';
+    alerteEl.innerHTML =
+      '<div style="background:rgba(239,68,68,0.08);border:0.5px solid rgba(239,68,68,0.45);border-left:3px solid #ef4444;border-radius:0 9px 9px 0;padding:11px 14px;margin-bottom:14px;">' +
+        '<div style="font-size:12.5px;color:#f3a3a3;font-weight:600;">⚠️ ATTENTION SARAH, tu as oublié des infos dans ' + (datesIncompletes.length > 1 ? 'les fiches suivantes' : 'la fiche suivante') + ' :</div>' +
+        '<div style="margin-top:5px;">' + liens + '</div>' +
+      '</div>';
   }
 
 
