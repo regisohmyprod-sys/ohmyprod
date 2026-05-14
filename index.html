@@ -3691,9 +3691,10 @@ function _hideTeamSelection() {
 
       <!-- Onglets -->
       <div class="meta-promo-tabs">
-        <button class="meta-promo-tab active" data-tab="campagnes" onclick="metaPromoSwitchTab('campagnes')">📊 8 Clusters Meta</button>
+        <button class="meta-promo-tab active" data-tab="campagnes" onclick="metaPromoSwitchTab('campagnes')">📊 Clusters Meta</button>
         <button class="meta-promo-tab" data-tab="actions" onclick="metaPromoSwitchTab('actions')">📅 Actions & Posts</button>
         <button class="meta-promo-tab" data-tab="tous" onclick="metaPromoSwitchTab('tous')">📆 Planning</button>
+        <button class="meta-promo-tab" data-tab="budgets" onclick="metaPromoSwitchTab('budgets')">💰 Budgets</button>
       </div>
 
       <!-- Liste -->
@@ -29853,6 +29854,10 @@ body.mp-modal-open { overflow: hidden; }
       items = metaPromoData.campagnes.map(c => ({ ...c, _kind: 'campagne' }));
     } else if (metaPromoCurrentTab === 'actions') {
       items = metaPromoData.actions.map(a => ({ ...a, _kind: 'action' }));
+    } else if (metaPromoCurrentTab === 'budgets') {
+      // === ONGLET BUDGETS : tableau de bord budgétaire ===
+      metaPromoRenderBudgets();
+      return;
     } else {
       // === ONGLET PLANNING : rendu timeline ===
       metaPromoRenderPlanning();
@@ -29863,6 +29868,199 @@ body.mp-modal-open { overflow: hidden; }
       return;
     }
     list.innerHTML = items.map(metaPromoRenderItem).join('');
+  }
+
+  // ━━━━━━ VUE BUDGETS : TABLEAU DE BORD BUDGÉTAIRE ━━━━━━
+  let metaPromoBudgetVue = 'mois'; // 'mois', 'clusters', 'annee'
+
+  function metaPromoSetBudgetVue(vue) {
+    metaPromoBudgetVue = vue;
+    metaPromoRenderBudgets();
+  }
+
+  // Extrait le tarif €/jour depuis la description d'une phase (format "💰 X €/j × ...")
+  function metaPromoExtraitTarifJour(desc) {
+    if (!desc) return 0;
+    const m = desc.match(/(\d+(?:[.,]\d+)?)\s*€\s*\/\s*j/i);
+    return m ? parseFloat(m[1].replace(',', '.')) : 0;
+  }
+
+  // Extrait le budget total estimé depuis la description (format "Total estimé : X €")
+  function metaPromoExtraitTotalPhase(desc) {
+    if (!desc) return 0;
+    const m = desc.match(/total\s*(?:estim[ée]|:)?\s*:?\s*([\d\s]+)\s*€/i);
+    if (m) return parseInt(m[1].replace(/\s/g, ''), 10) || 0;
+    return 0;
+  }
+
+  function metaPromoRenderBudgets() {
+    const list = document.getElementById('metaPromoList');
+    if (!list) return;
+
+    const clusters = metaPromoData.campagnes || [];
+    const actions = (metaPromoData.actions || []).filter(a => a.type === 'PUB_META' && a.cluster_id);
+
+    // Calcul du budget total de chaque cluster (somme des phases)
+    const budgetParCluster = {};
+    let budgetTotalAnnee = 0;
+    clusters.forEach(c => {
+      const phases = actions.filter(a => a.cluster_id === c.id);
+      let total = 0;
+      phases.forEach(p => { total += metaPromoExtraitTotalPhase(p.description); });
+      budgetParCluster[c.id] = { total, nbPhases: phases.length };
+      budgetTotalAnnee += total;
+    });
+
+    // Calcul du budget par mois (chaque phase contribue à son mois de démarrage)
+    const budgetParMois = {};
+    actions.forEach(p => {
+      if (!p.date_prevue) return;
+      const mois = p.date_prevue.slice(0, 7); // YYYY-MM
+      const montant = metaPromoExtraitTotalPhase(p.description);
+      if (!budgetParMois[mois]) budgetParMois[mois] = { total: 0, nbPhases: 0 };
+      budgetParMois[mois].total += montant;
+      budgetParMois[mois].nbPhases += 1;
+    });
+
+    const moisLabels = {
+      '01':'Jan','02':'Fév','03':'Mar','04':'Avr','05':'Mai','06':'Juin',
+      '07':'Juil','08':'Août','09':'Sep','10':'Oct','11':'Nov','12':'Déc'
+    };
+
+    // ─── Barre de sélection de vue ───
+    let html = `
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button onclick="metaPromoSetBudgetVue('mois')" style="background:${metaPromoBudgetVue==='mois'?'#d4af37':'#2a2a2a'};color:${metaPromoBudgetVue==='mois'?'#000':'#c0c0c0'};border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:13px;">📅 PAR MOIS</button>
+        <button onclick="metaPromoSetBudgetVue('clusters')" style="background:${metaPromoBudgetVue==='clusters'?'#d4af37':'#2a2a2a'};color:${metaPromoBudgetVue==='clusters'?'#000':'#c0c0c0'};border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:13px;">🎯 PAR CLUSTER</button>
+        <button onclick="metaPromoSetBudgetVue('annee')" style="background:${metaPromoBudgetVue==='annee'?'#d4af37':'#2a2a2a'};color:${metaPromoBudgetVue==='annee'?'#000':'#c0c0c0'};border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:13px;">🏆 SYNTHÈSE</button>
+      </div>
+    `;
+
+    // ─── Bandeau total année (toujours visible) ───
+    html += `
+      <div style="background:linear-gradient(135deg,#1a1a1a,#2a2a1a);border:1px solid rgba(212,175,55,0.4);border-radius:10px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-around;flex-wrap:wrap;gap:12px;">
+        <div style="text-align:center;">
+          <div style="font-size:26px;color:#d4af37;font-family:'Bebas Neue',sans-serif;">${budgetTotalAnnee.toLocaleString('fr-FR')} €</div>
+          <div style="font-size:11px;color:#888;letter-spacing:1px;">BUDGET TOTAL TOURNÉE</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:26px;color:#d4af37;font-family:'Bebas Neue',sans-serif;">${clusters.length}</div>
+          <div style="font-size:11px;color:#888;letter-spacing:1px;">SOUS-CLUSTERS</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:26px;color:#d4af37;font-family:'Bebas Neue',sans-serif;">${actions.length}</div>
+          <div style="font-size:11px;color:#888;letter-spacing:1px;">PHASES PUB</div>
+        </div>
+      </div>
+    `;
+
+    if (metaPromoBudgetVue === 'mois') {
+      // ─── VUE PAR MOIS ───
+      const moisTries = Object.keys(budgetParMois).sort();
+      const maxMois = Math.max(...moisTries.map(m => budgetParMois[m].total), 1);
+      html += `<div style="background:#1a1a1a;border-radius:10px;padding:14px;">`;
+      html += `<div style="color:#d4af37;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:16px;margin-bottom:12px;">💸 BUDGET ENGAGÉ PAR MOIS</div>`;
+      moisTries.forEach(m => {
+        const [annee, moisNum] = m.split('-');
+        const lbl = (moisLabels[moisNum] || moisNum) + ' ' + annee;
+        const montant = budgetParMois[m].total;
+        const nbP = budgetParMois[m].nbPhases;
+        const pct = Math.round((montant / maxMois) * 100);
+        html += `
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;">
+              <span style="color:#c0c0c0;">${lbl} <span style="color:#666;font-size:11px;">(${nbP} phase${nbP>1?'s':''})</span></span>
+              <span style="color:#d4af37;font-weight:700;">${montant.toLocaleString('fr-FR')} €</span>
+            </div>
+            <div style="background:#0a0a0a;border-radius:4px;height:10px;overflow:hidden;">
+              <div style="background:linear-gradient(90deg,#d4af37,#f0d878);height:100%;width:${pct}%;"></div>
+            </div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      html += `<div style="color:#666;font-size:11px;margin-top:10px;font-style:italic;">ℹ️ Le budget d'une phase est compté sur son mois de démarrage.</div>`;
+
+    } else if (metaPromoBudgetVue === 'clusters') {
+      // ─── VUE PAR CLUSTER ───
+      const clustersTries = [...clusters].sort((a, b) => (budgetParCluster[b.id]?.total || 0) - (budgetParCluster[a.id]?.total || 0));
+      html += `<div style="background:#1a1a1a;border-radius:10px;padding:14px;">`;
+      html += `<div style="color:#d4af37;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:16px;margin-bottom:12px;">🎯 BUDGET PAR SOUS-CLUSTER</div>`;
+      html += `<table style="width:100%;border-collapse:collapse;font-size:13px;">`;
+      html += `<tr style="border-bottom:1px solid rgba(212,175,55,0.3);color:#888;font-size:11px;">
+        <th style="text-align:left;padding:6px 4px;">SOUS-CLUSTER</th>
+        <th style="text-align:center;padding:6px 4px;">PÉRIODE</th>
+        <th style="text-align:center;padding:6px 4px;">PHASES</th>
+        <th style="text-align:right;padding:6px 4px;">BUDGET TOTAL</th>
+      </tr>`;
+      clustersTries.forEach(c => {
+        const b = budgetParCluster[c.id] || { total: 0, nbPhases: 0 };
+        const dl = c.date_lancement ? c.date_lancement.slice(8,10)+'/'+c.date_lancement.slice(5,7)+'/'+c.date_lancement.slice(2,4) : '—';
+        const df = c.date_fin ? c.date_fin.slice(8,10)+'/'+c.date_fin.slice(5,7)+'/'+c.date_fin.slice(2,4) : '—';
+        html += `
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:8px 4px;color:#e0e0e0;">${c.nom_cluster || c.code}</td>
+            <td style="padding:8px 4px;text-align:center;color:#999;font-size:11px;">${dl} → ${df}</td>
+            <td style="padding:8px 4px;text-align:center;color:#999;">${b.nbPhases}</td>
+            <td style="padding:8px 4px;text-align:right;color:#d4af37;font-weight:700;">${b.total.toLocaleString('fr-FR')} €</td>
+          </tr>
+        `;
+      });
+      html += `<tr style="border-top:2px solid rgba(212,175,55,0.4);">
+        <td colspan="3" style="padding:10px 4px;color:#d4af37;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">TOTAL TOURNÉE</td>
+        <td style="padding:10px 4px;text-align:right;color:#d4af37;font-size:16px;font-weight:700;">${budgetTotalAnnee.toLocaleString('fr-FR')} €</td>
+      </tr>`;
+      html += `</table></div>`;
+
+    } else {
+      // ─── VUE SYNTHÈSE ANNÉE ───
+      // Regroupement par année civile
+      const parAnnee = {};
+      Object.keys(budgetParMois).forEach(m => {
+        const annee = m.slice(0, 4);
+        if (!parAnnee[annee]) parAnnee[annee] = 0;
+        parAnnee[annee] += budgetParMois[m].total;
+      });
+      // Mois le plus chargé
+      let moisMax = null, moisMaxVal = 0;
+      Object.keys(budgetParMois).forEach(m => {
+        if (budgetParMois[m].total > moisMaxVal) { moisMaxVal = budgetParMois[m].total; moisMax = m; }
+      });
+      const moisMaxLbl = moisMax ? (moisLabels[moisMax.slice(5,7)] + ' ' + moisMax.slice(0,4)) : '—';
+      const moyenneMensuelle = Object.keys(budgetParMois).length > 0
+        ? Math.round(budgetTotalAnnee / Object.keys(budgetParMois).length) : 0;
+
+      html += `<div style="background:#1a1a1a;border-radius:10px;padding:14px;">`;
+      html += `<div style="color:#d4af37;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:16px;margin-bottom:12px;">🏆 SYNTHÈSE BUDGÉTAIRE</div>`;
+
+      // Par année civile
+      Object.keys(parAnnee).sort().forEach(annee => {
+        html += `
+          <div style="display:flex;justify-content:space-between;padding:10px;background:#0f0f0f;border-radius:6px;margin-bottom:8px;">
+            <span style="color:#c0c0c0;">📆 Budget année ${annee}</span>
+            <span style="color:#d4af37;font-weight:700;font-size:15px;">${parAnnee[annee].toLocaleString('fr-FR')} €</span>
+          </div>
+        `;
+      });
+
+      html += `
+        <div style="display:flex;justify-content:space-between;padding:10px;background:#0f0f0f;border-radius:6px;margin-bottom:8px;">
+          <span style="color:#c0c0c0;">📊 Moyenne mensuelle</span>
+          <span style="color:#d4af37;font-weight:700;font-size:15px;">${moyenneMensuelle.toLocaleString('fr-FR')} €/mois</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:#0f0f0f;border-radius:6px;margin-bottom:8px;">
+          <span style="color:#c0c0c0;">🔥 Mois le plus chargé</span>
+          <span style="color:#e67e22;font-weight:700;font-size:15px;">${moisMaxLbl} — ${moisMaxVal.toLocaleString('fr-FR')} €</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:#0f0f0f;border-radius:6px;margin-bottom:8px;border:1px solid rgba(212,175,55,0.3);">
+          <span style="color:#d4af37;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">💰 BUDGET TOTAL TOURNÉE</span>
+          <span style="color:#d4af37;font-weight:700;font-size:18px;">${budgetTotalAnnee.toLocaleString('fr-FR')} €</span>
+        </div>
+      `;
+      html += `</div>`;
+    }
+
+    list.innerHTML = html;
   }
 
   // ━━━━━━ VUE PLANNING TIMELINE ━━━━━━
@@ -30524,6 +30722,7 @@ ${c.notes || '(aucune)'}`
   window.metaPromoOpenMeta = metaPromoOpenMeta;
   window.metaPromoCopyFullPost = metaPromoCopyFullPost;
   window.metaPromoSetPlanningFilter = metaPromoSetPlanningFilter;
+  window.metaPromoSetBudgetVue = metaPromoSetBudgetVue;
 
   console.log('✅ Module META PLANNING chargé');
 })();
