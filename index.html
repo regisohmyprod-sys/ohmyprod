@@ -10474,6 +10474,7 @@ function _hideTeamSelection() {
 
     // Photo
     const photoContainer = document.getElementById('avhr-photo-container');
+    console.log('🖼️ DIAG PHOTO — date:', date.ville, '| photo_salle_url:', date.photo_salle_url, '| container trouvé:', !!photoContainer);
     if (date.photo_salle_url) {
       document.getElementById('avhr-photo').src = date.photo_salle_url;
       photoContainer.style.display = 'block';
