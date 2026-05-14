@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP — build 2026-05-14-livraison2-menu6fiches -->
+<!-- APPLI OMP — build 2026-05-14-livraison3-fixphoto-v2 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -10423,10 +10423,21 @@ function _hideTeamSelection() {
   }
 
   async function ouvrirArtisteDate(dateId) {
-    const date = _avhrDates.find(d => d.id === dateId);
+    let date = _avhrDates.find(d => d.id === dateId);
     if (!date) return;
     _avhrActiveIdx = _avhrDates.indexOf(date);
-    
+
+    // Recharger la date fraîche depuis Supabase (photo_salle_url, horaires... peuvent avoir changé)
+    try {
+      const { data: dateFraiche, error: errFraiche } = await _supabase.from('dates_concert').select('*').eq('id', dateId).single();
+      console.log('🖼️ DIAG — rechargement date:', dateId, '| erreur:', errFraiche, '| photo_salle_url reçu:', dateFraiche ? dateFraiche.photo_salle_url : 'PAS DE DATA');
+      if (dateFraiche) {
+        // Fusionner dans l'objet existant pour garder la référence dans _avhrDates
+        Object.assign(date, dateFraiche);
+      }
+    } catch(e) { console.warn('Rechargement date échoué, on garde la version en cache', e); }
+    console.log('🖼️ DIAG — après fusion, date.photo_salle_url =', date.photo_salle_url);
+
     // Définir les IDs pour les invitations
     _dateActiveId = dateId;
     _fpDateId = dateId;
@@ -10474,7 +10485,6 @@ function _hideTeamSelection() {
 
     // Photo
     const photoContainer = document.getElementById('avhr-photo-container');
-    console.log('🖼️ DIAG PHOTO — date:', date.ville, '| photo_salle_url:', date.photo_salle_url, '| container trouvé:', !!photoContainer);
     if (date.photo_salle_url) {
       document.getElementById('avhr-photo').src = date.photo_salle_url;
       photoContainer.style.display = 'block';
@@ -10487,11 +10497,11 @@ function _hideTeamSelection() {
     const nextBtn = document.getElementById('avhr-next-btn');
     if (prevBtn) {
       prevBtn.disabled = _avhrActiveIdx === 0;
-      prevBtn.onclick = async () => { if (_avhrActiveIdx > 0) { _avhrActiveIdx--; await avhrAfficherDetail(_avhrDates[_avhrActiveIdx]); } };
+      prevBtn.onclick = async () => { if (_avhrActiveIdx > 0) { await ouvrirArtisteDate(_avhrDates[_avhrActiveIdx - 1].id); } };
     }
     if (nextBtn) {
       nextBtn.disabled = _avhrActiveIdx === _avhrDates.length - 1;
-      nextBtn.onclick = async () => { if (_avhrActiveIdx < _avhrDates.length - 1) { _avhrActiveIdx++; await avhrAfficherDetail(_avhrDates[_avhrActiveIdx]); } };
+      nextBtn.onclick = async () => { if (_avhrActiveIdx < _avhrDates.length - 1) { await ouvrirArtisteDate(_avhrDates[_avhrActiveIdx + 1].id); } };
     }
     const backBtn = document.getElementById('avhr-detail-back');
     if (backBtn) backBtn.onclick = () => showPage('artiste-vhr');
