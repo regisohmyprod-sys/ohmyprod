@@ -6414,6 +6414,14 @@ function _hideTeamSelection() {
         <input id="vhr-search" type="text" placeholder="🔍 Rechercher une ville, salle..." oninput="filtrerDatesVHR(_vhrFiltreActif)" style="flex:1;min-width:170px;background:#0a0a0a;border:0.5px solid #2a2a2a;border-radius:8px;color:#fff;padding:7px 13px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
       </div>
 
+      <!-- FILTRE PAR ÉQUIPE -->
+      <div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:10px;color:#777;text-transform:uppercase;letter-spacing:1px;margin-right:2px;">👁️ Affichage :</span>
+        <button id="vhr-eq-tout" onclick="vhrFiltrerEquipe('tout')" style="background:#c9a84c;color:#000;border:none;border-radius:7px;padding:5px 13px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">TOUT VOIR</button>
+        <button id="vhr-eq-artistique" onclick="vhrFiltrerEquipe('artistique')" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:7px;padding:5px 13px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">🎤 ARTISTIQUE</button>
+        <button id="vhr-eq-technique" onclick="vhrFiltrerEquipe('technique')" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:7px;padding:5px 13px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">🔧 TECHNIQUE</button>
+      </div>
+
       <!-- LÉGENDE DES PASTILLES -->
       <div style="display:flex;gap:14px;font-size:10px;color:#777;padding:7px 4px 11px;border-bottom:0.5px solid #222;margin-bottom:12px;flex-wrap:wrap;">
         <span><span style="color:#2ecc71;">●</span> renseigné</span>
@@ -10605,13 +10613,102 @@ function _hideTeamSelection() {
     }
     else if (type === 'invitations') {
       titre = '🎁 MES INVITATIONS';
-      html = '<div style="background:#161616;border:0.5px solid #242424;border-radius:9px;padding:24px 14px;text-align:center;"><div style="font-size:30px;margin-bottom:8px;">🚧</div><div style="font-size:13px;color:#bbb;">La demande d\'invitations arrive très bientôt !</div><div style="font-size:11px;color:#777;margin-top:4px;">Tu pourras faire tes demandes directement ici.</div></div>';
+      html = `
+        <button onclick="avhrOuvrirDemandeInvit()" style="width:100%;background:rgba(224,85,111,0.12);border:0.5px solid rgba(224,85,111,0.45);color:#e0556f;border-radius:9px;padding:11px;font-size:13px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;margin-bottom:14px;">+ DEMANDER UNE INVITATION</button>
+        <div id="avhr-invit-liste-demandes"><div style="color:#666;font-size:12px;text-align:center;padding:14px;">Chargement...</div></div>`;
     }
 
     if (titreEl) titreEl.textContent = titre;
     contenuEl.innerHTML = html;
     if (menu) menu.style.display = 'none';
     detail.style.display = 'block';
+
+    // Chargement asynchrone du contenu de la fiche invitations
+    if (type === 'invitations') avhrChargerInvitDemandes();
+  }
+
+  // Ouvre la modal de demande d'invitation (côté artiste)
+  function avhrOuvrirDemandeInvit() {
+    const d = _avhrDateCourante;
+    if (!d) return;
+    const villeEl = document.getElementById('avhr-invit-demande-ville');
+    if (villeEl) {
+      const dt = new Date(d.date_concert);
+      villeEl.textContent = '📍 ' + (d.ville||'').toUpperCase() + ' · ' + dt.toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+    }
+    // Reset des champs
+    ['avhr-invit-prenom','avhr-invit-nom','avhr-invit-email'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const placesEl = document.getElementById('avhr-invit-places');
+    if (placesEl) placesEl.value = '1';
+    const demEl = document.getElementById('avhr-invit-demandeur');
+    if (demEl) demEl.value = (typeof _currentUserPrenom !== 'undefined' ? _currentUserPrenom : '') || '';
+    const listeEl = document.getElementById('avhr-invit-liste');
+    if (listeEl) listeEl.selectedIndex = 0;
+    openModal('modal-avhr-invit-demande');
+  }
+
+  // Envoie la demande d'invitation → insert dans invitations avec valide=0 (en attente)
+  async function avhrEnvoyerDemandeInvit() {
+    const d = _avhrDateCourante;
+    if (!d) { alert('Aucune date sélectionnée.'); return; }
+    const prenom = (document.getElementById('avhr-invit-prenom')?.value || '').trim();
+    const nom = (document.getElementById('avhr-invit-nom')?.value || '').trim();
+    if (!prenom && !nom) { alert('Merci de saisir le nom de l\'invité.'); return; }
+    const places = parseInt(document.getElementById('avhr-invit-places')?.value) || 1;
+    const email = (document.getElementById('avhr-invit-email')?.value || '').trim();
+    const demandeur = (document.getElementById('avhr-invit-demandeur')?.value || '').trim();
+    const liste = document.getElementById('avhr-invit-liste')?.value || 'prod_artistes';
+
+    const invitData = {
+      date_concert_id: d.id,
+      nom_liste: liste,
+      demandeur: demandeur || null,
+      nom_invite: (prenom + ' ' + nom).trim(),
+      nombre: places,
+      valide: 0,
+      email: email || null,
+      date_demande: new Date().toISOString().slice(0,10),
+    };
+
+    const { error } = await _supabase.from('invitations').insert([invitData]);
+    if (error) { alert('Erreur : ' + error.message); return; }
+    closeModal('modal-avhr-invit-demande');
+    if (typeof ompToast === 'function') ompToast('Demande envoyée à la production ✅', 'success');
+    else alert('Demande envoyée à la production ✅');
+    avhrChargerInvitDemandes();
+  }
+
+  // Affiche la liste des demandes d'invitation de la date courante avec leur statut
+  async function avhrChargerInvitDemandes() {
+    const cont = document.getElementById('avhr-invit-liste-demandes');
+    if (!cont) return;
+    const d = _avhrDateCourante;
+    if (!d) { cont.innerHTML = ''; return; }
+    cont.innerHTML = '<div style="color:#666;font-size:12px;text-align:center;padding:14px;">Chargement...</div>';
+
+    const { data, error } = await _supabase.from('invitations').select('*').eq('date_concert_id', d.id).order('date_demande', { ascending: false });
+    if (error) { cont.innerHTML = '<div style="color:#e24b4a;font-size:12px;text-align:center;padding:14px;">Erreur de chargement.</div>'; return; }
+    if (!data || !data.length) {
+      cont.innerHTML = '<div style="color:#666;font-size:12.5px;font-style:italic;text-align:center;padding:18px;">Aucune demande d\'invitation pour cette date.</div>';
+      return;
+    }
+
+    const esc = s => (s == null ? '' : String(s)).replace(/</g,'&lt;');
+    const badge = (v) => {
+      if (v === 1)  return '<span style="font-size:9px;padding:2px 9px;border-radius:20px;background:rgba(46,204,113,0.15);color:#2ecc71;border:0.5px solid rgba(46,204,113,0.4);">✅ VALIDÉE</span>';
+      if (v === -1) return '<span style="font-size:9px;padding:2px 9px;border-radius:20px;background:rgba(226,75,74,0.15);color:#e24b4a;border:0.5px solid rgba(226,75,74,0.4);">❌ REFUSÉE</span>';
+      return '<span style="font-size:9px;padding:2px 9px;border-radius:20px;background:rgba(245,158,11,0.15);color:#f59e0b;border:0.5px solid rgba(245,158,11,0.4);">⏳ EN ATTENTE</span>';
+    };
+
+    cont.innerHTML = data.map(inv => `
+      <div style="background:#161616;border:0.5px solid #242424;border-radius:9px;padding:11px 13px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div style="font-size:13px;color:#fff;font-weight:600;">🎟️ ${esc(inv.nom_invite||'Invité')}</div>
+          ${badge(inv.valide)}
+        </div>
+        <div style="font-size:11px;color:#888;margin-top:4px;">${inv.nombre||1} place${(inv.nombre||1)>1?'s':''}${inv.demandeur?' · demandé par '+esc(inv.demandeur):''}</div>
+        ${inv.email?`<div style="font-size:11px;color:#777;margin-top:2px;">✉️ ${esc(inv.email)}</div>`:''}
+      </div>`).join('');
   }
 
   // =============================================
@@ -10686,11 +10783,14 @@ function _hideTeamSelection() {
       const dateStr = dt.toLocaleDateString('fr-FR', {weekday:'short', day:'2-digit', month:'short', year:'numeric'}).toUpperCase();
       const isPast = dt < today;
       const vhrDate = vhrData.filter(v => v.date_concert_id === d.id);
-      const voyages = vhrDate.filter(v => v.type === 'voyage');
-      const hotels = vhrDate.filter(v => v.type === 'hebergement');
-      const contacts = vhrDate.filter(v => v.type === 'contact');
-      const docs = vhrDate.filter(v => v.type === 'document');
-      const infos = vhrDate.filter(v => v.type === 'info');
+      const voyages = vhrDate.filter(v => v.type === 'voyage' && vhrGardeSelonEquipe(v, 'voy_team'));
+      const hotels = vhrDate.filter(v => v.type === 'hebergement' && vhrGardeSelonEquipe(v, 'hotel_teams'));
+      const contacts = vhrDate.filter(v => v.type === 'contact' && vhrGardeSelonEquipe(v, 'contact_team'));
+      const docs = vhrDate.filter(v => v.type === 'document' && vhrGardeSelonEquipe(v, 'doc_team'));
+      const infos = vhrDate.filter(v => v.type === 'info' && vhrGardeSelonEquipe(v, 'info_team'));
+      // Comptes RÉELS (non filtrés par équipe) — pour l'alerte "infos manquantes"
+      const nbVoyagesReel = vhrDate.filter(v => v.type === 'voyage').length;
+      const nbHotelsReel = vhrDate.filter(v => v.type === 'hebergement').length;
 
       const typeLabels = { voyage_aller:'🚀 Voyage aller', transfert_gare_salle:'🚉 Gare→Salle', transfert_gare_hotel:'🏨 Gare→Hôtel', transfert_salle_hotel:'🎭 Salle→Hôtel', transfert_hotel_gare:'🚉 Hôtel→Gare', voyage_retour:'🏠 Voyage retour' };
       const teamLabels = { tous:'👥 Tous', artistique:'🎤 Artistique', production:'📋 Production', technique:'🔧 Technique' };
@@ -10753,12 +10853,12 @@ function _hideTeamSelection() {
           </div>
 
           <!-- ⚠️ Alerte infos manquantes (date concernée) — essentiel = voyages + hébergement -->
-          ${(voyages.length === 0 || hotels.length === 0) && !isPast ? `
+          ${(nbVoyagesReel === 0 || nbHotelsReel === 0) && !isPast ? `
           <div style="background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.5);border-radius:8px;padding:9px 13px;margin-bottom:14px;display:flex;align-items:center;gap:9px;">
             <span style="font-size:15px;">⚠️</span>
             <div style="font-size:11.5px;color:#f3a3a3;">
               Infos essentielles manquantes :
-              ${voyages.length === 0 ? '<span style="color:#ef4444;font-weight:600;">Voyages</span>' : ''}${voyages.length === 0 && hotels.length === 0 ? ' · ' : ''}${hotels.length === 0 ? '<span style="color:#ef4444;font-weight:600;">Hébergement</span>' : ''}
+              ${nbVoyagesReel === 0 ? '<span style="color:#ef4444;font-weight:600;">Voyages</span>' : ''}${nbVoyagesReel === 0 && nbHotelsReel === 0 ? ' · ' : ''}${nbHotelsReel === 0 ? '<span style="color:#ef4444;font-weight:600;">Hébergement</span>' : ''}
             </div>
           </div>` : ''}
 
@@ -10766,7 +10866,7 @@ function _hideTeamSelection() {
           <div style="margin-bottom:16px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
               <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;">
-                ${voyages.length === 0 && !isPast ? '<span style="color:#ef4444;margin-right:5px;" title="Information manquante">⚠️</span>' : ''}✈️ VOYAGES <span style="color:#555;">· ${voyages.length}</span>
+                ${nbVoyagesReel === 0 && !isPast ? '<span style="color:#ef4444;margin-right:5px;" title="Information manquante">⚠️</span>' : ''}✈️ VOYAGES <span style="color:#555;">· ${voyages.length}</span>
               </span>
               <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('voyage','${d.id}','${tourneeId}')" style="background:rgba(201,168,76,0.1);border:0.5px solid rgba(201,168,76,0.35);color:#c9a84c;border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">+ AJOUTER</button>
             </div>
@@ -10793,7 +10893,7 @@ function _hideTeamSelection() {
           <div style="margin-bottom:16px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
               <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;">
-                ${hotels.length === 0 && !isPast ? '<span style="color:#ef4444;margin-right:5px;" title="Information manquante">⚠️</span>' : ''}🏨 HÉBERGEMENT <span style="color:#555;">· ${hotels.length}</span>
+                ${nbHotelsReel === 0 && !isPast ? '<span style="color:#ef4444;margin-right:5px;" title="Information manquante">⚠️</span>' : ''}🏨 HÉBERGEMENT <span style="color:#555;">· ${hotels.length}</span>
               </span>
               <button class="vhr-admin-action" onclick="ouvrirAjoutVHREntry('hebergement','${d.id}','${tourneeId}')" style="background:rgba(201,168,76,0.1);border:0.5px solid rgba(201,168,76,0.35);color:#c9a84c;border-radius:6px;padding:4px 11px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">+ AJOUTER</button>
             </div>
@@ -11245,8 +11345,30 @@ function _hideTeamSelection() {
 
 
   let _vhrFiltreActif = 'avenir';
+  let _vhrFiltreEquipe = 'tout';   // 'tout' | 'artistique' | 'technique'
   let _vhrAllDates = [];
   let _vhrAllVhrData = [];
+
+  // Filtre d'affichage par équipe dans la fiche VHR (côté Sarah/admin)
+  function vhrFiltrerEquipe(equipe) {
+    _vhrFiltreEquipe = equipe;
+    ['tout','artistique','technique'].forEach(function(e) {
+      var btn = document.getElementById('vhr-eq-' + e);
+      if (!btn) return;
+      if (e === equipe) { btn.style.background = '#c9a84c'; btn.style.color = '#000'; btn.style.border = 'none'; }
+      else { btn.style.background = '#1a1a1a'; btn.style.color = '#888'; btn.style.border = '0.5px solid #2a2a2a'; }
+    });
+    filtrerDatesVHR(_vhrFiltreActif);
+  }
+
+  // Garde une entrée VHR selon le filtre équipe actif (champTeam = nom de la colonne d'équipe)
+  function vhrGardeSelonEquipe(it, champTeam) {
+    if (_vhrFiltreEquipe === 'tout') return true;
+    var t = (it[champTeam] || '').toLowerCase();
+    if (!t) return true;                       // pas de tag = visible partout
+    if (t.indexOf('tous') !== -1) return true;
+    return t.indexOf(_vhrFiltreEquipe) !== -1;
+  }
 
   function filtrerDatesVHR(filtre) {
     _vhrFiltreActif = filtre;
@@ -25452,6 +25574,60 @@ function _hideTeamSelection() {
   </div>
 </div>
 
+<!-- MODALE DEMANDE D'INVITATION — CÔTÉ ARTISTE/TECHNICIEN -->
+<div id="modal-avhr-invit-demande" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-header">
+      <div class="modal-title">🎁 DEMANDER UNE INVITATION</div>
+      <button class="modal-close" onclick="closeModal('modal-avhr-invit-demande')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="avhr-invit-demande-ville" style="font-size:12px;color:#c9a84c;margin-bottom:14px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;"></div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>Prénom invité</label>
+          <input type="text" id="avhr-invit-prenom" placeholder="ex: Jean" />
+        </div>
+        <div class="modal-field">
+          <label>Nom invité</label>
+          <input type="text" id="avhr-invit-nom" placeholder="ex: Dupont" />
+        </div>
+        <div class="modal-field" style="flex:0.5;">
+          <label>Nb de places</label>
+          <input type="number" id="avhr-invit-places" value="1" min="1" max="20" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>📧 Email invité</label>
+          <input type="email" id="avhr-invit-email" placeholder="ex: jean.dupont@email.com" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label>👤 Demandeur</label>
+          <input type="text" id="avhr-invit-demandeur" placeholder="Ton prénom" />
+        </div>
+        <div class="modal-field">
+          <label>📋 Liste</label>
+          <select id="avhr-invit-liste">
+            <option value="prod_artistes">🎭 Invitations Production/Artistes</option>
+            <option value="partenaires">🤝 Invitations Partenaires</option>
+            <option value="autres">📋 Invitations Autres</option>
+          </select>
+        </div>
+      </div>
+      <div style="background:rgba(201,168,76,0.08);border:0.5px solid rgba(201,168,76,0.3);border-radius:8px;padding:9px 12px;margin-top:6px;font-size:11px;color:#c9a84c;">
+        ℹ️ Ta demande sera envoyée à la production pour validation. Tu verras le statut ici-même.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-avhr-invit-demande')">Annuler</button>
+      <button class="btn btn-primary" onclick="avhrEnvoyerDemandeInvit()">📨 Envoyer la demande</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODALE AJOUTER UN TOUR BUS -->
 <div id="modal-add-tourbus" class="modal-overlay" onclick="closeModalOutside(event)">
   <div class="modal-box" style="max-width:720px;">
@@ -28756,6 +28932,56 @@ console.log('✅ OMP Mobile Kit chargé');
         });
       } catch (errT) {
         console.warn('[ALERTES] Erreur scan tâches :', errT);
+      }
+
+      // ━━━━━━ 7. INVITATIONS EN ATTENTE — demandes à valider ━━━━━━
+      try {
+        const { data: invitsAttente } = await sb
+          .from('invitations')
+          .select('id, date_concert_id, nom_invite, nombre, demandeur, date_demande')
+          .eq('valide', 0);
+
+        if (invitsAttente && invitsAttente.length > 0) {
+          // Regrouper par date de concert
+          const parDate = {};
+          invitsAttente.forEach(inv => {
+            if (!parDate[inv.date_concert_id]) parDate[inv.date_concert_id] = [];
+            parDate[inv.date_concert_id].push(inv);
+          });
+          const dateIds = Object.keys(parDate);
+
+          // Récupérer les villes des dates concernées
+          let villesMap = {};
+          if (dateIds.length) {
+            const { data: datesInv } = await sb
+              .from('dates_concert')
+              .select('id, ville, date_concert')
+              .in('id', dateIds);
+            (datesInv || []).forEach(d => { villesMap[d.id] = d; });
+          }
+
+          dateIds.forEach(dcId => {
+            const demandes = parDate[dcId];
+            const dInfo = villesMap[dcId];
+            const ville = dInfo ? dInfo.ville : 'Date inconnue';
+            const nbDemandes = demandes.length;
+            const nbPlaces = demandes.reduce((s, x) => s + (x.nombre || 0), 0);
+            alertes.push({
+              source: 'INVIT',
+              niveau: 'orange',
+              icon: '🎁',
+              jour: 'À VALIDER',
+              urgent: false,
+              titre: `${nbDemandes} demande${nbDemandes > 1 ? 's' : ''} d'invitation : ${ville}`,
+              sub: `${nbPlaces} place${nbPlaces > 1 ? 's' : ''} en attente de validation`,
+              actionType: 'FICHE_PROD',
+              dateConcertId: dcId,
+              ville: ville
+            });
+          });
+        }
+      } catch (errI) {
+        console.warn('[ALERTES] Erreur scan invitations :', errI);
       }
 
     } catch (err) {
