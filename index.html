@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- APPLI OMP — build 2026-05-14-livraison2-menu6fiches -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -6349,76 +6350,45 @@ function _hideTeamSelection() {
         <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.7));"></div>
       </div>
 
-      <!-- INFOS CLÉS DU JOUR -->
-      <div class="planning-keys" style="margin-bottom:16px;">
-        <div class="planning-keys-title" style="background:var(--red);color:#fff;">⏱️ INFOS CLÉS DU JOUR</div>
-
-        <div class="planning-keys-subtitle">🎭 REMPLISSAGE</div>
-        <div class="planning-keys-grid4">
-          <div class="planning-key-item"><div class="planning-key-label">Jauge choisie</div><div class="planning-key-value" id="avhr-jauge-choisie">–</div></div>
-          <div class="planning-key-item"><div class="planning-key-label">Pointage ventes</div><div class="planning-key-value" id="avhr-pointage" style="color:var(--green)">–</div></div>
-          <div class="planning-key-item"><div class="planning-key-label">Jauge occupée</div><div class="planning-key-value" id="avhr-jauge-occ" style="color:var(--green)">–</div></div>
-          <div class="planning-key-item"><div class="planning-key-label">% Remplissage</div><div class="planning-key-value" id="avhr-pct" style="color:var(--yellow)">–</div></div>
+      <!-- ════════ MENU 6 FICHES ════════ -->
+      <div id="avhr-menu-fiches" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px;">
+        <div onclick="avhrOuvrirFiche('voyage')" style="background:#161616;border:0.5px solid rgba(201,168,76,0.4);border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;" onmouseover="this.style.background='#1c1c1c'" onmouseout="this.style.background='#161616'">
+          <div style="font-size:28px;margin-bottom:6px;">🚀</div>
+          <div style="font-size:12.5px;color:#fff;font-weight:600;">Mon voyage</div>
+          <div style="font-size:9px;color:#888;margin-top:2px;" id="avhr-cnt-voyage">–</div>
         </div>
-
-        <div class="planning-keys-subtitle">🕐 HORAIRES</div>
-        <div class="planning-keys-grid4">
-          <div class="planning-key-item"><div class="planning-key-label">🔨 Montage</div><div class="planning-key-value" id="avhr-montage">–</div></div>
-          <div class="planning-key-item"><div class="planning-key-label">🍽️ Déjeuner</div><div class="planning-key-value" id="avhr-dejeuner">–</div></div>
-          <div class="planning-key-item"><div class="planning-key-label">🎸 Balances</div><div class="planning-key-value" id="avhr-balances">–</div></div>
-          <div class="planning-key-item"><div class="planning-key-label">🍷 Dîner</div><div class="planning-key-value" id="avhr-diner">–</div></div>
+        <div onclick="avhrOuvrirFiche('hotel')" style="background:#161616;border:0.5px solid rgba(201,168,76,0.4);border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;" onmouseover="this.style.background='#1c1c1c'" onmouseout="this.style.background='#161616'">
+          <div style="font-size:28px;margin-bottom:6px;">🏨</div>
+          <div style="font-size:12.5px;color:#fff;font-weight:600;">Mon hôtel</div>
+          <div style="font-size:9px;color:#888;margin-top:2px;" id="avhr-cnt-hotel">–</div>
         </div>
-        <div class="planning-keys-grid4">
-          <div class="planning-key-item"><div class="planning-key-label">🚪 Open Doors</div><div class="planning-key-value" id="avhr-portes">–</div></div>
-          <div class="planning-key-item"><div class="planning-key-label">🎵 Start Show</div><div class="planning-key-value" id="avhr-start">–</div></div>
-          <div class="planning-key-item"><div class="planning-key-label">🎬 End Show</div><div class="planning-key-value" id="avhr-end">–</div></div>
-          <div class="planning-key-item"><div class="planning-key-label">🏁 End Date</div><div class="planning-key-value" id="avhr-enddate">–</div></div>
+        <div onclick="avhrOuvrirFiche('infos')" style="background:#161616;border:0.5px solid rgba(201,168,76,0.4);border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;" onmouseover="this.style.background='#1c1c1c'" onmouseout="this.style.background='#161616'">
+          <div style="font-size:28px;margin-bottom:6px;">ℹ️</div>
+          <div style="font-size:12.5px;color:#fff;font-weight:600;">Mes Infos</div>
+          <div style="font-size:9px;color:#888;margin-top:2px;" id="avhr-cnt-infos">–</div>
         </div>
-
-        <div class="planning-keys-subtitle">⭐ INFOS IMPORTANTES</div>
-        <div style="padding:10px 14px;">
-          <div id="avhr-note" style="font-size:13px;color:#ccc;font-style:italic;">–</div>
+        <div onclick="avhrOuvrirFiche('oujevais')" style="background:#161616;border:0.5px solid rgba(201,168,76,0.4);border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;" onmouseover="this.style.background='#1c1c1c'" onmouseout="this.style.background='#161616'">
+          <div style="font-size:28px;margin-bottom:6px;">🗺️</div>
+          <div style="font-size:12.5px;color:#fff;font-weight:600;">Où je vais ?</div>
+          <div style="font-size:9px;color:#888;margin-top:2px;">Voir le plan</div>
         </div>
-      </div>
-
-      <!-- BLOC VHR LECTURE SEULE -->
-      <div style="background:#0f1923;border:2px solid #3b82f6;border-radius:12px;overflow:hidden;margin-bottom:16px;">
-        <div style="background:linear-gradient(135deg,#1e3a5f,#1565c0);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:20px;">🚌</span>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;">VHR – VOYAGES · HÉBERGEMENT · RESSOURCES</div>
-          </div>
-          <button onclick="ouvrirCarteDepuisEspace()" title="Voir la ville sur la carte" style="background:#e31e24;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:5px 14px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:700;box-shadow:0 2px 4px rgba(227,30,36,0.3);">🗺️ PLAN</button>
+        <div onclick="avhrOuvrirFiche('invitations')" style="background:#161616;border:0.5px solid rgba(201,168,76,0.4);border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;" onmouseover="this.style.background='#1c1c1c'" onmouseout="this.style.background='#161616'">
+          <div style="font-size:28px;margin-bottom:6px;">🎁</div>
+          <div style="font-size:12.5px;color:#fff;font-weight:600;">Mes Invitations</div>
+          <div style="font-size:9px;color:#e0556f;margin-top:2px;">Faire une demande</div>
         </div>
-        <div style="padding:16px;" id="avhr-vhr-content">
-          <div style="color:#888;text-align:center;padding:20px;">Chargement...</div>
+        <div onclick="avhrOuvrirFiche('documents')" style="background:#161616;border:0.5px solid rgba(201,168,76,0.4);border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;" onmouseover="this.style.background='#1c1c1c'" onmouseout="this.style.background='#161616'">
+          <div style="font-size:28px;margin-bottom:6px;">📄</div>
+          <div style="font-size:12.5px;color:#fff;font-weight:600;">Mes Documents</div>
+          <div style="font-size:9px;color:#888;margin-top:2px;" id="avhr-cnt-documents">–</div>
         </div>
       </div>
 
-      <!-- BLOC INVITATIONS (identique à la vue admin) -->
-      <div style="background:#1a1a1a;border:2px solid #c9a84c;border-radius:12px;padding:0;overflow:hidden;margin-bottom:16px;">
-        <div style="background:linear-gradient(135deg,#2a1f00,#c9a84c);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#000;">🎟️ INVITATIONS</div>
-        </div>
-        <div style="padding:16px;">
-          <button class="btn btn-primary" style="margin-bottom:16px;" onclick="openModal('modal-add-invit')">+ Ajouter une invitation</button>
-          <div class="invit-liste-bloc">
-            <div class="invit-liste-header">
-              <div>
-                <div style="font-weight:700;font-size:15px;" id="avhr-invit-titre">LISTE INVITATIONS</div>
-                <div style="font-size:11px;color:var(--grey);margin-top:2px;">🟢 Ouvert aux demandes</div>
-              </div>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-ghost" style="font-size:12px;" onclick="imprimerListeInvit(this)">🖨️ Imprimer PDF</button>
-              </div>
-            </div>
-            <table class="inv-table">
-              <thead><tr><th>Date</th><th>Demandeur</th><th>Invité(e)</th><th>Mail</th><th>Nb</th><th>N° Place</th><th>Statut</th><th>Options</th><th>Notes</th></tr></thead>
-              <tbody id="avhr-invit-tbody"></tbody>
-            </table>
-            <div class="inv-total" id="avhr-invit-total"><span>Total : 0</span><span>Validé : 0</span></div>
-          </div>
-        </div>
+      <!-- ════════ CONTENU D'UNE FICHE (s'affiche au clic) ════════ -->
+      <div id="avhr-fiche-detail" style="display:none;margin-bottom:16px;">
+        <button onclick="avhrFermerFiche()" style="background:#1a1a1a;color:#c9a84c;border:0.5px solid rgba(201,168,76,0.4);border-radius:7px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;margin-bottom:12px;">‹ Retour au menu</button>
+        <div id="avhr-fiche-titre" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#c9a84c;margin-bottom:12px;"></div>
+        <div id="avhr-fiche-contenu"></div>
       </div>
 
     </div>
@@ -10458,7 +10428,27 @@ function _hideTeamSelection() {
     showPage('artiste-date');
   }
 
+  let _avhrVhrData = [];      // données vhr_dates de la date courante
+  let _avhrDateCourante = null;
+
+  // Renvoie l'équipe de l'utilisateur connecté ('artistique' ou 'technique')
+  function avhrEquipeUser() {
+    return (_currentUserRole === 'technique') ? 'technique' : 'artistique';
+  }
+
+  // Garde les entrées VHR taguées pour l'équipe de l'user (+ "tous" / vide)
+  function avhrFiltreEquipe(items, champTeam) {
+    const eq = avhrEquipeUser();
+    return items.filter(function(it) {
+      const t = (it[champTeam] || '').toLowerCase();
+      if (!t) return true;                       // pas de tag = visible par tous
+      if (t.indexOf('tous') !== -1) return true;  // tag "tous"
+      return t.indexOf(eq) !== -1;                // tag de son équipe
+    });
+  }
+
   async function avhrAfficherDetail(date) {
+    _avhrDateCourante = date;
     const dt = new Date(date.date_concert);
     const fmt = h => h ? h.substring(0,5).replace(':','h') : '–';
 
@@ -10470,9 +10460,9 @@ function _hideTeamSelection() {
     const statutColors = {confirmee:'#22c55e',option:'#f59e0b',annulee:'#ef4444',reportee:'#a855f7'};
     const statutLabels = {confirmee:'● Confirmée',option:'● Option',annulee:'● Annulée',reportee:'● Reportée'};
     const sc = document.getElementById('avhr-statut');
-    sc.textContent = statutLabels[date.statut]||'';
-    sc.style.color = statutColors[date.statut]||'#fff';
-    document.getElementById('avhr-salle').textContent = date.nom_salle ? `📍 ${date.nom_salle}` : '';
+    if (sc) { sc.textContent = statutLabels[date.statut]||''; sc.style.color = statutColors[date.statut]||'#fff'; }
+    const salleEl = document.getElementById('avhr-salle');
+    if (salleEl) salleEl.textContent = date.nom_salle ? `📍 ${date.nom_salle}` : '';
 
     // Photo
     const photoContainer = document.getElementById('avhr-photo-container');
@@ -10483,154 +10473,145 @@ function _hideTeamSelection() {
       photoContainer.style.display = 'none';
     }
 
-    // Charger les infos depuis fiches_production si disponibles
-    var jaugeChoisie = date.jauge_choisie;
-    var jaugeMax = date.jauge_max;
-    var pointageVentes = date.pointage_ventes || 0;
-    var jaugeOccupee = date.jauge_occupee || 0;
-    
+    // Navigation entre dates
+    const prevBtn = document.getElementById('avhr-prev-btn');
+    const nextBtn = document.getElementById('avhr-next-btn');
+    if (prevBtn) {
+      prevBtn.disabled = _avhrActiveIdx === 0;
+      prevBtn.onclick = async () => { if (_avhrActiveIdx > 0) { _avhrActiveIdx--; await avhrAfficherDetail(_avhrDates[_avhrActiveIdx]); } };
+    }
+    if (nextBtn) {
+      nextBtn.disabled = _avhrActiveIdx === _avhrDates.length - 1;
+      nextBtn.onclick = async () => { if (_avhrActiveIdx < _avhrDates.length - 1) { _avhrActiveIdx++; await avhrAfficherDetail(_avhrDates[_avhrActiveIdx]); } };
+    }
+    const backBtn = document.getElementById('avhr-detail-back');
+    if (backBtn) backBtn.onclick = () => showPage('artiste-vhr');
+
+    // Revenir au menu (au cas où on changeait de date depuis une fiche ouverte)
+    avhrFermerFiche();
+
+    // Charger les données VHR de la date + remplir les compteurs du menu
+    _avhrVhrData = [];
     try {
-      var ficheRes = await _supabase.from('fiches_production').select('jauge_finale, jauge_depart, etat_ventes, total_jauge').eq('date_concert_id', date.id).single();
-      if (ficheRes.data) {
-        var f = ficheRes.data;
-        if (f.jauge_finale) jaugeChoisie = f.jauge_finale;
-        if (f.jauge_depart) jaugeMax = f.jauge_depart;
-        if (f.etat_ventes) pointageVentes = f.etat_ventes;
-        if (f.total_jauge) jaugeOccupee = f.total_jauge;
-      }
-    } catch(e) {}
+      const { data } = await _supabase.from('vhr_dates').select('*').eq('date_concert_id', date.id);
+      _avhrVhrData = data || [];
+    } catch(e) { _avhrVhrData = []; }
 
-    // Infos clés
-    const pct = jaugeChoisie ? Math.round((jaugeOccupee||pointageVentes||0)/jaugeChoisie*100) : 0;
-    document.getElementById('avhr-jauge-choisie').textContent = jaugeChoisie?.toLocaleString('fr-FR')||'–';
-    document.getElementById('avhr-pointage').textContent = pointageVentes?.toLocaleString('fr-FR')||'0';
-    document.getElementById('avhr-jauge-occ').textContent = jaugeOccupee?.toLocaleString('fr-FR')||pointageVentes?.toLocaleString('fr-FR')||'0';
-    document.getElementById('avhr-pct').textContent = jaugeChoisie ? `${pct}%` : '–';
-    document.getElementById('avhr-montage').textContent = fmt(date.heure_montage);
-    document.getElementById('avhr-dejeuner').textContent = date.heure_dejeuner||'–';
-    document.getElementById('avhr-balances').textContent = fmt(date.heure_balances);
-    document.getElementById('avhr-diner').textContent = date.heure_diner||'–';
-    document.getElementById('avhr-portes').textContent = fmt(date.heure_portes);
-    document.getElementById('avhr-start').textContent = fmt(date.heure_debut_show);
-    document.getElementById('avhr-end').textContent = fmt(date.heure_fin_show);
-    document.getElementById('avhr-enddate').textContent = date.heure_fin_demontage||'–';
-    const noteEl = document.getElementById('avhr-note');
-    noteEl.textContent = date.note_autre || '–';
+    const voyages = avhrFiltreEquipe(_avhrVhrData.filter(v => v.type === 'voyage'), 'voy_team');
+    const hotels  = avhrFiltreEquipe(_avhrVhrData.filter(v => v.type === 'hebergement'), 'hotel_teams');
+    const infos   = avhrFiltreEquipe(_avhrVhrData.filter(v => v.type === 'info'), 'info_team');
+    const docs    = avhrFiltreEquipe(_avhrVhrData.filter(v => v.type === 'document'), 'doc_team');
 
-    // Navigation
-    document.getElementById('avhr-prev-btn').disabled = _avhrActiveIdx === 0;
-    document.getElementById('avhr-next-btn').disabled = _avhrActiveIdx === _avhrDates.length - 1;
-    document.getElementById('avhr-prev-btn').onclick = async () => {
-      if (_avhrActiveIdx > 0) { _avhrActiveIdx--; await avhrAfficherDetail(_avhrDates[_avhrActiveIdx]); }
+    const setCnt = (id, n, mot) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = n > 0 ? (n + ' ' + mot + (n > 1 ? 's' : '')) : 'Rien pour l\'instant';
     };
-    document.getElementById('avhr-next-btn').onclick = async () => {
-      if (_avhrActiveIdx < _avhrDates.length - 1) { _avhrActiveIdx++; await avhrAfficherDetail(_avhrDates[_avhrActiveIdx]); }
-    };
-    document.getElementById('avhr-detail-back').onclick = () => showPage('artiste-vhr');
+    setCnt('avhr-cnt-voyage', voyages.length, 'trajet');
+    setCnt('avhr-cnt-hotel', hotels.length, 'hôtel');
+    setCnt('avhr-cnt-infos', infos.length, 'info');
+    setCnt('avhr-cnt-documents', docs.length, 'fichier');
 
-    // Invitations
-    document.getElementById('avhr-invit-titre').textContent = `LISTE INVITATIONS – ${date.ville.toUpperCase()}`;
-    avhrChargerInvitations(date.id);
-
-    // VHR content
-    await avhrChargerVHR(date.id);
+    // Invitations de la date (en mémoire pour la fiche invitations)
+    _dateActiveId = date.id;
+    _fpDateId = date.id;
   }
 
-  async function avhrChargerVHR(dateId) {
-    const content = document.getElementById('avhr-vhr-content');
-    content.innerHTML = '<div style="color:#888;text-align:center;padding:20px;">Chargement...</div>';
+  // ════════ MENU 6 FICHES — ouverture / fermeture ════════
+  function avhrFermerFiche() {
+    const menu = document.getElementById('avhr-menu-fiches');
+    const detail = document.getElementById('avhr-fiche-detail');
+    if (menu) menu.style.display = 'grid';
+    if (detail) detail.style.display = 'none';
+  }
 
-    const { data, error } = await _supabase.from('vhr_dates').select('*').eq('date_concert_id', dateId);
-    if (error || !data) { content.innerHTML = '<div style="color:#e31e24;text-align:center;padding:20px;">Erreur de chargement.</div>'; return; }
+  function avhrOuvrirFiche(type) {
+    const menu = document.getElementById('avhr-menu-fiches');
+    const detail = document.getElementById('avhr-fiche-detail');
+    const titreEl = document.getElementById('avhr-fiche-titre');
+    const contenuEl = document.getElementById('avhr-fiche-contenu');
+    if (!detail || !contenuEl) return;
 
-    const typeLabels = { voyage_aller:'🚀 Voyage aller', transfert_gare_salle:'🚉 Gare → Salle', transfert_gare_hotel:'🏨 Gare → Hôtel', transfert_salle_hotel:'🎭 Salle → Hôtel', transfert_hotel_gare:'🚉 Hôtel → Gare', voyage_retour:'🏠 Voyage retour' };
+    const d = _avhrDateCourante;
+    const vd = _avhrVhrData || [];
+    const teamLabels = { tous:'👥 Tous', artistique:'🎤 Artistique', production:'📋 Production', technique:'🔧 Technique' };
+    const typeLabels = { voyage_aller:'🚀 Voyage aller', transfert_gare_salle:'🚉 Gare→Salle', transfert_gare_hotel:'🏨 Gare→Hôtel', transfert_salle_hotel:'🎭 Salle→Hôtel', transfert_hotel_gare:'🚉 Hôtel→Gare', voyage_retour:'🏠 Voyage retour' };
     const jourLabels = { veille:'La veille', jour_j:'Jour J', lendemain:'Lendemain' };
+    const esc = s => (s == null ? '' : String(s)).replace(/</g,'&lt;');
 
-    const voyages  = data.filter(v => v.type === 'voyage');
-    const hotels   = data.filter(v => v.type === 'hebergement');
-    const contacts = data.filter(v => v.type === 'contact');
-    const docs     = data.filter(v => v.type === 'document');
+    let titre = '', html = '';
 
-    const section = (icon, titre, items, renderFn, emptyMsg) => `
-      <div style="margin-bottom:18px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#3b82f6;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2a2a2a;">${icon} ${titre}</div>
-        ${items.length ? items.map(renderFn).join('') : `<div style="color:#555;font-size:12px;font-style:italic;padding:4px 0;">${emptyMsg}</div>`}
-      </div>`;
+    if (type === 'voyage') {
+      titre = '🚀 MON VOYAGE';
+      const voyages = avhrFiltreEquipe(vd.filter(v => v.type === 'voyage'), 'voy_team');
+      html = voyages.length ? voyages.map(v => `
+        <div style="background:#161616;border:0.5px solid #242424;border-left:2px solid #c9a84c;border-radius:0 9px 9px 0;padding:12px 14px;margin-bottom:9px;">
+          <div style="font-size:13px;color:#fff;font-weight:600;">${typeLabels[v.voy_type]||v.voy_type||'Trajet'} <span style="color:#888;font-weight:400;">· ${jourLabels[v.voy_jour]||''}</span></div>
+          ${v.voy_heure_debut?`<div style="font-size:13px;color:#c9a84c;margin-top:4px;">⏰ ${esc(v.voy_heure_debut)}${v.voy_heure_fin?' → '+esc(v.voy_heure_fin):''}</div>`:''}
+          ${v.voy_lieu?`<div style="font-size:12px;color:#bbb;margin-top:3px;">📍 ${esc(v.voy_lieu)}</div>`:''}
+          ${v.voy_chauffeur_nom?`<div style="font-size:12px;color:#bbb;margin-top:3px;">🧑‍✈️ ${esc(v.voy_chauffeur_nom)}${v.voy_chauffeur_tel?' · <a href="tel:'+esc(v.voy_chauffeur_tel)+'" style="color:#c9a84c;">'+esc(v.voy_chauffeur_tel)+'</a>':''}</div>`:''}
+          ${v.voy_notes && v.voy_notes.indexOf('dosier')!==0 ?`<div style="font-size:11.5px;color:#888;font-style:italic;margin-top:5px;">💬 ${esc(v.voy_notes)}</div>`:''}
+        </div>`).join('') : '<div style="color:#666;font-size:12.5px;font-style:italic;padding:14px 2px;">Aucun voyage renseigné pour toi sur cette date.</div>';
+    }
+    else if (type === 'hotel') {
+      titre = '🏨 MON HÔTEL';
+      const hotels = avhrFiltreEquipe(vd.filter(v => v.type === 'hebergement'), 'hotel_teams');
+      html = hotels.length ? hotels.map(h => {
+        const adresseMaps = h.hotel_adresse ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(h.hotel_adresse) : '';
+        return `
+        <div style="background:#161616;border:0.5px solid #242424;border-radius:9px;padding:12px 14px;margin-bottom:9px;">
+          <div style="font-size:14px;color:#fff;font-weight:600;">🏨 ${esc(h.hotel_nom||'Hôtel')}</div>
+          ${h.hotel_adresse?`<div style="font-size:12px;color:#bbb;margin-top:5px;">📍 ${esc(h.hotel_adresse)}</div>`:''}
+          ${h.hotel_dist_salle||h.hotel_dist_gare?`<div style="font-size:11.5px;color:#888;margin-top:3px;">${h.hotel_dist_salle?'🎭 Salle : '+esc(h.hotel_dist_salle):''}${h.hotel_dist_salle&&h.hotel_dist_gare?' · ':''}${h.hotel_dist_gare?'🚉 Gare : '+esc(h.hotel_dist_gare):''}</div>`:''}
+          ${h.hotel_commentaire?`<div style="font-size:11.5px;color:#888;font-style:italic;margin-top:5px;">💬 ${esc(h.hotel_commentaire)}</div>`:''}
+          ${adresseMaps?`<a href="${adresseMaps}" target="_blank" style="display:inline-block;margin-top:9px;background:rgba(201,168,76,0.12);border:0.5px solid rgba(201,168,76,0.4);color:#c9a84c;border-radius:7px;padding:6px 13px;font-size:11px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-decoration:none;">🗺️ OUVRIR DANS MAPS</a>`:''}
+        </div>`;
+      }).join('') : '<div style="color:#666;font-size:12.5px;font-style:italic;padding:14px 2px;">Aucun hôtel renseigné pour toi sur cette date.</div>';
+    }
+    else if (type === 'infos') {
+      titre = 'ℹ️ MES INFOS';
+      const infos = avhrFiltreEquipe(vd.filter(v => v.type === 'info'), 'info_team');
+      html = infos.length ? infos.map(info => {
+        const tc = info.info_team === 'technique' ? '#3b9ae0' : (info.info_team === 'artistique' ? '#e0556f' : '#888');
+        return `
+        <div style="background:#161616;border:0.5px solid #242424;border-left:2px solid ${tc};border-radius:0 9px 9px 0;padding:12px 14px;margin-bottom:9px;">
+          <div style="font-size:9px;color:${tc};margin-bottom:5px;">${teamLabels[info.info_team]||'👥 Tous'}</div>
+          <div style="font-size:13px;color:#eee;white-space:pre-wrap;line-height:1.5;">${esc(info.info_texte)}</div>
+        </div>`;
+      }).join('') : '<div style="color:#666;font-size:12.5px;font-style:italic;padding:14px 2px;">Aucune info particulière pour cette date.</div>';
+    }
+    else if (type === 'oujevais') {
+      titre = '🗺️ OÙ JE VAIS ?';
+      const ville = d ? (d.ville||'') : '';
+      const salle = d ? (d.nom_salle||'') : '';
+      const adresseSalle = d ? (d.adresse_salle || ((salle?salle+' ':'') + ville)) : '';
+      const mapsQuery = encodeURIComponent(adresseSalle || ville);
+      html = `
+        <div style="background:#161616;border:0.5px solid #242424;border-radius:9px;padding:14px;">
+          <div style="font-size:15px;color:#fff;font-weight:600;">📍 ${esc(salle||ville||'Salle')}</div>
+          ${ville?`<div style="font-size:12.5px;color:#bbb;margin-top:4px;">${esc(ville)}</div>`:''}
+          ${adresseSalle&&adresseSalle!==ville?`<div style="font-size:12px;color:#888;margin-top:3px;">${esc(adresseSalle)}</div>`:''}
+          <a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="display:inline-block;margin-top:12px;background:rgba(201,168,76,0.12);border:0.5px solid rgba(201,168,76,0.4);color:#c9a84c;border-radius:7px;padding:8px 15px;font-size:12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-decoration:none;">🗺️ OUVRIR L'ITINÉRAIRE</a>
+        </div>`;
+    }
+    else if (type === 'documents') {
+      titre = '📄 MES DOCUMENTS VOYAGES';
+      const docs = avhrFiltreEquipe(vd.filter(v => v.type === 'document'), 'doc_team');
+      html = docs.length ? docs.map(doc => `
+        <div style="background:#161616;border:0.5px solid #242424;border-radius:9px;padding:12px 14px;margin-bottom:9px;">
+          <div style="font-size:13px;color:#fff;font-weight:600;">📄 ${esc(doc.doc_type||'Document')} <span style="color:#888;font-weight:400;">${esc(doc.doc_categorie||'')}</span></div>
+          ${doc.doc_deposant?`<div style="font-size:11.5px;color:#888;margin-top:4px;">👤 ${esc(doc.doc_deposant)}${doc.doc_date?' · '+esc(doc.doc_date):''}</div>`:''}
+          ${doc.doc_lien?`<a href="${esc(doc.doc_lien)}" target="_blank" style="display:inline-block;margin-top:9px;background:rgba(201,168,76,0.12);border:0.5px solid rgba(201,168,76,0.4);color:#c9a84c;border-radius:7px;padding:6px 13px;font-size:11px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-decoration:none;">🔗 OUVRIR LE DOCUMENT</a>`:''}
+        </div>`).join('') : '<div style="color:#666;font-size:12.5px;font-style:italic;padding:14px 2px;">Aucun document pour cette date.</div>';
+    }
+    else if (type === 'invitations') {
+      titre = '🎁 MES INVITATIONS';
+      html = '<div style="background:#161616;border:0.5px solid #242424;border-radius:9px;padding:24px 14px;text-align:center;"><div style="font-size:30px;margin-bottom:8px;">🚧</div><div style="font-size:13px;color:#bbb;">La demande d\'invitations arrive très bientôt !</div><div style="font-size:11px;color:#777;margin-top:4px;">Tu pourras faire tes demandes directement ici.</div></div>';
+    }
 
-    const card = (body) => `<div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;margin-bottom:8px;">${body}</div>`;
-
-    content.innerHTML =
-      section('✈️', 'VOYAGES', voyages, v => card(`
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#7eb8d4;">${typeLabels[v.voy_type]||v.voy_type||'–'} · ${jourLabels[v.voy_jour]||''}</div>
-          ${v.voy_team ? `<div>${formatTeamsBadges(v.voy_team)}</div>` : ''}
-        </div>
-        ${v.voy_heure_debut ? `<div style="font-size:12px;color:#aaa;margin-top:4px;">⏰ ${v.voy_heure_debut}${v.voy_heure_fin?' → '+v.voy_heure_fin:''}</div>` : ''}
-        ${v.voy_lieu ? `<div style="font-size:12px;color:#ccc;margin-top:2px;">📍 ${v.voy_lieu}</div>` : ''}
-        ${v.voy_notes && !v.voy_notes.startsWith('dosier') ? `<div style="font-size:11px;color:#888;font-style:italic;margin-top:4px;">💬 ${v.voy_notes}</div>` : ''}
-      `), 'Aucun voyage renseigné') +
-      section('🏨', 'HÉBERGEMENT', hotels, h => card(`
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#fff;">${h.hotel_nom||'–'}</div>
-          ${h.hotel_teams ? `<div style="display:flex;gap:4px;flex-wrap:wrap;">${formatTeamsBadges(h.hotel_teams)}</div>` : ''}
-        </div>
-        ${h.hotel_adresse ? `<div style="font-size:12px;color:#aaa;margin-top:4px;">📍 ${h.hotel_adresse}</div>` : ''}
-        ${h.hotel_dist_salle ? `<div style="font-size:11px;color:#888;margin-top:2px;">🎭 Salle : ${h.hotel_dist_salle}</div>` : ''}
-        ${h.hotel_dist_gare ? `<div style="font-size:11px;color:#888;margin-top:2px;">🚉 Gare : ${h.hotel_dist_gare}</div>` : ''}
-        ${h.hotel_commentaire ? `<div style="font-size:11px;color:#777;font-style:italic;margin-top:4px;">💬 ${h.hotel_commentaire}</div>` : ''}
-      `), 'Aucun hébergement renseigné') +
-      section('📞', 'CONTACTS', contacts, c => card(`
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#fff;">${c.contact_prenom||''} ${c.contact_nom||''}${c.contact_fonction?' <span style="color:#888;font-size:11px;">— '+c.contact_fonction+'</span>':''}</div>
-          ${c.contact_team ? `<div>${formatTeamsBadges(c.contact_team)}</div>` : ''}
-        </div>
-        ${c.contact_tel ? `<div style="font-size:12px;color:#aaa;margin-top:4px;">📱 ${c.contact_tel}</div>` : ''}
-        ${c.contact_email ? `<div style="font-size:11px;color:#888;margin-top:2px;">✉️ ${c.contact_email}</div>` : ''}
-        ${c.contact_notes ? `<div style="font-size:11px;color:#777;font-style:italic;margin-top:4px;">💬 ${c.contact_notes}</div>` : ''}
-      `), 'Aucun contact renseigné') +
-      section('📄', 'DOCUMENTS', docs, d => card(`
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#fff;">📄 ${d.doc_type||'–'} <span style="color:#888;font-size:11px;">${d.doc_categorie||''}</span></div>
-          ${d.doc_team ? `<div>${formatTeamsBadges(d.doc_team)}</div>` : ''}
-        </div>
-        ${d.doc_deposant ? `<div style="font-size:11px;color:#888;margin-top:4px;">👤 ${d.doc_deposant}${d.doc_date?' · '+d.doc_date:''}</div>` : ''}
-        ${d.doc_lien ? `<a href="${d.doc_lien}" target="_blank" style="font-size:12px;color:#3b82f6;margin-top:4px;display:inline-block;">🔗 Ouvrir le document</a>` : ''}
-      `), 'Aucun document déposé');
-  }
-
-  async function avhrChargerInvitations(dateId) {
-    const tbody = document.getElementById('avhr-invit-tbody');
-    const total = document.getElementById('avhr-invit-total');
-    if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#888;padding:16px;">Chargement...</td></tr>';
-    const { data, error } = await _supabase.from('invitations').select('*').eq('date_concert_id', dateId).order('created_at', {ascending:false});
-    if (error || !data) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#888;">Aucune invitation.</td></tr>'; return; }
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#555;padding:16px;">Aucune invitation pour cette date.</td></tr>'; if(total) total.innerHTML='<span>Total : 0</span><span>Validé : 0</span>'; return; }
-
-    const statutBadge = {
-      valide: '<span style="background:#166534;color:#4ade80;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:700;">VALIDÉ</span>',
-      en_attente: '<span style="background:#78350f;color:#fbbf24;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:700;">EN ATTENTE</span>',
-      refuse: '<span style="background:#7f1d1d;color:#f87171;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:700;">REFUSÉ</span>'
-    };
-
-    let totalNb = 0, valideNb = 0;
-    tbody.innerHTML = data.map(inv => {
-      totalNb += (inv.nombre||0);
-      if (inv.valide) valideNb += (inv.nombre||0);
-      const badge = inv.valide ? statutBadge.valide : statutBadge.en_attente;
-      return `<tr>
-        <td style="padding:8px 10px;font-size:12px;color:#888;">${inv.created_at ? new Date(inv.created_at).toLocaleDateString('fr-FR') : '–'}</td>
-        <td style="padding:8px 10px;font-size:12px;color:#aaa;">${inv.demandeur||'–'}</td>
-        <td style="padding:8px 10px;font-size:12px;color:#fff;font-weight:700;">${inv.nom_invite||'–'}</td>
-        <td style="padding:8px 10px;font-size:12px;color:#888;">${inv.email||'–'}</td>
-        <td style="padding:8px 10px;font-size:12px;color:#fff;text-align:center;">${inv.nombre||'–'}</td>
-        <td style="padding:8px 10px;font-size:12px;color:#888;text-align:center;">${inv.numero_place||'–'}</td>
-        <td style="padding:8px 10px;">${badge}</td>
-        <td style="padding:8px 10px;font-size:11px;color:#888;">${inv.nom_liste||'–'}</td>
-        <td style="padding:8px 10px;font-size:11px;color:#888;font-style:italic;">${inv.notes||'–'}</td>
-      </tr>`;
-    }).join('');
-    if (total) total.innerHTML = `<span>Total : ${totalNb}</span><span>Validé : ${valideNb}</span>`;
+    if (titreEl) titreEl.textContent = titre;
+    contenuEl.innerHTML = html;
+    if (menu) menu.style.display = 'none';
+    detail.style.display = 'block';
   }
 
   // =============================================
