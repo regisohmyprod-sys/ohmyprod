@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP — build 2026-05-14-livraison3-fixphoto-v4-diag -->
+<!-- APPLI OMP build v6 - 14mai2026-2230 - fix photo salle artiste -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -10429,14 +10429,11 @@ function _hideTeamSelection() {
 
     // Recharger la date fraîche depuis Supabase (photo_salle_url, horaires... peuvent avoir changé)
     try {
-      const { data: dateFraiche, error: errFraiche } = await _supabase.from('dates_concert').select('*').eq('id', dateId).single();
-      console.log('🖼️ DIAG — rechargement date:', dateId, '| erreur:', errFraiche, '| photo_salle_url reçu:', dateFraiche ? dateFraiche.photo_salle_url : 'PAS DE DATA');
+      const { data: dateFraiche } = await _supabase.from('dates_concert').select('*').eq('id', dateId).single();
       if (dateFraiche) {
-        // Fusionner dans l'objet existant pour garder la référence dans _avhrDates
         Object.assign(date, dateFraiche);
       }
     } catch(e) { console.warn('Rechargement date échoué, on garde la version en cache', e); }
-    console.log('🖼️ DIAG — après fusion, date.photo_salle_url =', date.photo_salle_url);
 
     // Définir les IDs pour les invitations
     _dateActiveId = dateId;
@@ -10483,23 +10480,34 @@ function _hideTeamSelection() {
     const salleEl = document.getElementById('avhr-salle');
     if (salleEl) salleEl.textContent = date.nom_salle ? `📍 ${date.nom_salle}` : '';
 
-    // Photo — d'abord la photo de la date, sinon celle de la salle (table salles)
+    // Photo — d'abord la photo de la date, sinon celle de la salle (table salles).
+    // Dans salles, ville_nom = "VILLE + nom salle" (ex: "BREST Arena"), donc on matche sur le début.
     const photoContainer = document.getElementById('avhr-photo-container');
     let urlPhoto = date.photo_salle_url || null;
     if (!urlPhoto && date.ville) {
       try {
-        const { data: salleData, error: errSalle } = await _supabase
+        const villeRecherche = date.ville.trim();
+        const { data: salleData } = await _supabase
           .from('salles')
           .select('photo_url, ville_nom')
-          .ilike('ville_nom', '%' + date.ville.trim() + '%');
-        console.log('🖼️ DIAG SALLES — recherche ville:', JSON.stringify(date.ville), '| erreur:', errSalle, '| résultats:', JSON.stringify(salleData));
+          .ilike('ville_nom', villeRecherche + '%');
         if (salleData && salleData.length) {
           const avecPhoto = salleData.find(s => s.photo_url);
           if (avecPhoto) urlPhoto = avecPhoto.photo_url;
         }
+        // 2e essai : recherche "contient" si le 1er essai n'a rien donné
+        if (!urlPhoto) {
+          const { data: salleData2 } = await _supabase
+            .from('salles')
+            .select('photo_url, ville_nom')
+            .ilike('ville_nom', '%' + villeRecherche + '%');
+          if (salleData2 && salleData2.length) {
+            const avecPhoto2 = salleData2.find(s => s.photo_url);
+            if (avecPhoto2) urlPhoto = avecPhoto2.photo_url;
+          }
+        }
       } catch(e) { console.warn('Recherche photo salle échouée', e); }
     }
-    console.log('🖼️ DIAG PHOTO finale —', date.ville, '| urlPhoto retenue:', urlPhoto);
     if (urlPhoto) {
       document.getElementById('avhr-photo').src = urlPhoto;
       photoContainer.style.display = 'block';
