@@ -3479,6 +3479,35 @@ function _hideTeamSelection() {
       <!-- Ligne séparatrice dorée animée -->
       <div class="gold-line-shimmer"></div>
 
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- ✨ BANDE TÂCHES RÉGIS (visible uniquement pour regis.ohmyprod@gmail.com) -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="dash-bande-taches" style="display:none;margin-bottom:20px;">
+        <div style="background:linear-gradient(135deg,#1a1a1a 0%,#1f1a2e 100%);border:1px solid #8e44ad;border-left:4px solid #8e44ad;border-radius:12px;padding:14px 16px;">
+          <!-- En-tête cliquable -->
+          <div onclick="dashTachesToggleDeroule()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:20px;">📋</span>
+              <div>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#a569bd;">MES TÂCHES</div>
+                <div style="font-size:10px;color:#888;" id="dash-taches-soustitre">Chargement…</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button onclick="event.stopPropagation(); window.tachesOpenModal && window.tachesOpenModal();" style="background:#8e44ad;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;white-space:nowrap;">+ AJOUTER</button>
+              <span id="dash-taches-chevron" style="font-size:14px;color:#a569bd;transition:transform 0.25s ease;">▼</span>
+            </div>
+          </div>
+          <!-- Aperçu : 3 prochaines tâches -->
+          <div id="dash-taches-apercu" style="margin-top:12px;display:flex;flex-direction:column;gap:6px;"></div>
+          <!-- Déroulé : toutes les tâches non terminées -->
+          <div id="dash-taches-deroule" style="display:none;margin-top:8px;border-top:1px solid rgba(142,68,173,0.25);padding-top:10px;">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Toutes les tâches en cours</div>
+            <div id="dash-taches-deroule-liste" style="display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto;"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- ===== BANDEAU TOURNÉES OMP (déplacé entre ACCÈS ADMIN et GESTION TOUR) ===== -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div class="page-title" style="font-size:22px;margin-bottom:0;">TOURNÉES OMP</div>
@@ -3693,11 +3722,26 @@ function _hideTeamSelection() {
       <!-- BLOC GESTION CLIENTS / SPECTATEURS : 2 cartes (CRM en cours) -->
       <div class="stats-grid" style="margin-bottom:20px; grid-template-columns: repeat(4, 1fr);">
 
-        <!-- SPECTATEURS -->
-        <div class="stat-card" style="border-left:3px solid #555;padding:20px;cursor:default;position:relative;opacity:0.7;">
-          <div class="stat-label">👥 Spectateurs</div>
-          <div class="stat-value" style="font-size:32px;color:#888;">SPECTATEURS</div>
-          <div class="stat-sub">⏳ CRM en cours de développement</div>
+        <!-- ✨ BLOC PROJECTION (remplace l'ancienne carte SPECTATEURS) -->
+        <div class="stat-card dashboard-projection-card" style="border-left:3px solid #c9a84c;padding:16px 18px;cursor:default;position:relative;background:linear-gradient(135deg,#1a1a1a 0%,#211d12 100%);">
+          <div class="stat-label" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>🎯 Projection Tournée</span>
+            <span id="dash-proj-etat" style="font-size:9px;color:#888;font-weight:400;">…</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,0.12);padding-bottom:6px;">
+              <span style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.5px;">👥 N° Spectateurs</span>
+              <span id="dash-proj-spectateurs" style="font-size:18px;font-weight:700;color:#c9a84c;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,0.12);padding-bottom:6px;">
+              <span style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.5px;">💰 CA TTC</span>
+              <span id="dash-proj-ca" style="font-size:18px;font-weight:700;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.5px;">📊 Résultat OMP</span>
+              <span id="dash-proj-resultat" style="font-size:18px;font-weight:700;color:#22c55e;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">–</span>
+            </div>
+          </div>
         </div>
 
         <!-- APPLI TWOQ PUBLIC -->
@@ -12508,6 +12552,15 @@ function _hideTeamSelection() {
     if (id === 'dashboard' && typeof chargerTournees === 'function' && typeof _currentUserRole !== 'undefined' && _currentUserRole === 'admin') {
       chargerTournees().catch(function(e) { console.error('refresh dashboard:', e); });
     }
+    // ✨ Refresh du bloc PROJECTION + de la bande TÂCHES à chaque ouverture du dashboard
+    if (id === 'dashboard') {
+      if (typeof window.dashboardChargerProjection === 'function') {
+        window.dashboardChargerProjection().catch(function(e) { console.error('projection dashboard:', e); });
+      }
+      if (typeof window.dashboardChargerBandeTaches === 'function') {
+        window.dashboardChargerBandeTaches();
+      }
+    }
     if (id === 'acces-frais') {
       // Afficher vue admin ou membre selon le rôle
       var adminView = document.getElementById('frais-admin-view');
@@ -19436,6 +19489,19 @@ function _hideTeamSelection() {
       // Plus besoin de renderArtisteStats : les 2 cartes cliquables sont rendues statiquement
     }
     // admin : page dashboard par défaut
+    if (role === 'admin') {
+      // ✨ Charger le bloc PROJECTION + la bande TÂCHES dès l'arrivée sur le dashboard
+      if (typeof window.dashboardChargerProjection === 'function') {
+        window.dashboardChargerProjection().catch(function(e) { console.error('projection login:', e); });
+      }
+      if (typeof window.dashboardChargerBandeTaches === 'function') {
+        // petit délai : laisser le module TÂCHES finir son chargement initial
+        window.dashboardChargerBandeTaches();
+        setTimeout(function() {
+          if (typeof window.dashboardChargerBandeTaches === 'function') window.dashboardChargerBandeTaches();
+        }, 3000);
+      }
+    }
     
     // Afficher le message de bienvenue personnalisé
     afficherMessageBienvenue();
@@ -29533,8 +29599,201 @@ console.log('✅ OMP Mobile Kit chargé');
   window.tachesRender = tachesRender;
   window.tachesLoad = tachesLoad;
   window.tachesGetData = function() { return tachesData; }; // pour le système d'alertes
+})();
 
-  console.log('✅ Module TÂCHES OMP chargé');
+// ═══════════════════════════════════════════════════════════════
+// ✨ MODULE DASHBOARD — BLOC PROJECTION + BANDE TÂCHES RÉGIS
+// ═══════════════════════════════════════════════════════════════
+(function() {
+
+  // ----- Helpers de formatage (mêmes formats que SUIVI DATES) -----
+  function dashFmtNb(n) {
+    return Math.round(n || 0).toLocaleString('fr-FR');
+  }
+  function dashFmtEur(n) {
+    return Math.round(n || 0).toLocaleString('fr-FR') + ' €';
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // 1) BLOC PROJECTION — 3 chiffres clés repris du résumé SUIVI DATES
+  //    (recalcul à l'identique du tfoot : tot.projBillets / projCA / projResultatOMP)
+  // ════════════════════════════════════════════════════════════
+  window.dashboardChargerProjection = async function() {
+    var elSpec = document.getElementById('dash-proj-spectateurs');
+    var elCA   = document.getElementById('dash-proj-ca');
+    var elRes  = document.getElementById('dash-proj-resultat');
+    var elEtat = document.getElementById('dash-proj-etat');
+    if (!elSpec || !elCA || !elRes) return;
+
+    try {
+      if (elEtat) elEtat.textContent = 'calcul…';
+
+      // S'assurer que le cache _suiviDonnees est rempli (sinon on le charge)
+      if (typeof _suiviDonnees === 'undefined' || !Array.isArray(_suiviDonnees) || _suiviDonnees.length === 0) {
+        if (typeof suiviChargerDonnees === 'function') {
+          await suiviChargerDonnees();
+        }
+      }
+
+      var data = (typeof _suiviDonnees !== 'undefined' && Array.isArray(_suiviDonnees)) ? _suiviDonnees : [];
+      if (data.length === 0) {
+        elSpec.textContent = '–'; elCA.textContent = '–'; elRes.textContent = '–';
+        if (elEtat) elEtat.textContent = 'aucune donnée';
+        return;
+      }
+
+      // ✨ Même logique exacte que le tfoot de suiviAfficher() — filtre "all"
+      var totProjBillets = 0, totProjCA = 0, totProjResultatOMP = 0;
+      data.forEach(function(d) {
+        var hasProjTot = (d.categorie !== 'passees') && (d.projBillets > 0 || d.billets > 0);
+        totProjBillets     += hasProjTot ? d.projBillets       : d.billets;
+        totProjCA          += hasProjTot ? d.projCA            : d.recetteTTC;
+        totProjResultatOMP += hasProjTot ? d.projResultatOMP   : d.resultatOMP;
+      });
+
+      elSpec.textContent = dashFmtNb(totProjBillets);
+      elCA.textContent   = dashFmtEur(totProjCA);
+      elRes.textContent  = dashFmtEur(totProjResultatOMP);
+      elRes.style.color  = totProjResultatOMP >= 0 ? '#22c55e' : '#ef4444';
+
+      if (elEtat) elEtat.textContent = data.length + ' dates';
+      console.log('[PROJECTION] Spectateurs:', Math.round(totProjBillets), '· CA:', Math.round(totProjCA), '· Résultat OMP:', Math.round(totProjResultatOMP));
+    } catch (err) {
+      console.error('[PROJECTION] Erreur :', err);
+      if (elEtat) elEtat.textContent = 'erreur';
+    }
+  };
+
+  // ════════════════════════════════════════════════════════════
+  // 2) BANDE TÂCHES RÉGIS — visible uniquement pour regis.ohmyprod@gmail.com
+  // ════════════════════════════════════════════════════════════
+  var EMAIL_REGIS = 'regis.ohmyprod@gmail.com';
+
+  function dashTachesEstRegis() {
+    try {
+      var em = (typeof _currentUserEmail !== 'undefined' && _currentUserEmail) ? _currentUserEmail : '';
+      return em.trim().toLowerCase() === EMAIL_REGIS;
+    } catch(e) { return false; }
+  }
+
+  // Jour relatif (J-X / AUJ / J+X retard)
+  function dashTacheJour(dateButoir) {
+    if (!dateButoir) return { label: '—', color: '#888', urgent: false };
+    var today = new Date(); today.setHours(0,0,0,0);
+    var due = new Date(dateButoir); due.setHours(0,0,0,0);
+    var diff = Math.floor((due - today) / 86400000);
+    if (diff < 0)  return { label: 'J+' + Math.abs(diff), color: '#ef4444', urgent: true };
+    if (diff === 0) return { label: 'AUJ.', color: '#ef4444', urgent: true };
+    if (diff === 1) return { label: 'J-1', color: '#ef4444', urgent: true };
+    if (diff <= 3) return { label: 'J-' + diff, color: '#f39c12', urgent: false };
+    return { label: 'J-' + diff, color: '#888', urgent: false };
+  }
+
+  var PRIO_DASH = {
+    HAUTE:   { icon: '🔴', color: '#e74c3c' },
+    MOYENNE: { icon: '🟡', color: '#f39c12' },
+    BASSE:   { icon: '🟢', color: '#2ecc71' }
+  };
+
+  // Tri : date butoir asc (nulls last), puis priorité
+  function dashTachesTrier(arr) {
+    var pOrder = { HAUTE: 1, MOYENNE: 2, BASSE: 3 };
+    return arr.slice().sort(function(a, b) {
+      if (a.date_butoir && b.date_butoir) {
+        if (a.date_butoir !== b.date_butoir) return a.date_butoir.localeCompare(b.date_butoir);
+      } else if (a.date_butoir && !b.date_butoir) return -1;
+      else if (!a.date_butoir && b.date_butoir) return 1;
+      return (pOrder[a.priorite] || 9) - (pOrder[b.priorite] || 9);
+    });
+  }
+
+  // Rendu d'une ligne de tâche (compacte)
+  function dashTacheLigne(t) {
+    var prio = PRIO_DASH[t.priorite] || PRIO_DASH.MOYENNE;
+    var jour = dashTacheJour(t.date_butoir);
+    var etatIcon = t.etat === 'EN_COURS' ? '🔥' : (t.etat === 'FAIT' ? '✅' : '⏳');
+    var titreTronq = (t.titre || '').length > 48 ? (t.titre.substring(0,48) + '…') : (t.titre || '');
+    return ''
+      + '<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border-radius:8px;padding:8px 10px;">'
+      +   '<span title="Changer l\'état" onclick="event.stopPropagation(); window.tachesCycleEtat && window.tachesCycleEtat(\'' + t.id + '\')" style="cursor:pointer;font-size:15px;flex-shrink:0;">' + etatIcon + '</span>'
+      +   '<span style="flex-shrink:0;font-size:11px;">' + prio.icon + '</span>'
+      +   '<div style="flex:1;min-width:0;cursor:pointer;" onclick="event.stopPropagation(); window.tachesEdit && window.tachesEdit(\'' + t.id + '\')">'
+      +     '<div style="font-size:12px;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + titreTronq + '</div>'
+      +     (t.date_butoir ? '<div style="font-size:9px;color:#888;">échéance ' + new Date(t.date_butoir).toLocaleDateString('fr-FR') + '</div>' : '')
+      +   '</div>'
+      +   '<span style="flex-shrink:0;font-size:10px;font-weight:700;color:' + jour.color + ';font-family:\'Bebas Neue\',sans-serif;letter-spacing:0.5px;">' + jour.label + '</span>'
+      + '</div>';
+  }
+
+  // Rafraîchit la bande TÂCHES du dashboard
+  window.dashboardChargerBandeTaches = function() {
+    var bande = document.getElementById('dash-bande-taches');
+    if (!bande) return;
+
+    // Visible uniquement pour Régis
+    if (!dashTachesEstRegis()) {
+      bande.style.display = 'none';
+      return;
+    }
+    bande.style.display = 'block';
+
+    var apercu  = document.getElementById('dash-taches-apercu');
+    var liste   = document.getElementById('dash-taches-deroule-liste');
+    var sousT   = document.getElementById('dash-taches-soustitre');
+    if (!apercu) return;
+
+    // Récupère les tâches depuis le module TÂCHES
+    var all = (typeof window.tachesGetData === 'function') ? (window.tachesGetData() || []) : [];
+    var actives = all.filter(function(t) { return t.etat !== 'FAIT'; });
+    var triees = dashTachesTrier(actives);
+
+    // Sous-titre
+    if (sousT) {
+      if (actives.length === 0) {
+        sousT.textContent = 'Aucune tâche en cours 🎉';
+      } else {
+        var nbUrgent = triees.filter(function(t) { return dashTacheJour(t.date_butoir).urgent; }).length;
+        sousT.textContent = actives.length + ' tâche' + (actives.length > 1 ? 's' : '') + ' en cours'
+          + (nbUrgent > 0 ? ' · ' + nbUrgent + ' urgente' + (nbUrgent > 1 ? 's' : '') : '');
+      }
+    }
+
+    // Aperçu = 3 prochaines
+    if (actives.length === 0) {
+      apercu.innerHTML = '<div style="font-size:11px;color:#666;font-style:italic;padding:4px 2px;">Rien à faire pour le moment — clique sur + AJOUTER pour créer une tâche.</div>';
+    } else {
+      apercu.innerHTML = triees.slice(0, 3).map(dashTacheLigne).join('');
+    }
+
+    // Déroulé = toutes les tâches en cours
+    if (liste) {
+      liste.innerHTML = triees.length > 0
+        ? triees.map(dashTacheLigne).join('')
+        : '<div style="font-size:11px;color:#666;font-style:italic;">Aucune tâche en cours.</div>';
+    }
+  };
+
+  // Ouvre / ferme le déroulé
+  window.dashTachesToggleDeroule = function() {
+    var der = document.getElementById('dash-taches-deroule');
+    var chev = document.getElementById('dash-taches-chevron');
+    if (!der) return;
+    var ouvert = der.style.display !== 'none';
+    der.style.display = ouvert ? 'none' : 'block';
+    if (chev) chev.style.transform = ouvert ? 'rotate(0deg)' : 'rotate(180deg)';
+  };
+
+  // ----- Hook : quand le module TÂCHES rerender, on rafraîchit aussi la bande -----
+  if (typeof window.tachesRender === 'function') {
+    var _tachesRenderOrig = window.tachesRender;
+    window.tachesRender = function() {
+      var r = _tachesRenderOrig.apply(this, arguments);
+      try { if (typeof window.dashboardChargerBandeTaches === 'function') window.dashboardChargerBandeTaches(); } catch(e) {}
+      return r;
+    };
+  }
+
+  console.log('✅ Module DASHBOARD (Projection + Bande Tâches) chargé');
 })();
 </script>
 
