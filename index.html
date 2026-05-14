@@ -6425,20 +6425,31 @@ function _hideTeamSelection() {
 
     <!-- PAGE FICHE VHR PAR TOURNÉE -->
     <div id="page-fiche-vhr" class="page">
-      <button class="back-btn" onclick="closeModal('modal-vhr-tournee');showPage('dashboard')">← Retour</button>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <button class="back-btn" onclick="closeModal('modal-vhr-tournee');showPage('dashboard')">← Retour au tableau de bord</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:12px;">
         <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#3b82f6;" id="vhr-fiche-titre">🚌 FICHE VHR</div>
-          <div style="font-size:13px;color:#888;" id="vhr-fiche-sous-titre"></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#c9a84c;" id="vhr-fiche-titre">🚌 FICHE VHR</div>
+          <div style="font-size:12px;color:#888;margin-top:1px;" id="vhr-fiche-sous-titre">Voyages · Hébergement · Contacts · Documents — par date</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button onclick="showPage('contacts-presta')" class="vhr-admin-action" style="background:#1a1a1a;color:#c9a84c;border:0.5px solid rgba(201,168,76,0.4);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.background='#222';this.style.borderColor='#c9a84c'" onmouseout="this.style.background='#1a1a1a';this.style.borderColor='rgba(201,168,76,0.4)'">📇 Contacts Presta</button>
         </div>
       </div>
 
       <!-- FILTRES + RECHERCHE -->
-      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-        <button id="vhr-filter-avenir" onclick="filtrerDatesVHR('avenir')" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">→ À VENIR</button>
-        <button id="vhr-filter-passees" onclick="filtrerDatesVHR('passees')" style="background:#1a1a1a;color:#888;border:1px solid #2a2a2a;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✓ PASSÉES</button>
-        <button id="vhr-filter-toutes" onclick="filtrerDatesVHR('toutes')" style="background:#1a1a1a;color:#888;border:1px solid #2a2a2a;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">≡ TOUTES</button>
-        <input id="vhr-search" type="text" placeholder="🔍 Rechercher une ville, salle..." oninput="filtrerDatesVHR(_vhrFiltreActif)" style="flex:1;min-width:200px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;color:#fff;padding:8px 14px;font-size:13px;font-family:'Inter',sans-serif;outline:none;">
+      <div style="display:flex;gap:7px;margin-bottom:8px;flex-wrap:wrap;align-items:center;">
+        <button id="vhr-filter-avenir" onclick="filtrerDatesVHR('avenir')" style="background:#c9a84c;color:#000;border:none;border-radius:8px;padding:7px 15px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">→ À VENIR</button>
+        <button id="vhr-filter-passees" onclick="filtrerDatesVHR('passees')" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:8px;padding:7px 15px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✓ PASSÉES</button>
+        <button id="vhr-filter-toutes" onclick="filtrerDatesVHR('toutes')" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:8px;padding:7px 15px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">≡ TOUTES</button>
+        <input id="vhr-search" type="text" placeholder="🔍 Rechercher une ville, salle..." oninput="filtrerDatesVHR(_vhrFiltreActif)" style="flex:1;min-width:170px;background:#0a0a0a;border:0.5px solid #2a2a2a;border-radius:8px;color:#fff;padding:7px 13px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+      </div>
+
+      <!-- LÉGENDE DES PASTILLES -->
+      <div style="display:flex;gap:14px;font-size:10px;color:#777;padding:7px 4px 11px;border-bottom:0.5px solid #222;margin-bottom:12px;flex-wrap:wrap;">
+        <span><span style="color:#2ecc71;">●</span> renseigné</span>
+        <span><span style="color:#c9a84c;">●</span> partiel</span>
+        <span><span style="color:#555;">○</span> à faire</span>
+        <span style="margin-left:auto;color:#555;">✈ voyages &nbsp;🏨 hôtel &nbsp;☎ contacts &nbsp;▤ docs</span>
       </div>
 
       <!-- LISTE DES DATES -->
@@ -10671,28 +10682,49 @@ function _hideTeamSelection() {
       const teamLabels = { tous:'👥 Tous', artistique:'🎤 Artistique', production:'📋 Production', technique:'🔧 Technique' };
       const jourLabels = { veille:'La veille', jour_j:'Jour J', lendemain:'Lendemain' };
 
-      return `<div style="background:#1a1a1a;border:1px solid ${isPast?'#2a2a2a':'#3b82f6'};border-radius:12px;margin-bottom:16px;overflow:hidden;">
+      // ✨ Pastille d'état par bloc + badge d'état global
+      const pastilleVHR = (n) => n > 0
+        ? '<span style="color:#2ecc71;font-size:12px;">●</span>'
+        : '<span style="color:#555;font-size:12px;">○</span>';
+      const nbRemplis = [voyages.length, hotels.length, contacts.length, docs.length].filter(x => x > 0).length;
+      let etatLabel, etatCol, etatBg, etatBd;
+      if (nbRemplis === 0) { etatLabel = 'À FAIRE'; etatCol = '#888'; etatBg = 'rgba(120,120,120,0.12)'; etatBd = '#333'; }
+      else if (nbRemplis === 4) { etatLabel = 'COMPLET'; etatCol = '#2ecc71'; etatBg = 'rgba(46,204,113,0.12)'; etatBd = 'rgba(46,204,113,0.4)'; }
+      else { etatLabel = 'EN COURS'; etatCol = '#c9a84c'; etatBg = 'rgba(201,168,76,0.12)'; etatBd = 'rgba(201,168,76,0.4)'; }
+
+      return `<div style="background:#1a1a1a;border:0.5px solid ${isPast?'#2a2a2a':'rgba(201,168,76,0.55)'};border-radius:10px;margin-bottom:9px;overflow:hidden;">
         <!-- HEADER DATE -->
-        <div style="background:${isPast?'#222':'linear-gradient(135deg,#1e3a5f,#1565c0)'};padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleVHRDate('vhr-date-${d.id}')">
-          <div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:${isPast?'#888':'#fff'};">${dateStr} — ${d.ville||''} ${d.nom_salle?'· '+d.nom_salle:''}</div>
-            <div style="font-size:11px;color:${isPast?'#555':'rgba(255,255,255,0.6)'};margin-top:2px;">
-              ${voyages.length} voyage(s) · ${hotels.length} hôtel(s) · ${contacts.length} contact(s) · ${docs.length} doc(s)
+        <div style="display:flex;align-items:stretch;cursor:pointer;" onclick="toggleVHRDate('vhr-date-${d.id}')">
+          <div style="width:4px;background:${isPast?'#333':'#c9a84c'};flex-shrink:0;"></div>
+          <div style="flex:1;padding:11px 14px;min-width:0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+              <div style="min-width:0;">
+                <div style="font-size:13.5px;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  ${d.ville||'—'} ${d.nom_salle?'<span style="color:#777;font-weight:400;font-size:12px;">· '+d.nom_salle+'</span>':''}
+                </div>
+                <div style="font-size:11px;color:#888;margin-top:2px;">${dateStr}</div>
+              </div>
+              <span style="font-size:9px;font-weight:500;letter-spacing:0.5px;padding:3px 9px;border-radius:20px;background:${etatBg};color:${etatCol};border:0.5px solid ${etatBd};white-space:nowrap;flex-shrink:0;">${isPast?'✓ PASSÉE':etatLabel}</span>
             </div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;" onclick="event.stopPropagation()">
-            <button onclick="event.stopPropagation();ouvrirCarteVHRDate('${d.id}')" title="Voir la ville sur la carte" style="background:#e31e24;border:1px solid #e31e24;border-radius:6px;color:#fff;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:700;box-shadow:0 2px 4px rgba(227,30,36,0.3);">🗺️ PLAN</button>
-            <span style="font-size:11px;color:${isPast?'#555':'#7eb8d4'};">${isPast?'✓ Passée':'→ À venir'}</span>
-            <span id="arrow-${d.id}" style="color:#888;font-size:14px;">▼</span>
+            <div style="display:flex;align-items:center;gap:13px;margin-top:9px;flex-wrap:wrap;">
+              <span style="font-size:11px;color:#aaa;">${pastilleVHR(voyages.length)} <span style="color:#888;">✈</span> ${voyages.length}</span>
+              <span style="font-size:11px;color:#aaa;">${pastilleVHR(hotels.length)} <span style="color:#888;">🏨</span> ${hotels.length}</span>
+              <span style="font-size:11px;color:#aaa;">${pastilleVHR(contacts.length)} <span style="color:#888;">☎</span> ${contacts.length}</span>
+              <span style="font-size:11px;color:#aaa;">${pastilleVHR(docs.length)} <span style="color:#888;">▤</span> ${docs.length}</span>
+              <span style="margin-left:auto;display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
+                <button onclick="event.stopPropagation();ouvrirCarteVHRDate('${d.id}')" title="Voir la ville sur la carte" style="font-size:10px;color:#e0556f;border:0.5px solid rgba(224,85,111,0.4);border-radius:6px;padding:3px 9px;background:rgba(224,85,111,0.1);cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.5px;">🗺️ PLAN</button>
+                <span id="arrow-${d.id}" style="font-size:11px;color:#c9a84c;">ouvrir ▼</span>
+              </span>
+            </div>
           </div>
         </div>
 
         <!-- CONTENU VHR DATE -->
-        <div id="vhr-date-${d.id}" style="display:none;padding:16px;">
+        <div id="vhr-date-${d.id}" style="display:none;padding:16px;border-top:0.5px solid #2a2a2a;background:#0f0f0f;">
 
           <!-- VOYAGES -->
           <div style="margin-bottom:14px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#3b82f6;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">✈️ VOYAGES</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">✈️ VOYAGES</div>
             <div id="vhr-voy-${d.id}">
               ${voyages.length ? voyages.map(v => `
                 <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -10703,7 +10735,7 @@ function _hideTeamSelection() {
                     ${v.voy_notes&&!v.voy_notes.startsWith('dosier')?`<div style="font-size:11px;color:#777;font-style:italic;">💬 ${v.voy_notes}</div>`:''}
                   </div>
                   <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
-                    <button onclick="modifierVHREntry('voyage','${v.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
+                    <button onclick="modifierVHREntry('voyage','${v.id}')" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${v.id}','vhr-voy-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
                 </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun voyage</div>'}
@@ -10713,7 +10745,7 @@ function _hideTeamSelection() {
 
           <!-- HÉBERGEMENT -->
           <div style="margin-bottom:14px;border-top:1px solid #2a2a2a;padding-top:12px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#3b82f6;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">🏨 HÉBERGEMENT</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">🏨 HÉBERGEMENT</div>
             <div id="vhr-hot-${d.id}">
               ${hotels.length ? hotels.map(h => `
                 <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -10728,7 +10760,7 @@ function _hideTeamSelection() {
                     ${h.hotel_commentaire?`<div style="font-size:11px;color:#777;font-style:italic;">💬 ${h.hotel_commentaire}</div>`:''}
                   </div>
                   <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
-                    <button onclick="modifierVHREntry('hebergement','${h.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
+                    <button onclick="modifierVHREntry('hebergement','${h.id}')" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${h.id}','vhr-hot-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
                 </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun hébergement</div>'}
@@ -10738,7 +10770,7 @@ function _hideTeamSelection() {
 
           <!-- CONTACTS -->
           <div style="margin-bottom:14px;border-top:1px solid #2a2a2a;padding-top:12px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#3b82f6;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">📞 CONTACTS</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">📞 CONTACTS</div>
             <div id="vhr-con-${d.id}">
               ${contacts.length ? contacts.map(c => `
                 <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -10748,7 +10780,7 @@ function _hideTeamSelection() {
                     ${c.contact_email?`<div style="font-size:11px;color:#aaa;">✉️ ${c.contact_email}</div>`:''}
                   </div>
                   <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
-                    <button onclick="modifierVHREntry('contact','${c.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
+                    <button onclick="modifierVHREntry('contact','${c.id}')" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${c.id}','vhr-con-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
                 </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun contact</div>'}
@@ -10758,17 +10790,17 @@ function _hideTeamSelection() {
 
           <!-- DOCUMENTS -->
           <div style="border-top:1px solid #2a2a2a;padding-top:12px;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#3b82f6;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">📄 DOCUMENTS</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:4px;">📄 DOCUMENTS</div>
             <div id="vhr-doc-${d.id}">
               ${docs.length ? docs.map(doc => `
                 <div style="background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                   <div style="flex:1;">
                     <div style="font-size:12px;color:#fff;font-weight:600;">📄 ${doc.doc_type||'–'} <span style="color:#888;font-weight:400;">${doc.doc_categorie||''}</span></div>
                     ${doc.doc_deposant?`<div style="font-size:11px;color:#888;">👤 ${doc.doc_deposant} · ${doc.doc_date||''}</div>`:''}
-                    ${doc.doc_lien?`<a href="${doc.doc_lien}" target="_blank" style="font-size:11px;color:#3b82f6;">🔗 Ouvrir</a>`:''}
+                    ${doc.doc_lien?`<a href="${doc.doc_lien}" target="_blank" style="font-size:11px;color:#c9a84c;">🔗 Ouvrir</a>`:''}
                   </div>
                   <div class="vhr-admin-action" style="display:flex;gap:4px;flex-shrink:0;">
-                    <button onclick="modifierVHREntry('document','${doc.id}')" style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#3b82f6;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
+                    <button onclick="modifierVHREntry('document','${doc.id}')" style="background:rgba(201,168,76,0.15);border:1px solid #c9a84c;color:#c9a84c;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✏️</button>
                     <button onclick="supprimerVHREntry('${doc.id}','vhr-doc-${d.id}','${d.id}')" style="background:transparent;border:none;color:#e31e24;cursor:pointer;font-size:13px;font-weight:700;">✕</button>
                   </div>
                 </div>`).join('') : '<div style="color:#555;font-size:11px;font-style:italic;padding:4px 0;">Aucun document</div>'}
@@ -10788,10 +10820,10 @@ function _hideTeamSelection() {
     const arrow = document.getElementById('arrow-'+dateId);
     if (el.style.display === 'none') {
       el.style.display = 'block';
-      if (arrow) arrow.textContent = '▲';
+      if (arrow) arrow.textContent = 'fermer ▲';
     } else {
       el.style.display = 'none';
-      if (arrow) arrow.textContent = '▼';
+      if (arrow) arrow.textContent = 'ouvrir ▼';
     }
   }
 
