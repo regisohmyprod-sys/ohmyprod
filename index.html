@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP build v9.2 - 15mai2026 - VHR POINTAGE corrigé : etat_ventes + total_jauge (= PILOTE DATE) -->
+<!-- APPLI OMP build v9.3 - 15mai2026 - codes simplifiés : Ompstaff26 / Twoq26art / Twoq26tech -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -7475,9 +7475,9 @@ function _hideTeamSelection() {
   // Codes d'accès par rôle
   var _codesAccesFrais = {
     'admin': 'OMP1504!',
-    'staff_omp': 'Staffomp2026!',
-    'artiste': 'Ompartistes2026!',
-    'technique': 'TechOMP2026!'
+    'staff_omp': 'Ompstaff26',
+    'artiste': 'Twoq26art',
+    'technique': 'Twoq26tech'
   };
 
   // Ouvrir la page FRAIS (dépôt justificatif) - Utilise l'utilisateur déjà connecté
@@ -19738,7 +19738,7 @@ function _hideTeamSelection() {
         var mb = res.data;
         var role = mb.role || 'membre';
         // Vérifier que le token correspond au rôle
-        var CODES = { 'admin': 'OMP1504!', 'staff_omp': 'Staffomp2026!', 'artiste': 'Ompartistes2026!', 'technique': 'TechOMP2026!' };
+        var CODES = { 'admin': 'OMP1504!', 'staff_omp': 'Ompstaff26', 'artiste': 'Twoq26art', 'technique': 'Twoq26tech' };
         // Token = hash(email + code + jour) → on vérifie en recalculant
         var expectedToken = simpleHash(savedEmail + (CODES[role] || '') + Math.floor(sessionExpiry / 86400000));
         if (sessionToken !== expectedToken) {
@@ -19818,9 +19818,9 @@ function _hideTeamSelection() {
     // Codes valides par role
     var CODES = {
       'admin': 'OMP1504!',
-      'staff_omp': 'Staffomp2026!',
-      'artiste': 'Ompartistes2026!',
-      'technique': 'TechOMP2026!'
+      'staff_omp': 'Ompstaff26',
+      'artiste': 'Twoq26art',
+      'technique': 'Twoq26tech'
     };
 
     // Vérifier email dans membres + role
