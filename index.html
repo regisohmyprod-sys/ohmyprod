@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP build v9.6 - 15mai2026 - modal centrée au lieu de bottom-sheet -->
+<!-- APPLI OMP build v10.0 - 15mai2026 - FIX NOTIFS PUSH : 1 token/user + nettoyage auto tokens morts -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -74,25 +74,27 @@
           // Sauvegarder le token dans localStorage
           localStorage.setItem('fcm_token', token);
           
-          // Sauvegarder dans Supabase (upsert pour éviter les doublons)
+          // Sauvegarder dans Supabase (UPSERT : 1 seul token par user)
           if (typeof _supabase !== 'undefined') {
-            // Vérifier si le token existe déjà
-            const { data: existing } = await _supabase
-              .from('push_tokens')
-              .select('id')
-              .eq('token', token)
-              .single();
+            const userName = localStorage.getItem('omp_user_name') || 'Inconnu';
+            const userRole = localStorage.getItem('omp_user_role') || 'staff';
             
-            if (!existing) {
-              // Nouveau token, on l'ajoute
-              await _supabase.from('push_tokens').insert({
-                token: token,
-                user_name: userName || localStorage.getItem('omp_user_name') || 'Inconnu',
-                user_role: userRole || localStorage.getItem('omp_user_role') || 'staff'
-              });
-              console.log('✅ Token enregistré dans Supabase');
+            // Supprimer l'ancien token de cet user (si existe)
+            await _supabase.from('push_tokens')
+              .delete()
+              .eq('user_name', userName);
+            
+            // Insérer le nouveau token
+            const { error } = await _supabase.from('push_tokens').insert({
+              token: token,
+              user_name: userName,
+              user_role: userRole
+            });
+            
+            if (error) {
+              console.error('❌ Erreur enregistrement token:', error);
             } else {
-              console.log('ℹ️ Token déjà enregistré');
+              console.log('✅ Token enregistré (ancien supprimé)');
             }
           }
           return token;
@@ -7182,17 +7184,17 @@ function _hideTeamSelection() {
   
   <!-- HEADER -->
   <div style="margin-bottom:24px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">💰 DÉPÔT DE JUSTIFICATIF</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2.5px;color:#c9a84c;">💰 DÉPÔT DE JUSTIFICATIF</div>
     <div style="font-size:12px;color:#888;margin-top:4px;">Déposez vos justificatifs de frais rapidement</div>
   </div>
 
   <!-- ÉCRAN FORMULAIRE DÉPÔT (direct - plus de connexion) -->
   <div id="frais-depot-screen">
     <!-- Info membre connecté -->
-    <div style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="background:linear-gradient(135deg,#1a1a1a 0%,#252525 100%);border:1px solid #c9a84c;border-radius:10px;padding:10px 14px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <span style="font-size:13px;color:#888;">Connecté en tant que :</span>
-        <span id="frais-membre-nom" style="font-size:15px;color:#c9a84c;font-weight:600;margin-left:8px;"></span>
+        <span style="font-size:11px;color:#888;">Connecté en tant que :</span>
+        <span id="frais-membre-nom" style="font-size:13px;color:#c9a84c;font-weight:600;margin-left:8px;"></span>
       </div>
     </div>
 
@@ -26246,12 +26248,12 @@ function _hideTeamSelection() {
         </div>
         <div class="modal-field" style="flex:2;">
           <label>Pour</label>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
-            <label class="notif-check"><input type="radio" name="notif-pour" value="Toute l'équipe" checked> Toute l'équipe</label>
-            <label class="notif-check"><input type="radio" name="notif-pour" value="Team Artistique"> Artistique</label>
-            <label class="notif-check"><input type="radio" name="notif-pour" value="Team Technique"> Technique</label>
-            <label class="notif-check"><input type="radio" name="notif-pour" value="Team Production"> Production</label>
-            <label class="notif-check"><input type="radio" name="notif-pour" value="1 Pers." id="notif-pour-1pers" onchange="toggleNotifPersonne()"> 1 Pers. de ton choix</label>
+          <div style="display:flex; gap:6px; flex-wrap:nowrap; margin-top:4px; align-items:center;">
+            <label class="notif-check" style="white-space:nowrap;"><input type="radio" name="notif-pour" value="Toute l'équipe" checked> Toute l'équipe</label>
+            <label class="notif-check" style="white-space:nowrap;"><input type="radio" name="notif-pour" value="Team Artistique"> Artistique</label>
+            <label class="notif-check" style="white-space:nowrap;"><input type="radio" name="notif-pour" value="Team Technique"> Technique</label>
+            <label class="notif-check" style="white-space:nowrap;"><input type="radio" name="notif-pour" value="Team Production"> Production</label>
+            <label class="notif-check" style="white-space:nowrap;"><input type="radio" name="notif-pour" value="1 Pers." id="notif-pour-1pers" onchange="toggleNotifPersonne()"> 1 Pers.</label>
           </div>
           <select id="notif-personne-select" style="display:none; margin-top:8px; background:var(--black); border:1px solid var(--border); border-radius:8px; color:var(--white); padding:8px 12px; font-size:13px; width:100%;">
             <option value="">-- Choisir un membre --</option>
