@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP build v10.0 - 15mai2026 - FIX NOTIFS PUSH : 1 token/user + nettoyage auto tokens morts -->
+<!-- APPLI OMP build v11.0 - 15mai2026 - SYSTÈME NOTIFICATIONS IN-APP + EMAIL + SMS -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2858,6 +2858,103 @@ html, body { overscroll-behavior-y: none; }
 /* ==========================================================
    ============ 📱 OMP MOBILE KIT — END ===================
    ========================================================== */
+
+/* Notifications page */
+.btn-filtre-notif {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--white);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-filtre-notif:hover {
+  background: var(--hover-bg);
+  border-color: var(--gold);
+}
+.btn-filtre-notif.active {
+  background: var(--gold);
+  color: var(--black);
+  border-color: var(--gold);
+  font-weight: 700;
+}
+
+.notif-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.notif-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+.notif-card.non-lue {
+  border-left: 4px solid #ff4444;
+  background: linear-gradient(90deg, rgba(255,68,68,0.05) 0%, var(--card-bg) 100%);
+}
+.notif-card.lue {
+  opacity: 0.7;
+}
+.notif-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.notif-expediteur {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.notif-date {
+  font-size: 11px;
+  color: #888;
+}
+.notif-objet {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.notif-message {
+  font-size: 13px;
+  color: #ccc;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.notif-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 11px;
+  color: #666;
+}
+.notif-tag {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.notif-tag.email {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+.notif-tag.sms {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
 </style>
 
 <!-- 🗺️ Leaflet (cartes OpenStreetMap - gratuit) -->
@@ -7273,6 +7370,55 @@ function _hideTeamSelection() {
 </div>
 
 <!-- ========== PAGE RÉCAP FRAIS ADMIN ========== -->
+<div id="page-mes-notifications" class="page">
+  <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
+  
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#c9a84c;">📬 MES NOTIFICATIONS</div>
+      <div style="font-size:12px;color:#888;margin-top:4px;">Centre de notifications in-app</div>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <button onclick="marquerToutLu()" style="background:#1e3a5f;color:#fff;border:2px solid #3b82f6;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✅ TOUT MARQUER LU</button>
+      <button onclick="openModal('modal-notifier');chargerMembresNotif();" style="background:#1a1400;color:#c9a84c;border:2px solid #c9a84c;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">📨 ENVOYER UNE NOTIF</button>
+    </div>
+  </div>
+
+  <!-- STATS RAPIDES -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div style="background:#1a1a1a;border-left:3px solid #ff4444;border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Non lues</div>
+      <div id="notif-stat-nonlues" style="font-size:32px;font-weight:700;color:#ff4444;font-family:'Bebas Neue',sans-serif;">0</div>
+    </div>
+    <div style="background:#1a1a1a;border-left:3px solid #3b82f6;border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total</div>
+      <div id="notif-stat-total" style="font-size:32px;font-weight:700;color:#3b82f6;font-family:'Bebas Neue',sans-serif;">0</div>
+    </div>
+    <div style="background:#1a1a1a;border-left:3px solid #c9a84c;border-radius:8px;padding:16px;">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Cette semaine</div>
+      <div id="notif-stat-semaine" style="font-size:32px;font-weight:700;color:#c9a84c;font-family:'Bebas Neue',sans-serif;">0</div>
+    </div>
+  </div>
+
+  <!-- FILTRES -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <button onclick="filtrerNotifications('toutes')" id="btn-filtre-toutes" class="btn-filtre-notif active">Toutes</button>
+    <button onclick="filtrerNotifications('nonlues')" id="btn-filtre-nonlues" class="btn-filtre-notif">Non lues</button>
+    <button onclick="filtrerNotifications('lues')" id="btn-filtre-lues" class="btn-filtre-notif">Lues</button>
+  </div>
+
+  <!-- LISTE DES NOTIFICATIONS -->
+  <div id="liste-notifications" style="display:flex;flex-direction:column;gap:12px;">
+    <div style="text-align:center;padding:40px;color:#666;">
+      <div style="font-size:48px;margin-bottom:12px;">📭</div>
+      <div>Chargement des notifications...</div>
+    </div>
+  </div>
+
+</div>
+
+
 <div id="page-recap-frais" class="page">
   <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Retour au Tableau de bord</button>
   
@@ -9455,10 +9601,12 @@ function _hideTeamSelection() {
     closeModal('modal-add-event');
   }
 
-  function envoyerNotif() {
+  async function envoyerNotif() {
     const de = document.getElementById('notif-de').value.trim();
     const objet = document.getElementById('notif-objet').value.trim();
     const message = document.getElementById('notif-message').value.trim();
+    const sendEmail = document.getElementById('notif-send-email').checked;
+    const sendSMS = document.getElementById('notif-send-sms').checked;
 
     if (!message) { alert('Merci de saisir un message.'); return; }
 
@@ -9466,28 +9614,81 @@ function _hideTeamSelection() {
     const pourRadio = document.querySelector('input[name="notif-pour"]:checked');
     let pour = pourRadio ? pourRadio.value : 'Toute l\'équipe';
     
-    // Si "1 Pers. de ton choix" est sélectionné, récupérer le membre choisi
-    let membreChoisi = null;
+    // Si "1 Pers." est sélectionné, récupérer le membre choisi
+    let destinataires = [];
     if (pour === '1 Pers.') {
       const select = document.getElementById('notif-personne-select');
-      membreChoisi = select.value;
+      const membreChoisi = select.value;
       if (!membreChoisi) {
         alert('Merci de choisir un membre.');
         return;
       }
+      destinataires = [membreChoisi];
       pour = membreChoisi;
+    } else {
+      // Récupérer tous les membres
+      const { data: membres } = await _supabase
+        .from('membres')
+        .select('prenom, nom');
+      destinataires = membres.map(m => `${m.prenom} ${m.nom}`.trim());
     }
 
-    // Envoyer par Notification Push
-    envoyerPushATous(objet || '📢 OH MY PROD', `${de}: ${message}`, membreChoisi);
+    console.log(`📤 Envoi notification à ${destinataires.length} personne(s)...`);
 
-    // Confirmation
-    alert(`✅ Notification envoyée à ${pour} !`);
+    try {
+      // Appeler la Edge Function send-notification
+      const response = await fetch('https://nhxqcavianozskxgfcbt.supabase.co/functions/v1/send-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          expediteur: de || localStorage.getItem('omp_user_name') || 'OH MY PROD',
+          expediteur_email: localStorage.getItem('omp_user_email'),
+          destinataires: destinataires,
+          objet: objet || '📢 Notification OH MY PROD',
+          message: message,
+          send_email: sendEmail,
+          send_sms: sendSMS
+        })
+      });
+
+      const result = await response.json();
+      console.log('✅ Résultat envoi:', result);
+
+      if (result.success) {
+        let msg = `✅ Notification envoyée à ${pour} !`;
+        if (sendEmail) msg += `
+📧 Email envoyé à ${result.email_count} personne(s)`;
+        if (sendSMS) msg += `
+💬 SMS envoyé à ${result.sms_count} personne(s)`;
+        if (result.email_errors && result.email_errors.length > 0) {
+          msg += `
+⚠️ Erreurs email: ${result.email_errors.join(', ')}`;
+        }
+        if (result.sms_errors && result.sms_errors.length > 0) {
+          msg += `
+⚠️ Erreurs SMS: ${result.sms_errors.join(', ')}`;
+        }
+        alert(msg);
+      } else {
+        alert('❌ Erreur lors de l\'envoi: ' + (result.error || 'Inconnue'));
+      }
+
+    } catch (err) {
+      console.error('Erreur envoi notification:', err);
+      alert('❌ Erreur: ' + err.message);
+    }
 
     // Reset et fermer
     document.getElementById('notif-objet').value = '';
     document.getElementById('notif-message').value = '';
+    document.getElementById('notif-send-email').checked = false;
+    document.getElementById('notif-send-sms').checked = false;
     closeModal('modal-notifier');
+    
+    // Recharger le badge (si on est sur la page notifs)
+    if (typeof chargerNotifications === 'function') {
+      chargerNotifications();
+    }
   }
 
   // Afficher/masquer le select de personne
@@ -9496,6 +9697,242 @@ function _hideTeamSelection() {
     const radio = document.getElementById('notif-pour-1pers');
     select.style.display = radio.checked ? 'block' : 'none';
   }
+
+  // ==========================================
+  // SYSTÈME NOTIFICATIONS IN-APP
+  // ==========================================
+
+  let _notificationsData = [];
+  let _notificationsFiltre = 'toutes';
+
+  // Ouvrir la page MES NOTIFICATIONS
+  function bnMesNotifications(el) {
+    ompHaptic(20);
+    bnSetActive(el);
+    showPage('mes-notifications');
+    chargerNotifications();
+  }
+
+  // Charger les notifications depuis Supabase
+  async function chargerNotifications() {
+    try {
+      const userName = localStorage.getItem('omp_user_name');
+      if (!userName) {
+        console.error('Nom d\'utilisateur non trouvé');
+        return;
+      }
+
+      const { data, error } = await _supabase
+        .from('notifications')
+        .select('*')
+        .contains('destinataires', [userName])
+        .order('date_envoi', { ascending: false });
+
+      if (error) {
+        console.error('Erreur chargement notifications:', error);
+        return;
+      }
+
+      _notificationsData = data || [];
+      
+      // Mettre à jour les stats
+      const nonLues = _notificationsData.filter(n => !n.lue).length;
+      const total = _notificationsData.length;
+      
+      // Cette semaine
+      const uneSemaine = new Date();
+      uneSemaine.setDate(uneSemaine.getDate() - 7);
+      const semaine = _notificationsData.filter(n => new Date(n.date_envoi) > uneSemaine).length;
+
+      document.getElementById('notif-stat-nonlues').textContent = nonLues;
+      document.getElementById('notif-stat-total').textContent = total;
+      document.getElementById('notif-stat-semaine').textContent = semaine;
+
+      // Mettre à jour le badge
+      updateNotifBadge(nonLues);
+
+      // Afficher la liste
+      afficherNotifications();
+
+    } catch (err) {
+      console.error('Exception chargement notifications:', err);
+    }
+  }
+
+  // Afficher les notifications selon le filtre actif
+  function afficherNotifications() {
+    const liste = document.getElementById('liste-notifications');
+    if (!liste) return;
+
+    let notifs = _notificationsData;
+    
+    // Filtrer
+    if (_notificationsFiltre === 'nonlues') {
+      notifs = notifs.filter(n => !n.lue);
+    } else if (_notificationsFiltre === 'lues') {
+      notifs = notifs.filter(n => n.lue);
+    }
+
+    // Vide
+    if (notifs.length === 0) {
+      liste.innerHTML = `
+        <div style="text-align:center;padding:60px 20px;color:#666;">
+          <div style="font-size:64px;margin-bottom:16px;">📭</div>
+          <div style="font-size:16px;margin-bottom:8px;">Aucune notification</div>
+          <div style="font-size:13px;color:#888;">
+            ${_notificationsFiltre === 'nonlues' ? 'Toutes les notifications ont été lues' : 
+              _notificationsFiltre === 'lues' ? 'Aucune notification lue' : 
+              'Vous n\'avez encore reçu aucune notification'}
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    // Générer les cartes
+    liste.innerHTML = notifs.map(notif => {
+      const date = new Date(notif.date_envoi);
+      const dateStr = formatDateNotif(date);
+      const lueClass = notif.lue ? 'lue' : 'non-lue';
+      
+      return `
+        <div class="notif-card ${lueClass}" onclick="ouvrirNotif('${notif.id}')">
+          <div class="notif-header">
+            <div>
+              <div class="notif-expediteur">${notif.expediteur}</div>
+              <div class="notif-date">${dateStr}</div>
+            </div>
+            ${!notif.lue ? '<div style="width:12px;height:12px;background:#ff4444;border-radius:50%;"></div>' : ''}
+          </div>
+          <div class="notif-objet">${notif.objet}</div>
+          <div class="notif-message">${notif.message.length > 150 ? notif.message.substring(0, 150) + '...' : notif.message}</div>
+          <div class="notif-footer">
+            <span>🔔 In-app</span>
+            ${notif.email_envoye ? '<span class="notif-tag email">📧 Email</span>' : ''}
+            ${notif.sms_envoye ? '<span class="notif-tag sms">💬 SMS</span>' : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Format date notif (ex: "Il y a 2 heures", "Hier à 14h30", "12 avril à 10h")
+  function formatDateNotif(date) {
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'À l\'instant';
+    if (minutes < 60) return `Il y a ${minutes} min`;
+    if (hours < 24) return `Il y a ${hours}h`;
+    if (days === 1) return `Hier à ${date.getHours()}h${String(date.getMinutes()).padStart(2,'0')}`;
+    
+    const mois = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+    return `${date.getDate()} ${mois[date.getMonth()]} à ${date.getHours()}h${String(date.getMinutes()).padStart(2,'0')}`;
+  }
+
+  // Ouvrir une notif (marquer comme lue)
+  async function ouvrirNotif(notifId) {
+    const notif = _notificationsData.find(n => n.id === notifId);
+    if (!notif) return;
+
+    // Si non lue, la marquer comme lue
+    if (!notif.lue) {
+      const { error } = await _supabase
+        .from('notifications')
+        .update({ lue: true })
+        .eq('id', notifId);
+
+      if (!error) {
+        notif.lue = true;
+        chargerNotifications();
+      }
+    }
+
+    // Afficher modal avec le contenu complet
+    alert(`${notif.objet}\n\n${notif.message}\n\n— ${notif.expediteur}`);
+  }
+
+  // Filtrer les notifications
+  function filtrerNotifications(filtre) {
+    _notificationsFiltre = filtre;
+    
+    // Mettre à jour les boutons
+    document.querySelectorAll('.btn-filtre-notif').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`btn-filtre-${filtre}`).classList.add('active');
+    
+    // Réafficher
+    afficherNotifications();
+  }
+
+  // Marquer toutes les notifs comme lues
+  async function marquerToutLu() {
+    const userName = localStorage.getItem('omp_user_name');
+    if (!userName) return;
+
+    const nonLues = _notificationsData.filter(n => !n.lue);
+    if (nonLues.length === 0) {
+      alert('✅ Aucune notification non lue');
+      return;
+    }
+
+    if (!confirm(`Marquer ${nonLues.length} notification(s) comme lue(s) ?`)) return;
+
+    try {
+      const ids = nonLues.map(n => n.id);
+      
+      const { error } = await _supabase
+        .from('notifications')
+        .update({ lue: true })
+        .in('id', ids);
+
+      if (error) {
+        console.error('Erreur marquage lu:', error);
+        alert('❌ Erreur lors du marquage');
+      } else {
+        alert(`✅ ${nonLues.length} notification(s) marquée(s) comme lue(s)`);
+        chargerNotifications();
+      }
+    } catch (err) {
+      console.error('Exception marquage:', err);
+    }
+  }
+
+  // Mettre à jour le badge compteur
+  function updateNotifBadge(count) {
+    const badge = document.getElementById('notif-badge');
+    if (!badge) return;
+
+    if (count > 0) {
+      badge.textContent = count > 99 ? '99+' : count;
+      badge.style.display = 'block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  // Charger le badge au démarrage
+  async function chargerBadgeNotif() {
+    const userName = localStorage.getItem('omp_user_name');
+    if (!userName) return;
+
+    try {
+      const { data, error } = await _supabase
+        .from('notifications')
+        .select('id', { count: 'exact', head: false })
+        .contains('destinataires', [userName])
+        .eq('lue', false);
+
+      if (!error && data) {
+        updateNotifBadge(data.length);
+      }
+    } catch (err) {
+      console.error('Erreur chargement badge:', err);
+    }
+  }
+
 
   // Charger les membres dans le select
   async function chargerMembresNotif() {
@@ -13060,6 +13497,10 @@ function _hideTeamSelection() {
     if (id === 'dashboard') {
       if (typeof window.dashboardChargerBandeTaches === 'function') {
         window.dashboardChargerBandeTaches();
+      }
+      // Charger le badge notifications
+      if (typeof chargerBadgeNotif === 'function') {
+        chargerBadgeNotif();
       }
     }
     // ✨ Refresh du bloc PROJECTION à chaque ouverture de CRÉA / SUIVI DATES
@@ -26278,8 +26719,19 @@ function _hideTeamSelection() {
       <div class="modal-row">
         <div class="modal-field">
           <label>Envoyer via</label>
-          <div style="display:flex; gap:12px; margin-top:4px; flex-wrap:wrap;">
-            <span style="color:var(--gold); font-weight:500;">🔔 Notification Push</span>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+            <div style="display:flex; align-items:center; gap:8px; color:var(--gold); font-weight:500;">
+              <span style="width:20px;">🔔</span>
+              <span>Notification in-app (toujours)</span>
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:4px 0;">
+              <input type="checkbox" id="notif-send-email" style="width:18px; height:18px; cursor:pointer;">
+              <span style="font-size:13px;">📧 Envoyer aussi par <strong>Email</strong></span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:4px 0;">
+              <input type="checkbox" id="notif-send-sms" style="width:18px; height:18px; cursor:pointer;">
+              <span style="font-size:13px;">💬 Envoyer aussi par <strong>SMS</strong> <span style="color:#888;font-size:11px;">(0.08€/SMS)</span></span>
+            </label>
           </div>
         </div>
       </div>
@@ -28292,6 +28744,7 @@ function bnNavigateContacts(el) {
 
 function bnNotifier(el) {
   ompHaptic(20);
+  bnSetActive(el);
   if (typeof openModal === 'function') {
     openModal('modal-notifier');
     if (typeof chargerMembresNotif === 'function') chargerMembresNotif();
