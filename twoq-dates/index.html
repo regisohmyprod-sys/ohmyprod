@@ -778,7 +778,9 @@
       // Récupère tous les liens disponibles depuis liens_billetterie (jsonb) + lien_billetterie_principal
       const liens = collecterLiens(d);
       
-      if (liens.length === 0) return '';
+     if (liens.length === 0) {
+     return `<span class="status-badge residence">No Tickets</span>`;
+   }
       
       // Si 1 seul lien → ouverture directe (pas de modal)
       if (liens.length === 1) {
