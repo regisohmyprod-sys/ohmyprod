@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP build v11.0 - 15mai2026 - SYSTÈME NOTIFICATIONS IN-APP + EMAIL + SMS -->
+<!-- APPLI OMP build v11.1 - 15mai2026 - FIX header Authorization Edge Function -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -9639,7 +9639,10 @@ function _hideTeamSelection() {
       // Appeler la Edge Function send-notification
       const response = await fetch('https://nhxqcavianozskxgfcbt.supabase.co/functions/v1/send-notification', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${_supabase.supabaseKey}`
+        },
         body: JSON.stringify({
           expediteur: de || localStorage.getItem('omp_user_name') || 'OH MY PROD',
           expediteur_email: localStorage.getItem('omp_user_email'),
