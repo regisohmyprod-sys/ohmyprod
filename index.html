@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP build v9.3 - 15mai2026 - codes simplifiés : Ompstaff26 / Twoq26art / Twoq26tech -->
+<!-- APPLI OMP build v9.5 - 15mai2026 - artiste: barre du bas 📅 → MA TOURNÉE (pas ancienne page) + modal plus haute -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2737,7 +2737,8 @@ html, body { overscroll-behavior-y: none; }
   z-index: 9600;
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-  max-height: 85vh;
+  max-height: 92vh;
+  min-height: 50vh;
   overflow-y: auto;
   padding-bottom: env(safe-area-inset-bottom, 0);
   box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
@@ -6316,10 +6317,10 @@ function _hideTeamSelection() {
       </div>
 
       <!-- FILTRES -->
-      <div style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;align-items:center;justify-content:center;">
-        <button onclick="avhrFiltrer('avenir')" id="avhr-btn-avenir" style="background:#c9a84c;color:#000;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">→ À VENIR</button>
-        <button onclick="avhrFiltrer('passees')" id="avhr-btn-passees" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">✓ PASSÉES</button>
-        <button onclick="avhrFiltrer('toutes')" id="avhr-btn-toutes" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;">≡ TOUTES</button>
+      <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:nowrap;align-items:center;justify-content:center;width:100%;">
+        <button onclick="avhrFiltrer('avenir')" id="avhr-btn-avenir" style="background:#c9a84c;color:#000;border:none;border-radius:7px;padding:7px 6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.8px;flex:1;white-space:nowrap;min-width:0;">→ À VENIR</button>
+        <button onclick="avhrFiltrer('passees')" id="avhr-btn-passees" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:7px;padding:7px 6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.8px;flex:1;white-space:nowrap;min-width:0;">✓ PASSÉES</button>
+        <button onclick="avhrFiltrer('toutes')" id="avhr-btn-toutes" style="background:#1a1a1a;color:#888;border:0.5px solid #2a2a2a;border-radius:7px;padding:7px 6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:0.8px;flex:1;white-space:nowrap;min-width:0;">≡ TOUTES</button>
       </div>
 
       <!-- LISTE DES DATES -->
@@ -28229,22 +28230,25 @@ function bnNavigateVHR(el) {
 function bnMesDatesVHR(el) {
   ompHaptic();
   bnSetActive(el);
+  // Détermine la fonction de navigation selon le rôle
+  var role = (typeof _currentUserRole !== 'undefined') ? _currentUserRole : 'staff';
+  var goFn = (role === 'artiste') ? 'ouvrirArtisteVHR' : 'showTournee';
   // Afficher une modal demandant quelle tournée
   var html = ''
     + '<div style="display:grid;grid-template-columns:1fr;gap:12px;padding:4px;">'
-    + '  <div onclick="ompCloseSheet();showTournee(\'twoq\');" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:12px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all 0.2s;" onmouseover="this.style.boxShadow=\'0 0 15px rgba(201,168,76,0.3)\'" onmouseout="this.style.boxShadow=\'\'">'
-    + '    <img src="assets/twoq1.jpg" onerror="this.style.display=\'none\'" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #c9a84c;flex-shrink:0;">'
+    + '  <div onclick="ompCloseSheet();' + goFn + '(\\'twoq\\');" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:12px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all 0.2s;" onmouseover="this.style.boxShadow=\\'0 0 15px rgba(201,168,76,0.3)\\'" onmouseout="this.style.boxShadow=\\'\\'">'
+    + '    <img src="assets/twoq1.jpg" onerror="this.style.display=\\'none\\'" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #c9a84c;flex-shrink:0;">'
     + '    <div style="flex:1;">'
-    + '      <div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1.5px;color:#fff;">🎸 THE WORLD OF QUEEN</div>'
-    + '      <div style="font-size:12px;color:#c9a84c;margin-top:2px;">L\'Hommage à la Légende</div>'
+    + '      <div style="font-family:\\'Bebas Neue\\',sans-serif;font-size:16px;letter-spacing:1.5px;color:#fff;">🎸 THE WORLD OF QUEEN</div>'
+    + '      <div style="font-size:12px;color:#c9a84c;margin-top:2px;">L\\'Hommage à la Légende</div>'
     + '    </div>'
     + '    <div style="color:#c9a84c;font-size:20px;">›</div>'
     + '  </div>'
-    + '  <div onclick="ompCloseSheet();showTournee(\'twoq2\');" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:12px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all 0.2s;" onmouseover="this.style.boxShadow=\'0 0 15px rgba(201,168,76,0.3)\'" onmouseout="this.style.boxShadow=\'\'">'
-    + '    <img src="assets/twoq2.jpg" onerror="this.style.display=\'none\'" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #c9a84c;flex-shrink:0;">'
+    + '  <div onclick="ompCloseSheet();' + goFn + '(\\'twoq2\\');" style="background:#1a1a1a;border:1px solid #c9a84c;border-radius:12px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all 0.2s;" onmouseover="this.style.boxShadow=\\'0 0 15px rgba(201,168,76,0.3)\\'" onmouseout="this.style.boxShadow=\\'\\'">'
+    + '    <img src="assets/twoq2.jpg" onerror="this.style.display=\\'none\\'" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #c9a84c;flex-shrink:0;">'
     + '    <div style="flex:1;">'
-    + '      <div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1.5px;color:#fff;">👑 THE WORLD OF QUEEN</div>'
-    + '      <div style="font-size:12px;color:#c9a84c;margin-top:2px;">L\'Éternelle Légende</div>'
+    + '      <div style="font-family:\\'Bebas Neue\\',sans-serif;font-size:16px;letter-spacing:1.5px;color:#fff;">👑 THE WORLD OF QUEEN</div>'
+    + '      <div style="font-size:12px;color:#c9a84c;margin-top:2px;">L\\'Éternelle Légende</div>'
     + '    </div>'
     + '    <div style="color:#c9a84c;font-size:20px;">›</div>'
     + '  </div>'
