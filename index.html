@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP build v9.1 - 15mai2026 - VHR fiche : 🚆 voyage + 🎟️ invits + ligne POINTAGE (re-push) -->
+<!-- APPLI OMP build v9.2 - 15mai2026 - VHR POINTAGE corrigé : etat_ventes + total_jauge (= PILOTE DATE) -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -6345,7 +6345,7 @@ function _hideTeamSelection() {
           <span style="color:#888;">POINTAGE :</span>
           <span style="color:#fff;">Ventes : <strong id="avhr-pointage-ventes" style="color:#22c55e;">–</strong></span>
           <span style="color:#888;">·</span>
-          <span style="color:#fff;">Jauge totale : <strong id="avhr-pointage-jauge" style="color:#c9a84c;">–</strong></span>
+          <span style="color:#fff;">Total jauge à ce jour : <strong id="avhr-pointage-jauge" style="color:#c9a84c;">–</strong></span>
         </div>
         <div class="date-nav right"><button class="nav-arrow" id="avhr-next-btn">▶</button></div>
       </div>
@@ -10511,7 +10511,7 @@ function _hideTeamSelection() {
       photoContainer.style.display = 'none';
     }
 
-    // ════════ POINTAGE : Ventes live (billetterie_data) + Jauge totale ════════
+    // ════════ POINTAGE : Ventes + Total jauge à ce jour (mêmes valeurs que PILOTE DATE) ════════
     try {
       var pointageEl = document.getElementById('avhr-pointage');
       var ventesEl = document.getElementById('avhr-pointage-ventes');
@@ -10519,31 +10519,17 @@ function _hideTeamSelection() {
       if (pointageEl && ventesEl && jaugeEl) {
         var rFiche = await _supabase
           .from('fiches_production')
-          .select('billetterie_data, jauge_finale, jauge_depart')
+          .select('etat_ventes, total_jauge')
           .eq('date_concert_id', date.id)
           .single();
-        var totalBillets = 0;
-        var jaugeTotale = 0;
+        var ventes = 0;
+        var totalJauge = 0;
         if (rFiche && rFiche.data) {
-          // Ventes : somme billets tous opérateurs
-          if (rFiche.data.billetterie_data) {
-            try {
-              var bd = JSON.parse(rFiche.data.billetterie_data);
-              ['ldc','fimalac','nda','dome','salle','bleucitron','tm','fnac'].forEach(function(op) {
-                if (!bd[op]) return;
-                bd[op].forEach(function(cat) {
-                  (cat||[]).forEach(function(d) {
-                    totalBillets += (parseInt(d.billets)||0);
-                  });
-                });
-              });
-            } catch(eJson) { console.warn('billetterie_data parse:', eJson); }
-          }
-          // Jauge totale : jauge_finale en priorité, sinon jauge_depart
-          jaugeTotale = parseInt(rFiche.data.jauge_finale) || parseInt(rFiche.data.jauge_depart) || 0;
+          ventes = parseInt(rFiche.data.etat_ventes) || 0;
+          totalJauge = parseInt(rFiche.data.total_jauge) || 0;
         }
-        ventesEl.textContent = totalBillets.toLocaleString('fr-FR');
-        jaugeEl.textContent = jaugeTotale > 0 ? jaugeTotale.toLocaleString('fr-FR') : '–';
+        ventesEl.textContent = ventes > 0 ? ventes.toLocaleString('fr-FR') : '–';
+        jaugeEl.textContent = totalJauge > 0 ? totalJauge.toLocaleString('fr-FR') : '–';
         pointageEl.style.display = 'block';
       }
     } catch(ePointage) {
