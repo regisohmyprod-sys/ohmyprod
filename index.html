@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APPLI OMP build v11.1 - 15mai2026 - FIX header Authorization Edge Function -->
+<!-- APPLI OMP build v11.2 - 15mai2026 - FIX clé ANON pour Edge Function -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -9641,7 +9641,8 @@ function _hideTeamSelection() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${_supabase.supabaseKey}`
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'apikey': SUPABASE_KEY
         },
         body: JSON.stringify({
           expediteur: de || localStorage.getItem('omp_user_name') || 'OH MY PROD',
