@@ -615,6 +615,136 @@
     padding: 16px;
   }
 
+  /* === FICHIER FANS === */
+  .fan-chip {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #ccc;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .fan-chip:hover {
+    border-color: #c9a84c;
+    color: #fff;
+  }
+  .fan-chip.active {
+    background: #c9a84c;
+    color: #0a0a0a;
+    border-color: #c9a84c;
+    font-weight: 600;
+  }
+  #fans-table tbody tr {
+    border-bottom: 1px solid #2a2a2a;
+    transition: background 0.15s;
+  }
+  #fans-table tbody tr:hover {
+    background: rgba(201,168,76,0.06);
+  }
+  #fans-table tbody td {
+    padding: 10px 12px;
+    font-size: 12.5px;
+    color: #ddd;
+  }
+  .fan-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+  }
+  .fan-badge-region {
+    background: rgba(34,197,94,0.12);
+    color: #22c55e;
+  }
+  .fan-badge-m {
+    background: rgba(59,130,246,0.12);
+    color: #3b82f6;
+  }
+  .fan-badge-f {
+    background: rgba(227,30,36,0.12);
+    color: #e31e24;
+  }
+  .fan-badge-nr {
+    background: rgba(136,136,136,0.12);
+    color: #999;
+  }
+  .fan-score-pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    min-width: 30px;
+    text-align: center;
+  }
+  .fan-score-hot {
+    background: linear-gradient(135deg, #f59e0b, #e31e24);
+    color: #fff;
+  }
+  .fan-score-warm {
+    background: rgba(245,158,11,0.18);
+    color: #f59e0b;
+  }
+  .fan-score-cool {
+    background: rgba(136,136,136,0.12);
+    color: #999;
+  }
+  .fan-news-on {
+    color: #22c55e;
+    font-weight: 600;
+  }
+  .fan-news-off {
+    color: #666;
+    font-size: 11px;
+  }
+  .fan-tel-hidden {
+    color: #666;
+    font-family: monospace;
+    cursor: pointer;
+    user-select: none;
+  }
+  .fan-tel-hidden:hover {
+    color: #c9a84c;
+  }
+  .fan-actions {
+    display: inline-flex;
+    gap: 4px;
+  }
+  .fan-icon-btn {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: #2a2a2a;
+    cursor: pointer;
+    font-size: 14px;
+    border: none;
+    color: #ccc;
+    transition: all 0.2s;
+  }
+  .fan-icon-btn:hover {
+    background: #c9a84c;
+    color: #0a0a0a;
+  }
+  .fan-icon-btn.delete:hover {
+    background: #e31e24;
+    color: #fff;
+  }
+  .fan-source-tag {
+    background: rgba(127,119,221,0.12);
+    color: #8888ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-family: monospace;
+  }
+
   .stat-label { font-size: 11px; color: var(--grey); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--white); line-height: 1; }
   .stat-sub { font-size: 11px; color: var(--grey); margin-top: 4px; }
@@ -3952,9 +4082,11 @@ function _hideTeamSelection() {
         <div class="stat-card dropdown-container" style="border-left:3px solid #c9a84c;padding:20px;cursor:pointer;position:relative;" onclick="toggleDropdown('dropdown-spectateurs')">
           <div class="stat-label">👥 Spectateurs</div>
           <div class="stat-value" style="font-size:32px;color:#c9a84c;">SPECTATEURS</div>
-          <div class="stat-sub">CRM spectateurs (à venir)</div>
+          <div class="stat-sub">CRM fans & spectateurs</div>
           <div id="dropdown-spectateurs" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1a1a; border:1px solid #c9a84c; border-radius:8px; margin-top:6px; z-index:100; overflow:hidden;">
-            <div style="padding:10px 14px; font-size:12px; color:#888; font-style:italic;">⏳ En cours de développement</div>
+            <div onclick="selectDropdownItem(event, function(){ showPage('fichier-fans'); chargerFichierFans(); })" style="padding:10px 14px; cursor:pointer; font-size:12px; color:#c9a84c; font-weight:600; border-bottom:1px solid #333;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'">📁 Fichier Fans (App TWOQ)</div>
+            <div style="padding:10px 14px; font-size:11px; color:#666; font-style:italic;">📊 Spectateurs concerts (à venir)</div>
+            <div style="padding:10px 14px; font-size:11px; color:#666; font-style:italic;">📧 Mailing groupé (à venir)</div>
           </div>
         </div>
 
@@ -6913,6 +7045,123 @@ function _hideTeamSelection() {
         <div style="color:var(--grey); font-size:13px;">Chargement des membres...</div>
       </div>
     </div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE FICHIER FANS — CRM des fans inscrits via l'app TWOQ
+     ════════════════════════════════════════════════════════════ -->
+<div id="page-fichier-fans" class="page">
+  <button class="back-btn" onclick="showPage('dashboard')" style="margin-bottom:12px;">← Tableau de bord</button>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#c9a84c;">📁 FICHIER FANS</div>
+      <div style="font-size:13px;color:#888;margin-top:4px;">CRM des fans inscrits via l'app TWOQ · <span style="color:#c9a84c;">Maj live</span></div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-ghost" onclick="chargerFichierFans()" style="font-size:12px;">🔄 Actualiser</button>
+      <button class="btn btn-primary" onclick="exportFansCSV()" style="font-size:12px;">📤 Export CSV</button>
+    </div>
+  </div>
+
+  <!-- STATS HEADER -->
+  <div id="fans-stats-row" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:18px;">
+    <div class="stat-card" style="border-left:3px solid #c9a84c;">
+      <div class="stat-label">Total fans</div>
+      <div class="stat-value" id="fans-stat-total" style="color:#c9a84c;">–</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #22c55e;">
+      <div class="stat-label">+ cette semaine</div>
+      <div class="stat-value" id="fans-stat-week" style="color:#22c55e;">–</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #f59e0b;">
+      <div class="stat-label">Profil complet</div>
+      <div class="stat-value" id="fans-stat-profil" style="color:#f59e0b;">–</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #3b82f6;">
+      <div class="stat-label">Newsletter ON</div>
+      <div class="stat-value" id="fans-stat-news" style="color:#3b82f6;">–</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #e31e24;">
+      <div class="stat-label">🏆 Super-fans (70+)</div>
+      <div class="stat-value" id="fans-stat-superfans" style="color:#e31e24;">–</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #8888ff;">
+      <div class="stat-label">🆕 Nouveaux (&lt;40)</div>
+      <div class="stat-value" id="fans-stat-nouveaux" style="color:#8888ff;">–</div>
+    </div>
+  </div>
+
+  <!-- BARRE RECHERCHE -->
+  <div style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+    <span style="color:#888;">🔍</span>
+    <input id="fans-search" type="text" placeholder="Rechercher par nom, email, ville..." oninput="filtrerFans()" style="flex:1; background:transparent; border:none; color:#fff; font-size:14px; outline:none;"/>
+    <span id="fans-count-display" style="color:#888; font-size:12px;"></span>
+  </div>
+
+  <!-- FILTRES CHIPS -->
+  <div id="fans-filters-row" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
+    <button class="fan-chip active" onclick="setFanFilter('all')">Tous</button>
+    <button class="fan-chip" onclick="setFanFilter('superfan')">🏆 Super-fans</button>
+    <button class="fan-chip" onclick="setFanFilter('nouveau')">🆕 Nouveaux</button>
+    <button class="fan-chip" onclick="setFanFilter('vip')">⭐ Profil complet</button>
+    <button class="fan-chip" onclick="setFanFilter('newsletter')">📧 Newsletter</button>
+    <button class="fan-chip" onclick="setFanFilter('region:sud-ouest')">Sud-Ouest</button>
+    <button class="fan-chip" onclick="setFanFilter('region:idf')">Île-de-France</button>
+    <button class="fan-chip" onclick="setFanFilter('region:sud-est')">Sud-Est</button>
+    <button class="fan-chip" onclick="setFanFilter('region:ouest')">Ouest</button>
+    <button class="fan-chip" onclick="setFanFilter('region:nord')">Nord</button>
+    <button class="fan-chip" onclick="setFanFilter('region:est')">Est</button>
+    <button class="fan-chip" onclick="setFanFilter('region:normandie')">Normandie</button>
+    <button class="fan-chip" onclick="setFanFilter('region:centre')">Centre</button>
+  </div>
+
+  <!-- TABLEAU FANS -->
+  <div id="fans-table-wrap" style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; overflow:auto;">
+    <table id="fans-table" style="width:100%; min-width:1100px; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#0f0f0f; border-bottom:1px solid #2a2a2a;">
+          <th style="padding:10px 12px; text-align:left; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer;" onclick="trierFans('created_at')">📅 Inscription</th>
+          <th style="padding:10px 12px; text-align:left; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer;" onclick="trierFans('nom')">Fan</th>
+          <th style="padding:10px 12px; text-align:left; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Tel</th>
+          <th style="padding:10px 12px; text-align:left; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer;" onclick="trierFans('ville')">Ville</th>
+          <th style="padding:10px 12px; text-align:left; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Région</th>
+          <th style="padding:10px 12px; text-align:left; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Profil</th>
+          <th style="padding:10px 12px; text-align:center; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;" title="Concerts TWOQ vus">🎤 Vus</th>
+          <th style="padding:10px 12px; text-align:center; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;" title="Favoris">❤</th>
+          <th style="padding:10px 12px; text-align:center; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;" title="Concours participés">🎁</th>
+          <th style="padding:10px 12px; text-align:left; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Source</th>
+          <th style="padding:10px 12px; text-align:center; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">News</th>
+          <th style="padding:10px 12px; text-align:center; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer;" onclick="trierFans('fan_score')">Score</th>
+          <th style="padding:10px 12px; text-align:center; font-size:10.5px; color:#888; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="fans-table-body">
+        <tr><td colspan="13" style="padding:30px; text-align:center; color:#888;">Chargement des fans...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGINATION -->
+  <div id="fans-pagination" style="display:flex; justify-content:center; align-items:center; gap:12px; margin-top:18px; padding:10px;">
+    <button class="btn btn-ghost" id="fans-prev-btn" onclick="changerPageFans(-1)" style="font-size:12px;">← Précédent</button>
+    <span id="fans-page-info" style="font-size:12px; color:#888;">Page 1</span>
+    <button class="btn btn-ghost" id="fans-next-btn" onclick="changerPageFans(1)" style="font-size:12px;">Suivant →</button>
+  </div>
+
+  <div style="margin-top:14px; padding:12px; background:#0f0f0f; border:1px dashed #c9a84c; border-radius:8px; font-size:11.5px; color:#888; line-height:1.6;">
+    💡 <strong style="color:#c9a84c;">Astuce :</strong> Le score fan-o-mètre se calcule automatiquement : Concerts × 10 + Favoris × 2 + Concours × 5 + Profil complet (10) + Newsletter (5) + Ancienneté (1pt/mois). Cap à 100. Cliquez sur un fan pour voir le détail complet.
+  </div>
+</div>
+
+
+<!-- MODAL DÉTAIL FAN -->
+<div id="modal-fan-detail" class="modal" style="display:none;">
+  <div class="modal-content" style="max-width:560px;">
+    <button class="modal-close" onclick="closeModal('modal-fan-detail')">×</button>
+    <div id="fan-detail-body" style="padding:20px;"></div>
+  </div>
+</div>
 
 
 <!-- PAGE CONTACTS PROMO -->
@@ -32363,6 +32612,393 @@ ${c.notes || '(aucune)'}`
   window.metaPromoSetBudgetVue = metaPromoSetBudgetVue;
 
   console.log('✅ Module META PLANNING chargé');
+})();
+</script>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     MODULE FICHIER FANS — CRM des fans inscrits via l'app TWOQ
+     ════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  // === ÉTAT DU MODULE ===
+  let _allFans = [];           // liste complète des fans
+  let _filteredFans = [];      // après filtre/recherche
+  let _currentFilter = 'all';
+  let _currentSort = { field: 'created_at', dir: 'desc' };
+  let _currentPage = 1;
+  const FANS_PER_PAGE = 50;
+
+  // === CHARGER LES FANS DEPUIS SUPABASE ===
+  window.chargerFichierFans = async function() {
+    const tbody = document.getElementById('fans-table-body');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="13" style="padding:30px; text-align:center; color:#888;">⏳ Chargement des fans...</td></tr>';
+
+    try {
+      // Récupère tous les fans (la table)
+      const { data: fans, error } = await window._supabase
+        .from('fans')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      _allFans = fans || [];
+
+      // Récupère aussi les stats agrégées
+      const { data: stats } = await window._supabase
+        .from('fans_stats')
+        .select('*')
+        .single();
+
+      majStatsHeader(stats);
+      _currentPage = 1;
+      filtrerFans();
+
+    } catch (err) {
+      console.error('[FICHIER FANS] Erreur chargement:', err);
+      if (tbody) tbody.innerHTML = `<tr><td colspan="13" style="padding:30px; text-align:center; color:#e31e24;">❌ Erreur : ${err.message || 'Impossible de charger les fans'}</td></tr>`;
+    }
+  };
+
+  function majStatsHeader(stats) {
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    if (stats) {
+      set('fans-stat-total', stats.total_fans || 0);
+      set('fans-stat-week', '+' + (stats.new_this_week || 0));
+      set('fans-stat-profil', (stats.pct_profil_complet != null ? stats.pct_profil_complet : 0) + '%');
+      set('fans-stat-news', (stats.pct_newsletter != null ? stats.pct_newsletter : 0) + '%');
+      set('fans-stat-superfans', stats.nb_super_fans || 0);
+      set('fans-stat-nouveaux', stats.nb_nouveaux || 0);
+    } else {
+      // Calcul local au cas où la vue ne répond pas
+      const tot = _allFans.length;
+      const now = new Date();
+      const week = new Date(now - 7 * 24 * 60 * 60 * 1000);
+      const newWeek = _allFans.filter(f => new Date(f.created_at) >= week).length;
+      const profil = _allFans.filter(f => f.profil_complete).length;
+      const news = _allFans.filter(f => f.consentement_newsletter).length;
+      const sf = _allFans.filter(f => (f.fan_score || 0) >= 70).length;
+      const nv = _allFans.filter(f => (f.fan_score || 0) < 40).length;
+      set('fans-stat-total', tot);
+      set('fans-stat-week', '+' + newWeek);
+      set('fans-stat-profil', tot ? Math.round(profil / tot * 100) + '%' : '0%');
+      set('fans-stat-news', tot ? Math.round(news / tot * 100) + '%' : '0%');
+      set('fans-stat-superfans', sf);
+      set('fans-stat-nouveaux', nv);
+    }
+  }
+
+  // === FILTRES ===
+  window.setFanFilter = function(filter) {
+    _currentFilter = filter;
+    document.querySelectorAll('.fan-chip').forEach(c => c.classList.remove('active'));
+    const btn = Array.from(document.querySelectorAll('.fan-chip')).find(b =>
+      b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${filter}'`)
+    );
+    if (btn) btn.classList.add('active');
+    _currentPage = 1;
+    filtrerFans();
+  };
+
+  window.filtrerFans = function() {
+    const searchInput = document.getElementById('fans-search');
+    const q = (searchInput?.value || '').toLowerCase().trim();
+
+    _filteredFans = _allFans.filter(f => {
+      // Filtre chip
+      if (_currentFilter === 'superfan' && (f.fan_score || 0) < 70) return false;
+      if (_currentFilter === 'nouveau' && (f.fan_score || 0) >= 40) return false;
+      if (_currentFilter === 'vip' && !f.profil_complete) return false;
+      if (_currentFilter === 'newsletter' && !f.consentement_newsletter) return false;
+      if (_currentFilter.startsWith('region:')) {
+        const r = _currentFilter.replace('region:', '');
+        if (f.region !== r) return false;
+      }
+
+      // Filtre recherche
+      if (q) {
+        const haystack = `${f.prenom || ''} ${f.nom || ''} ${f.email || ''} ${f.ville || ''}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+
+    // Tri
+    _filteredFans.sort((a, b) => {
+      const fa = a[_currentSort.field];
+      const fb = b[_currentSort.field];
+      if (fa == null) return 1;
+      if (fb == null) return -1;
+      if (typeof fa === 'number') return _currentSort.dir === 'desc' ? fb - fa : fa - fb;
+      return _currentSort.dir === 'desc' ? String(fb).localeCompare(String(fa)) : String(fa).localeCompare(String(fb));
+    });
+
+    afficherFans();
+  };
+
+  window.trierFans = function(field) {
+    if (_currentSort.field === field) {
+      _currentSort.dir = _currentSort.dir === 'desc' ? 'asc' : 'desc';
+    } else {
+      _currentSort.field = field;
+      _currentSort.dir = field === 'fan_score' || field === 'created_at' ? 'desc' : 'asc';
+    }
+    filtrerFans();
+  };
+
+  // === AFFICHAGE ===
+  function afficherFans() {
+    const tbody = document.getElementById('fans-table-body');
+    const countDisplay = document.getElementById('fans-count-display');
+    if (!tbody) return;
+
+    if (countDisplay) countDisplay.textContent = `${_filteredFans.length} fan${_filteredFans.length > 1 ? 's' : ''}`;
+
+    if (_filteredFans.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="13" style="padding:40px; text-align:center; color:#888;">Aucun fan ne correspond à ces critères.</td></tr>';
+      majPagination();
+      return;
+    }
+
+    // Pagination
+    const start = (_currentPage - 1) * FANS_PER_PAGE;
+    const pageData = _filteredFans.slice(start, start + FANS_PER_PAGE);
+
+    tbody.innerHTML = pageData.map(f => renderFanRow(f)).join('');
+    majPagination();
+  }
+
+  function renderFanRow(f) {
+    const dateInsc = f.created_at ? new Date(f.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' }) : '-';
+    const dateTime = f.created_at ? new Date(f.created_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : '';
+
+    const emailCourt = (f.email || '').length > 22 ? (f.email.substring(0, 20) + '...') : (f.email || '');
+
+    // Profil badge (genre + âge)
+    let profilBadge = '<span style="color:#666; font-size:11px; font-style:italic;">incomplet</span>';
+    if (f.profil_complete) {
+      const age = f.date_naissance ? Math.floor((Date.now() - new Date(f.date_naissance)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+      const genre = f.genre;
+      const cls = genre === 'H' ? 'fan-badge-m' : (genre === 'F' ? 'fan-badge-f' : 'fan-badge-nr');
+      const txt = (genre === 'H' ? 'H' : (genre === 'F' ? 'F' : 'NR')) + (age ? ' · ' + age + 'a' : '');
+      profilBadge = `<span class="fan-badge ${cls}">${txt}</span>`;
+    }
+
+    // Score
+    const score = f.fan_score || 0;
+    let scoreCls = 'fan-score-cool';
+    if (score >= 70) scoreCls = 'fan-score-hot';
+    else if (score >= 40) scoreCls = 'fan-score-warm';
+
+    // Région
+    const regionLabels = {
+      'sud-ouest': 'Sud-Ouest', 'idf': 'IDF', 'sud-est': 'Sud-Est', 'ouest': 'Ouest',
+      'nord': 'Nord', 'est': 'Est', 'normandie': 'Normandie', 'centre': 'Centre', 'corse': 'Corse'
+    };
+    const regionTxt = regionLabels[f.region] || (f.region || '-');
+
+    // Tel masqué
+    const telTxt = f.telephone
+      ? `<span class="fan-tel-hidden" onclick="this.textContent='${f.telephone}'; this.classList.remove('fan-tel-hidden');" title="Cliquer pour révéler">••• ${(f.telephone || '').slice(-2)}</span>`
+      : '<span style="color:#444;">—</span>';
+
+    // Newsletter
+    const newsTxt = f.consentement_newsletter
+      ? '<span class="fan-news-on">✓ ON</span>'
+      : '<span class="fan-news-off">OFF</span>';
+
+    // Source
+    const sourceTxt = f.source
+      ? `<span class="fan-source-tag">${f.source}</span>`
+      : '<span style="color:#666;">-</span>';
+
+    return `
+      <tr>
+        <td title="${dateTime}">${dateInsc}</td>
+        <td>
+          <div style="cursor:pointer;" onclick="ouvrirDetailFan('${f.id}')">
+            <div style="font-weight:600; color:#fff;">${escapeHtml(f.prenom || '')} ${escapeHtml((f.nom || '').charAt(0))}.</div>
+            <div style="color:#888; font-size:10.5px;">${escapeHtml(emailCourt)}</div>
+          </div>
+        </td>
+        <td>${telTxt}</td>
+        <td>${escapeHtml(f.ville || '-')}</td>
+        <td>${f.region ? `<span class="fan-badge fan-badge-region">${regionTxt}</span>` : '<span style="color:#666;">-</span>'}</td>
+        <td>${profilBadge}</td>
+        <td style="text-align:center; font-weight:600;">${f.concerts_vus || '-'}</td>
+        <td style="text-align:center; color:#e31e24; font-weight:600;">${f.nb_favoris || 0}</td>
+        <td style="text-align:center;">${f.nb_concours_participes || 0}</td>
+        <td>${sourceTxt}</td>
+        <td style="text-align:center;">${newsTxt}</td>
+        <td style="text-align:center;"><span class="fan-score-pill ${scoreCls}">${score}</span></td>
+        <td style="text-align:center;">
+          <div class="fan-actions">
+            <button class="fan-icon-btn" onclick="envoyerMailFan('${f.email}', '${escapeHtml(f.prenom)}')" title="Envoyer email">✉</button>
+            <button class="fan-icon-btn delete" onclick="supprimerFan('${f.id}', '${escapeHtml(f.prenom)} ${escapeHtml(f.nom)}')" title="Supprimer">🗑</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
+  function escapeHtml(s) {
+    return (s || '').toString().replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[c]);
+  }
+
+  // === PAGINATION ===
+  function majPagination() {
+    const total = _filteredFans.length;
+    const totalPages = Math.max(1, Math.ceil(total / FANS_PER_PAGE));
+    const info = document.getElementById('fans-page-info');
+    const prevBtn = document.getElementById('fans-prev-btn');
+    const nextBtn = document.getElementById('fans-next-btn');
+    if (info) info.textContent = `Page ${_currentPage} / ${totalPages} (${total} fan${total > 1 ? 's' : ''})`;
+    if (prevBtn) prevBtn.disabled = (_currentPage <= 1);
+    if (nextBtn) nextBtn.disabled = (_currentPage >= totalPages);
+    if (prevBtn) prevBtn.style.opacity = (_currentPage <= 1) ? '0.4' : '1';
+    if (nextBtn) nextBtn.style.opacity = (_currentPage >= totalPages) ? '0.4' : '1';
+  }
+
+  window.changerPageFans = function(delta) {
+    const total = _filteredFans.length;
+    const totalPages = Math.max(1, Math.ceil(total / FANS_PER_PAGE));
+    _currentPage = Math.max(1, Math.min(totalPages, _currentPage + delta));
+    afficherFans();
+    // Scroll vers le haut du tableau
+    const wrap = document.getElementById('fans-table-wrap');
+    if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  // === DÉTAIL D'UN FAN ===
+  window.ouvrirDetailFan = function(id) {
+    const f = _allFans.find(x => x.id === id);
+    if (!f) return;
+    const dateInsc = f.created_at ? new Date(f.created_at).toLocaleString('fr-FR') : '-';
+    const dateNaiss = f.date_naissance ? new Date(f.date_naissance).toLocaleDateString('fr-FR') : '-';
+    const age = f.date_naissance ? Math.floor((Date.now() - new Date(f.date_naissance)) / (365.25 * 24 * 60 * 60 * 1000)) + ' ans' : '-';
+    const body = document.getElementById('fan-detail-body');
+    if (!body) return;
+
+    body.innerHTML = `
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+        ${f.avatar_url
+          ? `<div style="width:64px; height:64px; border-radius:50%; background:url('${f.avatar_url}') center/cover; border:2px solid #c9a84c;"></div>`
+          : `<div style="width:64px; height:64px; border-radius:50%; background:#c9a84c; color:#0a0a0a; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:700;">${(f.prenom?.[0] || '').toUpperCase()}${(f.nom?.[0] || '').toUpperCase()}</div>`
+        }
+        <div style="flex:1;">
+          <div style="font-size:20px; font-weight:700; color:#fff;">${escapeHtml(f.prenom)} ${escapeHtml(f.nom)}</div>
+          <div style="font-size:12px; color:#888;">${escapeHtml(f.email)}</div>
+          <div style="margin-top:6px;">
+            <span class="fan-score-pill ${f.fan_score >= 70 ? 'fan-score-hot' : (f.fan_score >= 40 ? 'fan-score-warm' : 'fan-score-cool')}">${f.fan_score || 0}/100 pts</span>
+            ${f.profil_complete ? '<span style="margin-left:8px; color:#c9a84c; font-size:11px; font-weight:600;">⭐ PROFIL COMPLET</span>' : ''}
+          </div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12.5px;">
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Téléphone</div><div>${f.telephone || '<span style="color:#666;">non renseigné</span>'}</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Date inscription</div><div>${dateInsc}</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Ville</div><div>${escapeHtml(f.ville || '-')}</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Région</div><div>${f.region || '-'}</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Date naissance</div><div>${dateNaiss} (${age})</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Genre</div><div>${f.genre === 'H' ? 'Homme' : (f.genre === 'F' ? 'Femme' : (f.genre === 'NR' ? 'Préfère ne pas répondre' : '-'))}</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Concerts TWOQ vus</div><div>${f.concerts_vus || '-'}</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Source</div><div><span class="fan-source-tag">${f.source || 'direct_app'}</span></div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Favoris</div><div style="color:#e31e24; font-weight:600;">❤ ${f.nb_favoris || 0}</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Concours participés</div><div>${f.nb_concours_participes || 0}</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Newsletter</div><div>${f.consentement_newsletter ? '<span style="color:#22c55e;">✓ Activée</span>' : '<span style="color:#666;">Désactivée</span>'}</div></div>
+        <div style="background:#0f0f0f; padding:10px; border-radius:6px;"><div style="color:#888; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Consentement RGPD</div><div>${f.consentement_rgpd ? '<span style="color:#22c55e;">✓ Accordé</span>' : '<span style="color:#e31e24;">Non</span>'}</div></div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:18px; justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="envoyerMailFan('${f.email}', '${escapeHtml(f.prenom)}')">✉ Envoyer un email</button>
+        <button class="btn btn-ghost" onclick="closeModal('modal-fan-detail')">Fermer</button>
+      </div>
+    `;
+    if (typeof openModal === 'function') openModal('modal-fan-detail');
+    else document.getElementById('modal-fan-detail').style.display = 'flex';
+  };
+
+  // === ACTIONS ===
+  window.envoyerMailFan = function(email, prenom) {
+    if (!email) return alert('Pas d\'email pour ce fan.');
+    const subject = encodeURIComponent('The World of Queen — Message');
+    const body = encodeURIComponent(`Bonjour ${prenom || ''},\n\n`);
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  };
+
+  window.supprimerFan = async function(id, nomComplet) {
+    if (!confirm(`Supprimer définitivement le fan "${nomComplet}" ?\n\nCette action est irréversible. Le fan disparaîtra de la base et il ne pourra plus se reconnecter à l'app TWOQ.`)) return;
+    try {
+      const { error } = await window._supabase.from('fans').delete().eq('id', id);
+      if (error) throw error;
+      _allFans = _allFans.filter(f => f.id !== id);
+      filtrerFans();
+      // Refresh stats
+      const { data: stats } = await window._supabase.from('fans_stats').select('*').single();
+      majStatsHeader(stats);
+    } catch (err) {
+      alert('Erreur suppression : ' + (err.message || err));
+    }
+  };
+
+  // === EXPORT CSV ===
+  window.exportFansCSV = function() {
+    if (!_allFans || _allFans.length === 0) {
+      alert('Aucun fan à exporter.');
+      return;
+    }
+    // Utilise la liste filtrée si filtre actif, sinon tous
+    const dataToExport = (_currentFilter !== 'all' || (document.getElementById('fans-search')?.value || '').trim())
+      ? _filteredFans
+      : _allFans;
+
+    if (dataToExport.length === 0) {
+      alert('Aucun fan ne correspond aux filtres actuels.');
+      return;
+    }
+
+    const headers = ['Prénom', 'Nom', 'Email', 'Téléphone', 'Ville', 'Région', 'Date naissance', 'Genre', 'Concerts vus', 'Profil complet', 'Newsletter', 'Favoris', 'Concours', 'Score', 'Source', 'Date inscription'];
+    const lines = [headers.join(';')];
+
+    dataToExport.forEach(f => {
+      const row = [
+        (f.prenom || '').replace(/;/g, ','),
+        (f.nom || '').replace(/;/g, ','),
+        (f.email || '').replace(/;/g, ','),
+        (f.telephone || '').replace(/;/g, ','),
+        (f.ville || '').replace(/;/g, ','),
+        f.region || '',
+        f.date_naissance || '',
+        f.genre || '',
+        f.concerts_vus || '',
+        f.profil_complete ? 'Oui' : 'Non',
+        f.consentement_newsletter ? 'Oui' : 'Non',
+        f.nb_favoris || 0,
+        f.nb_concours_participes || 0,
+        f.fan_score || 0,
+        f.source || '',
+        f.created_at ? new Date(f.created_at).toLocaleDateString('fr-FR') : ''
+      ];
+      lines.push(row.join(';'));
+    });
+
+    const csv = '\uFEFF' + lines.join('\n'); // BOM UTF-8 pour Excel
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fans_twoq_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  console.log('✅ Module FICHIER FANS chargé');
 })();
 </script>
 
